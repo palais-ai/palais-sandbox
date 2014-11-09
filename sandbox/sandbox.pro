@@ -81,8 +81,11 @@ macx {
         Config.path = $$DESTDIR
         Config.files += config/resources.cfg
 
-        debug:Config.files += config/debug/plugins.cfg
-        release:Config.files += config/release/plugins.cfg
+        CONFIG(release, debug|release) {
+            Config.files += config/release/plugins.cfg
+        } else {
+            Config.files += config/debug/plugins.cfg
+        }
 
         INSTALLS += package Resources Config
 
