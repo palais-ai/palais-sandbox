@@ -17,11 +17,11 @@ static QString appPath()
 {
     QString path = QCoreApplication::applicationDirPath();
     QDir dir(path);
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     dir.cdUp();
     dir.cdUp();
     dir.cdUp();
-#elif defined(Q_WS_WIN)
+#elif defined(Q_OS_WIN)
     dir.cdUp();
 #endif
     return dir.absolutePath();
@@ -51,7 +51,9 @@ Ogre::Root* OgreEngine::startEngine()
     Ogre::Root *ogreRoot = new Ogre::Root;
     Ogre::RenderSystem *renderSystem = ogreRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
 
+#if defined(Q_OS_WIN)
     renderSystem->setConfigOption("FSAA","0");
+#endif
 
     ogreRoot->setRenderSystem(renderSystem);
     ogreRoot->initialise(false);
@@ -62,7 +64,7 @@ Ogre::Root* OgreEngine::startEngine()
     params["currentGLContext"] = "true";
     params["hidden"] = "true";
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     params["macAPI"] = "cocoa";
 #endif
 

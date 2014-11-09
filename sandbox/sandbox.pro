@@ -37,7 +37,7 @@ macx {
         FrameworkFiles.files = $$OGREDIR/lib/release/Ogre.framework
         FrameworkFiles.path = Contents/Frameworks
 
-        ConfigFiles.files += config/resources.cfg config/release/plugins.cfg
+        ConfigFiles.files += config/resources.cfg config/plugins.cfg
         ConfigFiles.path = Contents/MacOS
 
         PluginFiles.files = $$OGREDIR/lib/RenderSystem_GL.dylib
