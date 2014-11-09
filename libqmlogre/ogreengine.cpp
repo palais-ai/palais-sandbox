@@ -50,6 +50,9 @@ Ogre::Root* OgreEngine::startEngine()
 
     Ogre::Root *ogreRoot = new Ogre::Root;
     Ogre::RenderSystem *renderSystem = ogreRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
+
+    renderSystem->setConfigOption("FSAA","0");
+
     ogreRoot->setRenderSystem(renderSystem);
     ogreRoot->initialise(false);
 
@@ -57,7 +60,11 @@ Ogre::Root* OgreEngine::startEngine()
 
     params["externalGLControl"] = "true";
     params["currentGLContext"] = "true";
+    params["hidden"] = "true";
+
+#ifdef Q_WS_MAC
     params["macAPI"] = "cocoa";
+#endif
 
     //Finally create our window.
     m_ogreWindow = ogreRoot->createRenderWindow("OgreWindow", 1, 1, false, &params);

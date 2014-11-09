@@ -31,6 +31,7 @@ macx {
         error(QmlOgre needs Ogre to be built. Please set the environment variable OGRE_HOME pointing to your Ogre root directory.)
     } else {
         message(Using Ogre libraries in $$OGREDIR)
+
         INCLUDEPATH += $$OGREDIR/include/OGRE
         INCLUDEPATH += $$OGREDIR/include/OGRE/RenderSystems/GL
         CONFIG(release, debug|release) {
@@ -43,9 +44,9 @@ macx {
         !isEmpty(BOOSTDIR) {
             INCLUDEPATH += $$BOOSTDIR
             CONFIG(release, debug|release) {
-                LIBS += -L$$BOOSTDIR/lib -llibboost_date_time-vc90-mt-1_42 -llibboost_thread-vc90-mt-1_42
+                LIBS += -L$$BOOSTDIR/lib -llibboost_date_time-vc100-mt-1_49 -llibboost_thread-vc100-mt-1_49
             } else {
-                LIBS += -L$$BOOSTDIR/lib -llibboost_date_time-vc90-mt-gd-1_42 -llibboost_thread-vc90-mt-gd-1_42
+                LIBS += -L$$BOOSTDIR/lib -llibboost_date_time-vc100-mt-gd-1_49 -llibboost_thread-vc100-mt-gd-1_49
             }
         }
     }

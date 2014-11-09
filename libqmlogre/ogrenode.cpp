@@ -137,7 +137,7 @@ void OgreNode::updateFBO()
                                                                     0,
                                                                     Ogre::PF_R8G8B8A8,
                                                                     Ogre::TU_RENDERTARGET, 0, false,
-                                                                    samples);
+                                                                    0);
 
     m_renderTarget = m_rttTexture->getBuffer()->getRenderTarget();
 
