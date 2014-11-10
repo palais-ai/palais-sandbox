@@ -8,11 +8,10 @@ OBJECTS_DIR = ./.obj
 MOC_DIR = ./.moc
 
 SOURCES += main.cpp \
-    cameranodeobject.cpp \
-    exampleapp.cpp
+    application.cpp
 
-HEADERS += cameranodeobject.h \
-    exampleapp.h
+HEADERS += \
+    application.h
 
 OTHER_FILES += \
     resources/example.qml

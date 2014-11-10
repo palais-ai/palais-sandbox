@@ -10,16 +10,17 @@
 #ifndef OGREENGINEITEM_H
 #define OGREENGINEITEM_H
 
+#include <OgreString.h>
 #include <QObject>
 #include <QQuickWindow>
 #include <QOpenGLContext>
-#include <Ogre.h>
 
 namespace Ogre {
 class Root;
 class RenderTexture;
 class Viewport;
 class RenderTarget;
+class RenderWindow;
 }
 
 /**

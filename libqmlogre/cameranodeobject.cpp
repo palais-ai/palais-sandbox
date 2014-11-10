@@ -33,6 +33,7 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
     QString instanceName;
     instanceName.sprintf("camera_%08p", this);
 
+    g_engineMutex.lock();
     Ogre::Camera *camera = sceneManager->createCamera(instanceName.toLatin1().data());
     camera->setNearClipDistance(1);
     camera->setFarClipDistance(99999);
@@ -43,6 +44,7 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
     m_node = sceneManager->getRootSceneNode()->createChildSceneNode();
     m_node->attachObject(camera);
     camera->move(initialPosition);
+    g_engineMutex.unlock();
 }
 
 void CameraNodeObject::updateRotation()
@@ -56,8 +58,10 @@ void CameraNodeObject::updateRotation()
 
 void CameraNodeObject::setZoom(qreal z)
 {
+    g_engineMutex.lock();
     m_zoom = z;
     m_node->resetOrientation();
     m_camera->setPosition(initialPosition * (1 / m_zoom));
+    g_engineMutex.unlock();
     updateRotation();
 }

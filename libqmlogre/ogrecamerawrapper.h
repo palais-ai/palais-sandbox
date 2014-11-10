@@ -10,7 +10,9 @@
 #ifndef OGRECAMERAWRAPPER_H
 #define OGRECAMERAWRAPPER_H
 
-#include <Ogre.h>
+namespace Ogre {
+class Camera;
+}
 
 /**
  * @brief The OgreCameraWrapper class defines an interface

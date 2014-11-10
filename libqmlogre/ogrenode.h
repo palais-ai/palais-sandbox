@@ -10,7 +10,7 @@
 #ifndef OGRENODE_H
 #define OGRENODE_H
 
-#include "Ogre.h"
+#include <OgreTexture.h>
 #include "ogreengine.h"
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGTextureMaterial>
@@ -24,6 +24,7 @@ class SceneManager;
 class RenderTexture;
 class Viewport;
 class RenderTarget;
+class RenderWindow;
 }
 
 class CameraNodeObject;

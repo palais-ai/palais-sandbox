@@ -14,9 +14,7 @@ import QtQuick.Controls 1.2
 
 Rectangle {
     id: ogre
-    width: 1024
-    height: 768
-    color: "black"
+    anchors.fill: parent;
 
     Image {
         id: back
@@ -668,9 +666,9 @@ Rectangle {
             anchors.fill: parent
             onClicked: {
                 if (fullscreen)
-                    Window.showNormal();
+                    window.showNormal();
                 else
-                    Window.showFullScreen();
+                    window.showFullScreen();
                 fullscreen = !fullscreen;
             }
         }
