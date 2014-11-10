@@ -12,6 +12,5 @@
         <file>move.gif</file>
         <file>plus.png</file>
         <file>qt-logo.png</file>
-        <file>load.gif</file>
     </qresource>
 </RCC>
