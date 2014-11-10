@@ -31,7 +31,12 @@ static QString appPath()
 
 OgreEngine::OgreEngine(QQuickWindow *window)
     : QObject(),
-      m_resources_cfg(Ogre::StringUtil::BLANK)
+      m_resources_cfg(Ogre::StringUtil::BLANK),
+      mLoadingProgress(0),
+      mInitProportion(1.0),
+      mCurrentProgress(0),
+      mNumGroupsInit(0),
+      mNumGroupsLoad(0)
 {
     qmlRegisterType<OgreItem>("Ogre", 1, 0, "OgreItem");
     qmlRegisterType<OgreEngine>("OgreEngine", 1, 0, "OgreEngine");
@@ -164,6 +169,8 @@ QSGTexture* OgreEngine::createTextureFromId(uint id, const QSize &size, QQuickWi
 
 void OgreEngine::setupResources(void)
 {
+    Ogre::ResourceGroupManager::getSingleton().addResourceGroupListener(this);
+
     // Load resource paths from config file
     Ogre::ConfigFile cf;
     cf.load(m_resources_cfg);
@@ -187,5 +194,74 @@ void OgreEngine::setupResources(void)
         }
     }
 
+    mNumGroupsInit = 1;
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
+
+void OgreEngine::resourceGroupScriptingStarted(const Ogre::String& groupName, size_t scriptCount)
+{
+    assert(mNumGroupsInit > 0 && "You stated you were not going to init "
+        "any groups, but you did! Divide by zero would follow...");
+
+    if(scriptCount == 0)
+    {
+        mCurrentProgress = 0;
+        return;
+    }
+
+    mCurrentProgress = 100 * mInitProportion / (Ogre::Real)scriptCount;
+    mCurrentProgress /= mNumGroupsInit;
+}
+
+void OgreEngine::scriptParseStarted(const Ogre::String& scriptName, bool &skipThisScript)
+{
+    ;
+}
+
+void OgreEngine::scriptParseEnded(const Ogre::String& scriptName, bool skipped)
+{
+    addLoadingProgress(mCurrentProgress);
+}
+
+void OgreEngine::resourceGroupScriptingEnded(const Ogre::String& groupName)
+{
+}
+
+void OgreEngine::resourceGroupLoadStarted(const Ogre::String& groupName, size_t resourceCount)
+{
+    assert(mNumGroupsLoad > 0 && "You stated you were not going to load "
+        "any groups, but you did! Divide by zero would follow...");
+
+    if(resourceCount == 0)
+    {
+        mCurrentProgress = 0;
+        return;
+    }
+
+    mCurrentProgress = 100 * (1-mInitProportion) / (Ogre::Real)resourceCount;
+    mCurrentProgress /= mNumGroupsLoad;
+}
+
+void OgreEngine::resourceLoadStarted(const Ogre::ResourcePtr& resource)
+{
+    ;
+}
+
+void OgreEngine::resourceLoadEnded(void)
+{
+}
+
+void OgreEngine::worldGeometryStageStarted(const Ogre::String& description)
+{
+    ;
+}
+
+void OgreEngine::worldGeometryStageEnded(void)
+{
+    addLoadingProgress(mCurrentProgress);
+}
+
+void OgreEngine::resourceGroupLoadEnded(const Ogre::String& groupName)
+{
+}
+

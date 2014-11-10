@@ -42,6 +42,8 @@ int Application::onApplicationStarted(int argc, char **argv)
     connect(this, &Application::ogreInitialized, this, &Application::onOgreIsReady);
     connect(mApplicationEngine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
 
+    mApplicationEngine->rootContext()->setContextProperty("ApplicationWrapper", this);
+
     return app.exec();
 }
 
@@ -54,6 +56,9 @@ void Application::initializeOgre()
 
     // start up Ogre
     mOgreEngine = new OgreEngine(window);
+
+    connect(mOgreEngine, &OgreEngine::onLoadingProgressChanged, this, &Application::onLoadingProgressChanged);
+
     mRoot = mOgreEngine->startEngine();
     mOgreEngine->setupResources();
 
@@ -76,8 +81,12 @@ void Application::initializeOgre()
 
 void Application::onOgreIsReady()
 {
-    // expose objects as QML globals
     mApplicationEngine->rootContext()->setContextProperty("OgreEngine", mOgreEngine);
 
     QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "onOgreIsReady");
+}
+
+qreal Application::loadingProgress() const
+{
+    return mOgreEngine ? mOgreEngine->loadingProgress() : 0;
 }

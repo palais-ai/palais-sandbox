@@ -14,14 +14,16 @@ class QQmlApplicationEngine;
 class Application : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(qreal loadingProgress READ loadingProgress NOTIFY onLoadingProgressChanged)
 public:
-    explicit Application(QObject *parent = nullptr);
+    explicit Application(QObject *parent = 0);
     ~Application();
 
     int onApplicationStarted(int argc, char **argv);
-
+    qreal loadingProgress() const;
 signals:
     void ogreInitialized();
+    void onLoadingProgressChanged(qreal progress);
 
 public slots:
     void initializeOgre();

@@ -14,6 +14,7 @@
 #include <QObject>
 #include <QQuickWindow>
 #include <QOpenGLContext>
+#include <OgreResourceGroupManager.h>
 
 namespace Ogre {
 class Root;
@@ -27,9 +28,10 @@ class RenderWindow;
  * @brief The OgreEngineItem class
  * Must only be constructed from within Qt QML rendering thread.
  */
-class OgreEngine : public QObject
+class OgreEngine : public QObject, public Ogre::ResourceGroupListener
 {
     Q_OBJECT
+    Q_PROPERTY(qreal loadingProgress READ loadingProgress NOTIFY onLoadingProgressChanged)
 
 public:
     OgreEngine(QQuickWindow *window = 0);
@@ -42,11 +44,38 @@ public:
 
     QOpenGLContext* ogreContext() const;
 
-    QSGTexture* createTextureFromId(uint id, const QSize &size, QQuickWindow::CreateTextureOptions options = QQuickWindow::CreateTextureOption(0)) const;
+    QSGTexture* createTextureFromId(uint id,
+                                    const QSize &size,
+                                    QQuickWindow::CreateTextureOptions options = QQuickWindow::CreateTextureOption(0)) const;
 
     void setupResources(void);
 
+    qreal loadingProgress() const
+    {
+        return mLoadingProgress;
+    }
+
+    // ResourceGroupListener callbacks
+    void resourceGroupScriptingStarted(const Ogre::String& groupName, size_t scriptCount);
+    void scriptParseStarted(const Ogre::String& scriptName, bool &skipThisScript);
+    void scriptParseEnded(const Ogre::String& scriptName, bool skipped);
+    void resourceGroupScriptingEnded(const Ogre::String& groupName);
+    void resourceGroupLoadStarted(const Ogre::String& groupName, size_t resourceCount);
+    void resourceLoadStarted(const Ogre::ResourcePtr& resource);
+    void resourceLoadEnded(void);
+    void worldGeometryStageStarted(const Ogre::String& description);
+    void worldGeometryStageEnded(void);
+    void resourceGroupLoadEnded(const Ogre::String& groupName);
+
+signals:
+    void onLoadingProgressChanged(qreal progress);
 private:
+    void addLoadingProgress(qreal progress)
+    {
+        mLoadingProgress += progress;
+        emit onLoadingProgressChanged(mLoadingProgress);
+    }
+
     Ogre::String m_resources_cfg;
     Ogre::RenderWindow *m_ogreWindow;
 
@@ -57,6 +86,11 @@ private:
     /** Pointer to QOpenGLContext to be restored after Ogre context. */
     QOpenGLContext* m_qtContext;
 
+    // Loading progress variables
+    qreal mLoadingProgress;
+    qreal mCurrentProgress;
+    qreal mInitProportion;
+    int mNumGroupsInit, mNumGroupsLoad;
 protected:
     void setQuickWindow(QQuickWindow *window);
 };

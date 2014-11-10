@@ -1,8 +1,10 @@
 <RCC>
     <qresource prefix="/qml">
-        <file>example.qml</file>
         <file>loading.qml</file>
         <file>main_window.qml</file>
+        <file>LoadingIndicator.qml</file>
+        <file>AppLogo.qml</file>
+        <file>Ogre3DView.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>arrow.png</file>
@@ -12,5 +14,20 @@
         <file>move.gif</file>
         <file>plus.png</file>
         <file>qt-logo.png</file>
+        <file>sandbox-bg.jpg</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file>open-sans/OpenSans-Bold.ttf</file>
+        <file>open-sans/OpenSans-BoldItalic.ttf</file>
+        <file>open-sans/OpenSans-ExtraBold.ttf</file>
+        <file>open-sans/OpenSans-ExtraBoldItalic.ttf</file>
+        <file>open-sans/OpenSans-Italic.ttf</file>
+        <file>open-sans/OpenSans-Light.ttf</file>
+        <file>open-sans/OpenSans-LightItalic.ttf</file>
+        <file>open-sans/OpenSans-Regular.ttf</file>
+        <file>open-sans/OpenSans-Semibold.ttf</file>
+        <file>open-sans/OpenSans-SemiboldItalic.ttf</file>
+        <file>Deftone-Stylus/DEFTONE.ttf</file>
+        <file>FontAwesome/fontawesome-webfont.ttf</file>
     </qresource>
 </RCC>
