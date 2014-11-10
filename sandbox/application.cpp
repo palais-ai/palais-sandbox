@@ -12,10 +12,10 @@
 
 Application::Application(QObject *parent) :
     QObject(parent),
-    mOgreEngine(nullptr),
-    mSceneManager(nullptr),
-    mRoot(nullptr),
-    mApplicationEngine(nullptr)
+    mOgreEngine(0),
+    mSceneManager(0),
+    mRoot(0),
+    mApplicationEngine(0)
 {
     ;
 }
