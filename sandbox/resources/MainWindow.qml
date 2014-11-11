@@ -9,6 +9,7 @@ ApplicationWindow {
     height: 660
     visible: true
     title: "AI Sandbox"
+    color: "black"
 
     minimumWidth: 1024
     minimumHeight: 660
@@ -49,8 +50,10 @@ ApplicationWindow {
 
     Item {
         id: colors
-        property color primaryColor: "#4affff"
-        property color secondaryColor: "#4685e5"
+        property color primaryColor: "#0355a9"
+        property color primaryColorLighter: "#4685e5"
+        property color secondaryColor: "#467b24"
+        property color secondaryColorLighter: "#7cef09"
         property color dimmedTextColor: "#3Dffffff"
         property color slightlyDimmedTextColor: "#CCffffff"
     }
@@ -58,6 +61,14 @@ ApplicationWindow {
     FontLoader {
         id: openSans
         source: "qrc:/fonts/open-sans/OpenSans-Regular.ttf"
+    }
+
+    FontLoader {
+        source: "qrc:/fonts/open-sans/OpenSans-Bold.ttf"
+    }
+
+    FontLoader {
+        source: "qrc:/fonts/open-sans/OpenSans-Semibold.ttf"
     }
 
     FontLoader {

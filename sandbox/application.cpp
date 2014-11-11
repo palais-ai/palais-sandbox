@@ -44,7 +44,7 @@ int Application::onApplicationStarted(int argc, char **argv)
 
     // start Ogre once we are in the rendering thread (Ogre must live in the rendering thread)
     connect(window, &QQuickWindow::frameSwapped, this, &Application::initializeOgre, Qt::DirectConnection);
-    connect(this, &Application::ogreInitialized, this, &Application::onOgreIsReady);
+    connect(this, &Application::ogreInitialized, this, &Application::onOgreIsReady, Qt::DirectConnection);
     connect(mApplicationEngine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
 
     return app.exec();

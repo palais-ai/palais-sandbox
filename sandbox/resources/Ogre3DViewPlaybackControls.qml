@@ -28,11 +28,12 @@ RowLayout {
     }
 
     ColumnLayout {
-        spacing: 0
+        spacing: 6
 
         Text {
             text: "speed: " + speedSlider.value.toFixed(1)
             font.family: openSans.name;
+            font.weight: Font.DemiBold
             color: colors.dimmedTextColor
             Layout.alignment: Layout.Center
             renderType: Text.NativeRendering
@@ -59,8 +60,10 @@ RowLayout {
         function toggleFullscreen() {
             if(isFullscreen) {
                 appWindow.showNormal()
+                unicode = "\uf065"
             } else {
                 appWindow.showFullScreen()
+                unicode = "\uf066"
             }
             isFullscreen = !isFullscreen;
         }

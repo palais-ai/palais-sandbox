@@ -7,6 +7,9 @@
         <file>FAIconButton.qml</file>
         <file>ControlArea.qml</file>
         <file>Ogre3DViewPlaybackControls.qml</file>
+        <file>ActorTableCell.qml</file>
+        <file>ActorTableHeader.qml</file>
+        <file>TextShadow.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>sandbox-bg.jpg</file>

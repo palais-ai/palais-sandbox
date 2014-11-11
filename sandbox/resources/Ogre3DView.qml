@@ -63,7 +63,7 @@ Rectangle {
             id: playbackControls
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: parent.height * 0.15
+            anchors.bottomMargin: parent.height * 0.10
         }
     }
 }

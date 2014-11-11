@@ -31,8 +31,6 @@ OgreNode::OgreNode()
     , m_ogreEngineItem(0)
     , m_camera(0)
     , m_renderTarget(0)
-    , m_viewport(0)
-    , m_window(0)
     , m_ogreFboId(0)
     , m_dirtyFBO(false)
 {
@@ -95,11 +93,10 @@ GLuint OgreNode::getOgreFboId()
 
 void OgreNode::preprocess()
 {
+    g_engineMutex.lock();
+
     if (!m_renderTarget)
         return;
-
-
-    g_engineMutex.lock();
 
     activateOgreContext();
     m_renderTarget->update();

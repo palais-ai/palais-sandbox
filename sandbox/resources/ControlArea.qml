@@ -10,27 +10,40 @@ Image {
         id: model
 
         ListElement {
-            name: "Bill Smith"
-            number: "555 3264"
+            name: "Actor 1"
         }
         ListElement {
-            name: "John Brown"
-            number: "555 8426"
+            name: "Actor 2"
         }
         ListElement {
-            name: "Sam Wise"
-            number: "555 0473"
+            name: "Actor 3"
+        }
+        ListElement {
+            name: "Actor 4"
+        }
+        ListElement {
+            name: "Actor 5"
+        }
+        ListElement {
+            name: "Actor 6"
+        }
+        ListElement {
+            name: "Actor 7"
         }
     }
 
     ListView {
         width: parent.width;
-        height: childrenRect.height
-
+        height: parent.height
         model: model
-        delegate: Text {
+
+        header: ActorTableHeader {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: name + ": " + number
+        }
+
+        delegate: ActorTableCell {
+            width: parent.width
+            height: 34
         }
     }
 }

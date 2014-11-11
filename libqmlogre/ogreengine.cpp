@@ -15,20 +15,6 @@
 #include <QOpenGLFunctions>
 #include <QDir>
 
-static QString appPath()
-{
-    QString path = QCoreApplication::applicationDirPath();
-    QDir dir(path);
-#ifdef Q_OS_MAC
-    dir.cdUp();
-    dir.cdUp();
-    dir.cdUp();
-#elif defined(Q_OS_WIN)
-    dir.cdUp();
-#endif
-    return dir.absolutePath();
-}
-
 OgreEngine::OgreEngine(QQuickWindow *window)
     : QObject(),
       m_resources_cfg(Ogre::StringUtil::BLANK),
