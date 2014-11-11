@@ -40,6 +40,8 @@ int Application::onApplicationStarted(int argc, char **argv)
 
     QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
 
+    mApplicationEngine->rootContext()->setContextProperty("ApplicationWindow", window);
+
     // start Ogre once we are in the rendering thread (Ogre must live in the rendering thread)
     connect(window, &QQuickWindow::frameSwapped, this, &Application::initializeOgre, Qt::DirectConnection);
     connect(this, &Application::ogreInitialized, this, &Application::onOgreIsReady);

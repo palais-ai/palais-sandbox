@@ -6,6 +6,7 @@
         <file>Ogre3DViewControls.qml</file>
         <file>FAIconButton.qml</file>
         <file>ControlArea.qml</file>
+        <file>Ogre3DViewPlaybackControls.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>sandbox-bg.jpg</file>

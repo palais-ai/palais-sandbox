@@ -50,6 +50,21 @@ Rectangle {
             anchors.topMargin: 14
             anchors.leftMargin: 14
         }
+
+        Rectangle {
+            color: "#80000000"
+            width: playbackControls.width + 48
+            height: playbackControls.height + 24
+            radius: 3
+            anchors.centerIn: playbackControls
+        }
+
+        Ogre3DViewPlaybackControls {
+            id: playbackControls
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: parent.height * 0.15
+        }
     }
 }
 

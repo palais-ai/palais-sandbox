@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
+import QtQuick.Dialogs 1.2
 
 ApplicationWindow {
     id: appWindow
@@ -50,6 +51,8 @@ ApplicationWindow {
         id: colors
         property color primaryColor: "#4affff"
         property color secondaryColor: "#4685e5"
+        property color dimmedTextColor: "#3Dffffff"
+        property color slightlyDimmedTextColor: "#CCffffff"
     }
 
     FontLoader {
@@ -63,24 +66,34 @@ ApplicationWindow {
     }
 
 
-    RowLayout {
+    Item {
         anchors.fill: parent
-        spacing: 0
+        //spacing: 0
 
         ControlArea {
             id: controlArea
-            Layout.fillHeight: true
-            width: 215
+            height: parent.height
+            width: 210
 
-            Behavior on width { NumberAnimation { duration: 1000 } }
+            Behavior on width { NumberAnimation {  id:widthAnimation; duration: 180 } }
         }
 
         Loader {
             id: mainLoader
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            height: parent.height
+            width: parent.width - controlArea.width
+            anchors.left: controlArea.right
+            anchors.top: parent.top
+            focus: true
             source: "loading.qml"
         }
+    }
+
+    Dialog {
+        id: testDialog
+        visible: false
+        title: "Blue sky dialog"
+        standardButtons: StandardButton.Save | StandardButton.Cancel
     }
 
     function onOgreIsReady() {
@@ -89,3 +102,4 @@ ApplicationWindow {
 
     onClosing: Qt.quit()
 }
+

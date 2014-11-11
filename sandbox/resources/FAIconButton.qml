@@ -5,16 +5,17 @@ Text {
 
     signal pressed()
     property string unicode: "\uf00e"
+    property real iconSize: 12
 
     font.family: fontAwesome.name
-    font.pointSize: 12
+    font.pointSize: iconSize
     text: unicode
-    color: "#3Dffffff"
+    color: colors.dimmedTextColor
     renderType: Text.NativeRendering
 
     states: State {
         name: "HOVER"
-        PropertyChanges { target: icon; color: "#CCffffff"}
+        PropertyChanges { target: icon; color: colors.slightlyDimmedTextColor }
     }
 
     MouseArea {

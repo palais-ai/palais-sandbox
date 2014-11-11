@@ -63,6 +63,11 @@ Ogre::Root* OgreEngine::startEngine()
     renderSystem->setConfigOption("FSAA","0");
 #endif
 
+    if(!renderSystem)
+    {
+        throw "render system not found.";
+    }
+
     ogreRoot->setRenderSystem(renderSystem);
     ogreRoot->initialise(false);
 
@@ -105,10 +110,10 @@ void OgreEngine::setQuickWindow(QQuickWindow *window)
     m_qtContext = QOpenGLContext::currentContext();
 
     // create a new shared OpenGL context to be used exclusively by Ogre
-    /*m_ogreContext = new QOpenGLContext();
+    m_ogreContext = new QOpenGLContext();
     m_ogreContext->setFormat(m_quickWindow->requestedFormat());
     m_ogreContext->setShareContext(m_qtContext);
-    m_ogreContext->create();*/
+    m_ogreContext->create();
 
     m_ogreContext = m_qtContext;
 }
