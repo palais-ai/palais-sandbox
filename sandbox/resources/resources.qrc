@@ -1,20 +1,15 @@
 <RCC>
     <qresource prefix="/qml">
         <file>loading.qml</file>
-        <file>main_window.qml</file>
-        <file>LoadingIndicator.qml</file>
-        <file>AppLogo.qml</file>
+        <file>MainWindow.qml</file>
         <file>Ogre3DView.qml</file>
+        <file>Ogre3DViewControls.qml</file>
+        <file>FAIconButton.qml</file>
+        <file>ControlArea.qml</file>
     </qresource>
     <qresource prefix="/images">
-        <file>arrow.png</file>
-        <file>circle.png</file>
-        <file>GrassandSky.png</file>
-        <file>minus.png</file>
-        <file>move.gif</file>
-        <file>plus.png</file>
-        <file>qt-logo.png</file>
         <file>sandbox-bg.jpg</file>
+        <file>controls-bg.jpg</file>
     </qresource>
     <qresource prefix="/fonts">
         <file>open-sans/OpenSans-Bold.ttf</file>

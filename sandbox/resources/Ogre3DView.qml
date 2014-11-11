@@ -43,6 +43,13 @@ Rectangle {
             }
             onReleased: { prevX = -1; prevY = -1 }
         }
+
+        Ogre3DViewControls {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin: 14
+            anchors.leftMargin: 14
+        }
     }
 }
 

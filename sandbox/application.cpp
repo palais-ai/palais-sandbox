@@ -32,8 +32,11 @@ int Application::onApplicationStarted(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
-    QQmlApplicationEngine engine(QUrl("qrc:/qml/main_window.qml"));
+    QQmlApplicationEngine engine;
     mApplicationEngine = &engine;
+
+    mApplicationEngine->rootContext()->setContextProperty("ApplicationWrapper", this);
+    mApplicationEngine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
     QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
 
@@ -41,8 +44,6 @@ int Application::onApplicationStarted(int argc, char **argv)
     connect(window, &QQuickWindow::frameSwapped, this, &Application::initializeOgre, Qt::DirectConnection);
     connect(this, &Application::ogreInitialized, this, &Application::onOgreIsReady);
     connect(mApplicationEngine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
-
-    mApplicationEngine->rootContext()->setContextProperty("ApplicationWrapper", this);
 
     return app.exec();
 }
