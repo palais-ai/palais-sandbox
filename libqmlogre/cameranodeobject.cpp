@@ -91,13 +91,13 @@ void CameraNodeObject::fitToContain(Ogre::SceneNode* node)
 
         if(allVisible)
         {
-            child->showBoundingBox(true);
+            //child->showBoundingBox(true);
         }
     }
 
     // Scale view to fit
     mInitialPosition = Ogre::Vector3(1, 1, 0);
-    mInitialPosition = mInitialPosition.normalise() * ((boundingRadius / 2.f) / tan(camera->getFOVy().valueRadians() / 2.f));
+    mInitialPosition = mInitialPosition.normalise() * ((boundingRadius / 2.f) / tan(m_camera->getFOVy().valueRadians() / 2.f));
 
     // Reset zoom level
     m_zoom = 1;

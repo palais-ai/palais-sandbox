@@ -1,4 +1,4 @@
-<scene export_time="1415773263.527451" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1415773182.569134" >
+<scene export_time="1415813574.244124" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1415813274.178885" >
   <nodes >
     <node name="Cube.004" >
       <position x="1.692505" y="0.500000" z="0.929147" />
@@ -803,13 +803,6 @@
         <sensors />
         <actuators />
       </game>
-      <light name="Point.001" powerScale="1.0" shadow="true" type="point" >
-        <position x="8.018194" y="13.239445" z="-7.355185" />
-        <lightAttenuation constant="1.0" linear="0.04" quadratic="0.0" range="5000" />
-        <colourDiffuse b="1.0" g="1.0" r="1.0" />
-        <colourSpecular b="1.0" g="1.0" r="1.0" />
-        <colourShadow b="1.0" g="1.0" r="1.0" />
-      </light>
     </node>
   </nodes>
   <externals >

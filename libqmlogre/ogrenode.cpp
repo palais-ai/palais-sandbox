@@ -125,7 +125,7 @@ void OgreNode::updateFBO()
     if (m_renderTarget)
         Ogre::TextureManager::getSingleton().remove("RttTex");
 
-    int samples = m_ogreEngineItem->ogreContext()->format().samples();
+    int samples = m_ogreEngineItem->ogreContext()->format().samples(); //< Adding sampling causes context crashes on windows 7 VM.
     m_rttTexture = Ogre::TextureManager::getSingleton().createManual("RttTex",
                                                                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                                     Ogre::TEX_TYPE_2D,
@@ -143,7 +143,7 @@ void OgreNode::updateFBO()
 
     m_renderTarget->addViewport(m_camera);
     m_renderTarget->getViewport(0)->setClearEveryFrame(true);
-    m_renderTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
+    m_renderTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue(0.5, 0.5, 0.5));
     m_renderTarget->getViewport(0)->setOverlaysEnabled(false);
 
     QSGGeometry::updateTexturedRectGeometry(&m_geometry,
