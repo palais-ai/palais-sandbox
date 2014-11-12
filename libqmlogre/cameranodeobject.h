@@ -11,6 +11,7 @@
 #define CAMERANODEOBJECT_H
 
 #include <QObject>
+#include <OgreVector3.h>
 
 #include "ogrecamerawrapper.h"
 
@@ -46,9 +47,12 @@ public:
     void setZoom(qreal z);
     void setWireframeMode(bool enabled);
     bool getWireframeMode() const;
+    void fitToContain(Ogre::SceneNode* node);
 
 private:
     void updateRotation();
+
+    Ogre::Vector3 mInitialPosition;
 
     Ogre::SceneNode *m_node;
     Ogre::Camera *m_camera;

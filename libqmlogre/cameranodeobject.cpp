@@ -16,14 +16,14 @@
 #include <OgreAxisAlignedBox.h>
 
 #include <QDebug>
-
-static const Ogre::Vector3 initialPosition(0, 0, 300);
+#include <cmath>
 
 extern QMutex g_engineMutex;
 
 CameraNodeObject::CameraNodeObject(QObject *parent) :
     QObject(parent),
     OgreCameraWrapper(),
+    mInitialPosition(0,0,0),
     m_camera(0),
     m_yaw(0),
     m_pitch(0),
@@ -40,24 +40,68 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
     camera->setNearClipDistance(1);
     camera->setFarClipDistance(99999);
     camera->setAspectRatio(1);
-    camera->setAutoTracking(true, sceneManager->getRootSceneNode());
 
     m_camera = camera;
     m_node = sceneManager->getRootSceneNode()->createChildSceneNode();
     m_node->attachObject(camera);
-    camera->move(initialPosition);
 
-    Ogre::SceneNode::ChildNodeIterator children = sceneManager->getRootSceneNode()->getChildIterator();
+    fitToContain(sceneManager->getRootSceneNode());
+
+    g_engineMutex.unlock();
+}
+
+void CameraNodeObject::fitToContain(Ogre::SceneNode* node)
+{
+    if(!node)
+    {
+        return;
+    }
+
+    m_camera->setAutoTracking(true, node);
+
+    Ogre::SceneNode::ChildNodeIterator children = node->getChildIterator();
     Ogre::AxisAlignedBox aabb;
+
+    // Compute the bounding radius of a sphere at origin containing all child objects
+    Ogre::Real boundingRadius = 0;
     while (children.hasMoreElements())
     {
         Ogre::SceneNode* child = static_cast<Ogre::SceneNode*>(children.getNext());
+        bool allVisible = true;
 
-        aabb.merge(child->_getWorldAABB());
-        child->showBoundingBox(true);
+        Ogre::SceneNode::ObjectIterator objects = child->getAttachedObjectIterator();
+
+        while (objects.hasMoreElements())
+        {
+            Ogre::MovableObject* object = static_cast<Ogre::MovableObject*>(objects.getNext());
+            if(object->getVisible())
+            {
+                aabb.merge(object->getWorldBoundingBox());
+                const Ogre::Real radius = object->getBoundingRadius();
+                if(radius > boundingRadius)
+                {
+                    boundingRadius = radius;
+                }
+            }
+            else
+            {
+                allVisible = false;
+            }
+        }
+
+        if(allVisible)
+        {
+            child->showBoundingBox(true);
+        }
     }
 
-    g_engineMutex.unlock();
+    // Scale view to fit
+    mInitialPosition = Ogre::Vector3(1, 1, 0);
+    mInitialPosition = mInitialPosition.normalise() * ((boundingRadius / 2.f) / tan(camera->getFOVy().valueRadians() / 2.f));
+
+    // Reset zoom level
+    m_zoom = 1;
+    m_camera->move(mInitialPosition);
 }
 
 void CameraNodeObject::updateRotation()
@@ -74,7 +118,7 @@ void CameraNodeObject::setZoom(qreal z)
     g_engineMutex.lock();
     m_zoom = z;
     m_node->resetOrientation();
-    m_camera->setPosition(initialPosition * (1 / m_zoom));
+    m_camera->setPosition(mInitialPosition * (1 / m_zoom));
     g_engineMutex.unlock();
     updateRotation();
 }
