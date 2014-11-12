@@ -6,6 +6,8 @@
 #include "../libqmlogre/ogreitem.h"
 #include "../libqmlogre/ogreengine.h"
 
+#include "../libdotsceneloader/DotSceneLoader.h"
+
 #include <QCoreApplication>
 #include <QtQml/QQmlContext>
 #include <Ogre.h>
@@ -68,14 +70,19 @@ void Application::initializeOgre()
     // set up Ogre scene
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, "mySceneManager");
 
-    mSceneManager->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.3));
-    mSceneManager->createLight("myLight")->setPosition(20, 80, 50);
+    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+
+    //mSceneManager->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.3));
+    //mSceneManager->createLight("myLight")->setPosition(20, 80, 50);
 
     // Resources with textures must be loaded within Ogre's GL context
     mOgreEngine->activateOgreContext();
 
     mSceneManager->setSkyBox(true, "SpaceSkyBox", 10000);
-    mSceneManager->getRootSceneNode()->attachObject(mSceneManager->createEntity("Head", "ogrehead.mesh"));
+    //mSceneManager->getRootSceneNode()->attachObject(mSceneManager->createEntity("Head", "ogrehead.mesh"));
+
+    Ogre::DotSceneLoader dsloader;
+    dsloader.parseDotScene("capturetheflag.scene", "General", mSceneManager);
 
     mOgreEngine->doneOgreContext();
 

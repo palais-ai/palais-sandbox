@@ -14,7 +14,7 @@ HEADERS += \
     application.h
 
 OTHER_FILES += \
-    resources/example.qml
+    config/resources.cfg
 
 macx {
     OGREDIR = $$(OGRE_HOME)
@@ -33,16 +33,16 @@ macx {
 #            LIBS += -L$$BOOSTDIR/lib -lboost_date_time-xgcc40-mt-1_42 -lboost_thread-xgcc40-mt-1_42
         }
 
-        FrameworkFiles.files = $$OGREDIR/lib/release/Ogre.framework
+        FrameworkFiles.files += $$OGREDIR/lib/release/Ogre.framework
         FrameworkFiles.path = Contents/Frameworks
 
         ConfigFiles.files += config/resources.cfg config/plugins.cfg
         ConfigFiles.path = Contents/MacOS
 
-        PluginFiles.files = $$OGREDIR/lib/RenderSystem_GL.dylib
+        PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib
         PluginFiles.path = Contents/Plugins
 
-        MediaFiles.files = media/SdkTrays.zip media/data.zip
+        MediaFiles.files += $$files(media/*)
         MediaFiles.path = Contents/MacOS/Resources
 
         QMAKE_BUNDLE_DATA += FrameworkFiles ConfigFiles PluginFiles MediaFiles
@@ -74,7 +74,7 @@ macx {
 
         # Copy all resources to build folder
         Resources.path = $$DESTDIR/Resources
-        Resources.files = media/*.zip
+        Resources.files += media/*.zip
 
         # Copy all config files to build folder
         Config.path = $$DESTDIR
@@ -122,3 +122,16 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libq
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/release/qmlogre.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/debug/qmlogre.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/libqmlogre.a
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libdotsceneloader/release/ -ldotsceneloader
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libdotsceneloader/debug/ -ldotsceneloader
+else:unix: LIBS += -L$$OUT_PWD/../libdotsceneloader/ -ldotsceneloader
+
+INCLUDEPATH += $$PWD/../libdotsceneloader
+DEPENDPATH += $$PWD/../libdotsceneloader
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/release/libdotsceneloader.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/debug/libdotsceneloader.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/release/dotsceneloader.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/debug/dotsceneloader.lib
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/libdotsceneloader.a

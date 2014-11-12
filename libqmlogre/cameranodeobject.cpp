@@ -11,7 +11,9 @@
 
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>
+#include <OgreNode.h>
 #include <OgreCamera.h>
+#include <OgreAxisAlignedBox.h>
 
 #include <QDebug>
 
@@ -44,6 +46,17 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
     m_node = sceneManager->getRootSceneNode()->createChildSceneNode();
     m_node->attachObject(camera);
     camera->move(initialPosition);
+
+    Ogre::SceneNode::ChildNodeIterator children = sceneManager->getRootSceneNode()->getChildIterator();
+    Ogre::AxisAlignedBox aabb;
+    while (children.hasMoreElements())
+    {
+        Ogre::SceneNode* child = static_cast<Ogre::SceneNode*>(children.getNext());
+
+        aabb.merge(child->_getWorldAABB());
+        child->showBoundingBox(true);
+    }
+
     g_engineMutex.unlock();
 }
 
@@ -64,4 +77,24 @@ void CameraNodeObject::setZoom(qreal z)
     m_camera->setPosition(initialPosition * (1 / m_zoom));
     g_engineMutex.unlock();
     updateRotation();
+}
+
+void CameraNodeObject::setWireframeMode(bool enabled)
+{
+    if(m_camera)
+    {
+        m_camera->setPolygonMode(enabled ? Ogre::PM_WIREFRAME : Ogre::PM_SOLID);
+    }
+}
+
+bool CameraNodeObject::getWireframeMode() const
+{
+    if(m_camera)
+    {
+        return m_camera->getPolygonMode() == Ogre::PM_WIREFRAME;
+    }
+    else
+    {
+        return false;
+    }
 }

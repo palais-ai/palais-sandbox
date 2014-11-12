@@ -7,6 +7,7 @@ Rectangle {
     property color cellColorLighter: colors.primaryColorLighter
     signal pressed()
 
+    opacity: 0.8
     gradient: Gradient {
              GradientStop { position: 1.0; color: cellColor }
              GradientStop { position: 0.0; color: cellColorLighter }
