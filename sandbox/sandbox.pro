@@ -8,10 +8,16 @@ OBJECTS_DIR = ./.obj
 MOC_DIR = ./.moc
 
 SOURCES += main.cpp \
-    application.cpp
+    application.cpp \
+    scenemanager.cpp \
+    sceneloader.cpp \
+    scene.cpp
 
 HEADERS += \
-    application.h
+    application.h \
+    scenemanager.h \
+    sceneloader.h \
+    scene.h
 
 OTHER_FILES += \
     config/resources.cfg

@@ -1,5 +1,21 @@
-<scene export_time="1415813574.244124" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1415813274.178885" >
+<scene export_time="1416009374.954421" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1416009216.467025" >
   <nodes >
+    <node name="Sun" >
+      <position x="-0.082551" y="8.783691" z="-0.269227" />
+      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
+      <scale x="1.000000" y="1.000000" z="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <light name="Sun" powerScale="1.0" type="directional" >
+        <position x="-0.082551" y="8.783691" z="-0.269227" />
+        <lightAttenuation constant="1.0" linear="0.04" quadratic="0.0" range="5000" />
+        <direction x="0.0" y="-1.0" z="0.0" />
+        <colourDiffuse b="1.0" g="1.0" r="1.0" />
+        <colourSpecular b="1.0" g="1.0" r="1.0" />
+      </light>
+    </node>
     <node name="Cube.004" >
       <position x="1.692505" y="0.500000" z="0.929147" />
       <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
@@ -748,7 +764,7 @@
         <sensors />
         <actuators />
       </game>
-      <light name="Point" powerScale="1.0" shadow="true" type="point" >
+      <light name="Point" powerScale="10.0" shadow="true" type="point" >
         <position x="-7.465674" y="13.239445" z="5.648348" />
         <lightAttenuation constant="1.0" linear="0.04" quadratic="0.0" range="5000" />
         <colourDiffuse b="1.0" g="1.0" r="1.0" />
@@ -757,15 +773,15 @@
       </light>
     </node>
     <node name="Area" >
-      <position x="-0.036093" y="15.881546" z="0.104509" />
+      <position x="-0.036093" y="15.881546" z="0.247428" />
       <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
       <scale x="1.000000" y="1.000000" z="1.000000" />
       <game >
         <sensors />
         <actuators />
       </game>
-      <light name="Area" powerScale="0.5" shadow="true" type="directional" >
-        <position x="-0.036093" y="15.881546" z="0.104509" />
+      <light name="Area" powerScale="10.0" shadow="true" type="directional" >
+        <position x="-0.036093" y="15.881546" z="0.247428" />
         <lightAttenuation constant="1.0" linear="0.06666666666666667" quadratic="0.0" range="5000" />
         <direction x="0.0" y="-1.0" z="0.0" />
         <colourDiffuse b="1.0" g="1.0" r="1.0" />
@@ -803,6 +819,12 @@
         <sensors />
         <actuators />
       </game>
+      <light name="Point.001" powerScale="10.0" shadow="true" type="point" >
+        <position x="8.018194" y="13.239445" z="-7.355185" />
+        <lightAttenuation constant="1.0" linear="0.02857142857142857" quadratic="0.0" range="5000" />
+        <colourDiffuse b="1.0" g="1.0" r="1.0" />
+        <colourShadow b="1.0" g="1.0" r="1.0" />
+      </light>
     </node>
   </nodes>
   <externals >
@@ -815,7 +837,7 @@
   </externals>
   <environment >
     <colourDiffuse b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
-    <colourBackground b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
     <colourAmbient b="0.0" g="0.0" r="0.0" />
+    <colourBackground b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
   </environment>
 </scene>

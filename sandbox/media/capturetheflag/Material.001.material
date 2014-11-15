@@ -9,8 +9,8 @@ material Material.001
         pass Material.001
         {
             ambient 0.800000011920929 0.800000011920929 0.800000011920929 1.0
-            diffuse 0.6400000190734865 0.6400000190734865 0.6400000190734865 1.0
-            specular 0.5 0.5 0.5 1.0 12.5
+            diffuse 0.800000011920929 0.800000011920929 0.800000011920929 1.0
+            specular 1.0 1.0 1.0 1.0 12.5
             emissive 0.0 0.0 0.0 1.0
 
             alpha_to_coverage off
@@ -49,14 +49,7 @@ material Material.001
                 texture Lightmap.png
                 tex_address_mode wrap
                 scale 1.0 1.0
-                colour_op_ex add_signed src_texture src_current
-            }
-            texture_unit 
-            {
-                texture ssaomap.png
-                tex_address_mode wrap
-                scale 1.0 1.0
-                colour_op_ex add_signed src_texture src_current
+                colour_op modulate
             }
         }
     }

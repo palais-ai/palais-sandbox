@@ -4,8 +4,8 @@
 #include <QObject>
 
 namespace Ogre {
-    class SceneManager;
-    class Root;
+class SceneManager;
+class Root;
 }
 
 class OgreEngine;

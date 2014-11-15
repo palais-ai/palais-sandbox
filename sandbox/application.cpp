@@ -68,7 +68,7 @@ void Application::initializeOgre()
 
     // set up Ogre scene
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, "mySceneManager");
-    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
 
     // Resources with textures must be loaded within Ogre's GL context
     mOgreEngine->activateOgreContext();
