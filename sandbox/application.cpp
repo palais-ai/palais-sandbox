@@ -15,8 +15,8 @@ Application::Application(QObject *parent) :
     QObject(parent),
     mOgreEngine(0),
     mSceneManager(0),
-    mRoot(0),
-    mApplicationEngine(0)
+    mApplicationEngine(0),
+    mRoot(0)
 {
     ;
 }

@@ -10,7 +10,7 @@ SceneManager::SceneManager() :
     mSceneStarted(false),
     mSimulationSpeedFactor(1)
 {
-    startTimer(100.f / sMaximumTickRate);
+    startTimer(1000.f / sMaximumTickRate);
 }
 
 Scene* SceneManager::loadScene(const QString& sceneFile, const QString& logicFile)
