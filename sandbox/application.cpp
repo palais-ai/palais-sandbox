@@ -1,11 +1,11 @@
 #include "application.h"
+#include "scenemanager.h"
 
 #include <QtGui/QGuiApplication>
 #include <QQmlApplicationEngine>
 
 #include "../libqmlogre/ogreitem.h"
 #include "../libqmlogre/ogreengine.h"
-#include "../libdotsceneloader/DotSceneLoader.h"
 
 #include <QCoreApplication>
 #include <QtQml/QQmlContext>
@@ -13,10 +13,11 @@
 
 Application::Application(QObject *parent) :
     QObject(parent),
-    mOgreEngine(0),
-    mSceneManager(0),
-    mApplicationEngine(0),
-    mRoot(0)
+    mOgreEngine(NULL),
+    mSceneManager(NULL),
+    mApplicationEngine(NULL),
+    mScenarioManager(NULL),
+    mRoot(NULL)
 {
     ;
 }
@@ -26,6 +27,16 @@ Application::~Application()
     if (mSceneManager)
     {
         mRoot->destroySceneManager(mSceneManager);
+    }
+
+    if(mRoot)
+    {
+        delete mRoot;
+    }
+
+    if(mOgreEngine)
+    {
+        delete mOgreEngine;
     }
 }
 
@@ -70,13 +81,8 @@ void Application::initializeOgre()
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, "mySceneManager");
     mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
 
-    // Resources with textures must be loaded within Ogre's GL context
-    mOgreEngine->activateOgreContext();
-
-    Ogre::DotSceneLoader dsloader;
-    dsloader.parseDotScene("capturetheflag.scene", "General", mSceneManager);
-
-    mOgreEngine->doneOgreContext();
+    mScenarioManager = new SceneManager(mOgreEngine, mSceneManager);
+    mScenarioManager->loadScene("capturetheflag.scene", "ctf.js");
 
     emit(ogreInitialized());
 }

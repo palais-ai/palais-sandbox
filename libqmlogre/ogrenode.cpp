@@ -20,9 +20,6 @@
 #include <QSurfaceFormat>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
-#include <QMutex>
-
-QMutex g_engineMutex;
 
 OgreNode::OgreNode()
     : QSGGeometryNode()
@@ -78,7 +75,9 @@ void OgreNode::activateOgreContext()
 GLuint OgreNode::getOgreFboId()
 {
     if (!m_renderTarget)
+    {
         return 0;
+    }
 
     Ogre::GLFrameBufferObject *ogreFbo = 0;
     m_renderTarget->getCustomAttribute("FBO", &ogreFbo);
@@ -93,7 +92,7 @@ GLuint OgreNode::getOgreFboId()
 
 void OgreNode::preprocess()
 {
-    g_engineMutex.lock();
+    m_ogreEngineItem->lockEngine();
 
     if (!m_renderTarget)
         return;
@@ -102,13 +101,13 @@ void OgreNode::preprocess()
     m_renderTarget->update();
     doneOgreContext();
 
-    g_engineMutex.unlock();
+    m_ogreEngineItem->unlockEngine();
 }
 
 void OgreNode::update()
 {
     if (true) {
-        g_engineMutex.lock();
+        m_ogreEngineItem->lockEngine();
 
         activateOgreContext();
         updateFBO();
@@ -116,14 +115,16 @@ void OgreNode::update()
         m_dirtyFBO = false;
         doneOgreContext();
 
-        g_engineMutex.unlock();
+        m_ogreEngineItem->unlockEngine();
     }
 }
 
 void OgreNode::updateFBO()
 {
     if (m_renderTarget)
+    {
         Ogre::TextureManager::getSingleton().remove("RttTex");
+    }
 
     int samples = m_ogreEngineItem->ogreContext()->format().samples(); //< Adding sampling causes context crashes on windows 7 VM.
     m_rttTexture = Ogre::TextureManager::getSingleton().createManual("RttTex",

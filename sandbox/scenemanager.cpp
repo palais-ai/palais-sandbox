@@ -2,10 +2,15 @@
 #include "sceneloader.h"
 #include "scene.h"
 
+#include <QtGlobal>
 #include <QTimerEvent>
 #include <QTime>
 
-SceneManager::SceneManager() :
+#include <OgreSceneManager.h>
+
+SceneManager::SceneManager(OgreEngine* engine, Ogre::SceneManager* sceneManager) :
+    mOgreEngine(engine),
+    mSceneManager(sceneManager),
     mCurrentScene(NULL),
     mSceneStarted(false),
     mSimulationSpeedFactor(1)
@@ -15,7 +20,15 @@ SceneManager::SceneManager() :
 
 Scene* SceneManager::loadScene(const QString& sceneFile, const QString& logicFile)
 {
-    return SceneLoader::loadScene(sceneFile, logicFile);
+    if(mOgreEngine && mSceneManager)
+    {
+        return SceneLoader::loadScene(mOgreEngine, mSceneManager, sceneFile, logicFile);
+    }
+    else
+    {
+        qFatal("The ogre engine or the scene manager have to be instantiated to be able to load scenes.");
+        return NULL;
+    }
 }
 
 void SceneManager::pause()
@@ -47,9 +60,14 @@ void SceneManager::setSimulationSpeed(float speedFactor)
     {
         mSimulationSpeedFactor = speedFactor;
     }
+    else
+    {
+        qWarning("Tried to set simulation speed to %.2f, which is out of the valid range [%.2f, %.2f].",
+                 speedFactor, sMinimumSpeedFactor, sMaximumSpeedFactor);
+    }
 }
 
 Scene* SceneManager::getCurrentScene()
 {
-    return 0;
+    return mCurrentScene;
 }

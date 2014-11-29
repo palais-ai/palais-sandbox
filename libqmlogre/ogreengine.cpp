@@ -15,6 +15,8 @@
 #include <QOpenGLFunctions>
 #include <QDir>
 
+QMutex g_engineMutex;
+
 OgreEngine::OgreEngine(QQuickWindow *window)
     : QObject(),
       m_resources_cfg(Ogre::StringUtil::BLANK),
@@ -33,7 +35,7 @@ OgreEngine::OgreEngine(QQuickWindow *window)
 
 OgreEngine::~OgreEngine()
 {
-    delete m_ogreContext;
+    //delete m_ogreContext;
 }
 
 Ogre::Root* OgreEngine::startEngine()
@@ -96,10 +98,10 @@ void OgreEngine::setQuickWindow(QQuickWindow *window)
     m_qtContext = QOpenGLContext::currentContext();
 
     // create a new shared OpenGL context to be used exclusively by Ogre
-    m_ogreContext = new QOpenGLContext();
+    /**m_ogreContext = new QOpenGLContext();
     m_ogreContext->setFormat(m_quickWindow->requestedFormat());
     m_ogreContext->setShareContext(m_qtContext);
-    m_ogreContext->create();
+    m_ogreContext->create();*/
 
     m_ogreContext = m_qtContext;
 }
@@ -146,6 +148,16 @@ void OgreEngine::doneOgreContext()
     m_qtContext->makeCurrent(m_quickWindow);
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
+}
+
+void OgreEngine::lockEngine()
+{
+    g_engineMutex.lock();
+}
+
+void OgreEngine::unlockEngine()
+{
+    g_engineMutex.unlock();
 }
 
 QOpenGLContext* OgreEngine::ogreContext() const

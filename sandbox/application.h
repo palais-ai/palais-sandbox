@@ -2,7 +2,8 @@
 #define APPLICATION_H
 
 #include <QObject>
-#include "scenemanager.h"
+
+class SceneManager;
 
 namespace Ogre {
 class SceneManager;
@@ -34,7 +35,7 @@ private:
     QQmlApplicationEngine* mApplicationEngine;
     OgreEngine *mOgreEngine;
     Ogre::SceneManager *mSceneManager;
-    SceneManager mScenarioManager;
+    SceneManager* mScenarioManager;
     Ogre::Root *mRoot;
 };
 

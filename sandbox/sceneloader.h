@@ -4,12 +4,20 @@
 #include <QString>
 
 class Scene;
+class OgreEngine;
+
+namespace Ogre {
+class SceneManager;
+}
 
 class SceneLoader
 {
 public:
-    static Scene* loadScene(const QString& sceneFile, const QString& logicFile);
+    static Scene* loadScene(OgreEngine* engine, Ogre::SceneManager* sceneManager, const QString& sceneFile, const QString& logicFile);
 private:
+    static void loadSceneVisuals(OgreEngine* engine, Ogre::SceneManager* sceneManager, const QString& sceneFile);
+    static void loadSceneLogic(const QString& logicFile);
+
     SceneLoader();
 };
 
