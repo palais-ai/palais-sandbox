@@ -1,11 +1,12 @@
 #include "application.h"
-#include "scenemanager.h"
+#include "projectmanager.h"
 
 #include <QtGui/QGuiApplication>
 #include <QQmlApplicationEngine>
 
 #include "../libqmlogre/ogreitem.h"
 #include "../libqmlogre/ogreengine.h"
+#include "../libqmlogre/cameranodeobject.h"
 
 #include <QCoreApplication>
 #include <QtQml/QQmlContext>
@@ -14,9 +15,9 @@
 Application::Application(QObject *parent) :
     QObject(parent),
     mOgreEngine(NULL),
-    mSceneManager(NULL),
     mApplicationEngine(NULL),
-    mScenarioManager(NULL),
+    mSceneManager(NULL),
+    mProjectManager(NULL),
     mRoot(NULL)
 {
     ;
@@ -24,6 +25,11 @@ Application::Application(QObject *parent) :
 
 Application::~Application()
 {
+    if(mProjectManager)
+    {
+        delete mProjectManager;
+    }
+
     if (mSceneManager)
     {
         mRoot->destroySceneManager(mSceneManager);
@@ -81,8 +87,28 @@ void Application::initializeOgre()
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, "mySceneManager");
     mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
 
-    mScenarioManager = new SceneManager(mOgreEngine, mSceneManager);
-    mScenarioManager->loadScene("capturetheflag.scene", "ctf.js");
+    mProjectManager = new ProjectManager(mOgreEngine, mSceneManager);
+
+    mApplicationEngine->rootContext()->setContextProperty("ProjectManager", mProjectManager);
+
+    QObject::connect(mProjectManager, SIGNAL(sceneLoaded()),
+                     this, SLOT(onSceneLoaded()));
+
+    QObject::connect(mProjectManager, SIGNAL(sceneLoadFailed(QString)),
+                     this, SLOT(onSceneLoadFailed(QString)));
+
+    QString dialogName("openProjectDialog");
+    QObject* projectDialog = window->findChild<QObject*>(dialogName);
+
+    if(projectDialog)
+    {
+        QObject::connect(projectDialog, SIGNAL(projectFileSelected(QUrl)),
+                         mProjectManager, SLOT(onOpenProject(QUrl)));
+    }
+    else
+    {
+        qFatal("Couldn't find project dialog (id=%s).", dialogName.toStdString().c_str());
+    }
 
     emit(ogreInitialized());
 }
@@ -94,7 +120,34 @@ void Application::onOgreIsReady()
     QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "onOgreIsReady");
 }
 
+void Application::onSceneLoaded()
+{
+    if(!mSceneManager)
+    {
+        return;
+    }
+
+    QString cameraName("cam1");
+    QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
+    CameraNodeObject* camera = window->findChild<CameraNodeObject*>(cameraName);
+
+    if(!camera)
+    {
+        qFatal("Couldn't find first camera (id=%s).", cameraName.toStdString().c_str());
+    }
+
+    mOgreEngine->lockEngine();
+    camera->fitToContain(mSceneManager->getRootSceneNode());
+    mOgreEngine->unlockEngine();
+}
+
 qreal Application::loadingProgress() const
 {
     return mOgreEngine ? mOgreEngine->loadingProgress() : 0;
 }
+
+void Application::onSceneLoadFailed(const QString& message)
+{
+    QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "showErrorMessage", QGenericReturnArgument(), Q_ARG(QVariant, message));
+}
+

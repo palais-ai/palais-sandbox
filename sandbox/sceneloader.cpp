@@ -1,6 +1,9 @@
 #include "sceneloader.h"
 #include "scene.h"
 
+#include <exception>
+#include <QScopedPointer>
+
 #include <QtGlobal>
 
 #include <OgreSceneManager.h>
@@ -18,7 +21,20 @@ Scene* SceneLoader::loadScene(OgreEngine* engine, Ogre::SceneManager* sceneManag
     if(engine && sceneManager)
     {
         loadSceneVisuals(engine, sceneManager, sceneFile);
-        return 0;
+
+        QScopedPointer<Scene> scene(new Scene(sceneFile, logicFile, sceneManager->getRootSceneNode()));
+
+        try
+        {
+            loadSceneLogic(scene.data(), logicFile);
+        }
+        catch(const std::runtime_error& ex)
+        {
+            qWarning(ex.what());
+            return NULL;
+        }
+
+        return scene.take();
     }
     else
     {
@@ -47,7 +63,22 @@ void SceneLoader::loadSceneVisuals(OgreEngine* engine, Ogre::SceneManager* scene
     }
 }
 
-void SceneLoader::loadSceneLogic(const QString& logicFile)
+void SceneLoader::loadSceneLogic(Scene* scene, const QString& logicFile)
 {
+    if(!scene)
+    {
+        throw std::runtime_error("A scene must be initialized.");
+    }
 
+    QFile file(logicFile);
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        QString errorText(QString("Couldn't open logic file at %1.").arg(logicFile));
+        throw std::runtime_error(errorText.toStdString());
+    }
+
+    QByteArray ba = file.readAll();
+    file.close();
+
+    scene->getScriptEngine().evaluate(QScriptProgram(QString(ba), logicFile));
 }

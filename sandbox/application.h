@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-class SceneManager;
+class ProjectManager;
 
 namespace Ogre {
 class SceneManager;
@@ -26,16 +26,16 @@ public:
 signals:
     void ogreInitialized();
     void onLoadingProgressChanged(qreal progress);
-
 public slots:
     void initializeOgre();
     void onOgreIsReady();
-
+    void onSceneLoaded();
+    void onSceneLoadFailed(const QString& message);
 private:
     QQmlApplicationEngine* mApplicationEngine;
     OgreEngine *mOgreEngine;
     Ogre::SceneManager *mSceneManager;
-    SceneManager* mScenarioManager;
+    ProjectManager* mProjectManager;
     Ogre::Root *mRoot;
 };
 

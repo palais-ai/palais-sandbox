@@ -2,6 +2,7 @@
 #define SCENELOADER_H
 
 #include <QString>
+#include <QScriptEngine>
 
 class Scene;
 class OgreEngine;
@@ -16,7 +17,7 @@ public:
     static Scene* loadScene(OgreEngine* engine, Ogre::SceneManager* sceneManager, const QString& sceneFile, const QString& logicFile);
 private:
     static void loadSceneVisuals(OgreEngine* engine, Ogre::SceneManager* sceneManager, const QString& sceneFile);
-    static void loadSceneLogic(const QString& logicFile);
+    static void loadSceneLogic(Scene* scene, const QString& logicFile);
 
     SceneLoader();
 };

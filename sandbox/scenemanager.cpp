@@ -15,14 +15,23 @@ SceneManager::SceneManager(OgreEngine* engine, Ogre::SceneManager* sceneManager)
     mSceneStarted(false),
     mSimulationSpeedFactor(1)
 {
+    assert(engine);
+    assert(sceneManager);
+
     startTimer(1000.f / sMaximumTickRate);
 }
 
 Scene* SceneManager::loadScene(const QString& sceneFile, const QString& logicFile)
 {
+    if(mCurrentScene)
+    {
+        delete mCurrentScene;
+        mCurrentScene = NULL;
+    }
+
     if(mOgreEngine && mSceneManager)
     {
-        return SceneLoader::loadScene(mOgreEngine, mSceneManager, sceneFile, logicFile);
+        return mCurrentScene = SceneLoader::loadScene(mOgreEngine, mSceneManager, sceneFile, logicFile);
     }
     else
     {

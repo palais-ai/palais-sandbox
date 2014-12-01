@@ -1,5 +1,5 @@
 CONFIG += qt
-QT += qml quick
+QT += qml quick script
 TEMPLATE = app
 TARGET = sandbox
 
@@ -11,13 +11,15 @@ SOURCES += main.cpp \
     application.cpp \
     scenemanager.cpp \
     sceneloader.cpp \
-    scene.cpp
+    scene.cpp \
+    projectmanager.cpp
 
 HEADERS += \
     application.h \
     scenemanager.h \
     sceneloader.h \
-    scene.h
+    scene.h \
+    projectmanager.h
 
 OTHER_FILES += \
     config/resources.cfg

@@ -15,13 +15,18 @@ ApplicationWindow {
     minimumWidth: 1024
     minimumHeight: 660
 
+    property bool isOgreInitialized: false
+
     menuBar: MenuBar {
         Menu {
             title: "File"
+            enabled: isOgreInitialized
 
             MenuItem {
-                text: "Open"
+                text: "Open project"
                 shortcut: "Ctrl+O"
+
+                onTriggered: openProjectDialog.open()
             }
 
             MenuItem {
@@ -101,15 +106,36 @@ ApplicationWindow {
         }
     }
 
-    Dialog {
-        id: testDialog
+    MessageDialog {
+        id: errorDialog
+        title: "Error"
+        icon: StandardIcon.Critical
         visible: false
-        title: "Blue sky dialog"
-        standardButtons: StandardButton.Save | StandardButton.Cancel
+        standardButtons: StandardButton.Ok
+    }
+
+    FileDialog {
+        id: openProjectDialog
+        objectName: "openProjectDialog"
+        title: "Please choose a file"
+        visible: false
+        selectMultiple: false
+
+        signal projectFileSelected(url fileurl)
+
+        onAccepted: {
+            openProjectDialog.projectFileSelected(openProjectDialog.fileUrl)
+        }
     }
 
     function onOgreIsReady() {
         mainLoader.source = "Ogre3DView.qml"
+        isOgreInitialized = true
+    }
+
+    function showErrorMessage(message) {
+       errorDialog.text = message
+       errorDialog.open()
     }
 
     onClosing: Qt.quit()

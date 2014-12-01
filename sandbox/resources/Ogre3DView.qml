@@ -7,6 +7,7 @@ Rectangle {
 
     Camera {
         id: cam1
+        objectName: "cam1"
     }
 
     OgreItem {

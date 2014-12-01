@@ -1,8 +1,11 @@
 #include "scene.h"
 
-Scene::Scene(const QString& sceneFile, const QString& logicFile) :
+#include <OgreSceneNode.h>
+
+Scene::Scene(const QString& sceneFile, const QString& logicFile, Ogre::SceneNode* root) :
     mSceneFile(sceneFile),
-    mLogicFile(logicFile)
+    mLogicFile(logicFile),
+    mRoot(root)
 {
     ;
 }
@@ -10,7 +13,8 @@ Scene::Scene(const QString& sceneFile, const QString& logicFile) :
 
 void Scene::update(float time)
 {
-    ;
+    QScriptValue fun = mLogicScript.globalObject().property("update");
+    fun.call(QScriptValue(), QScriptValueList() << time);
 }
 
 void Scene::performAction(const QString& actionName, const QVariant& params)
@@ -36,5 +40,10 @@ QVariant Scene::getActorKnowledge(const QString& actorName, const QString& knowl
 void Scene::setActorKnowledge(const QString& actorName, const QString& knowledgeKey, const QVariant& value)
 {
     ;
+}
+
+QScriptEngine& Scene::getScriptEngine()
+{
+    return mLogicScript;
 }
 
