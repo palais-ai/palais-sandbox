@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+class Scene;
 class ProjectManager;
 
 namespace Ogre {
@@ -17,20 +18,27 @@ class Application : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(qreal loadingProgress READ loadingProgress NOTIFY onLoadingProgressChanged)
+    Q_PROPERTY(bool sceneLoaded READ getSceneLoaded NOTIFY onSceneLoadedChanged)
+    Q_PROPERTY(bool scenePlaying READ getScenePlaying NOTIFY onScenePlayingChanged)
 public:
     explicit Application(QObject *parent = 0);
     ~Application();
 
     int onApplicationStarted(int argc, char **argv);
     qreal loadingProgress() const;
+    bool getSceneLoaded() const;
+    bool getScenePlaying() const;
 signals:
     void ogreInitialized();
     void onLoadingProgressChanged(qreal progress);
+    void onSceneLoadedChanged(bool sceneLoaded);
+    void onScenePlayingChanged(bool scenePlaying);
 public slots:
     void initializeOgre();
     void onOgreIsReady();
-    void onSceneLoaded();
+    void onSceneLoaded(Scene* scene);
     void onSceneLoadFailed(const QString& message);
+    void onPlayButtonPressed();
 private:
     QQmlApplicationEngine* mApplicationEngine;
     OgreEngine *mOgreEngine;

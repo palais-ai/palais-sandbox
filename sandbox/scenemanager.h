@@ -18,16 +18,18 @@ class SceneManager : public QObject
 public:
     SceneManager(OgreEngine* engine, Ogre::SceneManager* sceneManager);
 
-    Scene* loadScene(const QString& sceneFile, const QString& logicFile);
-
     void pause();
     void start();
     void update(float deltaTime);
+    bool isPlaying() const;
 
     // __speedFactor__ must be in range between __sMinimumSpeedFactor__ and __sMaximumSpeedFactor__
     void setSimulationSpeed(float speedFactor);
 
     Scene* getCurrentScene();
+    const Scene* getCurrentScene() const;
+public slots:
+    Scene* loadScene(const QString& name, const QString& sceneFile, const QString& logicFile);
 protected:
     void timerEvent(QTimerEvent *);
 private:
@@ -39,7 +41,8 @@ private:
 
     static const float sMinimumSpeedFactor = 0.1f; // In times the normal speed
     static const float sMaximumSpeedFactor = 5.f;  // In times the normal speed
-    static const float sMaximumTickRate = 200.f; // In Ticks Per Second
+    static const float sMaximumTickRate = 100.f; // In Ticks Per Second
+    static const float sAITickRate = 100.f; // In Ticks Per Second
 };
 
 #endif // SCENEMANAGER_H

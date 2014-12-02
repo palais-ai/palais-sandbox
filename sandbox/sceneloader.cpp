@@ -1,13 +1,16 @@
 #include "sceneloader.h"
 #include "scene.h"
+#include "actor.h"
 
 #include <exception>
-#include <QScopedPointer>
 
+#include <QScopedPointer>
 #include <QtGlobal>
+#include <QTextStream>
 
 #include <OgreSceneManager.h>
 #include <OgreString.h>
+#include <OgreSceneNode.h>
 
 #include "../libqmlogre/ogreengine.h"
 #include "../libdotsceneloader/DotSceneLoader.h"
@@ -16,13 +19,13 @@ SceneLoader::SceneLoader()
 {
 }
 
-Scene* SceneLoader::loadScene(OgreEngine* engine, Ogre::SceneManager* sceneManager, const QString& sceneFile, const QString& logicFile)
+Scene* SceneLoader::loadScene(OgreEngine* engine, Ogre::SceneManager* sceneManager, const QString& name, const QString& sceneFile, const QString& logicFile)
 {
     if(engine && sceneManager)
     {
         loadSceneVisuals(engine, sceneManager, sceneFile);
 
-        QScopedPointer<Scene> scene(new Scene(sceneFile, logicFile, sceneManager->getRootSceneNode()));
+        QScopedPointer<Scene> scene(new Scene(name, sceneFile, logicFile, sceneManager->getRootSceneNode()));
 
         try
         {
@@ -34,6 +37,7 @@ Scene* SceneLoader::loadScene(OgreEngine* engine, Ogre::SceneManager* sceneManag
             return NULL;
         }
 
+        scene->setup();
         return scene.take();
     }
     else
@@ -63,6 +67,21 @@ void SceneLoader::loadSceneVisuals(OgreEngine* engine, Ogre::SceneManager* scene
     }
 }
 
+static QScriptValue print(QScriptContext *context, QScriptEngine *engine)
+{
+    QTextStream stream(stderr, QIODevice::WriteOnly);
+
+    for(int i = 0; i < context->argumentCount(); ++i)
+    {
+        stream << context->argument(i).toVariant().toString();
+    }
+
+    stream << "\n";
+    stream.flush();
+
+    return QScriptValue();
+}
+
 void SceneLoader::loadSceneLogic(Scene* scene, const QString& logicFile)
 {
     if(!scene)
@@ -80,5 +99,7 @@ void SceneLoader::loadSceneLogic(Scene* scene, const QString& logicFile)
     QByteArray ba = file.readAll();
     file.close();
 
-    scene->getScriptEngine().evaluate(QScriptProgram(QString(ba), logicFile));
+    QScriptEngine& engine = scene->getScriptEngine();
+    engine.evaluate(QScriptProgram(QString(ba), logicFile));
+    engine.globalObject().setProperty("print", engine.newFunction(print));
 }

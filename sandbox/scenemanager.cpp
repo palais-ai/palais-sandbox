@@ -2,10 +2,13 @@
 #include "sceneloader.h"
 #include "scene.h"
 
+#include "../libqmlogre/ogreengine.h"
+
 #include <QtGlobal>
 #include <QTimerEvent>
 #include <QTime>
 
+#include <OgreRoot.h>
 #include <OgreSceneManager.h>
 
 SceneManager::SceneManager(OgreEngine* engine, Ogre::SceneManager* sceneManager) :
@@ -17,21 +20,37 @@ SceneManager::SceneManager(OgreEngine* engine, Ogre::SceneManager* sceneManager)
 {
     assert(engine);
     assert(sceneManager);
+    assert(thread() == mOgreEngine->thread()); // This object must reside in the same thread as the ogre engine
 
     startTimer(1000.f / sMaximumTickRate);
 }
 
-Scene* SceneManager::loadScene(const QString& sceneFile, const QString& logicFile)
+Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, const QString& logicFile)
 {
-    if(mCurrentScene)
-    {
-        delete mCurrentScene;
-        mCurrentScene = NULL;
-    }
-
     if(mOgreEngine && mSceneManager)
     {
-        return mCurrentScene = SceneLoader::loadScene(mOgreEngine, mSceneManager, sceneFile, logicFile);
+        Scene* nextScene = SceneLoader::loadScene(mOgreEngine, mSceneManager, name, sceneFile, logicFile);
+
+        if(nextScene)
+        {
+            qWarning("Scene %s could not be loaded.", name.toStdString().c_str());
+            return NULL;
+        }
+
+        if(mCurrentScene)
+        {
+            delete mCurrentScene;
+            mCurrentScene = NULL;
+
+
+            /**
+            Ogre::Root& root = Ogre::Root::getSingleton();
+            Ogre::SceneManager *sceneManager = root.getSceneManager("mySceneManager");
+            root.destroySceneManager(sceneManager);
+            */
+        }
+
+        return mCurrentScene = nextScene;
     }
     else
     {
@@ -50,17 +69,31 @@ void SceneManager::start()
     mSceneStarted = true;
 }
 
+bool SceneManager::isPlaying() const
+{
+    return mSceneStarted;
+}
+
 void SceneManager::timerEvent(QTimerEvent*)
 {
     static QTime before = QTime::currentTime();
 
     QTime now = QTime::currentTime();
+    float accumulator = before.msecsTo(now) * mSimulationSpeedFactor;
+
     if(mCurrentScene && mSceneStarted)
     {
-        mCurrentScene->update(before.msecsTo(now) * mSimulationSpeedFactor);
+        float oneStep =  1000.f / sAITickRate;
+        while(accumulator > oneStep)
+        {
+            // We update at constant rates to keep the results the same, independent of simulation speed.
+            mCurrentScene->update(oneStep);
+            accumulator -= oneStep;
+        }
     }
 
-    before = now;
+    // Don't forget the leftovers.
+    before = now.addMSecs(-accumulator);
 }
 
 void SceneManager::setSimulationSpeed(float speedFactor)
@@ -77,6 +110,11 @@ void SceneManager::setSimulationSpeed(float speedFactor)
 }
 
 Scene* SceneManager::getCurrentScene()
+{
+    return mCurrentScene;
+}
+
+const Scene* SceneManager::getCurrentScene() const
 {
     return mCurrentScene;
 }

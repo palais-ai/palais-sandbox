@@ -7,35 +7,14 @@ Image {
     fillMode: Image.Tile
 
     ListModel {
-        id: model
-
-        ListElement {
-            name: "Actor 1"
-        }
-        ListElement {
-            name: "Actor 2"
-        }
-        ListElement {
-            name: "Actor 3"
-        }
-        ListElement {
-            name: "Actor 4"
-        }
-        ListElement {
-            name: "Actor 5"
-        }
-        ListElement {
-            name: "Actor 6"
-        }
-        ListElement {
-            name: "Actor 7"
-        }
+        id: emptyModel
     }
 
     ListView {
+        id: listView
         width: parent.width;
         height: parent.height
-        model: model
+        model: ActorModel
 
         header: ActorTableHeader {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -43,7 +22,7 @@ Image {
 
         delegate: ActorTableCell {
             width: parent.width
-            height: 34
+            height: 22
         }
     }
 }

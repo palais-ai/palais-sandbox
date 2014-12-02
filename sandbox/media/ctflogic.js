@@ -2,10 +2,11 @@ function onStart() {
 	// Initialization code here
 }
 
-function update(deltaTimne) {
+function update(deltaTime) {
 	// Logic here
+	print(deltaTime)
 }
 
-function shootAction(actor, parameters) {
-	
+function shoot(actor, target) {
+
 }

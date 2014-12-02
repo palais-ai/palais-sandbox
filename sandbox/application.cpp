@@ -1,5 +1,7 @@
 #include "application.h"
 #include "projectmanager.h"
+#include "scene.h"
+#include "actor.h"
 
 #include <QtGui/QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -14,8 +16,8 @@
 
 Application::Application(QObject *parent) :
     QObject(parent),
-    mOgreEngine(NULL),
     mApplicationEngine(NULL),
+    mOgreEngine(NULL),
     mSceneManager(NULL),
     mProjectManager(NULL),
     mRoot(NULL)
@@ -91,8 +93,8 @@ void Application::initializeOgre()
 
     mApplicationEngine->rootContext()->setContextProperty("ProjectManager", mProjectManager);
 
-    QObject::connect(mProjectManager, SIGNAL(sceneLoaded()),
-                     this, SLOT(onSceneLoaded()));
+    QObject::connect(mProjectManager, SIGNAL(sceneLoaded(Scene*)),
+                     this, SLOT(onSceneLoaded(Scene*)));
 
     QObject::connect(mProjectManager, SIGNAL(sceneLoadFailed(QString)),
                      this, SLOT(onSceneLoadFailed(QString)));
@@ -115,15 +117,28 @@ void Application::initializeOgre()
 
 void Application::onOgreIsReady()
 {
+    if(!mApplicationEngine)
+    {
+        qFatal("Application engine must be running when ogre is ready.");
+        return;
+    }
+
     mApplicationEngine->rootContext()->setContextProperty("OgreEngine", mOgreEngine);
 
     QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "onOgreIsReady");
 }
 
-void Application::onSceneLoaded()
+void Application::onSceneLoaded(Scene* scene)
 {
     if(!mSceneManager)
     {
+        qFatal("Scene manager must be instantiated when a scene finished loading.");
+        return;
+    }
+
+    if(!scene)
+    {
+        qFatal("SceneLoaded signal was sent but scene wasn't instantiated.");
         return;
     }
 
@@ -139,6 +154,9 @@ void Application::onSceneLoaded()
     mOgreEngine->lockEngine();
     camera->fitToContain(mSceneManager->getRootSceneNode());
     mOgreEngine->unlockEngine();
+
+    mApplicationEngine->rootContext()->setContextProperty("ActorModel", scene);
+    emit(onSceneLoadedChanged(true));
 }
 
 qreal Application::loadingProgress() const
@@ -146,8 +164,45 @@ qreal Application::loadingProgress() const
     return mOgreEngine ? mOgreEngine->loadingProgress() : 0;
 }
 
+bool Application::getSceneLoaded() const
+{
+    return mProjectManager ? mProjectManager->getSceneLoaded() : false;
+}
+
+bool Application::getScenePlaying() const
+{
+    return mProjectManager ? mProjectManager->isPlaying() : false;
+}
+
 void Application::onSceneLoadFailed(const QString& message)
 {
-    QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "showErrorMessage", QGenericReturnArgument(), Q_ARG(QVariant, message));
+    if(mApplicationEngine)
+    {
+        QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "showErrorMessage", QGenericReturnArgument(), Q_ARG(QVariant, message));
+    }
+    else
+    {
+        qWarning("Application engine should already be running when a scene load fails.");
+    }
+}
+
+void Application::onPlayButtonPressed()
+{
+    if(!mProjectManager)
+    {
+        qWarning("ProjectManager must've been instantiated to start playing a scene.");
+        return;
+    }
+
+    if(getScenePlaying())
+    {
+        mProjectManager->pause();
+    }
+    else
+    {
+        mProjectManager->play();
+    }
+
+    emit(onScenePlayingChanged(getSceneLoaded()));
 }
 

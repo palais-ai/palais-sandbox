@@ -62,6 +62,7 @@ ApplicationWindow {
         property color secondaryColorLighter: "#7cef09"
         property color dimmedTextColor: "#3Dffffff"
         property color slightlyDimmedTextColor: "#CCffffff"
+        property color stronglyDimmedTextColor: "#0Dffffff"
     }
 
     FontLoader {

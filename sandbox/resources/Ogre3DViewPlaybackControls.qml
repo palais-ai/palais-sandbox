@@ -7,13 +7,10 @@ RowLayout {
 
     FAIconButton {
         id: playButton
-        unicode: "\uf04b"
+        unicode: ApplicationWrapper.scenePlaying ? "\uf04c" : "\uf04b"
         iconSize: 20
-        onPressed: play()
-
-        function play() {
-
-        }
+        enabled: ApplicationWrapper.sceneLoaded
+        onPressed: ApplicationWrapper.onPlayButtonPressed()
     }
 
     FAIconButton {
@@ -46,6 +43,7 @@ RowLayout {
             stepSize: 0.1
             value: 1
             opacity: 0.8
+            onValueChanged: console.log(speedSlider.value)
         }
     }
 

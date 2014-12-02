@@ -21,6 +21,7 @@ Rectangle {
         font.family: openSans.name
         font.pointSize: 12
         color: "white"
+        renderType: Text.NativeRendering
     }
 
     Text {
@@ -31,14 +32,21 @@ Rectangle {
         font.family: fontAwesome.name
         font.pointSize: 12
         color: "white"
+        renderType: Text.NativeRendering
     }
 
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: actorCell.pressed()
-        onEntered: actorCell.state = 'HOVER'
-        onExited: actorCell.state = ''
+        onEntered: {
+            actorCell.state = 'HOVER'
+            ActorModel.toggleHighlight(index);
+        }
+        onExited: {
+            actorCell.state = ''
+            ActorModel.toggleHighlight(index);
+        }
     }
 
     states: [

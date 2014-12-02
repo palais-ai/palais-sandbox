@@ -12,14 +12,16 @@ SOURCES += main.cpp \
     scenemanager.cpp \
     sceneloader.cpp \
     scene.cpp \
-    projectmanager.cpp
+    projectmanager.cpp \
+    actor.cpp
 
 HEADERS += \
     application.h \
     scenemanager.h \
     sceneloader.h \
     scene.h \
-    projectmanager.h
+    projectmanager.h \
+    actor.h
 
 OTHER_FILES += \
     config/resources.cfg

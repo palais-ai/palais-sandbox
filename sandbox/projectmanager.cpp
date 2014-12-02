@@ -13,6 +13,27 @@ ProjectManager::ProjectManager(OgreEngine* engine, Ogre::SceneManager* sceneMana
 {
 }
 
+bool ProjectManager::getSceneLoaded() const
+{
+    return mScenarioManager.getCurrentScene() != NULL;
+}
+
+bool ProjectManager::isPlaying() const
+{
+    return mScenarioManager.isPlaying();
+}
+
+void ProjectManager::play()
+{
+    mScenarioManager.start();
+}
+
+void ProjectManager::pause()
+{
+    mScenarioManager.pause();
+}
+
+
 void ProjectManager::onOpenProject(const QUrl& url)
 {
     QFile file(url.toLocalFile());
@@ -61,9 +82,21 @@ void ProjectManager::onOpenProject(const QUrl& url)
         return;
     }
 
-    qDebug("Loading project with visuals (%s) and logic (%s).", sceneFile.toStdString().c_str(), logicFile.toStdString().c_str());
+    QString namePropertyName("name");
+    QString name;
+    if(obj.contains(namePropertyName))
+    {
+        name = obj[namePropertyName].toString();
+    }
+    else
+    {
+        emit(sceneLoadFailed(QString("The project file was missing the property %1.").arg(namePropertyName)));
+        return;
+    }
 
-    Scene* scene = mScenarioManager.loadScene(sceneFile, logicFile);
+    qDebug("Loading project %s with visuals (%s) and logic (%s).", name.toStdString().c_str(), sceneFile.toStdString().c_str(), logicFile.toStdString().c_str());
+
+    Scene* scene = mScenarioManager.loadScene(name, sceneFile, logicFile);
 
     if(!scene)
     {
@@ -71,5 +104,5 @@ void ProjectManager::onOpenProject(const QUrl& url)
         return;
     }
 
-    emit(sceneLoaded());
+    emit(sceneLoaded(scene));
 }
