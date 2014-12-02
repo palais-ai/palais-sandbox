@@ -85,7 +85,6 @@ void Application::initializeOgre()
     mRoot = mOgreEngine->startEngine();
     mOgreEngine->setupResources();
 
-    // set up Ogre scene
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, "mySceneManager");
     mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
 
@@ -98,6 +97,12 @@ void Application::initializeOgre()
 
     QObject::connect(mProjectManager, SIGNAL(sceneLoadFailed(QString)),
                      this, SLOT(onSceneLoadFailed(QString)));
+
+    QObject::connect(mProjectManager, SIGNAL(beforeSceneLoad(QString, QString, QString)),
+                     this, SLOT(onBeforeSceneLoad(QString, QString, QString)));
+
+    QObject::connect(this, SIGNAL(beforeSceneLoadFinished(QString, QString, QString)),
+                     mProjectManager, SLOT(onBeforeSceneLoadFinished(QString,QString,QString)));
 
     QString dialogName("openProjectDialog");
     QObject* projectDialog = window->findChild<QObject*>(dialogName);
@@ -128,6 +133,46 @@ void Application::onOgreIsReady()
     QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "onOgreIsReady");
 }
 
+void Application::onBeforeSceneLoad(const QString& name, const QString& sceneFile, const QString& logicFile)
+{
+    qDebug("Before scene load");
+    if(!mRoot)
+    {
+        qFatal("An Ogre Root must be instantiated before scene load.");
+    }
+
+    mOgreEngine->lockEngine();
+
+    if(mSceneManager)
+    {
+        mRoot->destroySceneManager(mSceneManager);
+    }
+
+    // set up Ogre scene
+    mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, "mySceneManager");
+    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+
+    CameraNodeObject* camera = getCameraWithName("cam1");
+    camera->createCameraWithCurrentSceneManager();
+
+    mOgreEngine->unlockEngine();
+
+    emit(beforeSceneLoadFinished(name, sceneFile, logicFile));
+}
+
+CameraNodeObject* Application::getCameraWithName(const QString& cameraName)
+{
+    QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
+    CameraNodeObject* camera = window->findChild<CameraNodeObject*>(cameraName);
+
+    if(!camera)
+    {
+        qFatal("Couldn't find camera with name (objectName=%s).", cameraName.toStdString().c_str());
+    }
+
+    return camera;
+}
+
 void Application::onSceneLoaded(Scene* scene)
 {
     if(!mSceneManager)
@@ -143,8 +188,7 @@ void Application::onSceneLoaded(Scene* scene)
     }
 
     QString cameraName("cam1");
-    QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
-    CameraNodeObject* camera = window->findChild<CameraNodeObject*>(cameraName);
+    CameraNodeObject* camera = getCameraWithName(cameraName);
 
     if(!camera)
     {

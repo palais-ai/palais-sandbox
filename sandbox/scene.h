@@ -8,6 +8,7 @@
 #include <QAbstractListModel>
 
 class Actor;
+class OgreEngine;
 
 namespace Ogre {
 class SceneNode;
@@ -23,7 +24,7 @@ public:
         ModelRoleIndex
     };
 
-    Scene(const QString& name, const QString& sceneFile, const QString& logicFile, Ogre::SceneNode* root);
+    Scene(const QString& name, const QString& sceneFile, const QString& logicFile, Ogre::SceneNode* root, OgreEngine* ogreEngine);
     ~Scene();
 
     // List Model impl
@@ -53,6 +54,7 @@ private:
 
     QString mName, mSceneFile, mLogicFile;
     Ogre::SceneNode* mRoot;
+    OgreEngine* mEngine;
     QScriptEngine mLogicScript;
     QMap<QString, Actor*> mActors;
 };

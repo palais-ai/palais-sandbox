@@ -29,13 +29,19 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
     m_pitch(0),
     m_zoom(1)
 {
+    g_engineMutex.lock();
+    createCameraWithCurrentSceneManager();
+    g_engineMutex.unlock();
+}
+
+void CameraNodeObject::createCameraWithCurrentSceneManager()
+{
     Ogre::SceneManager *sceneManager = Ogre::Root::getSingleton().getSceneManager("mySceneManager");
 
     // let's use the current memory address to create a unique name
     QString instanceName;
     instanceName.sprintf("camera_%08p", this);
 
-    g_engineMutex.lock();
     Ogre::Camera *camera = sceneManager->createCamera(instanceName.toLatin1().data());
     camera->setNearClipDistance(1);
     camera->setFarClipDistance(99999);
@@ -46,8 +52,6 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
     m_node->attachObject(camera);
 
     fitToContain(sceneManager->getRootSceneNode());
-
-    g_engineMutex.unlock();
 }
 
 void CameraNodeObject::fitToContain(Ogre::SceneNode* node)
