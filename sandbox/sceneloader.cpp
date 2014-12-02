@@ -25,7 +25,7 @@ Scene* SceneLoader::loadScene(OgreEngine* engine, Ogre::SceneManager* sceneManag
     {
         loadSceneVisuals(engine, sceneManager, sceneFile);
 
-        QScopedPointer<Scene> scene(new Scene(name, sceneFile, logicFile, sceneManager->getRootSceneNode()));
+        QScopedPointer<Scene> scene(new Scene(name, sceneFile, logicFile, sceneManager->getRootSceneNode(), engine));
 
         try
         {

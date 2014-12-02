@@ -34,25 +34,18 @@ Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, co
 {
     if(mOgreEngine && mSceneManager)
     {
+        if(mCurrentScene)
+        {
+            delete mCurrentScene;
+            mCurrentScene = NULL;
+        }
+
         Scene* nextScene = SceneLoader::loadScene(mOgreEngine, mSceneManager, name, sceneFile, logicFile);
 
         if(!nextScene)
         {
             qWarning("Scene %s could not be loaded.", name.toStdString().c_str());
             return NULL;
-        }
-
-        if(mCurrentScene)
-        {
-            delete mCurrentScene;
-            mCurrentScene = NULL;
-
-
-            /**
-            Ogre::Root& root = Ogre::Root::getSingleton();
-            Ogre::SceneManager *sceneManager = root.getSceneManager("mySceneManager");
-            root.destroySceneManager(sceneManager);
-            */
         }
 
         return mCurrentScene = nextScene;

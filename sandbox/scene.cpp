@@ -9,12 +9,20 @@
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
 
-Scene::Scene(const QString& name, const QString& sceneFile, const QString& logicFile, Ogre::SceneNode* root) :
+#include "../libqmlogre/ogreengine.h"
+
+Scene::Scene(const QString& name, const QString& sceneFile, const QString& logicFile, Ogre::SceneNode* root, OgreEngine* engine) :
     mName(name),
     mSceneFile(sceneFile),
     mLogicFile(logicFile),
-    mRoot(root)
+    mRoot(root),
+    mEngine(engine)
 {
+    if(!mEngine)
+    {
+        qFatal("Scene requires an engine instance.");
+    }
+
     getActors(mRoot);
 }
 
@@ -56,6 +64,7 @@ void Scene::destroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode )
 
 void Scene::toggleHighlight(int index)
 {
+    mEngine->lockEngine();
     if(index >= 0 && index < mActors.size())
     {
         mActors.values().at(index)->toggleHighlight();
@@ -64,6 +73,7 @@ void Scene::toggleHighlight(int index)
     {
         qWarning("Tried to access actor index beyond bounds idx=%d.", index);
     }
+    mEngine->unlockEngine();
 }
 
 int Scene::size() const

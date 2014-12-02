@@ -5,6 +5,9 @@
 #include <QFile>
 #include <QString>
 
+#include <OgreRoot.h>
+#include <OgreSceneManager.h>
+
 #include "../libqmlogre/ogreengine.h"
 
 ProjectManager::ProjectManager(OgreEngine* engine, Ogre::SceneManager* sceneManager) :
@@ -95,6 +98,11 @@ void ProjectManager::onOpenProject(const QUrl& url)
         return;
     }
 
+    emit(beforeSceneLoad(name, sceneFile, logicFile));
+}
+
+void ProjectManager::onBeforeSceneLoadFinished(const QString& name, const QString& sceneFile, const QString& logicFile)
+{
     qDebug("Loading project %s with visuals (%s) and logic (%s).", name.toStdString().c_str(), sceneFile.toStdString().c_str(), logicFile.toStdString().c_str());
 
     Scene* scene = mScenarioManager.loadScene(name, sceneFile, logicFile);

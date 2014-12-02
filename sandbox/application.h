@@ -13,6 +13,7 @@ class Root;
 
 class OgreEngine;
 class QQmlApplicationEngine;
+class CameraNodeObject;
 
 class Application : public QObject
 {
@@ -30,6 +31,7 @@ public:
     bool getScenePlaying() const;
 signals:
     void ogreInitialized();
+    void beforeSceneLoadFinished(const QString& name, const QString& sceneFile, const QString& logicFile);
     void onLoadingProgressChanged(qreal progress);
     void onSceneLoadedChanged(bool sceneLoaded);
     void onScenePlayingChanged(bool scenePlaying);
@@ -39,7 +41,10 @@ public slots:
     void onSceneLoaded(Scene* scene);
     void onSceneLoadFailed(const QString& message);
     void onPlayButtonPressed();
+    void onBeforeSceneLoad(const QString& name, const QString& sceneFile, const QString& logicFile);
 private:
+    CameraNodeObject* getCameraWithName(const QString& name);
+
     QQmlApplicationEngine* mApplicationEngine;
     OgreEngine *mOgreEngine;
     Ogre::SceneManager *mSceneManager;

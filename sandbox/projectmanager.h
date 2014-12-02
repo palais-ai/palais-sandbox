@@ -25,8 +25,10 @@ signals:
     void startSceneLoad(const QString& sceneFile, const QString& logicFile);
     void sceneLoaded(Scene* scene);
     void sceneLoadFailed(const QString& errorMessage);
+    void beforeSceneLoad(const QString& name, const QString& sceneFile, const QString& logicFile);
 public slots:
     void onOpenProject(const QUrl& url);
+    void onBeforeSceneLoadFinished(const QString& name, const QString& sceneFile, const QString& logicFile);
 private:
     SceneManager mScenarioManager;
 };

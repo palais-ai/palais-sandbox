@@ -30,6 +30,8 @@ class CameraNodeObject : public QObject, public OgreCameraWrapper
 public:
     explicit CameraNodeObject(QObject *parent = 0);
 
+    void createCameraWithCurrentSceneManager();
+
     Ogre::SceneNode *sceneNode() const
     { return m_node; }
     Ogre::Camera* camera() const { return m_camera; }
