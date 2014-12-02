@@ -39,10 +39,10 @@ private:
     bool mSceneStarted;
     float mSimulationSpeedFactor;
 
-    static const float sMinimumSpeedFactor = 0.1f; // In times the normal speed
-    static const float sMaximumSpeedFactor = 5.f;  // In times the normal speed
-    static const float sMaximumTickRate = 100.f; // In Ticks Per Second
-    static const float sAITickRate = 100.f; // In Ticks Per Second
+    static const float sMinimumSpeedFactor;
+    static const float sMaximumSpeedFactor;
+    static const float sMaximumTickRate;
+    static const float sAITickRate;
 };
 
 #endif // SCENEMANAGER_H

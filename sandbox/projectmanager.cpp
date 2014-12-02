@@ -62,7 +62,7 @@ void ProjectManager::onOpenProject(const QUrl& url)
     QString sceneFile;
     if(obj.contains(visualPropertyName))
     {
-        sceneFile = url.adjusted(QUrl::RemoveFilename).path() + obj[visualPropertyName].toString();
+        sceneFile = url.adjusted(QUrl::RemoveFilename).toLocalFile() + obj[visualPropertyName].toString();
     }
     else
     {
@@ -74,7 +74,8 @@ void ProjectManager::onOpenProject(const QUrl& url)
     QString logicFile;
     if(obj.contains(logicPropertyName))
     {
-        logicFile = url.adjusted(QUrl::RemoveFilename).path() + obj[logicPropertyName].toString();
+        qDebug("logic file path: %s, adjusted: %s", url.toLocalFile().toStdString().c_str(), url.adjusted(QUrl::RemoveFilename).toLocalFile().toStdString().c_str());
+        logicFile = url.adjusted(QUrl::RemoveFilename).toLocalFile() + obj[logicPropertyName].toString();
     }
     else
     {

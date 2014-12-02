@@ -11,6 +11,11 @@
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
 
+const float SceneManager::sMinimumSpeedFactor = 0.1f; // In times the normal speed
+const float SceneManager::sMaximumSpeedFactor = 5.f;  // In times the normal speed
+const float SceneManager::sMaximumTickRate = 100.f; // In Ticks Per Second
+const float SceneManager::sAITickRate = 100.f; // In Ticks Per Second
+
 SceneManager::SceneManager(OgreEngine* engine, Ogre::SceneManager* sceneManager) :
     mOgreEngine(engine),
     mSceneManager(sceneManager),
@@ -31,7 +36,7 @@ Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, co
     {
         Scene* nextScene = SceneLoader::loadScene(mOgreEngine, mSceneManager, name, sceneFile, logicFile);
 
-        if(nextScene)
+        if(!nextScene)
         {
             qWarning("Scene %s could not be loaded.", name.toStdString().c_str());
             return NULL;
