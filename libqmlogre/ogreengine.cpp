@@ -35,7 +35,10 @@ OgreEngine::OgreEngine(QQuickWindow *window)
 
 OgreEngine::~OgreEngine()
 {
-    //delete m_ogreContext;
+    if(m_ogreContext && m_ogreContext != m_qtContext)
+    {
+        delete m_ogreContext;
+    }
 }
 
 Ogre::Root* OgreEngine::startEngine()
@@ -95,15 +98,23 @@ void OgreEngine::setQuickWindow(QQuickWindow *window)
     Q_ASSERT(window);
 
     m_quickWindow = window;
-    m_qtContext = QOpenGLContext::currentContext();
+    //m_quickWindow->setClearBeforeRendering(true);
 
-    // create a new shared OpenGL context to be used exclusively by Ogre
-    /**m_ogreContext = new QOpenGLContext();
-    m_ogreContext->setFormat(m_quickWindow->requestedFormat());
-    m_ogreContext->setShareContext(m_qtContext);
-    m_ogreContext->create();*/
+    m_qtContext = QOpenGLContext::currentContext();
+    m_qtContext->doneCurrent();
 
     m_ogreContext = m_qtContext;
+
+    // create a new shared OpenGL context to be used exclusively by Ogre
+    m_ogreContext = new QOpenGLContext();
+    m_ogreContext->setFormat(m_quickWindow->requestedFormat());
+    m_ogreContext->setShareContext(m_qtContext);
+    m_ogreContext->create();
+
+    m_ogreContext->doneCurrent();
+
+
+    m_qtContext->makeCurrent(m_quickWindow);
 }
 
 void OgreEngine::activateOgreContext()
@@ -115,6 +126,8 @@ void OgreEngine::activateOgreContext()
     m_qtContext->doneCurrent();
 
     m_ogreContext->makeCurrent(m_quickWindow);
+
+    m_quickWindow->resetOpenGLState();
 }
 
 void OgreEngine::doneOgreContext()
@@ -148,6 +161,8 @@ void OgreEngine::doneOgreContext()
     m_qtContext->makeCurrent(m_quickWindow);
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
+
+    m_quickWindow->resetOpenGLState();
 }
 
 void OgreEngine::lockEngine()

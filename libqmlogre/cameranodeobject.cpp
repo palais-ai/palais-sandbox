@@ -16,6 +16,8 @@
 #include <OgreAxisAlignedBox.h>
 
 #include <QDebug>
+#include <QMutexLocker>
+
 #include <cmath>
 
 extern QMutex g_engineMutex;
@@ -24,14 +26,15 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
     QObject(parent),
     OgreCameraWrapper(),
     mInitialPosition(0,0,0),
+    m_node(0),
     m_camera(0),
     m_yaw(0),
     m_pitch(0),
     m_zoom(1)
 {
-    g_engineMutex.lock();
+    QMutexLocker locker(&g_engineMutex);
+
     createCameraWithCurrentSceneManager();
-    g_engineMutex.unlock();
 }
 
 void CameraNodeObject::createCameraWithCurrentSceneManager()
@@ -92,11 +95,6 @@ void CameraNodeObject::fitToContain(Ogre::SceneNode* node)
                 allVisible = false;
             }
         }
-
-        if(allVisible)
-        {
-            //child->showBoundingBox(true);
-        }
     }
 
     // Scale view to fit
@@ -108,27 +106,75 @@ void CameraNodeObject::fitToContain(Ogre::SceneNode* node)
     m_camera->move(mInitialPosition);
 }
 
+Ogre::SceneNode* CameraNodeObject::sceneNode() const
+{
+    return m_node;
+}
+
+Ogre::Camera* CameraNodeObject::camera() const
+{
+    return m_camera;
+}
+
+qreal CameraNodeObject::yaw() const
+{
+    QMutexLocker locker(&g_engineMutex);
+
+    return m_yaw;
+}
+
+qreal CameraNodeObject::pitch() const
+{
+    QMutexLocker locker(&g_engineMutex);
+
+    return m_pitch;
+}
+
+qreal CameraNodeObject::zoom() const
+{
+    QMutexLocker locker(&g_engineMutex);
+
+    return m_zoom;
+}
+
+void CameraNodeObject::setYaw(qreal y)
+{
+    QMutexLocker locker(&g_engineMutex);
+
+    m_yaw = y;
+    updateRotation();
+}
+
+void CameraNodeObject::setPitch(qreal p)
+{
+    QMutexLocker locker(&g_engineMutex);
+
+    m_pitch = p;
+    updateRotation();
+}
+
 void CameraNodeObject::updateRotation()
 {
-    g_engineMutex.lock();
     m_node->resetOrientation();
     m_node->yaw(Ogre::Radian(Ogre::Degree(m_yaw)));
     m_node->pitch(Ogre::Radian(Ogre::Degree(m_pitch)));
-    g_engineMutex.unlock();
 }
 
 void CameraNodeObject::setZoom(qreal z)
 {
-    g_engineMutex.lock();
+    QMutexLocker locker(&g_engineMutex);
+
     m_zoom = z;
     m_node->resetOrientation();
     m_camera->setPosition(mInitialPosition * (1 / m_zoom));
-    g_engineMutex.unlock();
+
     updateRotation();
 }
 
 void CameraNodeObject::setWireframeMode(bool enabled)
 {
+    QMutexLocker locker(&g_engineMutex);
+
     if(m_camera)
     {
         m_camera->setPolygonMode(enabled ? Ogre::PM_WIREFRAME : Ogre::PM_SOLID);
@@ -137,6 +183,8 @@ void CameraNodeObject::setWireframeMode(bool enabled)
 
 bool CameraNodeObject::getWireframeMode() const
 {
+    QMutexLocker locker(&g_engineMutex);
+
     if(m_camera)
     {
         return m_camera->getPolygonMode() == Ogre::PM_WIREFRAME;

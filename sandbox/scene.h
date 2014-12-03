@@ -34,7 +34,7 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual int rowCount(const QModelIndex &parent) const;
 
-    Q_INVOKABLE void toggleHighlight(int index);
+    Q_INVOKABLE void toggleHighlight(bool highlighted, int index);
     Q_INVOKABLE int size() const;
 
     void setup();

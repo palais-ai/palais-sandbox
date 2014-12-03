@@ -41,11 +41,11 @@ Rectangle {
         onClicked: actorCell.pressed()
         onEntered: {
             actorCell.state = 'HOVER'
-            ActorModel.toggleHighlight(index);
+            ActorModel.toggleHighlight(true, index);
         }
         onExited: {
             actorCell.state = ''
-            ActorModel.toggleHighlight(index);
+            ActorModel.toggleHighlight(false, index);
         }
     }
 

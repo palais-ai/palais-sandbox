@@ -32,23 +32,20 @@ public:
 
     void createCameraWithCurrentSceneManager();
 
-    Ogre::SceneNode *sceneNode() const
-    { return m_node; }
-    Ogre::Camera* camera() const { return m_camera; }
+    Ogre::SceneNode *sceneNode() const;
+    Ogre::Camera* camera() const;
 
-    qreal yaw() const
-    { return m_yaw; }
-    qreal pitch() const
-    { return m_pitch; }
-    qreal zoom() const
-    { return m_zoom; }
-    void setYaw(qreal y)
-    { m_yaw = y; updateRotation(); }
-    void setPitch(qreal p)
-    { m_pitch = p; updateRotation(); }
+    // Thread-safe
+    qreal yaw() const;
+    qreal pitch() const;
+    qreal zoom() const;
+    void setYaw(qreal y);
+    void setPitch(qreal p);
     void setZoom(qreal z);
     void setWireframeMode(bool enabled);
     bool getWireframeMode() const;
+
+    // Not thread-safe
     void fitToContain(Ogre::SceneNode* node);
 
 private:

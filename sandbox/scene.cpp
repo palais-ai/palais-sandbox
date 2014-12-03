@@ -62,17 +62,19 @@ void Scene::destroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode )
    }
 }
 
-void Scene::toggleHighlight(int index)
+void Scene::toggleHighlight(bool highlighted, int index)
 {
     mEngine->lockEngine();
+
     if(index >= 0 && index < mActors.size())
     {
-        mActors.values().at(index)->toggleHighlight();
+        mActors.values().at(index)->toggleHighlight(highlighted);
     }
     else
     {
         qWarning("Tried to access actor index beyond bounds idx=%d.", index);
     }
+
     mEngine->unlockEngine();
 }
 

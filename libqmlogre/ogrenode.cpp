@@ -39,12 +39,19 @@ OgreNode::OgreNode()
 
 OgreNode::~OgreNode()
 {
-    if (m_renderTarget) {
+    if (m_renderTarget)
+    {
         m_renderTarget->removeAllViewports();
     }
 
-    if (Ogre::Root::getSingletonPtr()) {
+    if (Ogre::Root::getSingletonPtr())
+    {
         Ogre::Root::getSingletonPtr()->detachRenderTarget(m_renderTarget);
+    }
+
+    if (m_renderTarget)
+    {
+        Ogre::TextureManager::getSingleton().remove("RttTex");
     }
 }
 
@@ -76,6 +83,7 @@ GLuint OgreNode::getOgreFboId()
 {
     if (!m_renderTarget)
     {
+        qWarning("No render target present, but FBO was requested.");
         return 0;
     }
 
@@ -95,9 +103,13 @@ void OgreNode::preprocess()
     m_ogreEngineItem->lockEngine();
 
     if (!m_renderTarget)
+    {
+        qWarning("no render target");
         return;
+    }
 
     activateOgreContext();
+
     m_renderTarget->update();
     doneOgreContext();
 
@@ -106,7 +118,8 @@ void OgreNode::preprocess()
 
 void OgreNode::update()
 {
-    if (true) {
+    if (true)
+    {
         m_ogreEngineItem->lockEngine();
 
         activateOgreContext();
@@ -163,7 +176,9 @@ void OgreNode::updateFBO()
 void OgreNode::setSize(const QSize &size)
 {
     if (size == m_size)
+    {
         return;
+    }
 
     m_size = size;
     m_dirtyFBO = true;

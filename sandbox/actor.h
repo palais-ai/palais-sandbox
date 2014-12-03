@@ -15,7 +15,7 @@ class Actor : public QObject
 public:
     Actor(Ogre::SceneNode* node);
 
-    void toggleHighlight();
+    void toggleHighlight(bool highlighted);
 
     QString getName() const;
     const QVariant& getKnowledge(const QString& key) const;

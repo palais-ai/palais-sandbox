@@ -13,9 +13,9 @@ Actor::Actor(Ogre::SceneNode* node) :
     }
 }
 
-void Actor::toggleHighlight()
+void Actor::toggleHighlight(bool highlighted)
 {
-    mNode->showBoundingBox(!mNode->getShowBoundingBox());
+    mNode->showBoundingBox(highlighted);
 }
 
 QString Actor::getName() const

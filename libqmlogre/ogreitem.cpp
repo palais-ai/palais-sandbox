@@ -39,6 +39,7 @@ QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     node->setCamera(m_camera->camera());
     node->setSize(QSize(width(), height()));
     node->update();
+
     // mark texture dirty, otherwise Qt will not trigger a redraw (preprocess())
     node->markDirty(QSGNode::DirtyMaterial);
 
