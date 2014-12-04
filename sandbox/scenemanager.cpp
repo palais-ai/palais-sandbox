@@ -21,7 +21,8 @@ SceneManager::SceneManager(OgreEngine* engine, Ogre::SceneManager* sceneManager)
     mSceneManager(sceneManager),
     mCurrentScene(NULL),
     mSceneStarted(false),
-    mSimulationSpeedFactor(1)
+    mSimulationSpeedFactor(1),
+    mLastUpdateTime(QTime::currentTime())
 {
     assert(engine);
     assert(sceneManager);
@@ -64,6 +65,7 @@ void SceneManager::pause()
 
 void SceneManager::start()
 {
+    mLastUpdateTime = QTime::currentTime();
     mSceneStarted = true;
 }
 
@@ -74,10 +76,10 @@ bool SceneManager::isPlaying() const
 
 void SceneManager::timerEvent(QTimerEvent*)
 {
-    static QTime before = QTime::currentTime();
+    static float accumulator = 0;
 
     QTime now = QTime::currentTime();
-    float accumulator = before.msecsTo(now) * mSimulationSpeedFactor;
+    accumulator += mLastUpdateTime.msecsTo(now) * mSimulationSpeedFactor;
 
     if(mCurrentScene && mSceneStarted)
     {
@@ -90,13 +92,12 @@ void SceneManager::timerEvent(QTimerEvent*)
         }
     }
 
-    // Don't forget the leftovers.
-    before = now.addMSecs(-accumulator);
+    mLastUpdateTime = now;
 }
 
 void SceneManager::setSimulationSpeed(float speedFactor)
 {
-    if(speedFactor > sMinimumSpeedFactor && speedFactor < sMaximumSpeedFactor)
+    if(speedFactor >= sMinimumSpeedFactor && speedFactor <= sMaximumSpeedFactor)
     {
         mSimulationSpeedFactor = speedFactor;
     }

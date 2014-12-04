@@ -80,8 +80,6 @@ void Application::initializeOgre()
     // start up Ogre
     mOgreEngine = new OgreEngine(window);
 
-    connect(mOgreEngine, &OgreEngine::onLoadingProgressChanged, this, &Application::onLoadingProgressChanged);
-
     mRoot = mOgreEngine->startEngine();
     mOgreEngine->setupResources();
 
@@ -201,11 +199,6 @@ void Application::onSceneLoaded(Scene* scene)
 
     mApplicationEngine->rootContext()->setContextProperty("ActorModel", scene);
     emit(onSceneLoadedChanged(true));
-}
-
-qreal Application::loadingProgress() const
-{
-    return mOgreEngine ? mOgreEngine->loadingProgress() : 0;
 }
 
 bool Application::getSceneLoaded() const

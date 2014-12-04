@@ -6,6 +6,8 @@
 #include <QScriptEngine>
 #include <QMap>
 #include <QAbstractListModel>
+#include <QVector3D>
+#include <QQuaternion>
 
 class Actor;
 class OgreEngine;
@@ -18,6 +20,8 @@ class Scene : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ getName)
+    Q_PROPERTY(QVariantMap knowledge READ getKnowledge)
+    Q_PROPERTY(QObjectList actors READ getActorsArray)
 public:
     enum ModelRole {
         ModelRoleName = Qt::UserRole + 1,
@@ -37,17 +41,25 @@ public:
     Q_INVOKABLE void toggleHighlight(bool highlighted, int index);
     Q_INVOKABLE int size() const;
 
+    Q_INVOKABLE Actor* instantiate(const QString& name, Actor* prototype, const QVector3D& position, const QQuaternion& rotation);
+    Q_INVOKABLE void destroy(Actor* actor);
+
     void setup();
     void update(float time);
     void performAction(const QString& actionName, const QVariant& params);
-    QVariant getGlobalKnowledge(const QString& knowledgeKey) const;
-    void setGlobalKnowledge(const QString& knowledgeKey, const QVariant& value);
+
+    Q_INVOKABLE bool hasKnowledge(const QString& knowledgeKey) const;
+    Q_INVOKABLE QVariant getKnowledge(const QString& knowledgeKey) const;
+    Q_INVOKABLE void setKnowledge(const QString& knowledgeKey, const QVariant& value);
     QVariant getActorKnowledge(const QString& actorName, const QString& knowledgeKey) const;
     void setActorKnowledge(const QString& actorName, const QString& knowledgeKey, const QVariant& value);
 
     QScriptEngine& getScriptEngine();
     const QMap<QString, Actor*>& getActors() const;
+    Q_INVOKABLE QObjectList getActorsArray() const;
+    QVariantMap& getKnowledge();
     const QString& getName() const;
+    void checkScriptEngineException(const QString& context = QString());
 private:
     void getActors(Ogre::SceneNode* root);
     void destroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode );
@@ -57,6 +69,7 @@ private:
     OgreEngine* mEngine;
     QScriptEngine mLogicScript;
     QMap<QString, Actor*> mActors;
+    QVariantMap mKnowledge;
 };
 
 #endif // SCENE_H

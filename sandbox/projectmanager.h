@@ -21,6 +21,7 @@ public:
     bool isPlaying() const;
     void play();
     void pause();
+    Q_INVOKABLE void setSimulationSpeed(float speedFactor);
 signals:
     void startSceneLoad(const QString& sceneFile, const QString& logicFile);
     void sceneLoaded(Scene* scene);

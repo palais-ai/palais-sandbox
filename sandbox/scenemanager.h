@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QObject>
+#include <QTime>
 
 class OgreEngine;
 class Scene;
@@ -38,6 +39,7 @@ private:
     Scene* mCurrentScene;
     bool mSceneStarted;
     float mSimulationSpeedFactor;
+    QTime mLastUpdateTime;
 
     static const float sMinimumSpeedFactor;
     static const float sMaximumSpeedFactor;

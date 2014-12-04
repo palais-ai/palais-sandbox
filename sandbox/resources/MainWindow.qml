@@ -6,8 +6,8 @@ import QtQuick.Dialogs 1.2
 
 ApplicationWindow {
     id: appWindow
-    width: Screen.width
-    height: Screen.height
+    //width: Screen.width
+    //height: Screen.height
     visible: true
     title: "AI Sandbox"
     color: "black"

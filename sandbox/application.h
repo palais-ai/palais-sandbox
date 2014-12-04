@@ -18,7 +18,6 @@ class CameraNodeObject;
 class Application : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(qreal loadingProgress READ loadingProgress NOTIFY onLoadingProgressChanged)
     Q_PROPERTY(bool sceneLoaded READ getSceneLoaded NOTIFY onSceneLoadedChanged)
     Q_PROPERTY(bool scenePlaying READ getScenePlaying NOTIFY onScenePlayingChanged)
 public:
@@ -32,7 +31,6 @@ public:
 signals:
     void ogreInitialized();
     void beforeSceneLoadFinished(const QString& name, const QString& sceneFile, const QString& logicFile);
-    void onLoadingProgressChanged(qreal progress);
     void onSceneLoadedChanged(bool sceneLoaded);
     void onScenePlayingChanged(bool scenePlaying);
 public slots:

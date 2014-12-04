@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-#include <QHash>
+#include <QtDebug>
 
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>
@@ -64,8 +64,6 @@ void Scene::destroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode )
 
 void Scene::toggleHighlight(bool highlighted, int index)
 {
-    mEngine->lockEngine();
-
     if(index >= 0 && index < mActors.size())
     {
         mActors.values().at(index)->toggleHighlight(highlighted);
@@ -74,8 +72,6 @@ void Scene::toggleHighlight(bool highlighted, int index)
     {
         qWarning("Tried to access actor index beyond bounds idx=%d.", index);
     }
-
-    mEngine->unlockEngine();
 }
 
 int Scene::size() const
@@ -131,6 +127,33 @@ const QMap<QString, Actor*>& Scene::getActors() const
     return mActors;
 }
 
+Actor* Scene::instantiate(const QString& name, Actor* prototype, const QVector3D& position, const QQuaternion& rotation)
+{
+    return NULL;
+}
+
+void Scene::destroy(Actor* actor)
+{
+
+}
+
+QObjectList Scene::getActorsArray() const
+{
+    QObjectList list;
+
+    for(QMap<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
+    {
+        list += it.value();
+    }
+
+    return list;
+}
+
+QVariantMap& Scene::getKnowledge()
+{
+    return mKnowledge;
+}
+
 void Scene::getActors(Ogre::SceneNode* root)
 {
     if(!root)
@@ -159,6 +182,24 @@ void Scene::setup()
     if(fun.isFunction())
     {
         fun.call();
+
+        checkScriptEngineException("onStart");
+    }
+}
+
+void Scene::checkScriptEngineException(const QString& context)
+{
+    if(mLogicScript.hasUncaughtException())
+    {
+        if(context.isEmpty())
+        {
+            qWarning() << "Exception in loaded logic file "
+                       << mLogicFile << ", ERROR:" << mLogicScript.uncaughtException().toString();
+        }
+        else
+        {
+            qWarning() << "Exception in " << context << ", ERROR:" << mLogicScript.uncaughtException().toString();
+        }
     }
 }
 
@@ -167,7 +208,9 @@ void Scene::update(float time)
     QScriptValue fun = mLogicScript.globalObject().property("update");
     if(fun.isFunction())
     {
-        fun.call(QScriptValue(), QScriptValueList() << time);
+        fun.call(QScriptValue(), QScriptValueList() << time / 1000.f);
+
+        checkScriptEngineException("update");
     }
 }
 
@@ -177,27 +220,34 @@ void Scene::performAction(const QString& actionName, const QVariant& params)
     if(fun.isFunction())
     {
         fun.call(QScriptValue(), QScriptValueList() << mLogicScript.newVariant(params));
+
+        checkScriptEngineException("performAction( " + actionName + " )");
     }
 }
 
-QVariant Scene::getGlobalKnowledge(const QString& knowledgeKey) const
+bool Scene::hasKnowledge(const QString& knowledgeKey) const
 {
-    return QVariant();
+    return mKnowledge.contains(knowledgeKey);
 }
 
-void Scene::setGlobalKnowledge(const QString& knowledgeKey, const QVariant& value)
+QVariant Scene::getKnowledge(const QString& knowledgeKey) const
 {
-    ;
+    return mKnowledge[knowledgeKey];
+}
+
+void Scene::setKnowledge(const QString& knowledgeKey, const QVariant& value)
+{
+    mKnowledge[knowledgeKey] = value;
 }
 
 QVariant Scene::getActorKnowledge(const QString& actorName, const QString& knowledgeKey) const
 {
-    return QVariant();
+    return mActors[actorName]->getKnowledge(knowledgeKey);
 }
 
 void Scene::setActorKnowledge(const QString& actorName, const QString& knowledgeKey, const QVariant& value)
 {
-    ;
+    mActors[actorName]->setKnowledge(knowledgeKey, value);
 }
 
 QScriptEngine& Scene::getScriptEngine()

@@ -36,6 +36,10 @@ void ProjectManager::pause()
     mScenarioManager.pause();
 }
 
+void ProjectManager::setSimulationSpeed(float speedFactor)
+{
+    mScenarioManager.setSimulationSpeed(speedFactor);
+}
 
 void ProjectManager::onOpenProject(const QUrl& url)
 {

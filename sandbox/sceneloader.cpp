@@ -1,12 +1,12 @@
 #include "sceneloader.h"
 #include "scene.h"
 #include "actor.h"
+#include "javascriptbindings.h"
 
 #include <exception>
 
 #include <QScopedPointer>
 #include <QtGlobal>
-#include <QTextStream>
 
 #include <OgreSceneManager.h>
 #include <OgreString.h>
@@ -67,21 +67,6 @@ void SceneLoader::loadSceneVisuals(OgreEngine* engine, Ogre::SceneManager* scene
     }
 }
 
-static QScriptValue print(QScriptContext *context, QScriptEngine *engine)
-{
-    QTextStream stream(stderr, QIODevice::WriteOnly);
-
-    for(int i = 0; i < context->argumentCount(); ++i)
-    {
-        stream << context->argument(i).toVariant().toString();
-    }
-
-    stream << "\n";
-    stream.flush();
-
-    return QScriptValue();
-}
-
 void SceneLoader::loadSceneLogic(Scene* scene, const QString& logicFile)
 {
     if(!scene)
@@ -101,5 +86,10 @@ void SceneLoader::loadSceneLogic(Scene* scene, const QString& logicFile)
 
     QScriptEngine& engine = scene->getScriptEngine();
     engine.evaluate(QScriptProgram(QString(ba), logicFile));
-    engine.globalObject().setProperty("print", engine.newFunction(print));
+
+    scene->checkScriptEngineException();
+
+    JavaScriptBindings::addBindings(engine, scene);
+
+    qDebug("JS Bindings have been installed.");
 }

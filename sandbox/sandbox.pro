@@ -13,7 +13,8 @@ SOURCES += main.cpp \
     sceneloader.cpp \
     scene.cpp \
     projectmanager.cpp \
-    actor.cpp
+    actor.cpp \
+    javascriptbindings.cpp
 
 HEADERS += \
     application.h \
@@ -21,7 +22,8 @@ HEADERS += \
     sceneloader.h \
     scene.h \
     projectmanager.h \
-    actor.h
+    actor.h \
+    javascriptbindings.h
 
 OTHER_FILES += \
     config/resources.cfg

@@ -43,7 +43,7 @@ RowLayout {
             stepSize: 0.1
             value: 1
             opacity: 0.8
-            onValueChanged: console.log(speedSlider.value)
+            onValueChanged: ProjectManager.setSimulationSpeed(speedSlider.value)
         }
     }
 
