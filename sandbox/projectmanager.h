@@ -2,7 +2,12 @@
 #define PROJECTMANAGER_H
 
 #include "scenemanager.h"
+#include "actorservice.h"
+#include "knowledgeservice.h"
+
 #include <QObject>
+
+#include "../libqjsonrpc/src/qjsonrpclocalserver.h"
 
 class OgreEngine;
 class Scene;
@@ -16,6 +21,7 @@ class ProjectManager : public QObject
     Q_OBJECT
 public:
     explicit ProjectManager(OgreEngine* engine, Ogre::SceneManager* sceneManager);
+    ~ProjectManager();
 
     bool getSceneLoaded() const;
     bool isPlaying() const;
@@ -32,6 +38,9 @@ public slots:
     void onBeforeSceneLoadFinished(const QString& name, const QString& sceneFile, const QString& logicFile);
 private:
     SceneManager mScenarioManager;
+    KnowledgeService mKnowledgeService;
+    ActorService mActorService;
+    QJsonRpcLocalServer mServer;
 };
 
 #endif // PROJECTMANAGER_H

@@ -1,4 +1,7 @@
 TEMPLATE = subdirs
 SUBDIRS = libqmlogre \
-          sandbox \
-    libdotsceneloader
+    libdotsceneloader \
+    libqjsonrpc \
+    sandbox
+
+CONFIG += ordered

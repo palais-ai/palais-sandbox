@@ -11,6 +11,8 @@
 #include "ogreitem.h"
 #include "cameranodeobject.h"
 
+#include <exception>
+
 #include <Ogre.h>
 #include <QOpenGLFunctions>
 #include <QDir>
@@ -51,7 +53,7 @@ Ogre::Root* OgreEngine::startEngine()
 
     if(!renderSystem)
     {
-        throw "render system not found.";
+        throw std::runtime_error("Render system not found. The RenderSystemGL shared library is most likely not being found.");
     }
 
     ogreRoot->setRenderSystem(renderSystem);

@@ -219,7 +219,13 @@ void Scene::performAction(const QString& actionName, const QVariant& params)
     QScriptValue fun = mLogicScript.globalObject().property(actionName);
     if(fun.isFunction())
     {
-        fun.call(QScriptValue(), QScriptValueList() << mLogicScript.newVariant(params));
+        QScriptValueList list;
+        if(params.isValid())
+        {
+                list << mLogicScript.newVariant(params);
+        }
+
+        fun.call(QScriptValue(), list);
 
         checkScriptEngineException("performAction( " + actionName + " )");
     }
@@ -238,6 +244,11 @@ QVariant Scene::getKnowledge(const QString& knowledgeKey) const
 void Scene::setKnowledge(const QString& knowledgeKey, const QVariant& value)
 {
     mKnowledge[knowledgeKey] = value;
+}
+
+bool Scene::hasActorKnowledge(const QString& actorName, const QString& knowledgeKey) const
+{
+    return mActors[actorName]->hasKnowledge(knowledgeKey);
 }
 
 QVariant Scene::getActorKnowledge(const QString& actorName, const QString& knowledgeKey) const

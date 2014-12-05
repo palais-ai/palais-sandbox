@@ -59,6 +59,12 @@ QString Actor::getName() const
     return mNode->getName().c_str();
 }
 
+
+bool Actor::hasKnowledge(const QString& key) const
+{
+    return mKnowledge.contains(key);
+}
+
 const QVariant& Actor::getKnowledge(const QString& key) const
 {
     return mKnowledge[key];

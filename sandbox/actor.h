@@ -29,6 +29,7 @@ public:
     void setRotation(const Ogre::Quaternion& rotation);
 
     QString getName() const;
+    Q_INVOKABLE bool hasKnowledge(const QString& key) const;
     Q_INVOKABLE const QVariant& getKnowledge(const QString& key) const;
     Q_INVOKABLE void setKnowledge(const QString& key, const QVariant& value);
 

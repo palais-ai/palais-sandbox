@@ -14,7 +14,9 @@ SOURCES += main.cpp \
     scene.cpp \
     projectmanager.cpp \
     actor.cpp \
-    javascriptbindings.cpp
+    javascriptbindings.cpp \
+    knowledgeservice.cpp \
+    actorservice.cpp
 
 HEADERS += \
     application.h \
@@ -23,7 +25,9 @@ HEADERS += \
     scene.h \
     projectmanager.h \
     actor.h \
-    javascriptbindings.h
+    javascriptbindings.h \
+    knowledgeservice.h \
+    actorservice.h
 
 OTHER_FILES += \
     config/resources.cfg
@@ -51,7 +55,7 @@ macx {
         ConfigFiles.files += config/resources.cfg config/plugins.cfg
         ConfigFiles.path = Contents/MacOS
 
-        PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib
+        PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib $$files($$OUT_PWD/../libqjsonrpc/src/libqjsonrpc.1.dylib)
         PluginFiles.path = Contents/Plugins
 
         MediaFiles.files += $$files(media/*)
@@ -122,28 +126,23 @@ macx {
 
 RESOURCES += resources/resources.qrc
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqmlogre/release/ -lqmlogre
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqmlogre/debug/ -lqmlogre
-else:unix: LIBS += -L$$OUT_PWD/../libqmlogre/ -lqmlogre
+unix|win32: LIBS += -L$$OUT_PWD/../libqmlogre/ -lqmlogre
 
 INCLUDEPATH += $$PWD/../libqmlogre
 DEPENDPATH += $$PWD/../libqmlogre
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/release/libqmlogre.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/debug/libqmlogre.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/release/qmlogre.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/debug/qmlogre.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/libqmlogre.a
+win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/qmlogre.lib
+else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/libqmlogre.a
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libdotsceneloader/release/ -ldotsceneloader
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libdotsceneloader/debug/ -ldotsceneloader
-else:unix: LIBS += -L$$OUT_PWD/../libdotsceneloader/ -ldotsceneloader
+unix|win32: LIBS += -L$$OUT_PWD/../libdotsceneloader/ -ldotsceneloader
 
 INCLUDEPATH += $$PWD/../libdotsceneloader
 DEPENDPATH += $$PWD/../libdotsceneloader
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/release/libdotsceneloader.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/debug/libdotsceneloader.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/release/dotsceneloader.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/debug/dotsceneloader.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/libdotsceneloader.a
+win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/dotsceneloader.lib
+else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/libdotsceneloader.a
+
+unix|win32: LIBS += -L$$OUT_PWD/../libqjsonrpc/src/ -lqjsonrpc
+
+INCLUDEPATH += $$PWD/../libqjsonrpc/src
+DEPENDPATH += $$PWD/../libqjsonrpc/src

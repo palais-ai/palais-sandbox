@@ -79,10 +79,11 @@ void SceneManager::timerEvent(QTimerEvent*)
     static float accumulator = 0;
 
     QTime now = QTime::currentTime();
-    accumulator += mLastUpdateTime.msecsTo(now) * mSimulationSpeedFactor;
 
     if(mCurrentScene && mSceneStarted)
     {
+        accumulator += mLastUpdateTime.msecsTo(now) * mSimulationSpeedFactor;
+
         float oneStep =  1000.f / sAITickRate;
         while(accumulator > oneStep)
         {

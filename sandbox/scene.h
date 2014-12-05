@@ -46,11 +46,12 @@ public:
 
     void setup();
     void update(float time);
-    void performAction(const QString& actionName, const QVariant& params);
+    void performAction(const QString& actionName, const QVariant& params = QVariant());
 
     Q_INVOKABLE bool hasKnowledge(const QString& knowledgeKey) const;
     Q_INVOKABLE QVariant getKnowledge(const QString& knowledgeKey) const;
     Q_INVOKABLE void setKnowledge(const QString& knowledgeKey, const QVariant& value);
+    bool hasActorKnowledge(const QString& actorName, const QString& knowledgeKey) const;
     QVariant getActorKnowledge(const QString& actorName, const QString& knowledgeKey) const;
     void setActorKnowledge(const QString& actorName, const QString& knowledgeKey, const QVariant& value);
 

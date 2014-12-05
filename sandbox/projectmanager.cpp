@@ -4,6 +4,8 @@
 #include <QJsonObject>
 #include <QFile>
 #include <QString>
+#include <QDebug>
+#include <QDir>
 
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
@@ -12,8 +14,34 @@
 
 ProjectManager::ProjectManager(OgreEngine* engine, Ogre::SceneManager* sceneManager) :
     QObject(0),
-    mScenarioManager(engine, sceneManager)
+    mScenarioManager(engine, sceneManager),
+    mKnowledgeService(mScenarioManager),
+    mActorService(mScenarioManager)
 {
+    QString serviceName = QDir::temp().absoluteFilePath("SandboxService");
+    if (QFile::exists(serviceName))
+    {
+        if (!QFile::remove(serviceName))
+        {
+            qWarning() << "Couldn't delete local temporary service file.";
+        }
+    }
+
+    mServer.addService(&mKnowledgeService);
+    mServer.addService(&mActorService);
+    if (!mServer.listen(serviceName))
+    {
+        qWarning() << "Couldn't start the sandbox service, because " << mServer.errorString();
+    }
+}
+
+ProjectManager::~ProjectManager()
+{
+    if(!mServer.removeService(&mKnowledgeService) ||
+       !mServer.removeService(&mActorService))
+    {
+        qWarning() << "Failed to remove the sandbox services on close.";
+    }
 }
 
 bool ProjectManager::getSceneLoaded() const
