@@ -1,6 +1,7 @@
 #ifndef KNOWLEDGESERVICE_H
 #define KNOWLEDGESERVICE_H
 
+#undef QJSONRPC_BUILD
 #include "../libqjsonrpc/src/qjsonrpcservice.h"
 
 class SceneManager;

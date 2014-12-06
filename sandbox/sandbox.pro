@@ -7,6 +7,10 @@ UI_DIR = ./.ui
 OBJECTS_DIR = ./.obj
 MOC_DIR = ./.moc
 
+# This is important for win32 linkage.
+DEFINES -= QJSONRPC_BUILD
+DEFINES += QJSONRPC_SHARED
+
 SOURCES += main.cpp \
     application.cpp \
     scenemanager.cpp \
@@ -31,6 +35,12 @@ HEADERS += \
 
 OTHER_FILES += \
     config/resources.cfg
+
+CONFIG(release, debug|release) {
+    M_BUILD_DIR = release
+} else {
+    M_BUILD_DIR = debug
+}
 
 macx {
     OGREDIR = $$(OGRE_HOME)
@@ -73,16 +83,13 @@ macx {
     } else {
         message(Using Ogre libraries in $$OGREDIR)
 
-        CONFIG(release, debug|release) {
-            DESTDIR = $$OUT_PWD/release
-        } else {
-            DESTDIR = $$OUT_PWD/debug
-        }
+        DESTDIR = $$OUT_PWD/$$M_BUILD_DIR
 
         message(Putting libraries in $$DESTDIR)
         message(QDIRs are in $$[QT_INSTALL_LIBS])
 
         package.path = $$DESTDIR
+        package.files += $$OUT_PWD/../libqjsonrpc/src/$$M_BUILD_DIR/qjsonrpc1.dll
         package.files += $$OGREDIR/bin/release/opt/*.dll $$OGREDIR/bin/release/*.dll
         package.files += $$OGREDIR/bin/debug/opt/*.dll $$OGREDIR/bin/debug/*.dll
         package.files += $$[QT_INSTALL_LIBS]/../bin/*.dll
@@ -90,26 +97,25 @@ macx {
 
         # Copy all resources to build folder
         Resources.path = $$DESTDIR/Resources
-        Resources.files += media/*.zip
+        Resources.files += media/*
 
         # Copy all config files to build folder
         Config.path = $$DESTDIR
         Config.files += config/resources.cfg
-
-        CONFIG(release, debug|release) {
-            Config.files += config/release/plugins.cfg
-        } else {
-            Config.files += config/debug/plugins.cfg
-        }
+        Config.files += config/$$M_BUILD_DIR/plugins.cfg
 
         INSTALLS += package Resources Config
 
         INCLUDEPATH += $$OGREDIR/include/OGRE
         INCLUDEPATH += $$OGREDIR/include/OGRE/RenderSystems/GL
+
+        LIBS += -L$$OGREDIR/lib/$$M_BUILD_DIR -L$$OGREDIR/lib/$$M_BUILD_DIR/opt
+        QMAKE_LIBDIR += $$OGREDIR/lib/$$M_BUILD_DIR $$OGREDIR/lib/$$M_BUILD_DIR/opt
+
         CONFIG(release, debug|release) {
-            LIBS += -L$$OGREDIR/lib/release -L$$OGREDIR/lib/release/opt -lOgreMain -lRenderSystem_GL
+            LIBS += -lOgreMain -lRenderSystem_GL
         } else {
-            LIBS += -L$$OGREDIR/lib/debug -L$$OGREDIR/lib/debug/opt -lOgreMain_d -lRenderSystem_GL_d
+            LIBS += -lOgreMain_d -lRenderSystem_GL_d
         }
 
         BOOSTDIR = $$OGREDIR/boost
@@ -126,12 +132,18 @@ macx {
 
 RESOURCES += resources/resources.qrc
 
+win32 {
+    QMAKE_LIBDIR += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR
+    QMAKE_LIBDIR += $$OUT_PWD/../libdotsceneloader/$$M_BUILD_DIR
+    QMAKE_LIBDIR += $$OUT_PWD/../libqjsonrpc/src/$$M_BUILD_DIR
+}
+
 unix|win32: LIBS += -L$$OUT_PWD/../libqmlogre/ -lqmlogre
 
 INCLUDEPATH += $$PWD/../libqmlogre
 DEPENDPATH += $$PWD/../libqmlogre
 
-win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/qmlogre.lib
+win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR/qmlogre.lib
 else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/libqmlogre.a
 
 unix|win32: LIBS += -L$$OUT_PWD/../libdotsceneloader/ -ldotsceneloader
@@ -139,10 +151,12 @@ unix|win32: LIBS += -L$$OUT_PWD/../libdotsceneloader/ -ldotsceneloader
 INCLUDEPATH += $$PWD/../libdotsceneloader
 DEPENDPATH += $$PWD/../libdotsceneloader
 
-win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/dotsceneloader.lib
+win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/$$M_BUILD_DIR/dotsceneloader.lib
 else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/libdotsceneloader.a
 
-unix|win32: LIBS += -L$$OUT_PWD/../libqjsonrpc/src/ -lqjsonrpc
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqjsonrpc/src/release/ -lqjsonrpc1
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqjsonrpc/src/debug/ -lqjsonrpc1
+else:unix: LIBS += -L$$OUT_PWD/../libqjsonrpc/src/ -lqjsonrpc
 
 INCLUDEPATH += $$PWD/../libqjsonrpc/src
 DEPENDPATH += $$PWD/../libqjsonrpc/src

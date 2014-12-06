@@ -1,6 +1,7 @@
 #ifndef ACTORSERVICE_H
 #define ACTORSERVICE_H
 
+#undef QJSONRPC_BUILD
 #include "../libqjsonrpc/src/qjsonrpcservice.h"
 
 class SceneManager;

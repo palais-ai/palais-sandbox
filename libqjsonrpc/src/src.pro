@@ -9,7 +9,7 @@ QT -= gui
 DEFINES += QJSONRPC_BUILD
 CONFIG += $${QJSONRPC_LIBRARY_TYPE}
 VERSION = $${QJSONRPC_VERSION}
-win32:DESTDIR = $$OUT_PWD
+#win32:DESTDIR = $$OUT_PWD
 macx:QMAKE_LFLAGS_SONAME = -Wl,-install_name,@executable_path/../Plugins/
 
 # check if we need to build qjson
