@@ -13,6 +13,9 @@
 
 #include <exception>
 
+#include <OgreAnimation.h>
+
+#include <QDebug>
 #include <Ogre.h>
 #include <QOpenGLFunctions>
 #include <QDir>
@@ -40,11 +43,19 @@ OgreEngine::~OgreEngine()
 
 Ogre::Root* OgreEngine::startEngine()
 {
-    m_resources_cfg = "resources.cfg";
-
     activateOgreContext();
 
-    Ogre::Root *ogreRoot = new Ogre::Root;
+    QString basePath = QCoreApplication::applicationDirPath();
+    qDebug() << "The base path is " << basePath;
+
+    m_resources_cfg = (basePath + "/resources.cfg").toStdString();
+    qDebug() << "Resources path is " << QString::fromStdString(m_resources_cfg);
+
+    Ogre::Root *ogreRoot = new Ogre::Root("", m_resources_cfg, "");
+
+    ogreRoot->loadPlugin((basePath + "/../Plugins/RenderSystem_GL").toStdString());
+    ogreRoot->loadPlugin((basePath + "/../Plugins/Plugin_OctreeSceneManager").toStdString());
+
     Ogre::RenderSystem *renderSystem = ogreRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
 
 #if defined(Q_OS_WIN)
@@ -73,6 +84,9 @@ Ogre::Root* OgreEngine::startEngine()
     m_ogreWindow = ogreRoot->createRenderWindow("OgreWindow", 1, 1, false, &params);
     m_ogreWindow->setVisible(false);
     m_ogreWindow->update(false);
+
+    Ogre::Animation::setDefaultInterpolationMode(Ogre::Animation::IM_LINEAR);
+    Ogre::Animation::setDefaultRotationInterpolationMode(Ogre::Animation::RIM_LINEAR);
 
     doneOgreContext();
 
@@ -184,6 +198,8 @@ QSGTexture* OgreEngine::createTextureFromId(uint id, const QSize &size, QQuickWi
 
 void OgreEngine::setupResources(void)
 {
+    QString basePath = QCoreApplication::applicationDirPath();
+
     // Load resource paths from config file
     Ogre::ConfigFile cf;
     cf.load(m_resources_cfg);
@@ -201,6 +217,11 @@ void OgreEngine::setupResources(void)
         {
             typeName = i->first;
             archName = i->second;
+            archName = (basePath + "/" + QString::fromStdString(archName)).toStdString();
+
+            qDebug() << "archName: " << QString::fromStdString(archName);
+            qDebug() << "typeName: " << QString::fromStdString(typeName);
+            qDebug() << "secName: " << QString::fromStdString(secName);
 
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
                 archName, typeName, secName);

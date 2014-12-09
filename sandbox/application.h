@@ -2,6 +2,7 @@
 #define APPLICATION_H
 
 #include <QObject>
+#include <QIdentityProxyModel>
 
 class Scene;
 class ProjectManager;
@@ -15,12 +16,19 @@ class OgreEngine;
 class QQmlApplicationEngine;
 class CameraNodeObject;
 
+class ActorProxyModel : public QIdentityProxyModel
+{
+    Q_OBJECT
+};
+
 class Application : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool sceneLoaded READ getSceneLoaded NOTIFY onSceneLoadedChanged)
     Q_PROPERTY(bool scenePlaying READ getScenePlaying NOTIFY onScenePlayingChanged)
 public:
+    static const std::string sSceneManagerName;
+
     explicit Application(QObject *parent = 0);
     ~Application();
 
@@ -44,6 +52,7 @@ private:
     CameraNodeObject* getCameraWithName(const QString& name);
 
     QQmlApplicationEngine* mApplicationEngine;
+    ActorProxyModel mActorProxyModel;
     OgreEngine *mOgreEngine;
     Ogre::SceneManager *mSceneManager;
     ProjectManager* mProjectManager;

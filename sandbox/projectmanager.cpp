@@ -14,7 +14,7 @@
 
 ProjectManager::ProjectManager(OgreEngine* engine, Ogre::SceneManager* sceneManager) :
     QObject(0),
-    mScenarioManager(engine, sceneManager),
+    mScenarioManager(engine),
     mKnowledgeService(mScenarioManager),
     mActorService(mScenarioManager)
 {

@@ -13,6 +13,7 @@ Q_DECLARE_METATYPE(Ogre::Vector3)
 Q_DECLARE_METATYPE(Ogre::Vector3*)
 Q_DECLARE_METATYPE(Ogre::Quaternion)
 Q_DECLARE_METATYPE(Ogre::Quaternion*)
+Q_DECLARE_METATYPE(Actor*)
 
 namespace JavaScriptBindings
 {
@@ -25,12 +26,13 @@ void addBindings(QScriptEngine& engine, Scene* scene)
         return;
     }
 
+    Actor_register_prototype(engine);
+
     QScriptValue sceneVal = engine.newQObject(scene);
 
     engine.globalObject().setProperty("scene", sceneVal);
 
     Vector3_register_prototype(engine);
-    engine.globalObject().setProperty("Vector3", engine.newFunction(Vector3_prototype_ctor));
 
     const QMap<QString, Actor*>& actors = scene->getActors();
 
@@ -40,10 +42,20 @@ void addBindings(QScriptEngine& engine, Scene* scene)
     }
 }
 
+void Actor_register_prototype(QScriptEngine& engine)
+{
+    const int actorTypeId = qRegisterMetaType<Actor*>("Actor*");
+
+    QScriptValue prototype = engine.newQObject((Actor*)0);
+    engine.setDefaultPrototype(actorTypeId, prototype);
+
+    engine.globalObject().setProperty("Actor", engine.newFunction(Vector3_prototype_ctor));
+}
+
 void Vector3_register_prototype(QScriptEngine& engine)
 {
     engine.setDefaultPrototype(qMetaTypeId<Ogre::Vector3*>(), QScriptValue());
-    QScriptValue obj = engine.newVariant(qVariantFromValue((Ogre::Vector3*)0));
+    QScriptValue obj = engine.newVariant(QVariant::fromValue((Ogre::Vector3*)0));
 
     obj.setProperty("x", engine.newFunction(Vector3_prototype_x),
                     QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
@@ -55,33 +67,41 @@ void Vector3_register_prototype(QScriptEngine& engine)
 
     engine.setDefaultPrototype(qMetaTypeId<Ogre::Vector3>(), obj);
     engine.setDefaultPrototype(qMetaTypeId<Ogre::Vector3*>(), obj);
+
+    engine.globalObject().setProperty("Vector3", engine.newFunction(Vector3_prototype_ctor));
 }
 
 QScriptValue Vector3_prototype_ctor(QScriptContext *context, QScriptEngine *engine)
 {
-    float x = 0, y = 0, z = 0;
-
-    if (context->argumentCount() > 0)
+    if (context->isCalledAsConstructor())
     {
-        x = context->argument(0).toNumber();
+        float x = 0, y = 0, z = 0;
 
-        if (context->argumentCount() > 1)
+        if (context->argumentCount() > 0)
         {
-            y = context->argument(1).toNumber();
+            x = context->argument(0).toNumber();
 
-            if (context->argumentCount() > 2)
+            if (context->argumentCount() > 1)
             {
-                z = context->argument(2).toNumber();
+                y = context->argument(1).toNumber();
+
+                if (context->argumentCount() > 2)
+                {
+                    z = context->argument(2).toNumber();
+                }
             }
         }
+
+        Ogre::Vector3 v(x,y,z);
+
+        qDebug() << v.x << ", " << v.y << ", " << v.z;
+
+        return engine->toScriptValue(v);
     }
-
-    Ogre::Vector3 v(x,y,z);
-
-    qDebug() << v.x << ", " << v.y << ", " << v.z;
-
-    QScriptValue sv = context->engine()->newVariant(context->thisObject(), QVariant::fromValue(v));
-    return sv;
+    else
+    {
+        return engine->undefinedValue();
+    }
 }
 
 QScriptValue Vector3_prototype_x(QScriptContext *context, QScriptEngine *engine)

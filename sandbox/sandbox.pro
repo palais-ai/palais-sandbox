@@ -62,10 +62,10 @@ macx {
         FrameworkFiles.files += $$OGREDIR/lib/release/Ogre.framework
         FrameworkFiles.path = Contents/Frameworks
 
-        ConfigFiles.files += config/resources.cfg config/plugins.cfg
+        ConfigFiles.files += config/resources.cfg
         ConfigFiles.path = Contents/MacOS
 
-        PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib $$files($$OUT_PWD/../libqjsonrpc/src/libqjsonrpc.1.dylib)
+        PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib $$OUT_PWD/../libqjsonrpc/src/libqjsonrpc.1.dylib
         PluginFiles.path = Contents/Plugins
 
         MediaFiles.files += $$files(media/*)

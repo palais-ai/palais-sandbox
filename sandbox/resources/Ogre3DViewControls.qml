@@ -31,6 +31,11 @@ Rectangle {
                 zoomInButton.performZoom()
                 event.accepted = true
             }
+
+            if(event.key == Qt.Key_P && ApplicationWrapper.sceneLoaded) {
+                ApplicationWrapper.onPlayButtonPressed()
+                event.accepted = true
+            }
         }
 
         FAIconButton {

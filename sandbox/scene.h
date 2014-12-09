@@ -6,8 +6,9 @@
 #include <QScriptEngine>
 #include <QMap>
 #include <QAbstractListModel>
-#include <QVector3D>
-#include <QQuaternion>
+
+#include <OgreVector3.h>
+#include <OgreQuaternion.h>
 
 class Actor;
 class OgreEngine;
@@ -41,7 +42,12 @@ public:
     Q_INVOKABLE void toggleHighlight(bool highlighted, int index);
     Q_INVOKABLE int size() const;
 
-    Q_INVOKABLE Actor* instantiate(const QString& name, Actor* prototype, const QVector3D& position, const QQuaternion& rotation);
+    Q_INVOKABLE Actor* instantiate(const QString& name,
+                                   const QString& meshName,
+                                   const Ogre::Vector3& position = Ogre::Vector3::ZERO,
+                                   const Ogre::Quaternion& rotation = Ogre::Quaternion::IDENTITY,
+                                   const Ogre::Vector3& scale = Ogre::Vector3(1,1,1));
+
     Q_INVOKABLE void destroy(Actor* actor);
 
     void setup();

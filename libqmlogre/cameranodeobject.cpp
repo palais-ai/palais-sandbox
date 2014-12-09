@@ -9,6 +9,8 @@
 
 #include "cameranodeobject.h"
 
+#include "../sandbox/application.h"
+
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>
 #include <OgreNode.h>
@@ -39,7 +41,7 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
 
 void CameraNodeObject::createCameraWithCurrentSceneManager()
 {
-    Ogre::SceneManager *sceneManager = Ogre::Root::getSingleton().getSceneManager("mySceneManager");
+    Ogre::SceneManager *sceneManager = Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName);
 
     // let's use the current memory address to create a unique name
     QString instanceName;

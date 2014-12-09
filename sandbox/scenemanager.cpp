@@ -1,6 +1,7 @@
 #include "scenemanager.h"
 #include "sceneloader.h"
 #include "scene.h"
+#include "application.h"
 
 #include "../libqmlogre/ogreengine.h"
 
@@ -16,16 +17,14 @@ const float SceneManager::sMaximumSpeedFactor = 5.f;  // In times the normal spe
 const float SceneManager::sMaximumTickRate = 100.f; // In Ticks Per Second
 const float SceneManager::sAITickRate = 100.f; // In Ticks Per Second
 
-SceneManager::SceneManager(OgreEngine* engine, Ogre::SceneManager* sceneManager) :
+SceneManager::SceneManager(OgreEngine* engine) :
     mOgreEngine(engine),
-    mSceneManager(sceneManager),
     mCurrentScene(NULL),
     mSceneStarted(false),
     mSimulationSpeedFactor(1),
     mLastUpdateTime(QTime::currentTime())
 {
     assert(engine);
-    assert(sceneManager);
     assert(thread() == mOgreEngine->thread()); // This object must reside in the same thread as the ogre engine
 
     startTimer(1000.f / sMaximumTickRate);
@@ -33,7 +32,7 @@ SceneManager::SceneManager(OgreEngine* engine, Ogre::SceneManager* sceneManager)
 
 Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, const QString& logicFile)
 {
-    if(mOgreEngine && mSceneManager)
+    if(mOgreEngine)
     {
         if(mCurrentScene)
         {
@@ -41,7 +40,7 @@ Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, co
             mCurrentScene = NULL;
         }
 
-        Scene* nextScene = SceneLoader::loadScene(mOgreEngine, mSceneManager, name, sceneFile, logicFile);
+        Scene* nextScene = SceneLoader::loadScene(mOgreEngine, Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName), name, sceneFile, logicFile);
 
         if(!nextScene)
         {
@@ -53,7 +52,7 @@ Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, co
     }
     else
     {
-        qFatal("The ogre engine or the scene manager have to be instantiated to be able to load scenes.");
+        qFatal("The ogre engine has to be instantiated to be able to load scenes.");
         return NULL;
     }
 }

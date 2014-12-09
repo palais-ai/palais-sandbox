@@ -14,6 +14,8 @@
 #include <QtQml/QQmlContext>
 #include <Ogre.h>
 
+const std::string Application::sSceneManagerName = "TheSceneManager";
+
 Application::Application(QObject *parent) :
     QObject(parent),
     mApplicationEngine(NULL),
@@ -83,7 +85,7 @@ void Application::initializeOgre()
     mRoot = mOgreEngine->startEngine();
     mOgreEngine->setupResources();
 
-    mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, "mySceneManager");
+    mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
     mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
 
     mProjectManager = new ProjectManager(mOgreEngine, mSceneManager);
@@ -147,7 +149,7 @@ void Application::onBeforeSceneLoad(const QString& name, const QString& sceneFil
     }
 
     // set up Ogre scene
-    mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, "mySceneManager");
+    mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
     mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
 
     CameraNodeObject* camera = getCameraWithName("cam1");
@@ -197,7 +199,10 @@ void Application::onSceneLoaded(Scene* scene)
     camera->fitToContain(mSceneManager->getRootSceneNode());
     mOgreEngine->unlockEngine();
 
-    mApplicationEngine->rootContext()->setContextProperty("ActorModel", scene);
+    // We need a proxy model, since the scene resides in the ogre thread, but updates must be made in the GUI thread.
+    mActorProxyModel.setSourceModel(scene);
+    mApplicationEngine->rootContext()->setContextProperty("ActorModel", &mActorProxyModel);
+    mApplicationEngine->rootContext()->setContextProperty("Scene", scene);
     emit(onSceneLoadedChanged(true));
 }
 
@@ -228,6 +233,12 @@ void Application::onPlayButtonPressed()
     if(!mProjectManager)
     {
         qWarning("ProjectManager must've been instantiated to start playing a scene.");
+        return;
+    }
+
+    if(!mProjectManager->getSceneLoaded())
+    {
+        qWarning("The play button was pressed, despite no scene being loaded.");
         return;
     }
 

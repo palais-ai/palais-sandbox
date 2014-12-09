@@ -1,5 +1,7 @@
 #include "scene.h"
 #include "actor.h"
+#include "application.h"
+#include "javascriptbindings.h"
 
 #include <cassert>
 
@@ -8,6 +10,9 @@
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
+#include <OgreMeshManager.h>
+#include <OgreEntity.h>
+#include <OgreAnimationState.h>
 
 #include "../libqmlogre/ogreengine.h"
 
@@ -127,9 +132,44 @@ const QMap<QString, Actor*>& Scene::getActors() const
     return mActors;
 }
 
-Actor* Scene::instantiate(const QString& name, Actor* prototype, const QVector3D& position, const QQuaternion& rotation)
+Actor* Scene::instantiate(const QString& name, const QString& meshName, const Ogre::Vector3& position, const Ogre::Quaternion& rotation, const Ogre::Vector3& scale)
 {
-    return NULL;
+    if(mActors.contains(name))
+    {
+        qWarning() << "Tried to instantiate an actor with name " << name << " that already existed in the scene. The instantiation is not performed.";
+        return NULL;
+    }
+
+    mEngine->lockEngine();
+
+    Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName);
+
+    Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode(name.toStdString(), position, rotation);
+    node->setScale(scale);
+
+    Ogre::String meshFile = meshName.toStdString() + ".mesh";
+    qDebug() << "Loading mesh at " << QString::fromStdString(meshFile);
+
+    Ogre::MeshManager::getSingleton().load(meshFile, "General");
+    Ogre::Entity* entity = scnMgr->createEntity(name.toStdString(), meshFile);
+    entity->setCastShadows(true);
+    node->attachObject(entity);
+
+    mEngine->unlockEngine();
+
+    Actor* retVal = new Actor(node);
+
+    QMap<QString, Actor*> actorsCopy = mActors;
+    actorsCopy[name] = retVal;
+    const int index = actorsCopy.values().indexOf(retVal);
+
+    beginInsertRows( QModelIndex(), index, index);
+    mActors[name] = retVal;
+    endInsertRows();
+
+    JavaScriptBindings::addActorBinding(retVal, mLogicScript);
+
+    return retVal;
 }
 
 void Scene::destroy(Actor* actor)
@@ -205,12 +245,18 @@ void Scene::checkScriptEngineException(const QString& context)
 
 void Scene::update(float time)
 {
+    float deltaTimeInSeconds = time / 1000.f;
     QScriptValue fun = mLogicScript.globalObject().property("update");
     if(fun.isFunction())
     {
-        fun.call(QScriptValue(), QScriptValueList() << time / 1000.f);
+        fun.call(QScriptValue(), QScriptValueList() << deltaTimeInSeconds);
 
         checkScriptEngineException("update");
+    }
+
+    for(QMap<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
+    {
+        it.value()->update(deltaTimeInSeconds);
     }
 }
 

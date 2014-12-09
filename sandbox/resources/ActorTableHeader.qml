@@ -34,7 +34,7 @@ Rectangle {
 
     Text {
         id: scenarioName
-        text: ActorModel.name
+        text: Scene.name
         font.family: openSans.name
         font.pointSize: 16
         color: "white"

@@ -17,7 +17,7 @@ class SceneManager : public QObject
 {
     Q_OBJECT
 public:
-    SceneManager(OgreEngine* engine, Ogre::SceneManager* sceneManager);
+    SceneManager(OgreEngine* engine);
 
     void pause();
     void start();
@@ -35,7 +35,6 @@ protected:
     void timerEvent(QTimerEvent *);
 private:
     OgreEngine* mOgreEngine;
-    Ogre::SceneManager* mSceneManager;
     Scene* mCurrentScene;
     bool mSceneStarted;
     float mSimulationSpeedFactor;
