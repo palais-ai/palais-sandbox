@@ -5,6 +5,10 @@ TARGET = qmlogre
 
 CONFIG += staticlib
 
+CONFIG(debug, debug|release) {
+    DEFINES += DEBUG
+}
+
 macx {
     OGREDIR = $$(OGRE_HOME)
     isEmpty(OGREDIR) {

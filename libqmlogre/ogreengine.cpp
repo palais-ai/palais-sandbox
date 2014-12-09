@@ -51,10 +51,27 @@ Ogre::Root* OgreEngine::startEngine()
     m_resources_cfg = (basePath + "/resources.cfg").toStdString();
     qDebug() << "Resources path is " << QString::fromStdString(m_resources_cfg);
 
-    Ogre::Root *ogreRoot = new Ogre::Root("", m_resources_cfg, "");
+    Ogre::Root *ogreRoot = new Ogre::Root("", m_resources_cfg);
 
-    ogreRoot->loadPlugin((basePath + "/../Plugins/RenderSystem_GL").toStdString());
-    ogreRoot->loadPlugin((basePath + "/../Plugins/Plugin_OctreeSceneManager").toStdString());
+#if defined(Q_OS_MAC)
+    const QString additionalPluginPath = "/../Plugins";
+#else
+    const QString additionalPluginPath = "";
+#endif
+
+#if (defined(DEBUG) && defined(Q_OS_WIN)) // We dont use debug dynamic libraries on mac.
+    const std::string renderSystemPath = (basePath + additionalPluginPath + "/RenderSystem_GL_d").toStdString();
+    const std::string octtreePath = (basePath + additionalPluginPath + "/Plugin_OctreeSceneManager_d").toStdString();
+#else
+    const std::string renderSystemPath = (basePath + additionalPluginPath + "/RenderSystem_GL").toStdString();
+    const std::string octtreePath = (basePath + additionalPluginPath + "/Plugin_OctreeSceneManager").toStdString();
+#endif
+
+    qDebug() << "Render System path is " << QString::fromStdString(renderSystemPath);
+    qDebug() << "Octtree Plugin path is " << QString::fromStdString(octtreePath);
+
+    ogreRoot->loadPlugin(renderSystemPath);
+    ogreRoot->loadPlugin(octtreePath);
 
     Ogre::RenderSystem *renderSystem = ogreRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
 
@@ -76,7 +93,7 @@ Ogre::Root* OgreEngine::startEngine()
     params["currentGLContext"] = "true";
     params["hidden"] = "true";
 
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC)
     params["macAPI"] = "cocoa";
 #endif
 
