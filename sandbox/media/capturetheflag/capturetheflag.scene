@@ -1,5 +1,25 @@
-<scene export_time="1416009374.954421" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1416009216.467025" >
+<scene export_time="1418159559.28913" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1418159443.797415" >
   <nodes >
+    <node name="spawn_team1" >
+      <position x="6.400911" y="1.002838" z="5.955466" />
+      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
+      <scale x="0.100000" y="0.100000" z="0.100000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <entity actor="False" anisotropic_friction="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" friction_x="1.0" friction_y="1.0" friction_z="1.0" ghost="False" inertia_tensor="0.4000000059604645" lock_rot_x="False" lock_rot_y="False" lock_rot_z="False" lock_trans_x="False" lock_trans_y="False" lock_trans_z="False" mass="1.0" mass_radius="1.0" meshFile="Cube.001.mesh" name="Cube.001" physics_type="STATIC" velocity_max="0.0" velocity_min="0.0" />
+    </node>
+    <node name="spawn_team2" >
+      <position x="-6.525959" y="1.002838" z="-6.405465" />
+      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
+      <scale x="0.100000" y="0.100000" z="0.100000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <entity actor="False" anisotropic_friction="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" friction_x="1.0" friction_y="1.0" friction_z="1.0" ghost="False" inertia_tensor="0.4000000059604645" lock_rot_x="False" lock_rot_y="False" lock_rot_z="False" lock_trans_x="False" lock_trans_y="False" lock_trans_z="False" mass="1.0" mass_radius="1.0" meshFile="Cube.mesh" name="Cube" physics_type="STATIC" velocity_max="0.0" velocity_min="0.0" />
+    </node>
     <node name="Sun" >
       <position x="-0.082551" y="8.783691" z="-0.269227" />
       <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
@@ -812,7 +832,7 @@
       </camera>
     </node>
     <node name="Point.001" >
-      <position x="8.018194" y="13.239445" z="-7.355185" />
+      <position x="4.748117" y="12.105970" z="-6.953862" />
       <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
       <scale x="1.000000" y="1.000000" z="1.000000" />
       <game >
@@ -820,7 +840,7 @@
         <actuators />
       </game>
       <light name="Point.001" powerScale="10.0" shadow="true" type="point" >
-        <position x="8.018194" y="13.239445" z="-7.355185" />
+        <position x="4.748117" y="12.105970" z="-6.953862" />
         <lightAttenuation constant="1.0" linear="0.02857142857142857" quadratic="0.0" range="5000" />
         <colourDiffuse b="1.0" g="1.0" r="1.0" />
         <colourShadow b="1.0" g="1.0" r="1.0" />
@@ -829,15 +849,15 @@
   </nodes>
   <externals >
     <item type="material" >
-      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Material.002.material" />
+      <file name="/Users/patrick/Desktop/capturetheflag/Material.002.material" />
     </item>
     <item type="material" >
-      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Material.001.material" />
+      <file name="/Users/patrick/Desktop/capturetheflag/Material.001.material" />
     </item>
   </externals>
   <environment >
-    <colourDiffuse b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
     <colourAmbient b="0.0" g="0.0" r="0.0" />
     <colourBackground b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
+    <colourDiffuse b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
   </environment>
 </scene>

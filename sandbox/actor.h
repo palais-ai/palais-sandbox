@@ -31,6 +31,7 @@ public:
     Q_INVOKABLE void enableAnimation(const QString& name);
     Q_INVOKABLE void disableAnimation(const QString& name);
     Q_INVOKABLE void setAnimationEnabled(const QString& name, bool enabled);
+    Q_INVOKABLE void lookAt(const Ogre::Vector3& target);
 
     const Ogre::Vector3& getPosition() const;
     void setPosition(const Ogre::Vector3& position);

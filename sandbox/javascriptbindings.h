@@ -25,6 +25,10 @@ QScriptValue Vector3_prototype_x(QScriptContext *context, QScriptEngine *engine)
 QScriptValue Vector3_prototype_y(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Vector3_prototype_z(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine *engine);
 }
 
 #endif // JAVASCRIPTBINDINGS_H

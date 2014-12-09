@@ -43,9 +43,7 @@ void Actor::setAnimationEnabled(const QString& name, bool enabled)
 
     Ogre::AnimationStateSet* set = entity->getAllAnimationStates();
 
-    Ogre::AnimationState* state = set->getAnimationState(name.toStdString());
-
-    if(!state)
+    if(!set->hasAnimationState(name.toStdString()))
     {
         qWarning() << "Tried to set the state of an animation named "
                    << name << " on actor "
@@ -54,9 +52,18 @@ void Actor::setAnimationEnabled(const QString& name, bool enabled)
         return;
     }
 
+    Ogre::AnimationState* state = set->getAnimationState(name.toStdString());
+
     state->setWeight(1);
     state->setEnabled(enabled);
     state->setLoop(true);
+}
+
+void Actor::lookAt(const Ogre::Vector3& target)
+{
+    QMutexLocker locker(&g_engineMutex);
+
+    mNode->lookAt(target, Ogre::Node::TS_WORLD);
 }
 
 void Actor::update(float deltaTime)

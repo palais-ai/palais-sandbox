@@ -64,6 +64,10 @@ void Vector3_register_prototype(QScriptEngine& engine)
     obj.setProperty("z", engine.newFunction(Vector3_prototype_z),
                     QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
     obj.setProperty("toString", engine.newFunction(Vector3_prototype_toString));
+    obj.setProperty("add", engine.newFunction(Vector3_prototype_add));
+    obj.setProperty("subtract", engine.newFunction(Vector3_prototype_subtract));
+    obj.setProperty("multiply", engine.newFunction(Vector3_prototype_multiply));
+    obj.setProperty("normalize", engine.newFunction(Vector3_prototype_normalize));
 
     engine.setDefaultPrototype(qMetaTypeId<Ogre::Vector3>(), obj);
     engine.setDefaultPrototype(qMetaTypeId<Ogre::Vector3*>(), obj);
@@ -215,6 +219,106 @@ QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *
 
     QString t;
     return QString("Vector3 @%0 (x: %1, y: %2, z: %3)").arg(t.sprintf("%08p", v)).arg(v->x).arg(v->y).arg(v->z);
+}
+
+QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError, "Vector3.prototype.toString: this object is not a Ogre::Vector3");
+    }
+
+    if (context->argumentCount() == 1)
+    {
+        Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
+        if (!v2)
+        {
+            return context->throwError(QScriptContext::TypeError, "Vector3.prototype.toString: Argument #0 object is not a Ogre::Vector3");
+        }
+
+        *v += *v2;
+
+        return engine->toScriptValue(v);
+    }
+
+    return engine->undefinedValue();
+}
+
+QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError, "Vector3.prototype.toString: this object is not a Ogre::Vector3");
+    }
+
+    if (context->argumentCount() == 1)
+    {
+        Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
+        if (!v2)
+        {
+            return context->throwError(QScriptContext::TypeError, "Vector3.prototype.toString: Argument #0 object is not a Ogre::Vector3");
+        }
+
+        *v -= *v2;
+
+        return engine->toScriptValue(v);
+    }
+
+    return engine->undefinedValue();
+}
+
+QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError, "Vector3.prototype.toString: this object is not a Ogre::Vector3");
+    }
+
+    if (context->argumentCount() == 1)
+    {
+        if(context->argument(0).isNumber())
+        {
+            *v *= context->argument(0).toNumber();
+
+            return engine->toScriptValue(v);
+        }
+
+        Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
+        if (!v2)
+        {
+            return context->throwError(QScriptContext::TypeError, "Vector3.prototype.toString: Argument #0 object is not a Ogre::Vector3 or a number");
+        }
+
+        *v *= *v2;
+
+        return engine->toScriptValue(v);
+    }
+
+    return engine->undefinedValue();
+}
+
+QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError, "Vector3.prototype.toString: this object is not a Ogre::Vector3");
+    }
+
+    v->normalise();
+
+    return engine->toScriptValue(v);
 }
 
 void addActorBinding(Actor* actor, QScriptEngine& engine)
