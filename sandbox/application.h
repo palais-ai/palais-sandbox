@@ -16,11 +16,6 @@ class OgreEngine;
 class QQmlApplicationEngine;
 class CameraNodeObject;
 
-class ActorProxyModel : public QIdentityProxyModel
-{
-    Q_OBJECT
-};
-
 class Application : public QObject
 {
     Q_OBJECT
@@ -52,7 +47,7 @@ private:
     CameraNodeObject* getCameraWithName(const QString& name);
 
     QQmlApplicationEngine* mApplicationEngine;
-    ActorProxyModel mActorProxyModel;
+    QIdentityProxyModel mActorProxyModel;
     OgreEngine *mOgreEngine;
     Ogre::SceneManager *mSceneManager;
     ProjectManager* mProjectManager;

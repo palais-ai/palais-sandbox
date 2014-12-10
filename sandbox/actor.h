@@ -19,6 +19,7 @@ class Actor : public QObject
     Q_PROPERTY(Ogre::Vector3 position READ getPosition WRITE setPosition)
     Q_PROPERTY(Ogre::Quaternion rotation READ getRotation WRITE setRotation)
     Q_PROPERTY(Ogre::Vector3 scale READ getScale WRITE setScale)
+    Q_PROPERTY(bool visible WRITE setVisible)
 public:
     explicit Actor(Ogre::SceneNode* node);
 
@@ -32,6 +33,9 @@ public:
     Q_INVOKABLE void disableAnimation(const QString& name);
     Q_INVOKABLE void setAnimationEnabled(const QString& name, bool enabled);
     Q_INVOKABLE void lookAt(const Ogre::Vector3& target);
+    Q_INVOKABLE void show();
+    Q_INVOKABLE void hide();
+    void setVisible(bool visible);
 
     const Ogre::Vector3& getPosition() const;
     void setPosition(const Ogre::Vector3& position);

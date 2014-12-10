@@ -66,9 +66,31 @@ void Actor::lookAt(const Ogre::Vector3& target)
     mNode->lookAt(target, Ogre::Node::TS_WORLD);
 }
 
+void Actor::show()
+{
+    setVisible(true);
+}
+
+void Actor::hide()
+{
+    setVisible(false);
+}
+
+void Actor::setVisible(bool visible)
+{
+    QMutexLocker locker(&g_engineMutex);
+
+    mNode->setVisible(visible);
+}
+
 void Actor::update(float deltaTime)
 {
     QMutexLocker locker(&g_engineMutex);
+
+    if(mNode->numAttachedObjects() == 0)
+    {
+        return;
+    }
 
     Ogre::Entity* entity = dynamic_cast<Ogre::Entity*>(mNode->getAttachedObject(0));
 

@@ -13,28 +13,6 @@ Rectangle {
              GradientStop { position: 0.0; color: cellColorLighter }
     }
 
-    Text {
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent.left
-        anchors.leftMargin: 10
-        text: name
-        font.family: openSans.name
-        font.pointSize: 12
-        color: "white"
-        renderType: Text.NativeRendering
-    }
-
-    Text {
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.right: parent.right
-        anchors.rightMargin: 10
-        text: "\uf105"
-        font.family: fontAwesome.name
-        font.pointSize: 12
-        color: "white"
-        renderType: Text.NativeRendering
-    }
-
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true
@@ -47,6 +25,69 @@ Rectangle {
             actorCell.state = ''
             Scene.toggleHighlight(false, index);
         }
+    }
+
+    Text {
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.leftMargin: 10
+        text: name
+        font.family: openSans.name
+        font.pointSize: 12
+        color: "white"
+        renderType: Text.NativeRendering
+    }
+
+    Text {
+        id: actorHideButton
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: arrowRightIndicator.left
+        anchors.rightMargin: 10
+        text: "\uf06e"
+        font.family: fontAwesome.name
+        font.pointSize: 12
+        color: "white"
+        renderType: Text.NativeRendering
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                var actor = Scene.getActor(index)
+                if(actorHideButton.state == '') {
+                    actor.hide()
+                    actorHideButton.state = 'HIDDEN'
+                } else {
+                    actor.show()
+                    actorHideButton.state = ''
+                }
+            }
+        }
+
+        states: [
+            State {
+                name: 'HIDDEN'
+                PropertyChanges {
+                    target: actorHideButton
+                    text: "\uf070"
+                }
+                PropertyChanges {
+                    target: actorHideButton
+                    color: colors.stronglyDimmedTextColor
+                }
+            }
+        ]
+    }
+
+    Text {
+        id: arrowRightIndicator
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        text: "\uf105"
+        font.family: fontAwesome.name
+        font.pointSize: 12
+        color: "white"
+        renderType: Text.NativeRendering
     }
 
     states: [

@@ -17,7 +17,7 @@ class SceneManager : public QObject
 {
     Q_OBJECT
 public:
-    SceneManager(OgreEngine* engine);
+    explicit SceneManager(OgreEngine* engine);
 
     void pause();
     void start();

@@ -2,9 +2,12 @@ var numCalls = 1;
 function spawnTeam(teamSize, startPos) {
 	var offset = new Vector3(0,0,0);
 	var offsetFactor = numCalls == 1 ? 1 : -1;
+	var meshSuffix = numCalls == 1 ? "red" : "green";
 
 	for(var i = 0; i < teamSize; ++i) {
-		var actor = scene.instantiate("player_team" + numCalls + "_" + i, "Soldier2", startPos);
+		var actor = scene.instantiate("player_team" + numCalls + "_" + i,
+									  "Soldier2" + meshSuffix, 
+									  startPos);
 
 		actor.enableAnimation("my_animation");
 		actor.setScale(0.2);
@@ -39,12 +42,11 @@ function onStart() {
 }
 
 function updateActor(deltaTime, actor) {
-	var actorSpeed = 0.5
+	var actorSpeed = 0.5 
 	if(actor.hasKnowledge("movementTarget")) {
 		var target = actor.knowledge["movementTarget"]
 		var current = actor.position
 		var step = target.subtract(current).normalize().multiply(actorSpeed * deltaTime)
-
 
 		actor.position = current.add(step)
 	}

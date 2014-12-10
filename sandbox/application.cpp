@@ -5,6 +5,7 @@
 
 #include <QtGui/QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QtQml>
 
 #include "../libqmlogre/ogreitem.h"
 #include "../libqmlogre/ogreengine.h"
@@ -64,6 +65,8 @@ int Application::onApplicationStarted(int argc, char **argv)
 
     mApplicationEngine->rootContext()->setContextProperty("ApplicationWindow", window);
 
+    qmlRegisterType<Actor>();
+
     // start Ogre once we are in the rendering thread (Ogre must live in the rendering thread)
     connect(window, &QQuickWindow::frameSwapped, this, &Application::initializeOgre, Qt::DirectConnection);
     connect(this, &Application::ogreInitialized, this, &Application::onOgreIsReady, Qt::DirectConnection);
@@ -86,7 +89,7 @@ void Application::initializeOgre()
     mOgreEngine->setupResources();
 
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
-    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 
     mProjectManager = new ProjectManager(mOgreEngine, mSceneManager);
 
@@ -150,7 +153,7 @@ void Application::onBeforeSceneLoad(const QString& name, const QString& sceneFil
 
     // set up Ogre scene
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
-    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 
     CameraNodeObject* camera = getCameraWithName("cam1");
     camera->createCameraWithCurrentSceneManager();

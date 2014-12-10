@@ -63,6 +63,7 @@ public:
 
     QScriptEngine& getScriptEngine();
     const QMap<QString, Actor*>& getActors() const;
+    Q_INVOKABLE Actor* getActor(unsigned int index);
     Q_INVOKABLE QObjectList getActorsArray() const;
     QVariantMap& getKnowledge();
     const QString& getName() const;

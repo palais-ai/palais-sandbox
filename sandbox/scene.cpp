@@ -144,13 +144,23 @@ Actor* Scene::instantiate(const QString& name, const QString& meshName, const Og
 
     Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName);
 
-    Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode(name.toStdString(), position, rotation);
-    node->setScale(scale);
-
     Ogre::String meshFile = meshName.toStdString() + ".mesh";
     qDebug() << "Loading mesh at " << QString::fromStdString(meshFile);
 
+    try
+    {
     Ogre::MeshManager::getSingleton().load(meshFile, "General");
+    }
+    catch(Ogre::Exception &/*e*/)
+    {
+        qWarning() << "Failed to load mesh at " << QString::fromStdString(meshFile)
+                   << ". Instantiation of actor " << name << " failed.";
+        return NULL;
+    }
+
+    Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode(name.toStdString(), position, rotation);
+    node->setScale(scale);
+
     Ogre::Entity* entity = scnMgr->createEntity(name.toStdString(), meshFile);
     entity->setCastShadows(true);
     node->attachObject(entity);
@@ -175,6 +185,11 @@ Actor* Scene::instantiate(const QString& name, const QString& meshName, const Og
 void Scene::destroy(Actor* actor)
 {
 
+}
+
+Actor* Scene::getActor(unsigned int index)
+{
+    return mActors.values()[index];
 }
 
 QObjectList Scene::getActorsArray() const

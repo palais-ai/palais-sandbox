@@ -98,8 +98,6 @@ QScriptValue Vector3_prototype_ctor(QScriptContext *context, QScriptEngine *engi
 
         Ogre::Vector3 v(x,y,z);
 
-        qDebug() << v.x << ", " << v.y << ", " << v.z;
-
         return engine->toScriptValue(v);
     }
     else
