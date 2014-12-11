@@ -104,24 +104,6 @@ void OgreEngine::startEngine()
     ogreRoot->setRenderSystem(renderSystem);
     ogreRoot->initialise(false);
 
-    // Get the parameters of the window QT created
-    Ogre::String winHandle;
-#ifdef defined(Q_OS_WIN)
-    // Windows code
-    winHandle += Ogre::StringConverter::toString((unsigned long)(m_quickWindow->parent()->winId()));
-#elif defined(Q_OS_MAC)
-    // Mac code, tested on Mac OSX 10.6 using Qt 4.7.4 and Ogre 1.7.3
-    winHandle  = Ogre::StringConverter::toString((unsigned long)m_quickWindow->winId());
-#else
-    // Unix code
-    QX11Info info = x11Info();
-    winHandle  = Ogre::StringConverter::toString((unsigned long)(info.display()));
-    winHandle += ":";
-    winHandle += Ogre::StringConverter::toString((unsigned int)(info.screen()));
-    winHandle += ":";
-    winHandle += Ogre::StringConverter::toString((unsigned long)(this->parent()->winId()));
-#endif
-
     Ogre::NameValuePairList params;
 
     params["externalGLControl"] = "true";
@@ -131,9 +113,6 @@ void OgreEngine::startEngine()
 #if defined(Q_OS_MAC)
     params["macAPI"] = "cocoa";
     params["macAPICocoaUseNSView"] = "true";
-    params["externalWindowHandle"] = winHandle;
-#else
-    params["parentWindowHandle"] = winHandle;
 #endif
 
     //Finally create our window.
