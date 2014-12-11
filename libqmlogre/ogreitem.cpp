@@ -14,11 +14,17 @@ OgreItem::OgreItem(QQuickItem *parent)
     : QQuickItem(parent)
     , m_camera(0)
     , m_ogreEngineItem(0)
+    , mLastNode(0)
 {
     setFlag(ItemHasContents);
     setSmooth(false);
 
-    m_timerID = startTimer(33);
+    connect(this, &QQuickItem::windowChanged, this, &OgreItem::windowChanged);
+}
+
+void OgreItem::windowChanged(QQuickWindow *window)
+{
+    connect(window, &QQuickWindow::frameSwapped, this, &OgreItem::update);
 }
 
 QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -31,11 +37,11 @@ QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     OgreNode *node = static_cast<OgreNode *>(oldNode);
     if (!node)
     {
-        node = new OgreNode();
+        node = mLastNode = new OgreNode();
         node->setOgreEngineItem(m_ogreEngineItem);
+        node->setCamera(m_camera->camera());
     }
 
-    node->setCamera(m_camera->camera());
     node->setSize(QSize(width(), height()));
     node->update();
 
@@ -45,14 +51,14 @@ QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     return node;
 }
 
-void OgreItem::timerEvent(QTimerEvent *)
-{
-    update();
-}
-
 void OgreItem::setCamera(QObject *camera)
 {
     m_camera = dynamic_cast<OgreCameraWrapper*>(camera);
+
+    if(mLastNode)
+    {
+        mLastNode->setCamera(m_camera->camera());
+    }
 }
 
 void OgreItem::setOgreEngine(OgreEngine *ogreEngine)

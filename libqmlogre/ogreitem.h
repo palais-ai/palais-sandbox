@@ -16,6 +16,8 @@
 #include <QtQuick/QQuickItem>
 #include <QtCore/QPropertyAnimation>
 
+class OgreNode;
+
 class OgreItem : public QQuickItem
 {
     Q_OBJECT
@@ -35,12 +37,12 @@ public:
 protected:
     virtual QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *);
 
-    void timerEvent(QTimerEvent *);
+private slots:
+    void windowChanged(QQuickWindow *window);
 
 private:
-    int m_timerID;
-
     OgreCameraWrapper *m_camera;
+    OgreNode *mLastNode;
     OgreEngine *m_ogreEngineItem;
 };
 

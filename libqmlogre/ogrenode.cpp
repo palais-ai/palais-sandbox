@@ -100,9 +100,16 @@ GLuint OgreNode::getOgreFboId()
 
 void OgreNode::resetViewport()
 {
+    if(!m_renderTarget || !m_camera)
+    {
+        qWarning("No render target or camera.");
+        return;
+    }
+
     Ogre::Real aspectRatio = Ogre::Real(m_size.width()) / Ogre::Real(m_size.height());
     m_camera->setAspectRatio(aspectRatio);
     m_renderTarget->removeAllViewports();
+
     m_renderTarget->addViewport(m_camera);
     m_renderTarget->getViewport(0)->setClearEveryFrame(true);
     m_renderTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue(0.5, 0.5, 0.5));
@@ -115,7 +122,7 @@ void OgreNode::preprocess()
 
     if (!m_renderTarget)
     {
-        qWarning("no render target");
+        qWarning("No render target.");
         return;
     }
 

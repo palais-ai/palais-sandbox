@@ -10,7 +10,7 @@ function spawnTeam(teamSize, startPos) {
 									  startPos);
 
 		actor.enableAnimation("my_animation");
-		actor.setScale(0.7);
+		actor.setScale(0.2);
 
 		var lookAtPos = actor.position
 		lookAtPos.y = Plane.position.y
