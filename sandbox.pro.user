@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.2.2, 2014-12-10T14:49:03. -->
+<!-- Written by QtCreator 3.2.2, 2014-12-11T12:18:19. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -58,9 +58,9 @@
  <data>
   <variable>ProjectExplorer.Project.Target.0</variable>
   <valuemap type="QVariantMap">
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Mac OSX 10.10</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Mac OSX 10.10</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{6ac0bc65-c4d7-429d-8847-86763099243b}</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Mac OSX 10.10 / 5.4</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Mac OSX 10.10 / 5.4</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{8ad89faa-bdec-4248-ab3b-aed07acecdd0}</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>

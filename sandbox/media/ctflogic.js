@@ -25,7 +25,7 @@ function spawnTeam(teamSize, startPos) {
 		lookAtPos.z += offset.z;
 
 		actor.position = lookAtPos
-
+		
 		lookAtPos.x *= 2
 		lookAtPos.y *= 2
 		lookAtPos.z *= 2
