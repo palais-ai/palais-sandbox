@@ -63,6 +63,9 @@ int Application::onApplicationStarted(int argc, char **argv)
 
     QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
 
+    window->setPersistentOpenGLContext(true);
+    window->setPersistentSceneGraph(true);
+
     mApplicationEngine->rootContext()->setContextProperty("ApplicationWindow", window);
 
     qmlRegisterType<Actor>();
@@ -85,13 +88,14 @@ void Application::initializeOgre()
     // start up Ogre
     mOgreEngine = new OgreEngine(window);
 
-    mRoot = mOgreEngine->startEngine();
+    mOgreEngine->startEngine();
+    mRoot = mOgreEngine->getRoot();
     mOgreEngine->setupResources();
 
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
     mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 
-    mProjectManager = new ProjectManager(mOgreEngine, mSceneManager);
+    mProjectManager = new ProjectManager(mOgreEngine);
 
     mApplicationEngine->rootContext()->setContextProperty("ProjectManager", mProjectManager);
 
@@ -139,6 +143,9 @@ void Application::onOgreIsReady()
 void Application::onBeforeSceneLoad(const QString& name, const QString& sceneFile, const QString& logicFile)
 {
     qDebug("Before scene load");
+
+    mRoot = mOgreEngine->getRoot();
+
     if(!mRoot)
     {
         qFatal("An Ogre Root must be instantiated before scene load.");

@@ -20,7 +20,7 @@ class ProjectManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit ProjectManager(OgreEngine* engine, Ogre::SceneManager* sceneManager);
+    explicit ProjectManager(OgreEngine* engine);
     ~ProjectManager();
 
     bool getSceneLoaded() const;

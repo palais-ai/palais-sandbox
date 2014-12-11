@@ -12,7 +12,7 @@
 
 #include "../libqmlogre/ogreengine.h"
 
-ProjectManager::ProjectManager(OgreEngine* engine, Ogre::SceneManager* sceneManager) :
+ProjectManager::ProjectManager(OgreEngine* engine) :
     QObject(0),
     mScenarioManager(engine),
     mKnowledgeService(mScenarioManager),

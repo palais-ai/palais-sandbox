@@ -34,8 +34,12 @@ class OgreEngine : public QObject
 public:
     OgreEngine(QQuickWindow *window = 0);
     ~OgreEngine();
-    Ogre::Root *startEngine();
-    void stopEngine(Ogre::Root *ogreRoot);
+
+    Ogre::Root* getRoot();
+    Ogre::RenderWindow* getRenderWindow();
+    bool isStarted() const;
+    void startEngine();
+    void stopEngine();
 
     void activateOgreContext();
     void doneOgreContext();
@@ -54,6 +58,7 @@ public:
 private:
     Ogre::String m_resources_cfg;
     Ogre::RenderWindow *m_ogreWindow;
+    Ogre::Root* mRoot;
 
     QQuickWindow *m_quickWindow;
 

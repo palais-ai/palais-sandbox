@@ -98,6 +98,17 @@ GLuint OgreNode::getOgreFboId()
     return id;
 }
 
+void OgreNode::resetViewport()
+{
+    Ogre::Real aspectRatio = Ogre::Real(m_size.width()) / Ogre::Real(m_size.height());
+    m_camera->setAspectRatio(aspectRatio);
+    m_renderTarget->removeAllViewports();
+    m_renderTarget->addViewport(m_camera);
+    m_renderTarget->getViewport(0)->setClearEveryFrame(true);
+    m_renderTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue(0.5, 0.5, 0.5));
+    m_renderTarget->getViewport(0)->setOverlaysEnabled(false);
+}
+
 void OgreNode::preprocess()
 {
     m_ogreEngineItem->lockEngine();
@@ -110,7 +121,13 @@ void OgreNode::preprocess()
 
     activateOgreContext();
 
+    resetViewport();
+
+    m_ogreEngineItem->getRoot()->_fireFrameStarted();
+    m_ogreEngineItem->getRoot()->_fireFrameRenderingQueued();
     m_renderTarget->update();
+    m_ogreEngineItem->getRoot()->_fireFrameEnded();
+
     doneOgreContext();
 
     m_ogreEngineItem->unlockEngine();
@@ -118,7 +135,7 @@ void OgreNode::preprocess()
 
 void OgreNode::update()
 {
-    if (true)
+    if (m_dirtyFBO)
     {
         m_ogreEngineItem->lockEngine();
 
@@ -134,13 +151,15 @@ void OgreNode::update()
 
 void OgreNode::updateFBO()
 {
+    static const Ogre::String textureName = "RttTex";
+
     if (m_renderTarget)
     {
-        Ogre::TextureManager::getSingleton().remove("RttTex");
+        Ogre::TextureManager::getSingleton().remove(textureName);
     }
 
     int samples = m_ogreEngineItem->ogreContext()->format().samples(); //< Adding sampling causes context crashes on windows 7 VM.
-    m_rttTexture = Ogre::TextureManager::getSingleton().createManual("RttTex",
+    m_rttTexture = Ogre::TextureManager::getSingleton().createManual(textureName,
                                                                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                                     Ogre::TEX_TYPE_2D,
                                                                     m_size.width(),
@@ -151,14 +170,9 @@ void OgreNode::updateFBO()
                                                                     0);
 
     m_renderTarget = m_rttTexture->getBuffer()->getRenderTarget();
+    m_renderTarget->setActive(true);
 
-    Ogre::Real aspectRatio = Ogre::Real(m_size.width()) / Ogre::Real(m_size.height());
-    m_camera->setAspectRatio(aspectRatio);
-
-    m_renderTarget->addViewport(m_camera);
-    m_renderTarget->getViewport(0)->setClearEveryFrame(true);
-    m_renderTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue(0.5, 0.5, 0.5));
-    m_renderTarget->getViewport(0)->setOverlaysEnabled(false);
+    resetViewport();
 
     QSGGeometry::updateTexturedRectGeometry(&m_geometry,
                                             QRectF(0, 0, m_size.width(), m_size.height()),

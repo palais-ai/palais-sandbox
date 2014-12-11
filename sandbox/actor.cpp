@@ -54,7 +54,6 @@ void Actor::setAnimationEnabled(const QString& name, bool enabled)
 
     Ogre::AnimationState* state = set->getAnimationState(name.toStdString());
 
-    state->setWeight(1);
     state->setEnabled(enabled);
     state->setLoop(true);
 }

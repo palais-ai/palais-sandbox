@@ -52,6 +52,7 @@ public:
     void setCamera(Ogre::Camera *camera) { m_camera = camera; }
 
 private:
+    void resetViewport();
 
     QSGTextureMaterial m_material;
     QSGOpaqueTextureMaterial m_materialO;

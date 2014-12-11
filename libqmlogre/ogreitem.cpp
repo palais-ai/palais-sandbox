@@ -12,14 +12,13 @@
 
 OgreItem::OgreItem(QQuickItem *parent)
     : QQuickItem(parent)
-    , m_timerID(0)
     , m_camera(0)
     , m_ogreEngineItem(0)
 {
     setFlag(ItemHasContents);
     setSmooth(false);
 
-    startTimer(16);
+    m_timerID = startTimer(33);
 }
 
 QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)

@@ -24,7 +24,8 @@ QMutex g_engineMutex;
 
 OgreEngine::OgreEngine(QQuickWindow *window)
     : QObject(),
-      m_resources_cfg(Ogre::StringUtil::BLANK)
+      m_resources_cfg(Ogre::StringUtil::BLANK),
+      mRoot(0)
 {
     qmlRegisterType<OgreItem>("Ogre", 1, 0, "OgreItem");
     qmlRegisterType<OgreEngine>("OgreEngine", 1, 0, "OgreEngine");
@@ -41,7 +42,23 @@ OgreEngine::~OgreEngine()
     }
 }
 
-Ogre::Root* OgreEngine::startEngine()
+Ogre::Root* OgreEngine::getRoot()
+{
+    return mRoot;
+}
+
+
+Ogre::RenderWindow* OgreEngine::getRenderWindow()
+{
+    return m_ogreWindow;
+}
+
+bool OgreEngine::isStarted() const
+{
+    return mRoot;
+}
+
+void OgreEngine::startEngine()
 {
     activateOgreContext();
 
@@ -87,6 +104,24 @@ Ogre::Root* OgreEngine::startEngine()
     ogreRoot->setRenderSystem(renderSystem);
     ogreRoot->initialise(false);
 
+    // Get the parameters of the window QT created
+    Ogre::String winHandle;
+#ifdef defined(Q_OS_WIN)
+    // Windows code
+    winHandle += Ogre::StringConverter::toString((unsigned long)(m_quickWindow->parent()->winId()));
+#elif defined(Q_OS_MAC)
+    // Mac code, tested on Mac OSX 10.6 using Qt 4.7.4 and Ogre 1.7.3
+    winHandle  = Ogre::StringConverter::toString((unsigned long)m_quickWindow->winId());
+#else
+    // Unix code
+    QX11Info info = x11Info();
+    winHandle  = Ogre::StringConverter::toString((unsigned long)(info.display()));
+    winHandle += ":";
+    winHandle += Ogre::StringConverter::toString((unsigned int)(info.screen()));
+    winHandle += ":";
+    winHandle += Ogre::StringConverter::toString((unsigned long)(this->parent()->winId()));
+#endif
+
     Ogre::NameValuePairList params;
 
     params["externalGLControl"] = "true";
@@ -95,10 +130,15 @@ Ogre::Root* OgreEngine::startEngine()
 
 #if defined(Q_OS_MAC)
     params["macAPI"] = "cocoa";
+    params["macAPICocoaUseNSView"] = "true";
+    params["externalWindowHandle"] = winHandle;
+#else
+    params["parentWindowHandle"] = winHandle;
 #endif
 
     //Finally create our window.
     m_ogreWindow = ogreRoot->createRenderWindow("OgreWindow", 1, 1, false, &params);
+    m_ogreWindow->setActive(true);
     m_ogreWindow->setVisible(false);
     m_ogreWindow->update(false);
 
@@ -107,18 +147,17 @@ Ogre::Root* OgreEngine::startEngine()
 
     doneOgreContext();
 
-    return ogreRoot;
+    mRoot = ogreRoot;
 }
 
-void OgreEngine::stopEngine(Ogre::Root *ogreRoot)
+void OgreEngine::stopEngine()
 {
-    if (ogreRoot) {
+    if (mRoot) {
 //        m_root->detachRenderTarget(m_renderTexture);
         // TODO tell node(s) to detach
-
+        delete mRoot;
+        mRoot = NULL;
     }
-
-    delete ogreRoot;
 }
 
 void OgreEngine::setQuickWindow(QQuickWindow *window)
@@ -134,13 +173,12 @@ void OgreEngine::setQuickWindow(QQuickWindow *window)
     m_ogreContext = m_qtContext;
 
     // create a new shared OpenGL context to be used exclusively by Ogre
-    m_ogreContext = new QOpenGLContext();
+    /**m_ogreContext = new QOpenGLContext();
     m_ogreContext->setFormat(m_quickWindow->requestedFormat());
     m_ogreContext->setShareContext(m_qtContext);
     m_ogreContext->create();
 
-    m_ogreContext->doneCurrent();
-
+    m_ogreContext->doneCurrent();*/
 
     m_qtContext->makeCurrent(m_quickWindow);
 }
@@ -189,6 +227,8 @@ void OgreEngine::doneOgreContext()
     m_qtContext->makeCurrent(m_quickWindow);
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
+
+    m_qtContext->functions()->glUseProgram(0);
 
     m_quickWindow->resetOpenGLState();
 }
