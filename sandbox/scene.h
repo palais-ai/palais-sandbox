@@ -78,7 +78,6 @@ public:
     Q_INVOKABLE QObjectList getActorsArray() const;
     QVariantMap& getKnowledge();
     const QString& getName() const;
-    void checkScriptEngineException(const QString& context = QString());
 private:
     void getActors(Ogre::SceneNode* root);
     Actor* getActorForNode(Ogre::SceneNode* node) const;

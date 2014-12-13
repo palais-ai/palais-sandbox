@@ -53,7 +53,7 @@ function onStart() {
 	scene.setKnowledge("hi3", 2.0);
 	scene.setKnowledge("hi4", new Vector3(3,3,3));
 
-	testRaycast()
+	setInterval(1000, function() {print("test timer")})
 }
 
 function updateActor(deltaTime, actor) {

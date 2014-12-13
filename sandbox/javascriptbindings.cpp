@@ -5,6 +5,7 @@
 #include <QScriptEngine>
 #include <QTextStream>
 #include <QDebug>
+#include <QList>
 
 #include <OgreQuaternion.h>
 #include <OgreVector3.h>
@@ -17,6 +18,125 @@ Q_DECLARE_METATYPE(Actor*)
 Q_DECLARE_METATYPE(RaycastResult)
 Q_DECLARE_METATYPE(RaycastResult*)
 
+int ScriptTimer::newTimer(int interval, bool oneShot, QScriptEngine& engine, const QScriptValue& function)
+{
+    if(function.isFunction())
+    {
+        sScriptTimers.append(new ScriptTimer(interval, oneShot, engine, function));
+        return  sScriptTimers.last()->getHandle();
+    }
+    else
+    {
+        qWarning("The second parameter to setTimeout/setInterval must be a function.");
+        return -1;
+    }
+}
+
+bool ScriptTimer::removeTimer(int handle)
+{
+    QMutableListIterator<ScriptTimer*> i(sScriptTimers);
+    while (i.hasNext())
+    {
+        ScriptTimer* timer = i.next();
+        if (timer->getHandle() == handle)
+        {
+            delete timer;
+            i.remove();
+            return true;
+        }
+    }
+    return false;
+}
+
+void ScriptTimer::onEngineDestroyed(QObject* engine)
+{
+    int removedCount = 0;
+
+    QMutableListIterator<ScriptTimer*> i(sScriptTimers);
+    while (i.hasNext())
+    {
+        ScriptTimer* timer = i.next();
+        // Remove all timers registered with that engine.
+        if (&timer->getEngine() == engine)
+        {
+            delete timer;
+            i.remove();
+            removedCount++;
+        }
+    }
+
+    qDebug() << "Removed " << removedCount << " timers on script destruction.";
+}
+
+int ScriptTimer::getHandle() const
+{
+    return mHandle;
+}
+
+QScriptEngine& ScriptTimer::getEngine()
+{
+    return mEngine;
+}
+
+void ScriptTimer::update(float deltaTime)
+{
+    mTimeLeft -= deltaTime;
+
+    if(mTimeLeft < 0)
+    {
+        timeout();
+
+        if(mIsOneShot)
+        {
+            if(!sScriptTimers.removeOne(this))
+            {
+                qWarning("Failed to remove single shot timer with id %d.", mHandle);
+            }
+        }
+        else
+        {
+            mTimeLeft = mInitialTime;
+        }
+    }
+}
+
+ScriptTimer::ScriptTimer(int interval, bool oneShot, QScriptEngine& engine, const QScriptValue& function) :
+    mTimeLeft(interval / 1000.f),
+    mInitialTime(mTimeLeft),
+    mIsOneShot(oneShot),
+    mEngine(engine),
+    mFunction(function),
+    mHandle(ScriptTimer::gHandleCounter++)
+{
+    ;
+}
+
+void ScriptTimer::timeout()
+{
+    if(mFunction.isFunction())
+    {
+        mFunction.call(QScriptValue());
+    }
+    else
+    {
+        qWarning("The second parameter to setTimeout/setInterval must be a function.");
+    }
+
+    JavaScriptBindings::checkScriptEngineException(mEngine, "script timer's timeout");
+}
+
+
+void ScriptTimer::updateAll(float deltaTime)
+{
+    foreach(ScriptTimer* timer, ScriptTimer::sScriptTimers)
+    {
+        timer->update(deltaTime);
+    }
+}
+
+int ScriptTimer::gHandleCounter = 0;
+QList<ScriptTimer*> ScriptTimer::sScriptTimers;
+
 namespace JavaScriptBindings
 {
 
@@ -27,6 +147,8 @@ void addBindings(QScriptEngine& engine, Scene* scene)
         qWarning("Can't install bindings on an uninitialized scene.");
         return;
     }
+
+    timers_register(engine);
 
     Actor_register_prototype(engine);
 
@@ -43,6 +165,120 @@ void addBindings(QScriptEngine& engine, Scene* scene)
     {
         addActorBinding(it.value(), engine);
     }
+}
+
+void timers_register(QScriptEngine& engine)
+{
+    QObject::connect(&engine, &QScriptEngine::destroyed, &ScriptTimer::onEngineDestroyed);
+
+    engine.globalObject().setProperty("setTimeout", engine.newFunction(script_setTimeout));
+    engine.globalObject().setProperty("setInterval", engine.newFunction(script_setInterval));
+    engine.globalObject().setProperty("clearTimeout", engine.newFunction(script_clearTimeout));
+    engine.globalObject().setProperty("clearInterval", engine.newFunction(script_clearInterval));
+}
+
+void timers_update(float deltaTime)
+{
+    ScriptTimer::updateAll(deltaTime);
+}
+
+void checkScriptEngineException(QScriptEngine& engine, const QString& context)
+{
+    if(engine.hasUncaughtException())
+    {
+        engine.uncaughtExceptionLineNumber();
+        if(context.isEmpty())
+        {
+            qWarning() << "Exception in loaded logic file "
+                       << ", ERROR:" << engine.uncaughtException().toString()
+                       << ", on line " << engine.uncaughtExceptionLineNumber()
+                       << ", backtrace: " << engine.uncaughtExceptionBacktrace().join("\n");
+        }
+        else
+        {
+            qWarning() << "Exception in " << context << ", ERROR:" << engine.uncaughtException().toString()
+                       << ", on line " << engine.uncaughtExceptionLineNumber()
+                       << ", backtrace: " << engine.uncaughtExceptionBacktrace().join("\n");
+        }
+        engine.clearExceptions();
+    }
+}
+
+QScriptValue script_addTimer_private(QScriptContext *context, QScriptEngine *engine, bool oneShot)
+{
+    if(context->argumentCount() == 2)
+    {
+        if(context->argument(0).isNumber())
+        {
+            int interval = context->argument(0).toInteger();
+
+            if(context->argument(1).isFunction())
+            {
+                QScriptValue function = context->argument(1).toObject();
+
+                return ScriptTimer::newTimer(interval, oneShot, *engine, function);
+            }
+            else
+            {
+                qWarning() << "The addTimer function requires a function as its second argument.";
+                return engine->undefinedValue();
+            }
+        }
+        else
+        {
+            qWarning() << "The addTimer function requires an integer as its first argument.";
+            return engine->undefinedValue();
+        }
+    }
+    else
+    {
+        qWarning() << "The addTimer function requires 2 arguments.";
+        return engine->undefinedValue();
+    }
+}
+
+
+QScriptValue script_removeTimer_private(QScriptContext *context, QScriptEngine *engine)
+{
+    if(context->argumentCount() == 0)
+    {
+        if(context->argument(0).isNumber())
+        {
+            int handle = context->argument(0).toInteger();
+
+            return ScriptTimer::removeTimer(handle);
+        }
+        else
+        {
+            qWarning() << "The removeTimeout function requires an integer as its first argument.";
+            return engine->undefinedValue();
+        }
+    }
+    else
+    {
+        qWarning() << "The removeTimeout function requires 1 argument.";
+        return engine->undefinedValue();
+    }
+}
+
+QScriptValue script_setTimeout(QScriptContext *context, QScriptEngine *engine)
+{
+    return script_addTimer_private(context, engine, true);
+}
+
+QScriptValue script_setInterval(QScriptContext *context, QScriptEngine *engine)
+{
+    return script_addTimer_private(context, engine, false);
+}
+
+QScriptValue script_clearTimeout(QScriptContext *context, QScriptEngine *engine)
+{
+    return script_removeTimer_private(context, engine);
+}
+
+QScriptValue script_clearInterval(QScriptContext *context, QScriptEngine *engine)
+{
+    return script_removeTimer_private(context, engine);
 }
 
 void RaycastResult_register_prototype(QScriptEngine& engine)

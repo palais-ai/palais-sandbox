@@ -299,33 +299,11 @@ void Scene::setup()
     {
         fun.call();
 
-        checkScriptEngineException("onStart");
+        JavaScriptBindings::checkScriptEngineException(mLogicScript, "onStart");
     }
     else
     {
         qWarning("No onStart handler defined in script.");
-    }
-}
-
-void Scene::checkScriptEngineException(const QString& context)
-{
-    if(mLogicScript.hasUncaughtException())
-    {
-        mLogicScript.uncaughtExceptionLineNumber();
-        if(context.isEmpty())
-        {
-            qWarning() << "Exception in loaded logic file "
-                       << mLogicFile << ", ERROR:" << mLogicScript.uncaughtException().toString()
-                       << ", on line " << mLogicScript.uncaughtExceptionLineNumber()
-                       << ", backtrace: " << mLogicScript.uncaughtExceptionBacktrace().join("\n");
-        }
-        else
-        {
-            qWarning() << "Exception in " << context << ", ERROR:" << mLogicScript.uncaughtException().toString()
-                       << ", on line " << mLogicScript.uncaughtExceptionLineNumber()
-                       << ", backtrace: " << mLogicScript.uncaughtExceptionBacktrace().join("\n");
-        }
-        mLogicScript.clearExceptions();
     }
 }
 
@@ -343,12 +321,14 @@ void Scene::update(float time)
     {
         fun.call(QScriptValue(), QScriptValueList() << deltaTimeInSeconds);
 
-        checkScriptEngineException("update");
+        JavaScriptBindings::checkScriptEngineException(mLogicScript, "update");
     }
     else
     {
         qWarning("No update handler defined in script.");
     }
+
+    JavaScriptBindings::timers_update(deltaTimeInSeconds);
 
     for(QMap<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
     {
@@ -369,7 +349,7 @@ void Scene::performAction(const QString& actionName, const QVariant& params)
 
         fun.call(QScriptValue(), list);
 
-        checkScriptEngineException("performAction( " + actionName + " )");
+        JavaScriptBindings::checkScriptEngineException(mLogicScript, "performAction( " + actionName + " )");
     }
 }
 
