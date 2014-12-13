@@ -71,17 +71,15 @@ void OgreEngine::startEngine()
     Ogre::Root *ogreRoot = new Ogre::Root("", m_resources_cfg);
 
 #if defined(Q_OS_MAC)
-    const QString additionalPluginPath = "/../Plugins";
-#else
-    const QString additionalPluginPath = "";
+    basePath += "/../Plugins";
 #endif
 
 #if (defined(DEBUG) && defined(Q_OS_WIN)) // We dont use debug dynamic libraries on mac.
-    const std::string renderSystemPath = (basePath + additionalPluginPath + "/RenderSystem_GL_d").toStdString();
-    const std::string octtreePath = (basePath + additionalPluginPath + "/Plugin_OctreeSceneManager_d").toStdString();
+    const std::string renderSystemPath = (basePath + "/RenderSystem_GL_d").toStdString();
+    const std::string octtreePath = (basePath + "/Plugin_OctreeSceneManager_d").toStdString();
 #else
-    const std::string renderSystemPath = (basePath + additionalPluginPath + "/RenderSystem_GL").toStdString();
-    const std::string octtreePath = (basePath + additionalPluginPath + "/Plugin_OctreeSceneManager").toStdString();
+    const std::string renderSystemPath = (basePath + "/RenderSystem_GL").toStdString();
+    const std::string octtreePath = (basePath + "/Plugin_OctreeSceneManager").toStdString();
 #endif
 
     qDebug() << "Render System path is " << QString::fromStdString(renderSystemPath);
@@ -94,6 +92,8 @@ void OgreEngine::startEngine()
 
 #if defined(Q_OS_WIN)
     renderSystem->setConfigOption("FSAA","0");
+#else
+    renderSystem->setConfigOption("FSAA", "4");
 #endif
 
     if(!renderSystem)
@@ -131,7 +131,8 @@ void OgreEngine::startEngine()
 
 void OgreEngine::stopEngine()
 {
-    if (mRoot) {
+    if (mRoot)
+    {
 //        m_root->detachRenderTarget(m_renderTexture);
         // TODO tell node(s) to detach
         delete mRoot;
@@ -177,7 +178,7 @@ void OgreEngine::activateOgreContext()
 
 void OgreEngine::doneOgreContext()
 {
-    m_ogreContext->functions()->glBindBuffer(GL_ARRAY_BUFFER, 0);
+    /**m_ogreContext->functions()->glBindBuffer(GL_ARRAY_BUFFER, 0);
     m_ogreContext->functions()->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     m_ogreContext->functions()->glBindRenderbuffer(GL_RENDERBUFFER, 0);
     m_ogreContext->functions()->glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
@@ -200,7 +201,7 @@ void OgreEngine::doneOgreContext()
     m_ogreContext->functions()->glBindBuffer(GL_TEXTURE_BUFFER, 0);
     m_ogreContext->functions()->glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
     m_ogreContext->functions()->glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
+*/
     m_ogreContext->doneCurrent();
 
     m_qtContext->makeCurrent(m_quickWindow);

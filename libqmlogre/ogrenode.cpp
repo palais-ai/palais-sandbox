@@ -13,7 +13,10 @@
 
 #include "ogrenode.h"
 
+#include <sstream>
+
 #include <Ogre.h>
+#include <OgreString.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
@@ -52,6 +55,11 @@ OgreNode::~OgreNode()
     if (m_renderTarget)
     {
         Ogre::TextureManager::getSingleton().remove("RttTex");
+    }
+
+    if(m_texture)
+    {
+        delete m_texture;
     }
 }
 
@@ -156,6 +164,28 @@ void OgreNode::update()
     }
 }
 
+int OgreNode::getNumberOfFSAASamples()
+{
+    int samples = 0;
+    try
+    {
+        Ogre::String samplesStr = m_ogreEngineItem->getRoot()->getRenderSystem()->getConfigOptions()["FSAA"].currentValue;
+        std::stringstream ss(samplesStr);
+        ss >> samples;
+
+        if(ss.fail())
+        {
+            samples = 0;
+        }
+    }
+    catch(...)
+    {
+        samples = 0;
+    }
+
+    return samples;
+}
+
 void OgreNode::updateFBO()
 {
     static const Ogre::String textureName = "RttTex";
@@ -165,16 +195,18 @@ void OgreNode::updateFBO()
         Ogre::TextureManager::getSingleton().remove(textureName);
     }
 
-    int samples = m_ogreEngineItem->ogreContext()->format().samples(); //< Adding sampling causes context crashes on windows 7 VM.
+    int samples = getNumberOfFSAASamples();
     m_rttTexture = Ogre::TextureManager::getSingleton().createManual(textureName,
                                                                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                                     Ogre::TEX_TYPE_2D,
                                                                     m_size.width(),
                                                                     m_size.height(),
-                                                                    0,
+                                                                    0, // num mipmaps
                                                                     Ogre::PF_R8G8B8A8,
-                                                                    Ogre::TU_RENDERTARGET, 0, false,
-                                                                    0);
+                                                                    Ogre::TU_RENDERTARGET,
+                                                                    0, // ManualLoader
+                                                                    false, // hwGammaCorrection
+                                                                    samples);
 
     m_renderTarget = m_rttTexture->getBuffer()->getRenderTarget();
     m_renderTarget->setActive(true);
@@ -187,7 +219,11 @@ void OgreNode::updateFBO()
 
     Ogre::GLTexture *nativeTexture = static_cast<Ogre::GLTexture *>(m_rttTexture.get());
 
-    delete m_texture;
+    if(m_texture)
+    {
+        delete m_texture;
+    }
+
     m_texture = m_ogreEngineItem->createTextureFromId(nativeTexture->getGLID(), m_size);
 
     m_material.setTexture(m_texture);

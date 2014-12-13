@@ -6,6 +6,7 @@
 #include "knowledgeservice.h"
 
 #include <QObject>
+#include <QUrl>
 
 #include "../libqjsonrpc/src/qjsonrpclocalserver.h"
 
@@ -28,6 +29,7 @@ public:
     void play();
     void pause();
     Q_INVOKABLE void setSimulationSpeed(float speedFactor);
+    Q_INVOKABLE void reloadProject();
 signals:
     void startSceneLoad(const QString& sceneFile, const QString& logicFile);
     void sceneLoaded(Scene* scene);
@@ -37,6 +39,7 @@ public slots:
     void onOpenProject(const QUrl& url);
     void onBeforeSceneLoadFinished(const QString& name, const QString& sceneFile, const QString& logicFile);
 private:
+    QUrl mLastOpenedUrl, mCurrentProjectUrl;
     SceneManager mScenarioManager;
     KnowledgeService mKnowledgeService;
     ActorService mActorService;

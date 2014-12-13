@@ -14,7 +14,7 @@ public:
     explicit KnowledgeService(SceneManager& sceneManager, QObject *parent = 0);
 
 public slots:
-    const QVariant& getKnowledge(const QString& knowledgeKey) const;
+    QVariant getKnowledge(const QString& knowledgeKey);
     void setKnowledge(const QString& knowledgeKey, const QVariant& value);
 private:
     SceneManager& mSceneManager;

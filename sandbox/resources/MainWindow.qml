@@ -33,6 +33,13 @@ ApplicationWindow {
                 text: "Save"
                 shortcut: "Ctrl+S"
             }
+
+            MenuItem {
+                text: "Reload project"
+                shortcut: "Ctrl+L"
+
+                onTriggered: ProjectManager.reloadProject();
+            }
         }
         Menu {
             title: "Edit"

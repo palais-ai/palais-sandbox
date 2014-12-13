@@ -53,6 +53,7 @@ public:
 
 private:
     void resetViewport();
+    int getNumberOfFSAASamples();
 
     QSGTextureMaterial m_material;
     QSGOpaqueTextureMaterial m_materialO;

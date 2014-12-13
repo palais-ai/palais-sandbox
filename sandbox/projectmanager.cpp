@@ -29,9 +29,14 @@ ProjectManager::ProjectManager(OgreEngine* engine) :
 
     mServer.addService(&mKnowledgeService);
     mServer.addService(&mActorService);
-    if (!mServer.listen(serviceName))
+    if (mServer.listen(serviceName))
     {
-        qWarning() << "Couldn't start the sandbox service, because " << mServer.errorString();
+        qDebug() << "Local RPC service listening on " << serviceName << ".";
+    }
+    else
+    {
+        qWarning() << "Couldn't start the sandbox service on " << serviceName << ", because " << mServer.errorString();
+        mServer.close();
     }
 }
 
@@ -42,6 +47,11 @@ ProjectManager::~ProjectManager()
     {
         qWarning() << "Failed to remove the sandbox services on close.";
     }
+}
+
+void ProjectManager::reloadProject()
+{
+    onOpenProject(mCurrentProjectUrl);
 }
 
 bool ProjectManager::getSceneLoaded() const
@@ -130,6 +140,8 @@ void ProjectManager::onOpenProject(const QUrl& url)
         return;
     }
 
+    mLastOpenedUrl = url;
+
     emit(beforeSceneLoad(name, sceneFile, logicFile));
 }
 
@@ -144,6 +156,8 @@ void ProjectManager::onBeforeSceneLoadFinished(const QString& name, const QStrin
         emit(sceneLoadFailed(QString("Failed to load scene %1.").arg(sceneFile)));
         return;
     }
+
+    mCurrentProjectUrl = mLastOpenedUrl;
 
     emit(sceneLoaded(scene));
 }

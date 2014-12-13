@@ -16,9 +16,9 @@ public:
 signals:
 
 public slots:
-    const QVariant& getKnowledge(const QString& actorName, const QString& knowledgeKey) const;
+    QVariant getKnowledge(const QString& actorName, const QString& knowledgeKey);
     void setKnowledge(const QString& actorName, const QString& knowledgeKey, const QVariant& value);
-    const QVariant& performAction(const QString& actorName, const QString& actionName, const QVariant& params = QVariant());
+    QVariant performAction(const QString& actorName, const QString& actionName, const QVariant& params = QVariant());
 private:
     SceneManager& mSceneManager;
 };

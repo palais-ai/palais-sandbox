@@ -13,8 +13,8 @@
 OgreItem::OgreItem(QQuickItem *parent)
     : QQuickItem(parent)
     , m_camera(0)
-    , m_ogreEngineItem(0)
     , mLastNode(0)
+    , m_ogreEngineItem(0)
 {
     setFlag(ItemHasContents);
     setSmooth(false);
@@ -29,7 +29,8 @@ void OgreItem::windowChanged(QQuickWindow *window)
 
 QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    if (width() <= 0 || height() <= 0 || !m_camera || !m_camera->camera() || !m_ogreEngineItem) {
+    if (width() <= 0 || height() <= 0 || !m_camera || !m_camera->camera() || !m_ogreEngineItem)
+    {
         delete oldNode;
         return 0;
     }
@@ -39,10 +40,10 @@ QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     {
         node = mLastNode = new OgreNode();
         node->setOgreEngineItem(m_ogreEngineItem);
-        node->setCamera(m_camera->camera());
     }
 
     node->setSize(QSize(width(), height()));
+    node->setCamera(m_camera->camera());
     node->update();
 
     // mark texture dirty, otherwise Qt will not trigger a redraw (preprocess())

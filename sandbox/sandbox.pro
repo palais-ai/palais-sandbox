@@ -3,6 +3,8 @@ QT += qml quick script
 TEMPLATE = app
 TARGET = sandbox
 
+#CONFIG += c++11
+
 UI_DIR = ./.ui
 OBJECTS_DIR = ./.obj
 MOC_DIR = ./.moc
@@ -42,22 +44,14 @@ CONFIG(release, debug|release) {
     M_BUILD_DIR = debug
 }
 
+include(../linkOgreSDK.pri)
+
 macx {
     OGREDIR = $$(OGRE_HOME)
     isEmpty(OGREDIR) {
-        error(QmlOgre needs Ogre to be built. Please set the environment variable OGRE_HOME pointing to your Ogre root directory.)
+        error($$TARGET needs Ogre to be built. Please set the environment variable OGRE_HOME pointing to your Ogre root directory.)
     } else {
-        message(Using Ogre libraries in $$OGREDIR)
-        INCLUDEPATH += $$OGREDIR/include/OGRE
-        INCLUDEPATH += $$OGREDIR/include/OGRE/RenderSystems/GL
-        QMAKE_LFLAGS += -F$$OGREDIR/lib/release
-        LIBS += -framework Ogre -framework OpenGL
-
-        BOOSTDIR = $$OGREDIR/boost
-        !isEmpty(BOOSTDIR) {
-            INCLUDEPATH += $$BOOSTDIR
-#            LIBS += -L$$BOOSTDIR/lib -lboost_date_time-xgcc40-mt-1_42 -lboost_thread-xgcc40-mt-1_42
-        }
+        message(Packaging Ogre libraries in $$OGREDIR)
 
         FrameworkFiles.files += $$OGREDIR/lib/release/Ogre.framework
         FrameworkFiles.path = Contents/Frameworks
@@ -79,9 +73,9 @@ macx {
 } else:win32 {
     OGREDIR = $$(OGRE_HOME)
     isEmpty(OGREDIR) {
-        error(QmlOgre needs Ogre to be built. Please set the environment variable OGRE_HOME pointing to your Ogre root directory.)
+        error($$TARGET needs Ogre to be built. Please set the environment variable OGRE_HOME pointing to your Ogre root directory.)
     } else {
-        message(Using Ogre libraries in $$OGREDIR)
+        message(Packaging Ogre libraries in $$OGREDIR)
 
         DESTDIR = $$OUT_PWD/$$M_BUILD_DIR
 
@@ -105,28 +99,6 @@ macx {
         Config.files += config/$$M_BUILD_DIR/plugins.cfg
 
         INSTALLS += package Resources Config
-
-        INCLUDEPATH += $$OGREDIR/include/OGRE
-        INCLUDEPATH += $$OGREDIR/include/OGRE/RenderSystems/GL
-
-        LIBS += -L$$OGREDIR/lib/$$M_BUILD_DIR -L$$OGREDIR/lib/$$M_BUILD_DIR/opt
-        QMAKE_LIBDIR += $$OGREDIR/lib/$$M_BUILD_DIR $$OGREDIR/lib/$$M_BUILD_DIR/opt
-
-        CONFIG(release, debug|release) {
-            LIBS += -lOgreMain -lRenderSystem_GL
-        } else {
-            LIBS += -lOgreMain_d -lRenderSystem_GL_d
-        }
-
-        BOOSTDIR = $$OGREDIR/boost
-        !isEmpty(BOOSTDIR) {
-            INCLUDEPATH += $$BOOSTDIR
-            CONFIG(release, debug|release) {
-                LIBS += -L$$BOOSTDIR/lib -llibboost_date_time-vc100-mt-1_49 -llibboost_thread-vc100-mt-1_49
-            } else {
-                LIBS += -L$$BOOSTDIR/lib -llibboost_date_time-vc100-mt-gd-1_49 -llibboost_thread-vc100-mt-gd-1_49
-            }
-        }
     }
 }
 
