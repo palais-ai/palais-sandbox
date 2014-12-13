@@ -37,7 +37,6 @@ Scene* SceneLoader::loadScene(OgreEngine* engine, Ogre::SceneManager* sceneManag
             return NULL;
         }
 
-        scene->setup();
         return scene.take();
     }
     else
@@ -90,6 +89,8 @@ void SceneLoader::loadSceneLogic(Scene* scene, const QString& logicFile)
     scene->checkScriptEngineException();
 
     JavaScriptBindings::addBindings(engine, scene);
+
+    scene->checkScriptEngineException();
 
     qDebug("JS Bindings have been installed.");
 }

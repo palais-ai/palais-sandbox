@@ -36,6 +36,12 @@ function spawnTeam(teamSize, startPos) {
 	numCalls++;
 }
 
+function testRaycast() {
+	var result = scene.raycast(new Vector3(0,0,0), new Vector3(1,0,0))
+	var result2 = scene.raycast(new Vector3(0,0,0), new Vector3(0,1,0))
+	var result3 = scene.raycast(new Vector3(0,0,0), new Vector3(0,0,1))
+}
+
 function onStart() {
 	spawnTeam(5, spawn_team1.position)
 	spawnTeam(5, spawn_team2.position)
@@ -46,6 +52,8 @@ function onStart() {
 	scene.setKnowledge("hi2", 1);
 	scene.setKnowledge("hi3", 2.0);
 	scene.setKnowledge("hi4", new Vector3(3,3,3));
+
+	testRaycast()
 }
 
 function updateActor(deltaTime, actor) {
@@ -60,6 +68,8 @@ function updateActor(deltaTime, actor) {
 } 
 
 function update(deltaTime) {
+	testRaycast()
+
 	var actors = scene.actors
 	for(var i = 0; i < actors.length; ++i) {
 		updateActor(deltaTime, actors[i]);

@@ -13,6 +13,8 @@
 #include <OgreMeshManager.h>
 #include <OgreEntity.h>
 #include <OgreAnimationState.h>
+#include <OgreRay.h>
+#include <OgreSceneQuery.h>
 
 #include "../libqmlogre/ogreengine.h"
 
@@ -21,7 +23,9 @@ Scene::Scene(const QString& name, const QString& sceneFile, const QString& logic
     mSceneFile(sceneFile),
     mLogicFile(logicFile),
     mRoot(root),
-    mEngine(engine)
+    mEngine(engine),
+    mRayQuery(Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName)->createRayQuery(Ogre::Ray())),
+    mIsSetup(false)
 {
     if(!mEngine)
     {
@@ -33,10 +37,67 @@ Scene::Scene(const QString& name, const QString& sceneFile, const QString& logic
 
 Scene::~Scene()
 {
+    if(mRayQuery)
+    {
+        Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName)->destroyQuery(mRayQuery);
+        mRayQuery = NULL;
+    }
+
     for(QMap<QString, Actor*>::iterator it = mActors.begin(); it != mActors.end(); ++it)
     {
         delete it.value();
     }
+}
+
+Actor* Scene::getActorForNode(Ogre::SceneNode* node) const
+{
+    for(QMap<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
+    {
+        if(it.value()->getSceneNode() == node)
+        {
+            return it.value();
+        }
+    }
+    return NULL;
+}
+
+RaycastResult Scene::raycast(const Ogre::Vector3& origin, const Ogre::Vector3& direction)
+{
+    Ogre::Ray ray(origin, direction.normalisedCopy());
+
+    mRayQuery->setRay(ray);
+    mRayQuery->setSortByDistance(true);
+    mRayQuery->setQueryTypeMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
+    Ogre::RaySceneQueryResult& result = mRayQuery->execute();
+
+    RaycastResult retVal;
+    retVal.actor = NULL;
+    retVal.distance = 0;
+
+    if(!result.empty())
+    {
+        Ogre::MovableObject* obj = result.front().movable;
+        Ogre::SceneNode* node = obj->getParentSceneNode();
+
+        if(!node)
+        {
+            qWarning("No parent node attached to movable object %s in raycast query.", obj->getName().c_str());
+            return retVal;
+        }
+
+        Actor* actor = getActorForNode(node);
+
+        if(!actor)
+        {
+            qWarning("No actor found for scene node %s in raycast query.", node->getName().c_str());
+            return retVal;
+        }
+
+        retVal.actor = actor;
+        retVal.distance = result.front().distance;
+    }
+
+    return retVal;
 }
 
 // CREDITS: http://www.ogre3d.org/forums/viewtopic.php?f=2&t=53647&start=0
@@ -240,26 +301,42 @@ void Scene::setup()
 
         checkScriptEngineException("onStart");
     }
+    else
+    {
+        qWarning("No onStart handler defined in script.");
+    }
 }
 
 void Scene::checkScriptEngineException(const QString& context)
 {
     if(mLogicScript.hasUncaughtException())
     {
+        mLogicScript.uncaughtExceptionLineNumber();
         if(context.isEmpty())
         {
             qWarning() << "Exception in loaded logic file "
-                       << mLogicFile << ", ERROR:" << mLogicScript.uncaughtException().toString();
+                       << mLogicFile << ", ERROR:" << mLogicScript.uncaughtException().toString()
+                       << ", on line " << mLogicScript.uncaughtExceptionLineNumber()
+                       << ", backtrace: " << mLogicScript.uncaughtExceptionBacktrace().join("\n");
         }
         else
         {
-            qWarning() << "Exception in " << context << ", ERROR:" << mLogicScript.uncaughtException().toString();
+            qWarning() << "Exception in " << context << ", ERROR:" << mLogicScript.uncaughtException().toString()
+                       << ", on line " << mLogicScript.uncaughtExceptionLineNumber()
+                       << ", backtrace: " << mLogicScript.uncaughtExceptionBacktrace().join("\n");
         }
+        mLogicScript.clearExceptions();
     }
 }
 
 void Scene::update(float time)
 {
+    if(!mIsSetup)
+    {
+        setup();
+        mIsSetup = true;
+    }
+
     float deltaTimeInSeconds = time / 1000.f;
     QScriptValue fun = mLogicScript.globalObject().property("update");
     if(fun.isFunction())
@@ -267,6 +344,10 @@ void Scene::update(float time)
         fun.call(QScriptValue(), QScriptValueList() << deltaTimeInSeconds);
 
         checkScriptEngineException("update");
+    }
+    else
+    {
+        qWarning("No update handler defined in script.");
     }
 
     for(QMap<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)

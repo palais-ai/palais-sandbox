@@ -15,7 +15,15 @@ class OgreEngine;
 
 namespace Ogre {
 class SceneNode;
+class RaySceneQuery;
 }
+
+class RaycastResult
+{
+public:
+    Actor* actor;
+    float distance;
+};
 
 class Scene : public QAbstractListModel
 {
@@ -50,6 +58,8 @@ public:
 
     Q_INVOKABLE void destroy(Actor* actor);
 
+    Q_INVOKABLE RaycastResult raycast(const Ogre::Vector3& origin, const Ogre::Vector3& direction); //< Reports the first hit actor in the scene
+
     void setup();
     void update(float time);
     void performAction(const QString& actionName, const QVariant& params = QVariant());
@@ -57,6 +67,7 @@ public:
     Q_INVOKABLE bool hasKnowledge(const QString& knowledgeKey) const;
     Q_INVOKABLE QVariant getKnowledge(const QString& knowledgeKey) const;
     Q_INVOKABLE void setKnowledge(const QString& knowledgeKey, const QVariant& value);
+
     bool hasActorKnowledge(const QString& actorName, const QString& knowledgeKey) const;
     QVariant getActorKnowledge(const QString& actorName, const QString& knowledgeKey) const;
     void setActorKnowledge(const QString& actorName, const QString& knowledgeKey, const QVariant& value);
@@ -70,14 +81,17 @@ public:
     void checkScriptEngineException(const QString& context = QString());
 private:
     void getActors(Ogre::SceneNode* root);
+    Actor* getActorForNode(Ogre::SceneNode* node) const;
     void destroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode );
 
     QString mName, mSceneFile, mLogicFile;
     Ogre::SceneNode* mRoot;
     OgreEngine* mEngine;
+    Ogre::RaySceneQuery* mRayQuery;
     QScriptEngine mLogicScript;
     QMap<QString, Actor*> mActors;
     QVariantMap mKnowledge;
+    bool mIsSetup;
 };
 
 #endif // SCENE_H

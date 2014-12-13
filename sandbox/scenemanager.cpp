@@ -32,8 +32,10 @@ SceneManager::SceneManager(OgreEngine* engine) :
 
 Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, const QString& logicFile)
 {
+    pause();
+
     if(mOgreEngine)
-    {
+    {       
         if(mCurrentScene)
         {
             delete mCurrentScene;

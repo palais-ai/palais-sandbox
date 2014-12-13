@@ -14,6 +14,8 @@ Q_DECLARE_METATYPE(Ogre::Vector3*)
 Q_DECLARE_METATYPE(Ogre::Quaternion)
 Q_DECLARE_METATYPE(Ogre::Quaternion*)
 Q_DECLARE_METATYPE(Actor*)
+Q_DECLARE_METATYPE(RaycastResult)
+Q_DECLARE_METATYPE(RaycastResult*)
 
 namespace JavaScriptBindings
 {
@@ -33,6 +35,7 @@ void addBindings(QScriptEngine& engine, Scene* scene)
     engine.globalObject().setProperty("scene", sceneVal);
 
     Vector3_register_prototype(engine);
+    RaycastResult_register_prototype(engine);
 
     const QMap<QString, Actor*>& actors = scene->getActors();
 
@@ -41,6 +44,68 @@ void addBindings(QScriptEngine& engine, Scene* scene)
         addActorBinding(it.value(), engine);
     }
 }
+
+void RaycastResult_register_prototype(QScriptEngine& engine)
+{
+    QScriptValue obj = engine.newObject();
+
+    obj.setProperty("distance", engine.newFunction(RaycastResult_prototype_distance),
+                    QScriptValue::PropertyGetter | QScriptValue::ReadOnly);
+    obj.setProperty("actor", engine.newFunction(RaycastResult_prototype_actor),
+                    QScriptValue::PropertyGetter | QScriptValue::ReadOnly);
+    obj.setProperty("hasHit", engine.newFunction(RaycastResult_prototype_hasHit),
+                    QScriptValue::PropertyGetter | QScriptValue::ReadOnly);
+
+    obj.setProperty("toString", engine.evaluate("(function() {return 'RaycastResult @value ( hasHit: ' + this.hasHit + ', distance: ' + this.distance + ', actor: ' + this.actor + ')'; })"));
+
+    engine.setDefaultPrototype(qMetaTypeId<RaycastResult>(), obj);
+    engine.setDefaultPrototype(qMetaTypeId<RaycastResult*>(), obj);
+}
+
+QScriptValue RaycastResult_prototype_distance(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
+
+    if (!res)
+    {
+        return context->throwError(QScriptContext::TypeError, "RaycastResult.prototype.distance: this object is not a RaycastResult");
+    }
+
+    return res->distance;
+}
+
+QScriptValue RaycastResult_prototype_actor(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
+
+    if (!res)
+    {
+        return context->throwError(QScriptContext::TypeError, "RaycastResult.prototype.distance: this object is not a RaycastResult");
+    }
+
+    if(!res->actor)
+    {
+        return engine->undefinedValue();
+    }
+
+    return engine->toScriptValue(res->actor);
+}
+
+QScriptValue RaycastResult_prototype_hasHit(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
+
+    if (!res)
+    {
+        return context->throwError(QScriptContext::TypeError, "RaycastResult.prototype.distance: this object is not a RaycastResult");
+    }
+
+    return res->actor != NULL;
+}
+
 
 void Actor_register_prototype(QScriptEngine& engine)
 {

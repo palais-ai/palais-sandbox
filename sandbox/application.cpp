@@ -161,6 +161,10 @@ void Application::onBeforeSceneLoad(const QString& name, const QString& sceneFil
     // set up Ogre scene
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
     mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+    Ogre::AxisAlignedBox box;
+    Ogre::Vector3 max(100000, 100000, 100000);
+    box.setExtents(-max, max);
+    mSceneManager->setOption("Size", &box);
 
     CameraNodeObject* camera = getCameraWithName("cam1");
     camera->createCameraWithCurrentSceneManager();

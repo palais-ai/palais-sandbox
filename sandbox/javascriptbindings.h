@@ -18,7 +18,13 @@ void addBindings(QScriptEngine& engine, Scene* scene);
 void addActorBinding(Actor* actor, QScriptEngine& engine);
 QString cleanIdentifier(const QString& input);
 
+void RaycastResult_register_prototype(QScriptEngine& engine);
+QScriptValue RaycastResult_prototype_distance(QScriptContext *context, QScriptEngine *engine);
+QScriptValue RaycastResult_prototype_actor(QScriptContext *context, QScriptEngine *engine);
+QScriptValue RaycastResult_prototype_hasHit(QScriptContext *context, QScriptEngine *engine);
+
 void Actor_register_prototype(QScriptEngine& engine);
+
 void Vector3_register_prototype(QScriptEngine& engine);
 QScriptValue Vector3_prototype_ctor(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Vector3_prototype_x(QScriptContext *context, QScriptEngine *engine);
