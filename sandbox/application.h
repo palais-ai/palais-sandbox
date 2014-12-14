@@ -31,6 +31,9 @@ public:
     qreal loadingProgress() const;
     bool getSceneLoaded() const;
     bool getScenePlaying() const;
+
+    // Coordinates are in normalized screen coordinates.
+    Q_INVOKABLE void onOgreViewClicked(float mouseX, float mouseY);
 signals:
     void ogreInitialized();
     void beforeSceneLoadFinished(const QString& name, const QString& sceneFile, const QString& logicFile);
@@ -43,7 +46,9 @@ public slots:
     void onSceneLoadFailed(const QString& message);
     void onPlayButtonPressed();
     void onBeforeSceneLoad(const QString& name, const QString& sceneFile, const QString& logicFile);
+    void onPlayingChanged(bool isPlaying);
 private:
+    void initializeSceneManager();
     CameraNodeObject* getCameraWithName(const QString& name);
 
     QQmlApplicationEngine* mApplicationEngine;

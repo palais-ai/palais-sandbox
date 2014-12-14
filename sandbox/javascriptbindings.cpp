@@ -240,7 +240,7 @@ QScriptValue script_addTimer_private(QScriptContext *context, QScriptEngine *eng
 
 QScriptValue script_removeTimer_private(QScriptContext *context, QScriptEngine *engine)
 {
-    if(context->argumentCount() == 0)
+    if(context->argumentCount() == 1)
     {
         if(context->argument(0).isNumber())
         {
@@ -622,8 +622,34 @@ QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine 
 
 void addActorBinding(Actor* actor, QScriptEngine& engine)
 {
+    if(!actor)
+    {
+        qWarning("Tried to add a null actor to the scripting environment. The addition was not performed.");
+        return;
+    }
+
     qDebug() << "Adding actor " << cleanIdentifier(actor->getName()) << " to the scripting system.";
     engine.globalObject().setProperty(cleanIdentifier(actor->getName()), engine.newQObject(actor));
+}
+
+void removeActorBinding(Actor* actor, QScriptEngine& engine)
+{
+    if(!actor)
+    {
+        qWarning("Tried to remove a null actor to the scripting environment. The removal was not performed.");
+        return;
+    }
+
+    QString name = cleanIdentifier(actor->getName());
+    qDebug() << "Removing actor " << name << " from the scripting system.";
+
+    QScriptValue value = engine.globalObject().property(name);
+    if(value.toVariant().userType() != qMetaTypeId<Actor*>())
+    {
+        qDebug() << "The actor " << actor->getName() << " you tried to remove from the scripting environment wasn't properly added. The deletion is performed anyway.";
+    }
+
+    engine.globalObject().setProperty(name, engine.undefinedValue());
 }
 
 QString cleanIdentifier(const QString &input)

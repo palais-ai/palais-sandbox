@@ -42,7 +42,16 @@ Rectangle {
                     prevY = mouse.y
                 }
             }
-            onReleased: { prevX = -1; prevY = -1 }
+            onReleased: {
+                if(prevX == -1 && prevY == -1) {
+                    // No dragging has happened between press and release - interpret this, and only this, as a click on the 3D view
+                    // Coordinates must be in normalized screen coordinates.
+                    ApplicationWrapper.onOgreViewClicked((mouse.x + ogre.x) / ogre.width, (mouse.y + ogre.y) / ogre.height)
+                } else {
+                    prevX = -1
+                    prevY = -1
+                }
+            }
         }
 
         Ogre3DViewControls {

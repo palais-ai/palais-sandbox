@@ -78,6 +78,18 @@ int Application::onApplicationStarted(int argc, char **argv)
     return app.exec();
 }
 
+void Application::initializeSceneManager()
+{
+    mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
+    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+
+    // This fixes some issues with ray casting when using shallow terrain.
+    Ogre::AxisAlignedBox box;
+    Ogre::Vector3 max(100000, 100000, 100000);
+    box.setExtents(-max, max);
+    mSceneManager->setOption("Size", &box);
+}
+
 void Application::initializeOgre()
 {
     QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
@@ -92,12 +104,14 @@ void Application::initializeOgre()
     mRoot = mOgreEngine->getRoot();
     mOgreEngine->setupResources();
 
-    mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
-    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+    initializeSceneManager();
 
     mProjectManager = new ProjectManager(mOgreEngine);
 
     mApplicationEngine->rootContext()->setContextProperty("ProjectManager", mProjectManager);
+
+    QObject::connect(mProjectManager, &ProjectManager::onPlayingChanged,
+                     this, &Application::onPlayingChanged);
 
     QObject::connect(mProjectManager, SIGNAL(sceneLoaded(Scene*)),
                      this, SLOT(onSceneLoaded(Scene*)));
@@ -140,6 +154,13 @@ void Application::onOgreIsReady()
     QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "onOgreIsReady");
 }
 
+void Application::onOgreViewClicked(float mouseX, float mouseY)
+{
+    if(getSceneLoaded()) {
+        mProjectManager->selectActorAtClickpoint(mouseX, mouseY, getCameraWithName("cam1")->camera());
+    }
+}
+
 void Application::onBeforeSceneLoad(const QString& name, const QString& sceneFile, const QString& logicFile)
 {
     qDebug("Before scene load");
@@ -158,13 +179,7 @@ void Application::onBeforeSceneLoad(const QString& name, const QString& sceneFil
         mRoot->destroySceneManager(mSceneManager);
     }
 
-    // set up Ogre scene
-    mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
-    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
-    Ogre::AxisAlignedBox box;
-    Ogre::Vector3 max(100000, 100000, 100000);
-    box.setExtents(-max, max);
-    mSceneManager->setOption("Size", &box);
+    initializeSceneManager();
 
     CameraNodeObject* camera = getCameraWithName("cam1");
     camera->createCameraWithCurrentSceneManager();
@@ -264,7 +279,10 @@ void Application::onPlayButtonPressed()
     {
         mProjectManager->play();
     }
+}
 
-    emit(onScenePlayingChanged(getSceneLoaded()));
+void Application::onPlayingChanged(bool isPlaying)
+{
+    emit onScenePlayingChanged(isPlaying);
 }
 

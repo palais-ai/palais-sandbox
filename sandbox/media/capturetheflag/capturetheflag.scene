@@ -1,4 +1,4 @@
-<scene export_time="1418324939.425396" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1418324823.811123" >
+<scene export_time="1418507880.50612" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1418324939.425396" >
   <nodes >
     <node name="Navmesh" >
       <position x="0.000000" y="0.000000" z="-0.000000" />
@@ -808,18 +808,18 @@
   </nodes>
   <externals >
     <item type="material" >
-      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Material.material" />
+      <file name="/Users/patrick/Desktop/capturetheflag/Material.material" />
     </item>
     <item type="material" >
-      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Material.002.material" />
+      <file name="/Users/patrick/Desktop/capturetheflag/Material.002.material" />
     </item>
     <item type="material" >
-      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Material.001.material" />
+      <file name="/Users/patrick/Desktop/capturetheflag/Material.001.material" />
     </item>
   </externals>
   <environment >
     <colourAmbient b="0.0" g="0.0" r="0.0" />
-    <colourBackground b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
     <colourDiffuse b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
+    <colourBackground b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
   </environment>
 </scene>

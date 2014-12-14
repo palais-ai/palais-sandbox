@@ -63,6 +63,8 @@ Actor* Scene::getActorForNode(Ogre::SceneNode* node) const
 
 RaycastResult Scene::raycast(const Ogre::Vector3& origin, const Ogre::Vector3& direction)
 {
+    mEngine->lockEngine();
+
     Ogre::Ray ray(origin, direction.normalisedCopy());
 
     mRayQuery->setRay(ray);
@@ -82,6 +84,7 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin, const Ogre::Vector3& d
         if(!node)
         {
             qWarning("No parent node attached to movable object %s in raycast query.", obj->getName().c_str());
+            mEngine->unlockEngine();
             return retVal;
         }
 
@@ -90,6 +93,7 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin, const Ogre::Vector3& d
         if(!actor)
         {
             qWarning("No actor found for scene node %s in raycast query.", node->getName().c_str());
+            mEngine->unlockEngine();
             return retVal;
         }
 
@@ -97,6 +101,8 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin, const Ogre::Vector3& d
         retVal.distance = result.front().distance;
     }
 
+    mRayQuery->clearResults();
+    mEngine->unlockEngine();
     return retVal;
 }
 
@@ -245,7 +251,35 @@ Actor* Scene::instantiate(const QString& name, const QString& meshName, const Og
 
 void Scene::destroy(Actor* actor)
 {
+    if(!actor)
+    {
+        qWarning() << "Tried to destroy a null actor. The destruction can't be performed.";
+        return;
+    }
 
+    if(!mActors.contains(actor->getName()))
+    {
+        qWarning() << "Tried to destroy an actor with name " << actor->getName()
+                   << " that didnt exist in the scene. The destruction is not performed.";
+        return;
+    }
+
+    mEngine->lockEngine();
+
+    Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName);
+
+    destroyAllAttachedMovableObjects(actor->getSceneNode());
+    scnMgr->destroySceneNode(actor->getSceneNode());
+
+    mEngine->unlockEngine();
+
+    JavaScriptBindings::removeActorBinding(actor, mLogicScript);
+
+    const int index = mActors.values().indexOf(actor);
+
+    beginRemoveRows( QModelIndex(), index, index);
+    mActors.remove(actor->getName());
+    endRemoveRows();
 }
 
 Actor* Scene::getActor(unsigned int index)

@@ -1,4 +1,6 @@
 #include "projectmanager.h"
+#include "scene.h"
+#include "actor.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -9,6 +11,7 @@
 
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
+#include <OgreCamera.h>
 
 #include "../libqmlogre/ogreengine.h"
 
@@ -49,9 +52,37 @@ ProjectManager::~ProjectManager()
     }
 }
 
+void ProjectManager::selectActorAtClickpoint(float mouseX, float mouseY, Ogre::Camera* camera)
+{
+    if(!camera)
+    {
+        qWarning("Cant determine an actor to select without a corresponding camera.");
+        return;
+    }
+
+    qDebug() << "mouse x: " << mouseX << ", mouse y: " << mouseY;
+
+    Ogre::Ray mouseRay = camera->getCameraToViewportRay(mouseX, mouseY);
+
+    Actor* actor = mScenarioManager.getCurrentScene()->raycast(mouseRay.getOrigin(), mouseRay.getDirection()).actor;
+
+    if(actor)
+    {
+        qDebug() << "Clicked " << actor->getName();
+        actor->toggleHighlight(!actor->getSceneNode()->getShowBoundingBox());
+    }
+    else
+    {
+        qDebug() << "No hit.";
+    }
+}
+
 void ProjectManager::reloadProject()
 {
-    onOpenProject(mCurrentProjectUrl);
+    if(!mCurrentProjectUrl.isEmpty())
+    {
+        onOpenProject(mCurrentProjectUrl);
+    }
 }
 
 bool ProjectManager::getSceneLoaded() const
@@ -67,11 +98,15 @@ bool ProjectManager::isPlaying() const
 void ProjectManager::play()
 {
     mScenarioManager.start();
+
+    emit onPlayingChanged(isPlaying());
 }
 
 void ProjectManager::pause()
 {
     mScenarioManager.pause();
+
+    emit onPlayingChanged(isPlaying());
 }
 
 void ProjectManager::setSimulationSpeed(float speedFactor)
@@ -148,6 +183,8 @@ void ProjectManager::onOpenProject(const QUrl& url)
 void ProjectManager::onBeforeSceneLoadFinished(const QString& name, const QString& sceneFile, const QString& logicFile)
 {
     qDebug("Loading project %s with visuals (%s) and logic (%s).", name.toStdString().c_str(), sceneFile.toStdString().c_str(), logicFile.toStdString().c_str());
+
+    pause();
 
     Scene* scene = mScenarioManager.loadScene(name, sceneFile, logicFile);
 

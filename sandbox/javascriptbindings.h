@@ -60,6 +60,7 @@ namespace JavaScriptBindings
 {
 void addBindings(QScriptEngine& engine, Scene* scene);
 void addActorBinding(Actor* actor, QScriptEngine& engine);
+void removeActorBinding(Actor* actor, QScriptEngine& engine);
 QString cleanIdentifier(const QString& input);
 void checkScriptEngineException(QScriptEngine& engine, const QString& context);
 

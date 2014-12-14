@@ -42,6 +42,7 @@ function testRaycast() {
 	var result3 = scene.raycast(new Vector3(0,0,0), new Vector3(0,0,1))
 }
 
+var timer;
 function onStart() {
 	spawnTeam(5, spawn_team1.position)
 	spawnTeam(5, spawn_team2.position)
@@ -53,7 +54,7 @@ function onStart() {
 	scene.setKnowledge("hi3", 2.0);
 	scene.setKnowledge("hi4", new Vector3(3,3,3));
 
-	setInterval(1000, function() {print("test timer")})
+	timer = setInterval(1000, function() {print("test timer")})
 }
 
 function updateActor(deltaTime, actor) {
@@ -77,6 +78,8 @@ function update(deltaTime) {
 
 	Cube_000.position = new Vector3(0, 0 , 5)
 	Cube_000.setScale(10)
+
+	clearInterval(timer)
 }
 
 function shoot(actor, target) {
