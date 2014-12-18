@@ -1,12 +1,17 @@
 var numCalls = 1;
-function spawnTeam(teamSize, startPos) {
-	var offset = new Vector3(0,0,0);
-	var offsetFactor = numCalls == 1 ? 1 : -1;
-	var meshSuffix = numCalls == 1 ? "red" : "green";
 
-	for(var i = 0; i < teamSize; ++i) {
-		var actor = scene.instantiate("player_team" + numCalls + "_" + i,
-									  "Soldier2" + meshSuffix, 
+function partial(func /*, 0..n args */) {
+	var args = Array.prototype.slice.call(arguments, 1);
+	return function() {
+		var allArguments = args.concat(Array.prototype.slice.call(arguments));
+		return func.apply(this, allArguments);
+	};
+}
+
+var fighterCount = 0;
+function spawnFighter(startPos, teamColor) {
+		var actor = scene.instantiate("player_team" + numCalls + "_" + fighterCount++,
+									  "Soldier2" + teamColor, 
 									  startPos);
 
 		actor.enableAnimation("my_animation");
@@ -14,15 +19,6 @@ function spawnTeam(teamSize, startPos) {
 
 		var lookAtPos = actor.position
 		lookAtPos.y = Plane.position.y
-
-		if(i % 2) {
-			offset.x += offsetFactor
-		} else {
-			offset.z += offsetFactor
-		}
-
-		lookAtPos.x += offset.x;
-		lookAtPos.z += offset.z;
 
 		actor.position = lookAtPos
 
@@ -32,6 +28,14 @@ function spawnTeam(teamSize, startPos) {
 		actor.lookAt(lookAtPos);
 
 		actor.setKnowledge("movementTarget", new Vector3(0,0,0))
+}
+
+function spawnTeam(teamSize, startPos) {
+	var meshSuffix = numCalls == 1 ? "red" : "green";
+
+	var spawnDelay = 1000; // in ms
+	for(var i = 0; i < teamSize; ++i) {
+		setTimeout(spawnDelay*i, partial(spawnFighter, startPos, meshSuffix));
 	}
 	numCalls++;
 }

@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-#include <QtDebug>
+#include <QDebug>
 
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>

@@ -10,6 +10,7 @@
         <file>ActorTableCell.qml</file>
         <file>ActorTableHeader.qml</file>
         <file>TextShadow.qml</file>
+        <file>ListSeparator.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>sandbox-bg.jpg</file>

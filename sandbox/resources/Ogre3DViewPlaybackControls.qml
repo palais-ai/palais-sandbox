@@ -30,10 +30,9 @@ RowLayout {
         Text {
             text: "speed: " + speedSlider.value.toFixed(1)
             font.family: openSans.name;
-            font.weight: Font.DemiBold
             color: colors.dimmedTextColor
             Layout.alignment: Layout.Center
-            renderType: Text.NativeRendering
+            //renderType: Text.NativeRendering
         }
 
         Slider {

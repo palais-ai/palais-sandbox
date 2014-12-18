@@ -69,7 +69,11 @@ ApplicationWindow {
         property color secondaryColorLighter: "#7cef09"
         property color dimmedTextColor: "#3Dffffff"
         property color slightlyDimmedTextColor: "#CCffffff"
-        property color stronglyDimmedTextColor: "#0Dffffff"
+        property color stronglyDimmedTextColor: "#40ffffff"
+        property color lightGray: '#a7a7a7'
+        property color darkGray: '#3b3b3b'
+        property color black95: '#111111'
+        property color black75: '#555555'
     }
 
     FontLoader {
@@ -83,6 +87,10 @@ ApplicationWindow {
 
     FontLoader {
         source: "qrc:/fonts/open-sans/OpenSans-Semibold.ttf"
+    }
+
+    FontLoader {
+        source: "qrc:/fonts/open-sans/OpenSans-Light.ttf"
     }
 
     FontLoader {
@@ -100,7 +108,7 @@ ApplicationWindow {
             height: parent.height
             width: 210
 
-            Behavior on width { NumberAnimation {  id:widthAnimation; duration: 180 } }
+            Behavior on width { NumberAnimation {  id:widthAnimation; duration: 120 } }
         }
 
         Loader {

@@ -11,7 +11,7 @@ Text {
     font.pointSize: iconSize
     text: unicode
     color: icon.enabled ? colors.dimmedTextColor : colors.stronglyDimmedTextColor
-    renderType: Text.NativeRendering
+    //renderType: Text.NativeRendering
     height: iconSize
     width: iconSize
     clip: true

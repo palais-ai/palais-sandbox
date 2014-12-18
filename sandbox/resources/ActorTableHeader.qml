@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.1
 
 Rectangle {
     id: headerColumn
-    property real headerPadding: 8
+    property real headerPadding: 16
     height: childrenRect.height
     width: parent.width
     color: "transparent"
@@ -19,15 +19,17 @@ Rectangle {
 
     Text {
         id: scenarioText
-        Layout.alignment: Layout.Center
+        Layout.alignment: Layout.Left
         text: ApplicationWrapper.sceneLoaded ? "Scenario" : "No Scene Is Loaded Yet."
         font.family: openSans.name
-        font.capitalization: Font.SmallCaps
-        font.pointSize: 14
-        color: "white"
+        font.capitalization: Font.AllUppercase
+        font.pointSize: 12
+        font.weight: Font.Light
+        color: colors.lightGray
         anchors.top: pad1.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        renderType: Text.NativeRendering
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        //renderType: Text.NativeRendering
 
         //TextShadow {}
     }
@@ -36,23 +38,32 @@ Rectangle {
         id: scenarioName
         text: Scene.name
         font.family: openSans.name
+        font.capitalization: Font.AllUppercase
         font.pointSize: 16
+        font.weight: Font.DemiBold
         color: "white"
         maximumLineCount: 1
         elide: Text.ElideRight
         clip: true
         anchors.top: scenarioText.bottom
-        anchors.horizontalCenter: scenarioText.horizontalCenter
-        renderType: Text.NativeRendering
+        anchors.topMargin: -5
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        //renderType: Text.NativeRendering
 
         //TextShadow {}
     }
 
     Rectangle {
+        id: pad2
         width: parent.width
-        height: headerColumn.headerPadding
+        height: ApplicationWrapper.sceneLoaded ? headerColumn.headerPadding : 0
         color: "transparent"
         anchors.top: scenarioName.bottom
         anchors.left: parent.left
+    }
+
+    ListSeparator {
+        anchors.top: pad2.bottom
     }
 }

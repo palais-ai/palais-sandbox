@@ -2,16 +2,9 @@ import QtQuick 2.0
 
 Rectangle {
     id: actorCell
-
-    property color cellColor: colors.primaryColor
-    property color cellColorLighter: colors.primaryColorLighter
     signal pressed()
-
-    opacity: 0.8
-    gradient: Gradient {
-             GradientStop { position: 1.0; color: cellColor }
-             GradientStop { position: 0.0; color: cellColorLighter }
-    }
+    property color textColor: colors.lightGray
+    color: colors.darkGray
 
     MouseArea {
         anchors.fill: parent
@@ -29,25 +22,27 @@ Rectangle {
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -2
         anchors.left: parent.left
-        anchors.leftMargin: 10
+        anchors.leftMargin: 8
         text: name
         font.family: openSans.name
         font.pointSize: 12
-        color: "white"
-        renderType: Text.NativeRendering
+        color: textColor
+        //renderType: Text.NativeRendering
     }
 
     Text {
         id: actorHideButton
         anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -2
         anchors.right: arrowRightIndicator.left
-        anchors.rightMargin: 10
+        anchors.rightMargin: 8
         text: "\uf06e"
         font.family: fontAwesome.name
         font.pointSize: 12
-        color: "white"
-        renderType: Text.NativeRendering
+        color: textColor
+        //renderType: Text.NativeRendering
 
         MouseArea {
             anchors.fill: parent
@@ -81,13 +76,18 @@ Rectangle {
     Text {
         id: arrowRightIndicator
         anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -2
         anchors.right: parent.right
-        anchors.rightMargin: 10
+        anchors.rightMargin: 8
         text: "\uf105"
         font.family: fontAwesome.name
         font.pointSize: 12
-        color: "white"
-        renderType: Text.NativeRendering
+        color: textColor
+        //renderType: Text.NativeRendering
+    }
+
+    ListSeparator {
+        anchors.bottom: parent.bottom
     }
 
     states: [
@@ -95,11 +95,7 @@ Rectangle {
             name: 'HOVER'
             PropertyChanges {
                 target: actorCell
-                cellColor: colors.secondaryColor
-            }
-            PropertyChanges {
-                target: actorCell
-                cellColorLighter: colors.secondaryColorLighter
+                textColor: "white"
             }
         }
     ]

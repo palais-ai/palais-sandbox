@@ -2,9 +2,8 @@ import QtQuick 2.0
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 
-Image {
-    source: "qrc:/images/controls-bg.jpg"
-    fillMode: Image.Tile
+Rectangle {
+    color: colors.darkGray
 
     ListModel {
         id: emptyModel
@@ -21,8 +20,8 @@ Image {
         }
 
         delegate: ActorTableCell {
-            width: parent.width
-            height: 22
+            width: 210
+            height: 25
         }
     }
 }

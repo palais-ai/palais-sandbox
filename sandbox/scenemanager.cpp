@@ -14,8 +14,8 @@
 
 const float SceneManager::sMinimumSpeedFactor = 0.1f; // In times the normal speed
 const float SceneManager::sMaximumSpeedFactor = 5.f;  // In times the normal speed
-const float SceneManager::sMaximumTickRate = 100.f; // In Ticks Per Second
-const float SceneManager::sAITickRate = 100.f; // In Ticks Per Second
+const float SceneManager::sMaximumTickRate = 100.f; // In ticks Per Second
+const float SceneManager::sAITickRate = 100.f; // In ticks Per Second
 
 SceneManager::SceneManager(OgreEngine* engine) :
     mOgreEngine(engine),
