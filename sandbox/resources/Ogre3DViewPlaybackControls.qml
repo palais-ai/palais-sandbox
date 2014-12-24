@@ -32,7 +32,7 @@ RowLayout {
             font.family: openSans.name;
             color: colors.dimmedTextColor
             Layout.alignment: Layout.Center
-            //renderType: Text.NativeRendering
+            renderType: Text.NativeRendering
         }
 
         Slider {

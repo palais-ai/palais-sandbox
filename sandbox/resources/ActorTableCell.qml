@@ -7,27 +7,28 @@ Rectangle {
     color: colors.darkGray
 
     MouseArea {
+        id: cellMouseArea
         anchors.fill: parent
         hoverEnabled: true
         onClicked: actorCell.pressed()
         onEntered: {
-            actorCell.state = 'HOVER'
             Scene.toggleHighlight(true, index);
         }
         onExited: {
-            actorCell.state = ''
             Scene.toggleHighlight(false, index);
         }
     }
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -2
+        anchors.verticalCenterOffset: -separator.height
         anchors.left: parent.left
         anchors.leftMargin: 8
         text: name
+        //font.capitalization: Font.AllUppercase
         font.family: openSans.name
-        font.pointSize: 12
+        //font.weight: Font.DemiBold
+        font.pointSize: 11
         color: textColor
         //renderType: Text.NativeRendering
     }
@@ -35,7 +36,7 @@ Rectangle {
     Text {
         id: actorHideButton
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -2
+        anchors.verticalCenterOffset: -separator.height
         anchors.right: arrowRightIndicator.left
         anchors.rightMargin: 8
         text: "\uf06e"
@@ -76,7 +77,7 @@ Rectangle {
     Text {
         id: arrowRightIndicator
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -2
+        anchors.verticalCenterOffset: -separator.height
         anchors.right: parent.right
         anchors.rightMargin: 8
         text: "\uf105"
@@ -87,15 +88,17 @@ Rectangle {
     }
 
     ListSeparator {
+        id: separator
         anchors.bottom: parent.bottom
     }
 
     states: [
         State {
             name: 'HOVER'
+            when: cellMouseArea.containsMouse
             PropertyChanges {
                 target: actorCell
-                textColor: "white"
+                color: colors.darkerGray
             }
         }
     ]

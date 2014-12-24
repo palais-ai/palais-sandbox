@@ -22,7 +22,9 @@ SOURCES += main.cpp \
     actor.cpp \
     javascriptbindings.cpp \
     knowledgeservice.cpp \
-    actorservice.cpp
+    actorservice.cpp \
+    timedlogger.cpp \
+    ogrehelper.cpp
 
 HEADERS += \
     application.h \
@@ -33,7 +35,9 @@ HEADERS += \
     actor.h \
     javascriptbindings.h \
     knowledgeservice.h \
-    actorservice.h
+    actorservice.h \
+    timedlogger.h \
+    ogrehelper.h
 
 OTHER_FILES += \
     config/resources.cfg
@@ -132,3 +136,5 @@ else:unix: LIBS += -L$$OUT_PWD/../libqjsonrpc/src/ -lqjsonrpc
 
 INCLUDEPATH += $$PWD/../libqjsonrpc/src
 DEPENDPATH += $$PWD/../libqjsonrpc/src
+
+INCLUDEPATH += ../../smastar/

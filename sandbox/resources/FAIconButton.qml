@@ -10,8 +10,8 @@ Text {
     font.family: fontAwesome.name
     font.pointSize: iconSize
     text: unicode
-    color: icon.enabled ? colors.dimmedTextColor : colors.stronglyDimmedTextColor
-    //renderType: Text.NativeRendering
+    color: colors.dimmedTextColor
+    renderType: Text.NativeRendering
     height: iconSize
     width: iconSize
     clip: true
@@ -19,29 +19,22 @@ Text {
     states: [
         State {
                 name: "HOVER"
+                when: iconMouseArea.containsMouse
                 PropertyChanges { target: icon; color: colors.slightlyDimmedTextColor }
         },
         State {
                 name: "DISABLED"
+                when: !icon.enabled
                 PropertyChanges { target: icon; color: colors.stronglyDimmedTextColor }
         }
     ]
 
     MouseArea {
+        id: iconMouseArea
         anchors.fill: parent
         hoverEnabled: true
         onClicked: {
             if(icon.enabled) icon.pressed()
         }
-        onEntered: {
-            if(icon.enabled) icon.state = 'HOVER'
-        }
-        onExited: {
-            if(icon.enabled) icon.state = ''
-        }
-    }
-
-    onEnabledChanged: {
-        icon.state = icon.enabled ? icon.state = '' : icon.state = 'DISABLED';
     }
 }

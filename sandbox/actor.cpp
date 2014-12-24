@@ -42,7 +42,6 @@ void Actor::setAnimationEnabled(const QString& name, bool enabled)
     Ogre::Entity* entity = static_cast<Ogre::Entity*>(mNode->getAttachedObject(0));
 
     Ogre::AnimationStateSet* set = entity->getAllAnimationStates();
-
     if(!set->hasAnimationState(name.toStdString()))
     {
         qWarning() << "Tried to set the state of an animation named "
@@ -92,7 +91,6 @@ void Actor::update(float deltaTime)
     }
 
     Ogre::Entity* entity = dynamic_cast<Ogre::Entity*>(mNode->getAttachedObject(0));
-
     if(!entity)
     {
         return;

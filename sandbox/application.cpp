@@ -6,6 +6,8 @@
 #include <QtGui/QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtQml>
+#include <QTime>
+#include <QDebug>
 
 #include "../libqmlogre/ogreitem.h"
 #include "../libqmlogre/ogreengine.h"
@@ -53,6 +55,8 @@ Application::~Application()
 
 int Application::onApplicationStarted(int argc, char **argv)
 {
+    mTimeLogger.start();
+
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
@@ -81,7 +85,8 @@ int Application::onApplicationStarted(int argc, char **argv)
 void Application::initializeSceneManager()
 {
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
-    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+    mSceneManager->setAmbientLight(Ogre::ColourValue(0, 0, 0));
 
     // This fixes some issues with ray casting when using shallow terrain.
     Ogre::AxisAlignedBox box;
@@ -97,6 +102,8 @@ void Application::initializeOgre()
     // we only want to initialize once
     disconnect(window, &QQuickWindow::frameSwapped, this, &Application::initializeOgre);
 
+    TimedLogger engineStartupLogger;
+
     // start up Ogre
     mOgreEngine = new OgreEngine(window);
 
@@ -105,6 +112,8 @@ void Application::initializeOgre()
     mOgreEngine->setupResources();
 
     initializeSceneManager();
+
+    engineStartupLogger.stop("Ogre3D startup");
 
     mProjectManager = new ProjectManager(mOgreEngine);
 
@@ -152,6 +161,8 @@ void Application::onOgreIsReady()
     mApplicationEngine->rootContext()->setContextProperty("OgreEngine", mOgreEngine);
 
     QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "onOgreIsReady");
+
+    mTimeLogger.stop("Application Startup");
 }
 
 void Application::onOgreViewClicked(float mouseX, float mouseY)

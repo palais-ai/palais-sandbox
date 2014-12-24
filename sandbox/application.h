@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QIdentityProxyModel>
+#include "timedlogger.h"
 
 class Scene;
 class ProjectManager;
@@ -57,6 +58,7 @@ private:
     Ogre::SceneManager *mSceneManager;
     ProjectManager* mProjectManager;
     Ogre::Root *mRoot;
+    TimedLogger mTimeLogger;
 };
 
 #endif // APPLICATION_H

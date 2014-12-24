@@ -2,6 +2,7 @@
 #include "sceneloader.h"
 #include "scene.h"
 #include "application.h"
+#include "timedlogger.h"
 
 #include "../libqmlogre/ogreengine.h"
 
@@ -32,6 +33,9 @@ SceneManager::SceneManager(OgreEngine* engine) :
 
 Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, const QString& logicFile)
 {
+    TimedLogger logger;
+    logger.start();
+
     if(mOgreEngine)
     {       
         if(mCurrentScene)
@@ -48,6 +52,7 @@ Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, co
             return NULL;
         }
 
+        logger.stop("Scene load");
         return mCurrentScene = nextScene;
     }
     else

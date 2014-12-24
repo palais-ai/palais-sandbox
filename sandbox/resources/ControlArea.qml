@@ -21,7 +21,7 @@ Rectangle {
 
         delegate: ActorTableCell {
             width: 210
-            height: 25
+            height: 30
         }
     }
 }

@@ -2,19 +2,12 @@ import QtQuick 2.0
 
 Rectangle {
     width: parent.width
-    height: 2
+    height: 1
 
     Rectangle {
-        color: colors.black95
-        width: parent.width
-        anchors.top: parent.top
-        height: 1
-    }
-
-    Rectangle {
-        color: colors.black75
+        color: colors.darkerGray
         width: parent.width
         anchors.bottom: parent.bottom
-        height:1
+        height: 1
     }
 }

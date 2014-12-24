@@ -120,7 +120,7 @@ void ProjectManager::onOpenProject(const QUrl& url)
 
     if(!file.open(QIODevice::ReadOnly))
     {
-        emit(sceneLoadFailed(QString("Couldn't open project file at %1.").arg(url.toLocalFile())));
+        emit(sceneLoadFailed(QString("Failed to open the project file at %1.").arg(url.toLocalFile())));
         return;
     }
 
@@ -132,7 +132,7 @@ void ProjectManager::onOpenProject(const QUrl& url)
 
     if(error.error != QJsonParseError::NoError)
     {
-        emit(sceneLoadFailed(QString("Failed to parse JSON file, because: %1.").arg(error.errorString())));
+        emit(sceneLoadFailed(QString("Failed to parse the project file at %0, because it isn't a JSON document.").arg(url.toLocalFile())));
         return;
     }
 
@@ -146,7 +146,7 @@ void ProjectManager::onOpenProject(const QUrl& url)
     }
     else
     {
-        emit(sceneLoadFailed(QString("The project file was missing the property %1.").arg(visualPropertyName)));
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.").arg(url.toLocalFile()).arg(visualPropertyName)));
         return;
     }
 
@@ -159,7 +159,7 @@ void ProjectManager::onOpenProject(const QUrl& url)
     }
     else
     {
-        emit(sceneLoadFailed(QString("The project file was missing the property %1.").arg(logicPropertyName)));
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.").arg(url.toLocalFile()).arg(logicPropertyName)));
         return;
     }
 
@@ -171,7 +171,7 @@ void ProjectManager::onOpenProject(const QUrl& url)
     }
     else
     {
-        emit(sceneLoadFailed(QString("The project file was missing the property %1.").arg(namePropertyName)));
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.").arg(url.toLocalFile()).arg(namePropertyName)));
         return;
     }
 

@@ -72,6 +72,7 @@ ApplicationWindow {
         property color stronglyDimmedTextColor: "#40ffffff"
         property color lightGray: '#a7a7a7'
         property color darkGray: '#3b3b3b'
+        property color darkerGray: '#303030'
         property color black95: '#111111'
         property color black75: '#555555'
     }

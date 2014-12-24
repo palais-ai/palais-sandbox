@@ -196,6 +196,8 @@ void OgreNode::updateFBO()
     }
 
     int samples = getNumberOfFSAASamples();
+
+    // TODO: Don't recreate the texture on every frame during animations.
     m_rttTexture = Ogre::TextureManager::getSingleton().createManual(textureName,
                                                                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                                     Ogre::TEX_TYPE_2D,

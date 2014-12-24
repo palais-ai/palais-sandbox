@@ -2,6 +2,8 @@
 #include "actor.h"
 #include "application.h"
 #include "javascriptbindings.h"
+#include "ogrehelper.h"
+#include "timedlogger.h"
 
 #include <cassert>
 
@@ -321,8 +323,24 @@ void Scene::getActors(Ogre::SceneNode* root)
         getActors(child);
 
         QString name = child->getName().c_str();
+
         mActors[name] = new Actor(child);
+
+        if(name.toLower() == "navmesh")
+        {
+            parseNavMesh(mActors[name]);
+        }
     }
+}
+
+void Scene::parseNavMesh(Actor* navmesh)
+{
+    TimedLogger logger;
+    logger.start();
+    mNavMesh = OgreHelper::makeNavGraphFromOgreNode(navmesh->getSceneNode());
+    logger.stop("NavMesh parsing");
+
+    qDebug() << "Navigation mesh loaded with " << mNavMesh.nodes.size() << " nodes.";
 }
 
 void Scene::setup()

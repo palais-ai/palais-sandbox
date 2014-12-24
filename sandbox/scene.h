@@ -1,6 +1,8 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include "ogrehelper.h"
+
 #include <QString>
 #include <QVariant>
 #include <QScriptEngine>
@@ -81,6 +83,7 @@ public:
 private:
     void getActors(Ogre::SceneNode* root);
     Actor* getActorForNode(Ogre::SceneNode* node) const;
+    void parseNavMesh(Actor* navmesh);
     void destroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode );
 
     QString mName, mSceneFile, mLogicFile;
@@ -89,6 +92,7 @@ private:
     Ogre::RaySceneQuery* mRayQuery;
     QScriptEngine mLogicScript;
     QMap<QString, Actor*> mActors;
+    ailib::Graph<OgreHelper::TriangleNode> mNavMesh;
     QVariantMap mKnowledge;
     bool mIsSetup;
 };
