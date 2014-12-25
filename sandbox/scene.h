@@ -2,6 +2,7 @@
 #define SCENE_H
 
 #include "ogrehelper.h"
+#include "DebugDrawer.h"
 
 #include <QString>
 #include <QVariant>
@@ -11,6 +12,7 @@
 
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
+#include <OgreFrameListener.h>
 
 class Actor;
 class OgreEngine;
@@ -27,7 +29,7 @@ public:
     float distance;
 };
 
-class Scene : public QAbstractListModel
+class Scene : public QAbstractListModel, public Ogre::FrameListener
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ getName)
@@ -41,6 +43,11 @@ public:
 
     Scene(const QString& name, const QString& sceneFile, const QString& logicFile, Ogre::SceneNode* root, OgreEngine* ogreEngine);
     ~Scene();
+
+    // Frame Listener
+    virtual bool frameStarted(const Ogre::FrameEvent& evt);
+    virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+    virtual bool frameEnded(const Ogre::FrameEvent& evt);
 
     // List Model impl
     virtual QHash<int, QByteArray> roleNames() const;
@@ -61,6 +68,7 @@ public:
     Q_INVOKABLE void destroy(Actor* actor);
 
     Q_INVOKABLE RaycastResult raycast(const Ogre::Vector3& origin, const Ogre::Vector3& direction); //< Reports the first hit actor in the scene
+    Q_INVOKABLE void moveActor(Actor* actor, const Ogre::Vector3& target);
 
     void setup();
     void update(float time);
@@ -92,8 +100,9 @@ private:
     Ogre::RaySceneQuery* mRayQuery;
     QScriptEngine mLogicScript;
     QMap<QString, Actor*> mActors;
-    ailib::Graph<OgreHelper::TriangleNode> mNavMesh;
+    OgreHelper::NavigationGraph mNavMesh;
     QVariantMap mKnowledge;
+    DebugDrawer mDebugDrawer;
     bool mIsSetup;
 };
 

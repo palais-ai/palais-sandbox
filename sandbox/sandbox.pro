@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     knowledgeservice.cpp \
     actorservice.cpp \
     timedlogger.cpp \
-    ogrehelper.cpp
+    ogrehelper.cpp \
+    DebugDrawer.cpp
 
 HEADERS += \
     application.h \
@@ -37,7 +38,8 @@ HEADERS += \
     knowledgeservice.h \
     actorservice.h \
     timedlogger.h \
-    ogrehelper.h
+    ogrehelper.h \
+    DebugDrawer.h
 
 OTHER_FILES += \
     config/resources.cfg
@@ -129,6 +131,14 @@ DEPENDPATH += $$PWD/../libdotsceneloader
 
 win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/$$M_BUILD_DIR/dotsceneloader.lib
 else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/libdotsceneloader.a
+
+unix|win32: LIBS += -L$$OUT_PWD/../libmeshmagick/ -lmeshmagick
+
+INCLUDEPATH += $$PWD/../libmeshmagick/include
+DEPENDPATH += $$PWD/../libmeshmagick
+
+win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libmeshmagick/meshmagick.lib
+else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libmeshmagick/libmeshmagick.a
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqjsonrpc/src/release/ -lqjsonrpc1
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqjsonrpc/src/debug/ -lqjsonrpc1

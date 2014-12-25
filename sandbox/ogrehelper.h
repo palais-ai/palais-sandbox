@@ -27,18 +27,9 @@ public:
 
     Ogre::Vector3 a, b, c;
 
-    const Ogre::Vector3& getCentroid() const
-    {
-        float lenA = c.distance(b), lenB = a.distance(c), lenC = b.distance(a);
-        float mul = lenA*lenB*lenC;
-        return fromBarycentric(mul, mul, mul);
-    }
-
-    const Ogre::Vector3& fromBarycentric(float x, float y, float z) const
-    {
-        float div = x+y+z;
-        return (x / div) * a + (y / div) * b + (z / div) * c;
-    }
+    Ogre::Vector3 getCentroid() const;
+    Ogre::Vector3 fromBarycentric(float x, float y, float z) const;
+    bool isProjectionInside(const Ogre::Vector3& point) const;
 };
 
 class TriangleNode : public Triangle, public ailib::BaseNode
@@ -49,7 +40,10 @@ public:
                  const Ogre::Vector3& v3);
 };
 
-ailib::Graph<TriangleNode> makeNavGraphFromOgreNode(Ogre::SceneNode* node);
+typedef ailib::Graph<TriangleNode> NavigationGraph;
+
+NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node);
+const TriangleNode* getNavNodeClosestToPoint(const NavigationGraph& graph, const Ogre::Vector3& point);
 
 // CREDITS: Public domain license, from http://www.ogre3d.org/tikiwiki/tiki-index.php?page=RetrieveVertexData
 void getMeshInformation(const Ogre::MeshPtr mesh,

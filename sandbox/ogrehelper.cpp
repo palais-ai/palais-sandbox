@@ -2,26 +2,109 @@
 #include "astar.h"
 
 #include <QScopedArrayPointer>
-#include <QMap>
+#include <QHash>
 #include <QVector>
 #include <QSet>
+#include <QDebug>
 
+#include <OgreLogManager.h>
 #include <OgreEntity.h>
 #include <OgreSceneNode.h>
 #include <OgreMesh.h>
 #include <OgreSubMesh.h>
 #include <OgreMovableObject.h>
+#include <OgrePlane.h>
+#include <OgrePolygon.h>
+
+#include <MmOptimiseTool.h>
+#include <MmOgreEnvironment.h>
+
+using namespace meshmagick;
+
+namespace Ogre
+{
+static uint qHash(const Ogre::Vector3& key)
+{
+     return static_cast<uint>(key.x) ^ static_cast<uint>(key.z) + static_cast<uint>(key.y);
+}
+};
 
 namespace OgreHelper
 {
+class Edge
+{
+public:
+    Edge(unsigned i1, unsigned i2) :
+        index1(i1 < i2 ? i1 : i2),
+        index2(i1 < i2 ? i2 : i1)
+    {
+        ;
+    }
+
+    unsigned index1, index2;
+
+    bool operator==(const Edge& other) const
+    {
+        return index1 == other.index1 && index2 == other.index2;
+    }
+};
+
+static uint qHash(const Edge& key)
+{
+     return key.index1 ^ key.index2;
+}
 
 Triangle::Triangle(const Ogre::Vector3& v1,
-         const Ogre::Vector3& v2,
-         const Ogre::Vector3& v3)
+                   const Ogre::Vector3& v2,
+                   const Ogre::Vector3& v3)
 {
     a = v1;
     b = v2;
     c = v3;
+}
+
+Ogre::Vector3 Triangle::getCentroid() const
+{
+    float lenA = c.distance(b), lenB = a.distance(c), lenC = b.distance(a);
+    float mul = lenA*lenB*lenC;
+    return fromBarycentric(mul, mul, mul);
+}
+
+Ogre::Vector3 Triangle::fromBarycentric(float x, float y, float z) const
+{
+    float div = x+y+z;
+    return (x / div) * a + (y / div) * b + (z / div) * c;
+}
+
+bool Triangle::isProjectionInside(const Ogre::Vector3& point) const
+{
+    Ogre::Plane triPlane(a, b, c);
+    triPlane.normalise();
+
+    Ogre::Vector3 pt = triPlane.projectVector(point);
+
+    const float sign = sinf((b-a).angleBetween(c-a).valueRadians());
+
+    Ogre::Polygon poly;
+    // Counterclockwise
+    if(sign > 0.f)
+    {
+        poly.insertVertex(a);
+        poly.insertVertex(b);
+        poly.insertVertex(c);
+    }
+    // Clockwise
+    else
+    {
+        poly.insertVertex(c);
+        poly.insertVertex(b);
+        poly.insertVertex(a);
+    }
+
+    // TODO: Improve projection so this hack isnt necessary.
+    pt.y = a.y;
+
+    return poly.isPointInside(pt);
 }
 
 TriangleNode::TriangleNode(const Ogre::Vector3& v1,
@@ -32,13 +115,59 @@ TriangleNode::TriangleNode(const Ogre::Vector3& v1,
     ;
 }
 
-ailib::Graph<TriangleNode> makeNavGraphFromOgreNode(Ogre::SceneNode* node)
+class DistanceComparator
 {
-    ailib::Graph<TriangleNode> graph;
+public:
+    DistanceComparator(const Ogre::Vector3& reference) :
+        mReference(reference)
+    {
+        ;
+    }
+
+    bool operator() (const TriangleNode& lv, const TriangleNode& rv) const
+    {
+        return lv.getCentroid().squaredDistance(mReference) < rv.getCentroid().squaredDistance(mReference);
+    }
+private:
+    const Ogre::Vector3& mReference;
+};
+
+const TriangleNode* getNavNodeClosestToPoint(const NavigationGraph& graph, const Ogre::Vector3& point)
+{
+    NavigationGraph::node_collection nodeCopy(graph.nodes.begin(), graph.nodes.end());
+
+    DistanceComparator comp(point);
+    std::sort(nodeCopy.begin(), nodeCopy.end(), comp);
+
+    for(NavigationGraph::node_collection::const_iterator it = nodeCopy.begin(); it != nodeCopy.end(); ++it)
+    {
+        const NavigationGraph::node_type& node = *it;
+
+        if(node.isProjectionInside(point))
+        {
+           return &node;
+        }
+    }
+
+    return NULL;
+}
+
+OgreHelper::NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node)
+{
+    OgreHelper::NavigationGraph graph;
 
     if(node->numAttachedObjects() > 0)
     {
         const Ogre::MeshPtr mesh = static_cast<Ogre::Entity*>(node->getAttachedObject(0))->getMesh();
+
+        OgreEnvironment ogreEnv;
+        ogreEnv.initialize(false, Ogre::LogManager::getSingleton().getDefaultLog());
+        OptimiseTool optimiseTool;
+
+        // Remove duplicate vertices using libmeshmagick
+        // This is important for the following algorithm to generate a discrete navigation graph from
+        // the continuous navigation mesh.
+        optimiseTool.processMesh(mesh);
 
         size_t vertexCount, indexCount;
         Ogre::Vector3* verticesPtr;
@@ -55,65 +184,38 @@ ailib::Graph<TriangleNode> makeNavGraphFromOgreNode(Ogre::SceneNode* node)
         QScopedArrayPointer<Ogre::Vector3> vertices(verticesPtr);
         QScopedArrayPointer<unsigned> indices(indicesPtr);
 
-        QMap<unsigned, QVector<TriangleNode*> > rawAdjacencyMapping;
+        QHash<Edge, QSet<TriangleNode*> > edgeConnections;
 
         graph.nodes.reserve(indexCount / 3);
         for(size_t i = 0; i < indexCount; i+=3)
         {
-            graph.nodes.push_back(TriangleNode(vertices[i],
-                                               vertices[i+1],
-                                               vertices[i+2]));
+            graph.nodes.push_back(TriangleNode(vertices[indices[i]],
+                                               vertices[indices[i+1]],
+                                               vertices[indices[i+2]]));
 
             TriangleNode* node = &graph.nodes.back();
 
-            rawAdjacencyMapping[i] += node;
-            rawAdjacencyMapping[i+1] += node;
-            rawAdjacencyMapping[i+2] += node;
+            edgeConnections[Edge(indices[i], indices[i+1])] += node;
+            edgeConnections[Edge(indices[i+1], indices[i+2])] += node;
+            edgeConnections[Edge(indices[i+2], indices[i])] += node;
         }
 
-        QMap<TriangleNode*, QSet<TriangleNode*> > adjacencyMapping;
+        QHashIterator<Edge, QSet<TriangleNode*> > it(edgeConnections);
 
+        while(it.hasNext())
         {
-            QMapIterator<unsigned, QVector<TriangleNode*> > it(rawAdjacencyMapping);
+            it.next();
+            const QSet<TriangleNode*>& nodes = it.value();
 
-            while(it.hasNext())
+            qDebug() << nodes.size();
+            if(nodes.size() == 2)
             {
-                it.next();
-                const QVector<TriangleNode*>& nodes = it.value();
+                TriangleNode* n1 = *nodes.begin();
+                TriangleNode* n2 = *(nodes.begin() + 1);
 
-                QVectorIterator<TriangleNode*> nodeIt(nodes);
-
-                while(nodeIt.hasNext())
-                {
-                    TriangleNode* next = nodeIt.next();
-
-                    QVectorIterator<TriangleNode*> inner(nodes);
-
-                    while(nodeIt.hasNext())
-                    {
-                        TriangleNode* innerNext = inner.next();
-                        if(innerNext != next)
-                        {
-                            adjacencyMapping[next] += innerNext;
-                        }
-                    }
-                }
-            }
-        }
-
-        {
-            QMapIterator<TriangleNode*, QSet<TriangleNode*> > it(adjacencyMapping);
-            while(it.hasNext())
-            {
-                it.next();
-                QSetIterator<TriangleNode*> nodeIt(it.value());
-
-                while(nodeIt.hasNext())
-                {
-                    TriangleNode* target = nodeIt.next();
-                    float distance = it.key()->getCentroid().distance(target->getCentroid());
-                    it.key()->edges.push_back(ailib::Edge::makeEdge(target, distance));
-                }
+                float distance = n1->getCentroid().distance(n2->getCentroid());
+                n1->edges.push_back(ailib::Edge::makeEdge(n2, distance));
+                n2->edges.push_back(ailib::Edge::makeEdge(n1, distance));
             }
         }
     }

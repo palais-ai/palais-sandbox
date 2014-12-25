@@ -27,7 +27,7 @@ function spawnFighter(startPos, teamColor) {
 		lookAtPos.z *= 2
 		actor.lookAt(lookAtPos);
 
-		actor.setKnowledge("movementTarget", new Vector3(0,0,0))
+		scene.moveActor(spawn_team1, teamColor == "red" ? spawn_team2.position : spawn_team1.position);
 }
 
 function spawnTeam(teamSize, startPos) {
@@ -63,8 +63,8 @@ function onStart() {
 
 function updateActor(deltaTime, actor) {
 	var actorSpeed = 0.5 
-	if(actor.hasKnowledge("movementTarget")) {
-		var target = actor.knowledge["movementTarget"]
+	if(actor.hasKnowledge("movement_target")) {
+		var target = actor.knowledge["movement_target"]
 		var current = actor.position
 		var step = target.subtract(current).normalize().multiply(actorSpeed * deltaTime)
 

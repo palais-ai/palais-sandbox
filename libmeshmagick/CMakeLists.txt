@@ -1,0 +1,155 @@
+project(meshmagick)
+
+cmake_minimum_required(VERSION 2.6)
+cmake_policy(SET CMP0003 NEW)
+cmake_policy(SET CMP0005 OLD)
+
+include(FeatureSummary)
+
+set(MESHMAGICK_MAJOR_VERSION 0)
+set(MESHMAGICK_MINOR_VERSION 5)
+set(MESHMAGICK_PATCH_VERSION 2)
+
+# include our custom cmake scripts
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+option(STATIC_BUILD "Build MeshMagick as static library" TRUE)
+
+# dependencies
+find_package(PkgConfig)
+find_package(OGRE REQUIRED)
+find_package(Tootle)
+
+set(MESHMAGICK_HEADERS
+include/MeshMagick.h
+include/MeshMagickPrerequisites.h
+include/MmEditableBone.h
+include/MmEditableMesh.h
+include/MmEditableSkeleton.h
+include/MmInfoTool.h
+include/MmInfoToolFactory.h
+include/MmMeshMergeTool.h
+include/MmMeshMergeToolFactory.h
+include/MmMeshUtils.h
+include/MmOgreEnvironment.h
+include/MmOptimiseTool.h
+include/MmOptimiseToolFactory.h
+include/MmOptionsParser.h
+include/MmRenameTool.h
+include/MmRenameToolFactory.h
+include/MmStatefulMeshSerializer.h
+include/MmStatefulSkeletonSerializer.h
+include/MmTool.h
+include/MmToolFactory.h
+include/MmToolManager.h
+include/MmToolUtils.h
+include/MmTransformTool.h
+include/MmTransformToolFactory.h
+)
+
+set(MESHMAGICK_SOURCE
+src/MeshMagick.cpp
+src/MmEditableBone.cpp
+src/MmEditableMesh.cpp
+src/MmEditableSkeleton.cpp
+src/MmInfoTool.cpp
+src/MmInfoToolFactory.cpp
+src/MmMeshMergeTool.cpp
+src/MmMeshMergeToolFactory.cpp
+src/MmMeshUtils.cpp
+src/MmOgreEnvironment.cpp
+src/MmOptimiseTool.cpp
+src/MmOptimiseToolFactory.cpp
+src/MmOptionsParser.cpp
+src/MmRenameTool.cpp
+src/MmRenameToolFactory.cpp
+src/MmStatefulMeshSerializer.cpp
+src/MmStatefulSkeletonSerializer.cpp
+src/MmTool.cpp
+src/MmToolManager.cpp
+src/MmToolsUtils.cpp
+src/MmTransformTool.cpp
+src/MmTransformToolFactory.cpp
+)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${OGRE_INCLUDE_DIRS})
+
+if (Tootle_FOUND)
+  set(MESHMAGICK_HEADERS ${MESHMAGICK_HEADERS}
+    include/MmTootleTool.h
+	include/MmTootleToolFactory.h)
+  set(MESHMAGICK_SOURCE ${MESHMAGICK_SOURCE}
+    src/MmTootleTool.cpp
+	src/MmTootleToolFactory.cpp)
+	
+  include_directories(${Tootle_INCLUDE_DIRS})
+  add_definitions(-DMESHMAGICK_USE_TOOTLE)
+	
+endif()
+
+if (STATIC_BUILD)
+	# Static lib
+	add_definitions(-DMESHMAGICK_STATIC)
+	add_library(meshmagick_lib STATIC ${MESHMAGICK_HEADERS} ${MESHMAGICK_SOURCE})
+	set_target_properties(meshmagick_lib PROPERTIES
+		VERSION ${MESHMAGICK_MAJOR_VERSION}.${MESHMAGICK_MINOR_VERSION}.${MESHMAGICK_PATCH_VERSION})
+	target_link_libraries(meshmagick_lib ${OGRE_LIBRARIES} ${Tootle_LIBRARIES})
+
+else()
+	# DLL
+	add_library(meshmagick_lib SHARED ${MESHMAGICK_HEADERS} ${MESHMAGICK_SOURCE})
+	set_target_properties(meshmagick_lib PROPERTIES
+		OUTPUT_NAME meshmagick
+		VERSION ${MESHMAGICK_MAJOR_VERSION}.${MESHMAGICK_MINOR_VERSION}.${MESHMAGICK_PATCH_VERSION}
+		SOVERSION ${MESHMAGICK_MAJOR_VERSION}.${MESHMAGICK_MINOR_VERSION}
+		DEFINE_SYMBOL MESHMAGICK_EXPORTS)
+	target_link_libraries(meshmagick_lib ${OGRE_LIBRARIES} ${Tootle_LIBRARIES})
+endif()
+
+
+add_executable(meshmagick_bin src/main.cpp)
+set_target_properties(meshmagick_bin PROPERTIES
+	OUTPUT_NAME meshmagick)
+
+target_link_libraries(meshmagick_bin meshmagick_lib ${OGRE_LIBRARIES})
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/meshmagick.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/meshmagick.pc)
+
+install(TARGETS meshmagick_bin meshmagick_lib
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib)
+	
+if(NOT WIN32)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/meshmagick.pc
+	        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+endif(NOT WIN32)
+
+install(FILES
+include/MeshMagick.h
+include/MeshMagickPrerequisites.h
+include/MmEditableBone.h
+include/MmEditableMesh.h
+include/MmEditableSkeleton.h
+include/MmInfoToolFactory.h
+include/MmInfoTool.h
+include/MmMeshMergeToolFactory.h
+include/MmMeshMergeTool.h
+include/MmMeshUtils.h
+include/MmOgreEnvironment.h
+include/MmOptimiseToolFactory.h
+include/MmOptimiseTool.h
+include/MmOptionsParser.h
+include/MmRenameToolFactory.h
+include/MmRenameTool.h
+include/MmStatefulMeshSerializer.h
+include/MmStatefulSkeletonSerializer.h
+include/MmToolFactory.h
+include/MmTool.h
+include/MmToolManager.h
+include/MmToolUtils.h
+include/MmTransformToolFactory.h
+include/MmTransformTool.h
+DESTINATION ${CMAKE_INSTALL_PREFIX}/include/meshmagick)
+
+include(CPack)
