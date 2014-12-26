@@ -14,7 +14,9 @@ QVariant ActorService::getKnowledge(const QString& actorName, const QString& kno
     Scene* scene = mSceneManager.getCurrentScene();
     if(!scene)
     {
-        QJsonRpcMessage msg = currentRequest().request().createErrorResponse(QJsonRpc::InternalError, "There's no active scene right now.");
+        QJsonRpcMessage request = currentRequest().request();
+        QJsonRpcMessage msg = request.createErrorResponse(QJsonRpc::InternalError,
+                                                          "There's no active scene right now.");
         beginDelayedResponse();
         currentRequest().respond(msg);
         return QVariant(QVariant::Invalid);
@@ -22,8 +24,10 @@ QVariant ActorService::getKnowledge(const QString& actorName, const QString& kno
 
     if(!scene->hasActorKnowledge(actorName, knowledgeKey))
     {
-        QJsonRpcMessage msg = currentRequest().request().createErrorResponse(QJsonRpc::UserError,
-                                                                             QString("There's no knowledge for key __%1__.").arg(knowledgeKey));
+        QJsonRpcMessage request = currentRequest().request();
+        QJsonRpcMessage msg = request.createErrorResponse(QJsonRpc::UserError,
+                                                          QString("There's no knowledge for key __%1__.")
+                                                                 .arg(knowledgeKey));
         beginDelayedResponse();
         currentRequest().respond(msg);
         return QVariant(QVariant::Invalid);
@@ -37,7 +41,8 @@ void ActorService::setKnowledge(const QString& actorName, const QString& knowled
     Scene* scene = mSceneManager.getCurrentScene();
     if(!scene)
     {
-        QJsonRpcMessage msg = currentRequest().request().createErrorResponse(QJsonRpc::InternalError, "There's no active scene right now.");
+        QJsonRpcMessage msg = currentRequest().request().createErrorResponse(QJsonRpc::InternalError,
+                                                                             "There's no active scene right now.");
         beginDelayedResponse();
         currentRequest().respond(msg);
         return;
@@ -51,7 +56,8 @@ QVariant ActorService::performAction(const QString& actorName, const QString& ac
     Scene* scene = mSceneManager.getCurrentScene();
     if(!scene)
     {
-        QJsonRpcMessage msg = currentRequest().request().createErrorResponse(QJsonRpc::InternalError, "There's no active scene right now.");
+        QJsonRpcMessage msg = currentRequest().request().createErrorResponse(QJsonRpc::InternalError,
+                                                                             "There's no active scene right now.");
         beginDelayedResponse();
         currentRequest().respond(msg);
         return QVariant(QVariant::Invalid);

@@ -260,7 +260,10 @@ void Application::onSceneLoadFailed(const QString& message)
 {
     if(mApplicationEngine)
     {
-        QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "showErrorMessage", QGenericReturnArgument(), Q_ARG(QVariant, message));
+        QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(),
+                                  "showErrorMessage",
+                                  QGenericReturnArgument(),
+                                  Q_ARG(QVariant, message));
     }
     else
     {

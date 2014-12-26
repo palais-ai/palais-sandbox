@@ -11,7 +11,8 @@ class KnowledgeService : public QJsonRpcService
     Q_OBJECT
     Q_CLASSINFO("serviceName", "KnowledgeService")
 public:
-    explicit KnowledgeService(SceneManager& sceneManager, QObject *parent = 0);
+    explicit KnowledgeService(SceneManager& sceneManager,
+                              QObject *parent = 0);
 
 public slots:
     QVariant getKnowledge(const QString& knowledgeKey);

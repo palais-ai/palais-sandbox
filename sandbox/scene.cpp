@@ -9,6 +9,7 @@
 #include <cassert>
 
 #include <QDebug>
+#include <QVector>
 
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>
@@ -22,13 +23,23 @@
 
 #include "../libqmlogre/ogreengine.h"
 
-Scene::Scene(const QString& name, const QString& sceneFile, const QString& logicFile, Ogre::SceneNode* root, OgreEngine* engine) :
+Q_DECLARE_METATYPE(Ogre::Vector3)
+Q_DECLARE_METATYPE(Ogre::Vector3*)
+Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
+Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
+
+Scene::Scene(const QString& name,
+             const QString& sceneFile,
+             const QString& logicFile,
+             Ogre::SceneNode* root,
+             OgreEngine* engine) :
     mName(name),
     mSceneFile(sceneFile),
     mLogicFile(logicFile),
     mRoot(root),
     mEngine(engine),
-    mRayQuery(Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName)->createRayQuery(Ogre::Ray())),
+    mRayQuery(Ogre::Root::getSingleton()
+                         .getSceneManager(Application::sSceneManagerName)->createRayQuery(Ogre::Ray())),
     mDebugDrawer(Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName), 0.5f),
     mIsSetup(false)
 {
@@ -137,44 +148,58 @@ static ailib::real_type euclideanHeuristic(const OgreHelper::NavigationGraph::no
     return n1.getCentroid().distance(n2.getCentroid());
 }
 
-Q_DECLARE_METATYPE(Ogre::Vector3)
-Q_DECLARE_METATYPE(Ogre::Vector3*)
-
 void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
 {
     const OgreHelper::TriangleNode* start = OgreHelper::getNavNodeClosestToPoint(mNavMesh, actor->getPosition());
     if(!start)
     {
-        qWarning() << "Actor [ " << actor->getName() << " ]'s start position is not covered by the navmesh. No valid path could be calculated.";
+        qWarning() << "Actor [ "
+                   << actor->getName()
+                   << " ]'s start position is not covered by the navmesh. No valid path could be calculated.";
         return;
     }
 
     const OgreHelper::TriangleNode* goal = OgreHelper::getNavNodeClosestToPoint(mNavMesh, target);
     if(!goal)
     {
-        qWarning() << "Target position " << Ogre::StringConverter::toString(target).c_str() << " is not covered by the navmesh. No valid path could be calculated.";
+        qWarning() << "Target position "
+                   << Ogre::StringConverter::toString(target).c_str()
+                   << " is not covered by the navmesh. No valid path could be calculated.";
         return;
     }
 
     ailib::AStar<OgreHelper::NavigationGraph> astar;
-    ailib::AStar<OgreHelper::NavigationGraph>::path_type path = astar.find_path(mNavMesh, start, goal, euclideanHeuristic);
+    ailib::AStar<OgreHelper::NavigationGraph>::path_type path = astar.findPath(mNavMesh,
+                                                                               start,
+                                                                               goal,
+                                                                               euclideanHeuristic);
 
     qDebug() << "path size is " << path.size() << "hops.";
 
+    if(path.empty())
+    {
+        qWarning() << "Could not find a path for actor [ "
+                   << actor->getName() << " ] to reach "
+                   << Ogre::StringConverter::toString(target).c_str();
+        return;
+    }
+
     if(path.size() == 1 && path[0] == start)
     {
-        qDebug() << "Target has already been reached.";
-        actor->setKnowledge("movement_target", QVariant::fromValue(start->getCentroid()));
+        qDebug() << "Target triangle has already been reached.";
+        actor->setKnowledge("movement_target", QVariant::fromValue(target));
         return;
     }
 
     QVector<Ogre::Vector3> qpath;
-
-    for(ailib::AStar<OgreHelper::NavigationGraph>::path_type::const_iterator it = path.begin(); it != path.end(); ++it)
+    // Dont save the first entry as we immediately store it in "movement_target"
+    ailib::AStar<OgreHelper::NavigationGraph>::path_type::const_iterator it = path.begin() + 1;
+    for(; it != path.end(); ++it)
     {
         qpath += (*it)->getCentroid();
     }
     actor->setKnowledge("current_path", QVariant::fromValue(qpath));
+    actor->setKnowledge("movement_target", QVariant::fromValue(qpath.first()));
 }
 
 // CREDITS: http://www.ogre3d.org/forums/viewtopic.php?f=2&t=53647&start=0
@@ -255,7 +280,9 @@ QVariant Scene::data(const QModelIndex &index, int role) const
     }
 }
 
-QVariant Scene::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant Scene::headerData(int section,
+                           Qt::Orientation orientation,
+                           int role) const
 {
     return QVariant(QVariant::Invalid);
 }
@@ -270,17 +297,24 @@ const QMap<QString, Actor*>& Scene::getActors() const
     return mActors;
 }
 
-Actor* Scene::instantiate(const QString& name, const QString& meshName, const Ogre::Vector3& position, const Ogre::Quaternion& rotation, const Ogre::Vector3& scale)
+Actor* Scene::instantiate(const QString& name,
+                          const QString& meshName,
+                          const Ogre::Vector3& position,
+                          const Ogre::Quaternion& rotation,
+                          const Ogre::Vector3& scale)
 {
     if(mActors.contains(name))
     {
-        qWarning() << "Tried to instantiate an actor with name " << name << " that already existed in the scene. The instantiation is not performed.";
+        qWarning() << "Tried to instantiate an actor with name "
+                   << name
+                   << " that already existed in the scene. The instantiation is not performed.";
         return NULL;
     }
 
     mEngine->lockEngine();
 
-    Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName);
+    Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton()
+                                            .getSceneManager(Application::sSceneManagerName);
 
     Ogre::String meshFile = meshName.toStdString() + ".mesh";
     qDebug() << "Loading mesh at " << QString::fromStdString(meshFile);
@@ -296,7 +330,9 @@ Actor* Scene::instantiate(const QString& name, const QString& meshName, const Og
         return NULL;
     }
 
-    Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode(name.toStdString(), position, rotation);
+    Ogre::SceneNode* node = scnMgr->getRootSceneNode()->createChildSceneNode(name.toStdString(),
+                                                                             position,
+                                                                             rotation);
     node->setScale(scale);
 
     Ogre::Entity* entity = scnMgr->createEntity(name.toStdString(), meshFile);
@@ -337,7 +373,8 @@ void Scene::destroy(Actor* actor)
 
     mEngine->lockEngine();
 
-    Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName);
+    Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton()
+                                            .getSceneManager(Application::sSceneManagerName);
 
     destroyAllAttachedMovableObjects(actor->getSceneNode());
     scnMgr->destroySceneNode(actor->getSceneNode());
@@ -409,15 +446,17 @@ void Scene::parseNavMesh(Actor* navmesh)
     mNavMesh = OgreHelper::makeNavGraphFromOgreNode(navmesh->getSceneNode());
     logger.stop("NavMesh parsing");
 
-    for(OgreHelper::NavigationGraph::node_collection::const_iterator it = mNavMesh.nodes.begin(); it != mNavMesh.nodes.end(); ++it)
+    OgreHelper::NavigationGraph::node_collection::const_iterator it = mNavMesh.nodes.begin();
+    for(; it != mNavMesh.nodes.end(); ++it)
     {
         mDebugDrawer.drawCircle(it->getCentroid(), 0.1, 4, Ogre::ColourValue::Green, true);
 
         qDebug() << "edgecount: " << it->edges.size();
-        for(ailib::BaseNode::edge_collection::const_iterator it2 = it->edges.begin(); it2 != it->edges.end(); ++it2)
+        ailib::BaseNode::edge_collection::const_iterator it2 = it->edges.begin();
+        for(; it2 != it->edges.end(); ++it2)
         {
             mDebugDrawer.drawLine(it->getCentroid(),
-                                  static_cast<const OgreHelper::NavigationGraph::node_type*>(it2->target)->getCentroid(),
+                                  mNavMesh.nodes[it2->targetIndex].getCentroid(),
                                   Ogre::ColourValue::Red);
         }
     }
@@ -470,7 +509,8 @@ void Scene::update(float time)
     }
 }
 
-void Scene::performAction(const QString& actionName, const QVariant& params)
+void Scene::performAction(const QString& actionName,
+                          const QVariant& params)
 {
     QScriptValue fun = mLogicScript.globalObject().property(actionName);
     if(fun.isFunction())
@@ -483,7 +523,8 @@ void Scene::performAction(const QString& actionName, const QVariant& params)
 
         fun.call(QScriptValue(), list);
 
-        JavaScriptBindings::checkScriptEngineException(mLogicScript, "performAction( " + actionName + " )");
+        JavaScriptBindings::checkScriptEngineException(mLogicScript,
+                                                       "performAction( " + actionName + " )");
     }
 }
 
@@ -497,22 +538,27 @@ QVariant Scene::getKnowledge(const QString& knowledgeKey) const
     return mKnowledge[knowledgeKey];
 }
 
-void Scene::setKnowledge(const QString& knowledgeKey, const QVariant& value)
+void Scene::setKnowledge(const QString& knowledgeKey,
+                         const QVariant& value)
 {
     mKnowledge[knowledgeKey] = value;
 }
 
-bool Scene::hasActorKnowledge(const QString& actorName, const QString& knowledgeKey) const
+bool Scene::hasActorKnowledge(const QString& actorName,
+                              const QString& knowledgeKey) const
 {
     return mActors[actorName]->hasKnowledge(knowledgeKey);
 }
 
-QVariant Scene::getActorKnowledge(const QString& actorName, const QString& knowledgeKey) const
+QVariant Scene::getActorKnowledge(const QString& actorName,
+                                  const QString& knowledgeKey) const
 {
     return mActors[actorName]->getKnowledge(knowledgeKey);
 }
 
-void Scene::setActorKnowledge(const QString& actorName, const QString& knowledgeKey, const QVariant& value)
+void Scene::setActorKnowledge(const QString& actorName,
+                              const QString& knowledgeKey,
+                              const QVariant& value)
 {
     mActors[actorName]->setKnowledge(knowledgeKey, value);
 }

@@ -4,10 +4,16 @@
 
 #include <QMutexLocker>
 #include <QDebug>
+#include <QVector>
 
 #include <OgreSceneNode.h>
 #include <OgreAnimation.h>
 #include <OgreEntity.h>
+
+Q_DECLARE_METATYPE(Ogre::Vector3)
+Q_DECLARE_METATYPE(Ogre::Vector3*)
+Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
+Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
 
 extern QMutex g_engineMutex;
 
@@ -109,7 +115,14 @@ void Actor::update(float deltaTime)
 
         if(state->getEnabled())
         {
-            //qDebug() << "Updating animation " << QString::fromStdString(state->getAnimationName()) << " by " << deltaTime << " seconds. Current time is " << state->getTimePosition();
+            /**
+            qDebug() << "Updating animation "
+                     << QString::fromStdString(state->getAnimationName())
+                     << " by "
+                     << deltaTime
+                     << " seconds. Current time is "
+                     << state->getTimePosition();
+            */
             state->addTime(deltaTime);
         }
     }
@@ -183,9 +196,16 @@ bool Actor::hasKnowledge(const QString& key) const
     return mKnowledge.contains(key);
 }
 
-const QVariant& Actor::getKnowledge(const QString& key) const
+QVariant Actor::getKnowledge(const QString& key) const
 {
-    return mKnowledge[key];
+    const QVariant& retVal = mKnowledge[key];
+
+    return retVal;
+}
+
+void Actor::removeKnowledge(const QString& key)
+{
+    mKnowledge.remove(key);
 }
 
 void Actor::setKnowledge(const QString& key, const QVariant& value)

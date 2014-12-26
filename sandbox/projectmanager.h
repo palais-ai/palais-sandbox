@@ -27,7 +27,9 @@ public:
     ~ProjectManager();
 
     // Coordinates are in normalized screen coordinates.
-    void selectActorAtClickpoint(float mouseX, float mouseY, Ogre::Camera* camera);
+    void selectActorAtClickpoint(float mouseX,
+                                 float mouseY,
+                                 Ogre::Camera* camera);
     bool getSceneLoaded() const;
     bool isPlaying() const;
     void play();
@@ -35,14 +37,19 @@ public:
     Q_INVOKABLE void setSimulationSpeed(float speedFactor);
     Q_INVOKABLE void reloadProject();
 signals:
-    void startSceneLoad(const QString& sceneFile, const QString& logicFile);
+    void startSceneLoad(const QString& sceneFile,
+                        const QString& logicFile);
     void sceneLoaded(Scene* scene);
     void sceneLoadFailed(const QString& errorMessage);
-    void beforeSceneLoad(const QString& name, const QString& sceneFile, const QString& logicFile);
+    void beforeSceneLoad(const QString& name,
+                         const QString& sceneFile,
+                         const QString& logicFile);
     void onPlayingChanged(bool isPlaying);
 public slots:
     void onOpenProject(const QUrl& url);
-    void onBeforeSceneLoadFinished(const QString& name, const QString& sceneFile, const QString& logicFile);
+    void onBeforeSceneLoadFinished(const QString& name,
+                                   const QString& sceneFile,
+                                   const QString& logicFile);
 private:
     QUrl mLastOpenedUrl, mCurrentProjectUrl;
     SceneManager mScenarioManager;

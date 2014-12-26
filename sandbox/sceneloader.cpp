@@ -19,7 +19,11 @@ SceneLoader::SceneLoader()
 {
 }
 
-Scene* SceneLoader::loadScene(OgreEngine* engine, Ogre::SceneManager* sceneManager, const QString& name, const QString& sceneFile, const QString& logicFile)
+Scene* SceneLoader::loadScene(OgreEngine* engine,
+                              Ogre::SceneManager* sceneManager,
+                              const QString& name,
+                              const QString& sceneFile,
+                              const QString& logicFile)
 {
     if(engine && sceneManager)
     {

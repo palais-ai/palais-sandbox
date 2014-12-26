@@ -10,24 +10,24 @@ function partial(func /*, 0..n args */) {
 
 var fighterCount = 0;
 function spawnFighter(startPos, teamColor) {
-		var actor = scene.instantiate("player_team" + numCalls + "_" + fighterCount++,
-									  "Soldier2" + teamColor, 
-									  startPos);
+	var actor = scene.instantiate("player_team" + numCalls + "_" + fighterCount++,
+								  "Soldier2" + teamColor, 
+								  startPos);
 
-		actor.enableAnimation("my_animation");
-		actor.setScale(0.2);
+	actor.enableAnimation("my_animation");
+	actor.setScale(0.2);
 
-		var lookAtPos = actor.position
-		lookAtPos.y = Plane.position.y
+	var lookAtPos = actor.position
+	lookAtPos.y = Plane.position.y
 
-		actor.position = lookAtPos
+	actor.position = lookAtPos
 
-		lookAtPos.x *= 2
-		lookAtPos.y *= 2
-		lookAtPos.z *= 2
-		actor.lookAt(lookAtPos);
+	lookAtPos.x *= 2
+	lookAtPos.y *= 2
+	lookAtPos.z *= 2
+	actor.lookAt(lookAtPos);
 
-		scene.moveActor(spawn_team1, teamColor == "red" ? spawn_team2.position : spawn_team1.position);
+	scene.moveActor(actor, teamColor == "red" ? spawn_team2.position : spawn_team1.position);
 }
 
 function spawnTeam(teamSize, startPos) {
@@ -48,8 +48,9 @@ function testRaycast() {
 
 var timer;
 function onStart() {
-	spawnTeam(5, spawn_team1.position)
-	spawnTeam(5, spawn_team2.position)
+	var teamSize = 5;
+	spawnTeam(teamSize, spawn_team1.position)
+	spawnTeam(teamSize, spawn_team2.position)
 
 	print(Cube_000.position)
 
@@ -64,11 +65,36 @@ function onStart() {
 function updateActor(deltaTime, actor) {
 	var actorSpeed = 0.5 
 	if(actor.hasKnowledge("movement_target")) {
-		var target = actor.knowledge["movement_target"]
+		var target = actor.getKnowledge("movement_target")
 		var current = actor.position
-		var step = target.subtract(current).normalize().multiply(actorSpeed * deltaTime)
 
-		actor.position = current.add(step)
+		if(current.distanceTo(target) < 0.01) {
+			if(actor.hasKnowledge("current_path")) {
+				var path = actor.getKnowledge("current_path")
+				var next = path[0]
+
+				if(path.length == 1) {
+					actor.removeKnowledge("current_path")
+				}
+				else {
+					path.splice(0, 1)
+					actor.setKnowledge("current_path", path)
+				}
+
+				actor.setKnowledge("movement_target", next);
+				actor.lookAt(new Vector3(next.x, next.y, next.z).multiply(-1));
+				target = next;
+			}
+			else {
+				actor.removeKnowledge("movement_target");
+				actor.disableAnimation("my_animation");
+				print("Reached goal.");
+			}
+		}
+
+		var step = target.subtract(current).normalize().multiply(actorSpeed * deltaTime);
+
+		actor.position = current.add(step);
 	}
 } 
 

@@ -47,7 +47,8 @@ public:
 
     QString getName() const;
     Q_INVOKABLE bool hasKnowledge(const QString& key) const;
-    Q_INVOKABLE const QVariant& getKnowledge(const QString& key) const;
+    Q_INVOKABLE QVariant getKnowledge(const QString& key) const;
+    Q_INVOKABLE void removeKnowledge(const QString& key);
     Q_INVOKABLE void setKnowledge(const QString& key, const QVariant& value);
     Q_INVOKABLE QString toString() const;
 

@@ -43,7 +43,8 @@ public:
 typedef ailib::Graph<TriangleNode> NavigationGraph;
 
 NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node);
-const TriangleNode* getNavNodeClosestToPoint(const NavigationGraph& graph, const Ogre::Vector3& point);
+const TriangleNode* getNavNodeClosestToPoint(const NavigationGraph& graph,
+                                             const Ogre::Vector3& point);
 
 // CREDITS: Public domain license, from http://www.ogre3d.org/tikiwiki/tiki-index.php?page=RetrieveVertexData
 void getMeshInformation(const Ogre::MeshPtr mesh,

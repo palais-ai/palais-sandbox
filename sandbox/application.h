@@ -37,7 +37,9 @@ public:
     Q_INVOKABLE void onOgreViewClicked(float mouseX, float mouseY);
 signals:
     void ogreInitialized();
-    void beforeSceneLoadFinished(const QString& name, const QString& sceneFile, const QString& logicFile);
+    void beforeSceneLoadFinished(const QString& name,
+                                 const QString& sceneFile,
+                                 const QString& logicFile);
     void onSceneLoadedChanged(bool sceneLoaded);
     void onScenePlayingChanged(bool scenePlaying);
 public slots:
@@ -46,7 +48,9 @@ public slots:
     void onSceneLoaded(Scene* scene);
     void onSceneLoadFailed(const QString& message);
     void onPlayButtonPressed();
-    void onBeforeSceneLoad(const QString& name, const QString& sceneFile, const QString& logicFile);
+    void onBeforeSceneLoad(const QString& name,
+                           const QString& sceneFile,
+                           const QString& logicFile);
     void onPlayingChanged(bool isPlaying);
 private:
     void initializeSceneManager();

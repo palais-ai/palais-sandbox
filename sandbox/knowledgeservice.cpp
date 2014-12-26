@@ -16,7 +16,8 @@ QVariant KnowledgeService::getKnowledge(const QString& knowledgeKey)
     Scene* scene = mSceneManager.getCurrentScene();
     if(!scene)
     {
-        QJsonRpcMessage msg = currentRequest().request().createErrorResponse(QJsonRpc::UserError, "There's no active scene right now.");
+        QJsonRpcMessage msg = currentRequest().request().createErrorResponse(QJsonRpc::UserError,
+                                                                             "There's no active scene right now.");
         beginDelayedResponse();
         currentRequest().respond(msg);
         return QVariant(QVariant::Invalid);
@@ -39,7 +40,8 @@ void KnowledgeService::setKnowledge(const QString& knowledgeKey, const QVariant&
     Scene* scene = mSceneManager.getCurrentScene();
     if(!scene)
     {
-        QJsonRpcMessage msg = currentRequest().request().createErrorResponse(QJsonRpc::UserError, "There's no active scene right now.");
+        QJsonRpcMessage msg = currentRequest().request().createErrorResponse(QJsonRpc::UserError,
+                                                                             "There's no active scene right now.");
         beginDelayedResponse();
         currentRequest().respond(msg);
         return;

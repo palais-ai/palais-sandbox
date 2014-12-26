@@ -115,31 +115,9 @@ TriangleNode::TriangleNode(const Ogre::Vector3& v1,
     ;
 }
 
-class DistanceComparator
-{
-public:
-    DistanceComparator(const Ogre::Vector3& reference) :
-        mReference(reference)
-    {
-        ;
-    }
-
-    bool operator() (const TriangleNode& lv, const TriangleNode& rv) const
-    {
-        return lv.getCentroid().squaredDistance(mReference) < rv.getCentroid().squaredDistance(mReference);
-    }
-private:
-    const Ogre::Vector3& mReference;
-};
-
 const TriangleNode* getNavNodeClosestToPoint(const NavigationGraph& graph, const Ogre::Vector3& point)
 {
-    NavigationGraph::node_collection nodeCopy(graph.nodes.begin(), graph.nodes.end());
-
-    DistanceComparator comp(point);
-    std::sort(nodeCopy.begin(), nodeCopy.end(), comp);
-
-    for(NavigationGraph::node_collection::const_iterator it = nodeCopy.begin(); it != nodeCopy.end(); ++it)
+    for(NavigationGraph::node_collection::const_iterator it = graph.nodes.begin(); it != graph.nodes.end(); ++it)
     {
         const NavigationGraph::node_type& node = *it;
 
@@ -195,13 +173,14 @@ OgreHelper::NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node)
 
             TriangleNode* node = &graph.nodes.back();
 
-            edgeConnections[Edge(indices[i], indices[i+1])] += node;
+            edgeConnections[Edge(indices[i],   indices[i+1])] += node;
             edgeConnections[Edge(indices[i+1], indices[i+2])] += node;
-            edgeConnections[Edge(indices[i+2], indices[i])] += node;
+            edgeConnections[Edge(indices[i+2], indices[i])]   += node;
         }
 
         QHashIterator<Edge, QSet<TriangleNode*> > it(edgeConnections);
 
+        const TriangleNode* firstNode = &graph.nodes[0];
         while(it.hasNext())
         {
             it.next();
@@ -213,9 +192,15 @@ OgreHelper::NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node)
                 TriangleNode* n1 = *nodes.begin();
                 TriangleNode* n2 = *(nodes.begin() + 1);
 
+                const size_t n1Idx = n1 - firstNode;
+                const size_t n2Idx = n2 - firstNode;
+
+                assert(n1Idx < graph.nodes.size());
+                assert(n2Idx < graph.nodes.size());
+
                 float distance = n1->getCentroid().distance(n2->getCentroid());
-                n1->edges.push_back(ailib::Edge::makeEdge(n2, distance));
-                n2->edges.push_back(ailib::Edge::makeEdge(n1, distance));
+                n1->edges.push_back(ailib::Edge::makeEdge(n2Idx, distance));
+                n2->edges.push_back(ailib::Edge::makeEdge(n1Idx, distance));
             }
         }
     }

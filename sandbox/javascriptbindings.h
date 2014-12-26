@@ -91,6 +91,7 @@ QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engin
 QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *engine);
 }
 
 #endif // JAVASCRIPTBINDINGS_H

@@ -41,7 +41,12 @@ public:
         ModelRoleIndex
     };
 
-    Scene(const QString& name, const QString& sceneFile, const QString& logicFile, Ogre::SceneNode* root, OgreEngine* ogreEngine);
+    Scene(const QString& name,
+          const QString& sceneFile,
+          const QString& logicFile,
+          Ogre::SceneNode* root,
+          OgreEngine* ogreEngine);
+
     ~Scene();
 
     // Frame Listener
@@ -67,7 +72,9 @@ public:
 
     Q_INVOKABLE void destroy(Actor* actor);
 
-    Q_INVOKABLE RaycastResult raycast(const Ogre::Vector3& origin, const Ogre::Vector3& direction); //< Reports the first hit actor in the scene
+    // Reports the first hit actor in the scene.
+    Q_INVOKABLE RaycastResult raycast(const Ogre::Vector3& origin,
+                                      const Ogre::Vector3& direction);
     Q_INVOKABLE void moveActor(Actor* actor, const Ogre::Vector3& target);
 
     void setup();
@@ -80,7 +87,9 @@ public:
 
     bool hasActorKnowledge(const QString& actorName, const QString& knowledgeKey) const;
     QVariant getActorKnowledge(const QString& actorName, const QString& knowledgeKey) const;
-    void setActorKnowledge(const QString& actorName, const QString& knowledgeKey, const QVariant& value);
+    void setActorKnowledge(const QString& actorName,
+                           const QString& knowledgeKey,
+                           const QVariant& value);
 
     QScriptEngine& getScriptEngine();
     const QMap<QString, Actor*>& getActors() const;
@@ -92,7 +101,7 @@ private:
     void getActors(Ogre::SceneNode* root);
     Actor* getActorForNode(Ogre::SceneNode* node) const;
     void parseNavMesh(Actor* navmesh);
-    void destroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode );
+    void destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode);
 
     QString mName, mSceneFile, mLogicFile;
     Ogre::SceneNode* mRoot;

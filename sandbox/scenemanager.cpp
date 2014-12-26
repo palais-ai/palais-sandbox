@@ -31,7 +31,9 @@ SceneManager::SceneManager(OgreEngine* engine) :
     startTimer(1000.f / sMaximumTickRate);
 }
 
-Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, const QString& logicFile)
+Scene* SceneManager::loadScene(const QString& name,
+                               const QString& sceneFile,
+                               const QString& logicFile)
 {
     TimedLogger logger;
     logger.start();
@@ -44,7 +46,12 @@ Scene* SceneManager::loadScene(const QString& name, const QString& sceneFile, co
             mCurrentScene = NULL;
         }
 
-        Scene* nextScene = SceneLoader::loadScene(mOgreEngine, Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName), name, sceneFile, logicFile);
+        Scene* nextScene = SceneLoader::loadScene(mOgreEngine,
+                                                  Ogre::Root::getSingleton()
+                                                             .getSceneManager(Application::sSceneManagerName),
+                                                  name,
+                                                  sceneFile,
+                                                  logicFile);
 
         if(!nextScene)
         {
@@ -91,7 +98,8 @@ void SceneManager::timerEvent(QTimerEvent*)
         float oneStep =  1000.f / sAITickRate;
         while(accumulator > oneStep)
         {
-            // We update at constant rates to keep the results the same, independent of simulation speed.
+            // We update at constant rates to keep the results the same,
+            // independent of simulation speed.
             mCurrentScene->update(oneStep);
             accumulator -= oneStep;
         }
