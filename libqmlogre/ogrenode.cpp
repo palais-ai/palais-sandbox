@@ -42,17 +42,17 @@ OgreNode::OgreNode()
 
 OgreNode::~OgreNode()
 {
-    if (m_renderTarget)
+    if(m_renderTarget)
     {
         m_renderTarget->removeAllViewports();
     }
 
-    if (Ogre::Root::getSingletonPtr())
+    if(Ogre::Root::getSingletonPtr())
     {
         Ogre::Root::getSingletonPtr()->detachRenderTarget(m_renderTarget);
     }
 
-    if (m_renderTarget)
+    if(m_renderTarget)
     {
         Ogre::TextureManager::getSingleton().remove("RttTex");
     }
@@ -84,7 +84,8 @@ void OgreNode::doneOgreContext()
 void OgreNode::activateOgreContext()
 {
     m_ogreEngineItem->activateOgreContext();
-    m_ogreEngineItem->ogreContext()->functions()->glBindFramebuffer(GL_FRAMEBUFFER_EXT, m_ogreFboId);
+    m_ogreEngineItem->ogreContext()->functions()->glBindFramebuffer(GL_FRAMEBUFFER_EXT,
+                                                                    m_ogreFboId);
 }
 
 GLuint OgreNode::getOgreFboId()
@@ -169,7 +170,8 @@ int OgreNode::getNumberOfFSAASamples()
     int samples = 0;
     try
     {
-        Ogre::String samplesStr = m_ogreEngineItem->getRoot()->getRenderSystem()->getConfigOptions()["FSAA"].currentValue;
+        Ogre::RenderSystem* renderSystem = m_ogreEngineItem->getRoot()->getRenderSystem();
+        Ogre::String samplesStr = renderSystem->getConfigOptions()["FSAA"].currentValue;
         std::stringstream ss(samplesStr);
         ss >> samples;
 
@@ -199,16 +201,16 @@ void OgreNode::updateFBO()
 
     // TODO: Don't recreate the texture on every frame during animations.
     m_rttTexture = Ogre::TextureManager::getSingleton().createManual(textureName,
-                                                                    Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                                    Ogre::TEX_TYPE_2D,
-                                                                    m_size.width(),
-                                                                    m_size.height(),
-                                                                    0, // num mipmaps
-                                                                    Ogre::PF_R8G8B8A8,
-                                                                    Ogre::TU_RENDERTARGET,
-                                                                    0, // ManualLoader
-                                                                    false, // hwGammaCorrection
-                                                                    samples);
+                                                                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                     Ogre::TEX_TYPE_2D,
+                                                                     m_size.width(),
+                                                                     m_size.height(),
+                                                                     0, // num mipmaps
+                                                                     Ogre::PF_R8G8B8A8,
+                                                                     Ogre::TU_RENDERTARGET,
+                                                                     0, // ManualLoader
+                                                                     false, // hwGammaCorrection
+                                                                     samples);
 
     m_renderTarget = m_rttTexture->getBuffer()->getRenderTarget();
     m_renderTarget->setActive(true);
@@ -230,6 +232,16 @@ void OgreNode::updateFBO()
 
     m_material.setTexture(m_texture);
     m_materialO.setTexture(m_texture);
+}
+
+void OgreNode::setCamera(Ogre::Camera *camera)
+{
+    m_camera = camera;
+}
+
+QSize OgreNode::size() const
+{
+    return m_size;
 }
 
 void OgreNode::setSize(const QSize &size)

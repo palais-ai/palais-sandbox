@@ -12,3 +12,8 @@
 OgreCameraWrapper::OgreCameraWrapper()
 {
 }
+
+
+OgreCameraWrapper::~OgreCameraWrapper()
+{
+}

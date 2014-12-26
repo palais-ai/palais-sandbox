@@ -26,7 +26,8 @@ class OgreCameraWrapper
 {
 public:
     OgreCameraWrapper();
-    virtual ~OgreCameraWrapper() {}
+    virtual ~OgreCameraWrapper();
+
     virtual Ogre::Camera* camera() const = 0;
 };
 

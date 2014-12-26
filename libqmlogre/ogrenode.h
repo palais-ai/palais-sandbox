@@ -38,7 +38,7 @@ public:
     ~OgreNode();
 
     void setSize(const QSize &size);
-    QSize size() const { return m_size; }
+    QSize size() const;
 
     void update();
     void updateFBO();
@@ -51,7 +51,7 @@ public:
 
     void preprocess();
 
-    void setCamera(Ogre::Camera *camera) { m_camera = camera; }
+    void setCamera(Ogre::Camera *camera);
 
 private:
     void resetViewport();
