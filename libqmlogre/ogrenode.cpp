@@ -72,9 +72,9 @@ void OgreNode::doneOgreContext()
 {
     if (m_ogreFboId != 0)
     {
-        Ogre::GLFrameBufferObject *ogreFbo = NULL;
+        Ogre::GLFrameBufferObject* ogreFbo = NULL;
         m_renderTarget->getCustomAttribute("FBO", &ogreFbo);
-        Ogre::GLFBOManager *manager = ogreFbo->getManager();
+        Ogre::GLFBOManager* manager = ogreFbo->getManager();
         manager->unbind(m_renderTarget);
     }
 
@@ -95,9 +95,9 @@ GLuint OgreNode::getOgreFboId()
         return 0;
     }
 
-    Ogre::GLFrameBufferObject *ogreFbo = 0;
+    Ogre::GLFrameBufferObject* ogreFbo = NULL;
     m_renderTarget->getCustomAttribute("FBO", &ogreFbo);
-    Ogre::GLFBOManager *manager = ogreFbo->getManager();
+    Ogre::GLFBOManager* manager = ogreFbo->getManager();
     manager->bind(m_renderTarget);
 
     GLint id;
@@ -219,7 +219,7 @@ void OgreNode::updateFBO()
                                             QRectF(0, 0, m_size.width(), m_size.height()),
                                             QRectF(0, 0, 1, 1));
 
-    Ogre::GLTexture *nativeTexture = static_cast<Ogre::GLTexture *>(m_rttTexture.get());
+    Ogre::GLTexture* nativeTexture = static_cast<Ogre::GLTexture*>(m_rttTexture.get());
 
     if(m_texture)
     {

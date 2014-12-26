@@ -14,7 +14,6 @@
 #include "ogrecamerawrapper.h"
 
 #include <QtQuick/QQuickItem>
-#include <QtCore/QPropertyAnimation>
 
 class OgreNode;
 
@@ -22,28 +21,28 @@ class OgreItem : public QQuickItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(QObject *camera READ camera WRITE setCamera)
-    Q_PROPERTY(OgreEngine *ogreEngine READ ogreEngine WRITE setOgreEngine)
+    Q_PROPERTY(QObject* camera READ camera WRITE setCamera)
+    Q_PROPERTY(OgreEngine* ogreEngine READ ogreEngine WRITE setOgreEngine)
 
 public:
-    OgreItem(QQuickItem *parent = 0);
+    OgreItem(QQuickItem* parent = 0);
 
-    QObject *camera() const { return dynamic_cast<QObject *>(m_camera); }
-    void setCamera(QObject *camera);
+    QObject* camera() const;
+    void setCamera(QObject* camera);
 
-    OgreEngine *ogreEngine() const { return m_ogreEngineItem; }
-    void setOgreEngine(OgreEngine *ogreEngine);
+    OgreEngine* ogreEngine() const;
+    void setOgreEngine(OgreEngine* ogreEngine);
 
 protected:
-    virtual QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *);
+    virtual QSGNode* updatePaintNode(QSGNode*, UpdatePaintNodeData*);
 
 private slots:
-    void windowChanged(QQuickWindow *window);
+    void windowChanged(QQuickWindow* window);
 
 private:
-    OgreCameraWrapper *m_camera;
-    OgreNode *mLastNode;
-    OgreEngine *m_ogreEngineItem;
+    OgreCameraWrapper* m_camera;
+    OgreNode* mLastNode;
+    OgreEngine* m_ogreEngineItem;
 };
 
 #endif // OGREITEM_H

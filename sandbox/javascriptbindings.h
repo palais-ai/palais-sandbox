@@ -1,20 +1,21 @@
 #ifndef JAVASCRIPTBINDINGS_H
 #define JAVASCRIPTBINDINGS_H
 
+#include <QScriptValue>
+#include <QList>
+#include <QTimer>
+#include <QScopedPointer>
+
 class QScriptEngine;
 class QScriptContext;
 class QTimer;
 class Scene;
 class Actor;
 
-namespace Ogre {
+namespace Ogre
+{
 class Vector3;
 }
-
-#include <QScriptValue>
-#include <QList>
-#include <QTimer>
-#include <QScopedPointer>
 
 /**
  * @brief The ScriptTimer class

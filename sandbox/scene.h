@@ -4,7 +4,6 @@
 #include "ogrehelper.h"
 #include "DebugDrawer.h"
 
-#include <QString>
 #include <QVariant>
 #include <QScriptEngine>
 #include <QMap>

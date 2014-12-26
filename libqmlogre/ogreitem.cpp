@@ -27,6 +27,16 @@ void OgreItem::windowChanged(QQuickWindow *window)
     connect(window, &QQuickWindow::frameSwapped, this, &OgreItem::update);
 }
 
+OgreEngine* OgreItem::ogreEngine() const
+{
+    return m_ogreEngineItem;
+}
+
+QObject* OgreItem::camera() const
+{
+    return dynamic_cast<QObject*>(m_camera);
+}
+
 QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
     if (width() <= 0 || height() <= 0 || !m_camera || !m_camera->camera() || !m_ogreEngineItem)

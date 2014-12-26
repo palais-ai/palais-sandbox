@@ -8,7 +8,8 @@
 class Scene;
 class ProjectManager;
 
-namespace Ogre {
+namespace Ogre
+{
 class SceneManager;
 class Root;
 }
@@ -58,10 +59,10 @@ private:
 
     QQmlApplicationEngine* mApplicationEngine;
     QIdentityProxyModel mActorProxyModel;
-    OgreEngine *mOgreEngine;
-    Ogre::SceneManager *mSceneManager;
+    OgreEngine* mOgreEngine;
+    Ogre::SceneManager* mSceneManager;
     ProjectManager* mProjectManager;
-    Ogre::Root *mRoot;
+    Ogre::Root* mRoot;
     TimedLogger mTimeLogger;
 };
 

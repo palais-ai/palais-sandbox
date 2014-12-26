@@ -1,7 +1,6 @@
 #ifndef SCENEMANAGER_H
 #define SCENEMANAGER_H
 
-#include <QString>
 #include <QObject>
 #include <QTime>
 

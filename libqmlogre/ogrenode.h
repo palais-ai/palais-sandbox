@@ -10,14 +10,16 @@
 #ifndef OGRENODE_H
 #define OGRENODE_H
 
-#include <OgreTexture.h>
 #include "ogreengine.h"
+
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QSGOpaqueTextureMaterial>
-#include <QtQuick/QQuickWindow>
 
-namespace Ogre {
+#include <OgreTexture.h>
+
+namespace Ogre
+{
 class Root;
 class Camera;
 class SceneManager;
@@ -43,7 +45,7 @@ public:
 
     GLuint getOgreFboId();
 
-    void setOgreEngineItem(OgreEngine *ogreRootItem);
+    void setOgreEngineItem(OgreEngine* ogreRootItem);
     void doneOgreContext();
     void activateOgreContext();
 
@@ -58,13 +60,13 @@ private:
     QSGTextureMaterial m_material;
     QSGOpaqueTextureMaterial m_materialO;
     QSGGeometry m_geometry;
-    QSGTexture *m_texture;
-    OgreEngine *m_ogreEngineItem;
+    QSGTexture* m_texture;
+    OgreEngine* m_ogreEngineItem;
 
     QSize m_size;
 
-    Ogre::Camera *m_camera;
-    Ogre::RenderTexture *m_renderTarget;
+    Ogre::Camera* m_camera;
+    Ogre::RenderTexture* m_renderTarget;
     Ogre::TexturePtr m_rttTexture;
 
     GLuint m_ogreFboId;

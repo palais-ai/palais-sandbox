@@ -15,7 +15,8 @@
 
 #include "ogrecamerawrapper.h"
 
-namespace Ogre {
+namespace Ogre
+{
 class SceneNode;
 class Camera;
 }
@@ -32,7 +33,7 @@ public:
 
     void createCameraWithCurrentSceneManager();
 
-    Ogre::SceneNode *sceneNode() const;
+    Ogre::SceneNode* sceneNode() const;
     Ogre::Camera* camera() const;
 
     // Thread-safe
@@ -53,8 +54,8 @@ private:
 
     Ogre::Vector3 mInitialPosition;
 
-    Ogre::SceneNode *m_node;
-    Ogre::Camera *m_camera;
+    Ogre::SceneNode* m_node;
+    Ogre::Camera* m_camera;
 
     qreal m_yaw;
     qreal m_pitch;

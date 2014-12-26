@@ -1,13 +1,13 @@
 #ifndef SCENELOADER_H
 #define SCENELOADER_H
 
-#include <QString>
 #include <QScriptEngine>
 
 class Scene;
 class OgreEngine;
 
-namespace Ogre {
+namespace Ogre
+{
 class SceneManager;
 }
 

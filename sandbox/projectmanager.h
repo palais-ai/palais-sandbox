@@ -13,7 +13,8 @@
 class OgreEngine;
 class Scene;
 
-namespace Ogre {
+namespace Ogre
+{
 class SceneManager;
 class Camera;
 }

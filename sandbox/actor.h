@@ -7,7 +7,8 @@
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 
-namespace Ogre {
+namespace Ogre
+{
 class SceneNode;
 }
 

@@ -10,12 +10,14 @@
 #ifndef OGREENGINEITEM_H
 #define OGREENGINEITEM_H
 
-#include <OgreString.h>
 #include <QObject>
 #include <QQuickWindow>
 #include <QOpenGLContext>
 
-namespace Ogre {
+#include <OgreString.h>
+
+namespace Ogre
+{
 class Root;
 class RenderTexture;
 class Viewport;
@@ -32,7 +34,7 @@ class OgreEngine : public QObject
     Q_OBJECT
 
 public:
-    OgreEngine(QQuickWindow *window = 0);
+    OgreEngine(QQuickWindow* window = 0);
     ~OgreEngine();
 
     Ogre::Root* getRoot();
@@ -50,24 +52,24 @@ public:
     QOpenGLContext* ogreContext() const;
 
     QSGTexture* createTextureFromId(uint id,
-                                    const QSize &size,
+                                    const QSize& size,
                                     QQuickWindow::CreateTextureOptions options = QQuickWindow::CreateTextureOption(0)) const;
 
     void setupResources(void);
 
 private:
     Ogre::String m_resources_cfg;
-    Ogre::RenderWindow *m_ogreWindow;
+    Ogre::RenderWindow* m_ogreWindow;
     Ogre::Root* mRoot;
 
-    QQuickWindow *m_quickWindow;
+    QQuickWindow* m_quickWindow;
 
     /** Pointer to QOpenGLContext to be used by Ogre. */
     QOpenGLContext* m_ogreContext;
     /** Pointer to QOpenGLContext to be restored after Ogre context. */
     QOpenGLContext* m_qtContext;
 protected:
-    void setQuickWindow(QQuickWindow *window);
+    void setQuickWindow(QQuickWindow* window);
 };
 
 #endif // OGREENGINEITEM_H

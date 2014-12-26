@@ -82,7 +82,6 @@ function updateActor(deltaTime, actor) {
 				}
 
 				actor.setKnowledge("movement_target", next);
-				actor.lookAt(new Vector3(next.x, next.y, next.z).multiply(-1));
 				target = next;
 			}
 			else {

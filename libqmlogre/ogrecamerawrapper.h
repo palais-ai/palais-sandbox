@@ -10,7 +10,8 @@
 #ifndef OGRECAMERAWRAPPER_H
 #define OGRECAMERAWRAPPER_H
 
-namespace Ogre {
+namespace Ogre
+{
 class Camera;
 }
 
