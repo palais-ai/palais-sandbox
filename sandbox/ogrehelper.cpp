@@ -65,14 +65,17 @@ Triangle::Triangle(const Ogre::Vector3& v1,
 
 Ogre::Vector3 Triangle::getCentroid() const
 {
-    float lenA = c.distance(b), lenB = a.distance(c), lenC = b.distance(a);
-    float mul = lenA*lenB*lenC;
+    const float lenA = c.squaredDistance(b),
+                lenB = a.squaredDistance(c),
+                lenC = b.squaredDistance(a);
+
+    const float mul = sqrtf(lenA*lenB*lenC);
     return fromBarycentric(mul, mul, mul);
 }
 
 Ogre::Vector3 Triangle::fromBarycentric(float x, float y, float z) const
 {
-    float div = x+y+z;
+    const float div = x+y+z;
     return (x / div) * a + (y / div) * b + (z / div) * c;
 }
 
@@ -107,17 +110,9 @@ bool Triangle::isProjectionInside(const Ogre::Vector3& point) const
     return poly.isPointInside(pt);
 }
 
-TriangleNode::TriangleNode(const Ogre::Vector3& v1,
-                           const Ogre::Vector3& v2,
-                           const Ogre::Vector3& v3) :
-    Triangle(v1, v2, v3)
+const NavigationGraph::node_type* getNavNodeClosestToPoint(const NavigationGraph& graph, const Ogre::Vector3& point)
 {
-    ;
-}
-
-const TriangleNode* getNavNodeClosestToPoint(const NavigationGraph& graph, const Ogre::Vector3& point)
-{
-    for(NavigationGraph::node_collection::const_iterator it = graph.nodes.begin(); it != graph.nodes.end(); ++it)
+    for(const NavigationGraph::node_type* it = graph.getNodesBegin(); it != graph.getNodesEnd(); ++it)
     {
         const NavigationGraph::node_type& node = *it;
 
@@ -162,45 +157,40 @@ OgreHelper::NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node)
         QScopedArrayPointer<Ogre::Vector3> vertices(verticesPtr);
         QScopedArrayPointer<unsigned> indices(indicesPtr);
 
-        QHash<Edge, QSet<TriangleNode*> > edgeConnections;
+        QHash<Edge, QSet<uint32_t> > edgeConnections;
 
-        graph.nodes.reserve(indexCount / 3);
         for(size_t i = 0; i < indexCount; i+=3)
         {
-            graph.nodes.push_back(TriangleNode(vertices[indices[i]],
-                                               vertices[indices[i+1]],
-                                               vertices[indices[i+2]]));
+            uint32_t idx = graph.addNode(OgreHelper::NavigationGraph::node_type(vertices[indices[i]],
+                                                                                vertices[indices[i+1]],
+                                                                                vertices[indices[i+2]]));
 
-            TriangleNode* node = &graph.nodes.back();
-
-            edgeConnections[Edge(indices[i],   indices[i+1])] += node;
-            edgeConnections[Edge(indices[i+1], indices[i+2])] += node;
-            edgeConnections[Edge(indices[i+2], indices[i])]   += node;
+            edgeConnections[Edge(indices[i],   indices[i+1])] += idx;
+            edgeConnections[Edge(indices[i+1], indices[i+2])] += idx;
+            edgeConnections[Edge(indices[i+2], indices[i])]   += idx;
         }
 
-        QHashIterator<Edge, QSet<TriangleNode*> > it(edgeConnections);
+        QHashIterator<Edge, QSet<uint32_t> > it(edgeConnections);
 
-        const TriangleNode* firstNode = &graph.nodes[0];
         while(it.hasNext())
         {
             it.next();
-            const QSet<TriangleNode*>& nodes = it.value();
+            const QSet<uint32_t>& nodes = it.value();
 
-            qDebug() << nodes.size();
             if(nodes.size() == 2)
             {
-                TriangleNode* n1 = *nodes.begin();
-                TriangleNode* n2 = *(nodes.begin() + 1);
+                const uint32_t n1Idx = *nodes.begin();
+                const uint32_t n2Idx = *(nodes.begin() + 1);
 
-                const size_t n1Idx = n1 - firstNode;
-                const size_t n2Idx = n2 - firstNode;
+                assert(n1Idx < graph.getNumNodes());
+                assert(n2Idx < graph.getNumNodes());
 
-                assert(n1Idx < graph.nodes.size());
-                assert(n2Idx < graph.nodes.size());
+                const OgreHelper::NavigationGraph::node_type* n1 = graph.getNode(n1Idx);
+                const OgreHelper::NavigationGraph::node_type* n2 = graph.getNode(n2Idx);
 
-                float distance = n1->getCentroid().distance(n2->getCentroid());
-                n1->edges.push_back(ailib::Edge::makeEdge(n2Idx, distance));
-                n2->edges.push_back(ailib::Edge::makeEdge(n1Idx, distance));
+                const float distance = n1->getCentroid().distance(n2->getCentroid());
+                graph.addEdge(n1Idx, n2Idx, distance);
+                graph.addEdge(n2Idx, n1Idx, distance);
             }
         }
     }

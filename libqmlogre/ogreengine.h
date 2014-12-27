@@ -39,6 +39,7 @@ public:
 
     Ogre::Root* getRoot();
     Ogre::RenderWindow* getRenderWindow();
+    QQuickWindow* getQQuickWindow();
     bool isStarted() const;
     void startEngine();
     void stopEngine();

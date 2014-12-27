@@ -32,19 +32,11 @@ public:
     bool isProjectionInside(const Ogre::Vector3& point) const;
 };
 
-class TriangleNode : public Triangle, public ailib::BaseNode
-{
-public:
-    TriangleNode(const Ogre::Vector3& v1,
-                 const Ogre::Vector3& v2,
-                 const Ogre::Vector3& v3);
-};
-
-typedef ailib::Graph<TriangleNode> NavigationGraph;
+typedef ailib::Graph<Triangle, 0> NavigationGraph;
 
 NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node);
-const TriangleNode* getNavNodeClosestToPoint(const NavigationGraph& graph,
-                                             const Ogre::Vector3& point);
+const NavigationGraph::node_type* getNavNodeClosestToPoint(const NavigationGraph& graph,
+                                                           const Ogre::Vector3& point);
 
 // CREDITS: Public domain license, from http://www.ogre3d.org/tikiwiki/tiki-index.php?page=RetrieveVertexData
 void getMeshInformation(const Ogre::MeshPtr mesh,

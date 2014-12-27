@@ -70,6 +70,7 @@ public:
                                    const Ogre::Vector3& scale = Ogre::Vector3(1,1,1));
 
     Q_INVOKABLE void destroy(Actor* actor);
+    Q_INVOKABLE void setCameraFocus(Actor* actor);
 
     // Reports the first hit actor in the scene.
     Q_INVOKABLE RaycastResult raycast(const Ogre::Vector3& origin,

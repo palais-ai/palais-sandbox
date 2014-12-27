@@ -62,6 +62,13 @@ void CameraNodeObject::createCameraWithCurrentSceneManager()
     fitToContain(sceneManager->getRootSceneNode());
 }
 
+void CameraNodeObject::focus(Ogre::SceneNode* node)
+{
+    QMutexLocker locker(&g_engineMutex);
+
+    fitToContain(node);
+}
+
 void CameraNodeObject::fitToContain(Ogre::SceneNode* node)
 {
     if(!node)

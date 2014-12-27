@@ -29,7 +29,7 @@ OgreEngine::OgreEngine(QQuickWindow *window)
 {
     qmlRegisterType<OgreItem>("Ogre", 1, 0, "OgreItem");
     qmlRegisterType<OgreEngine>("OgreEngine", 1, 0, "OgreEngine");
-    qmlRegisterType<CameraNodeObject>("Example", 1, 0, "Camera");
+    qmlRegisterType<CameraNodeObject>("Ogre", 1, 0, "Camera");
 
     setQuickWindow(window);
 }
@@ -138,6 +138,11 @@ void OgreEngine::stopEngine()
         delete mRoot;
         mRoot = NULL;
     }
+}
+
+QQuickWindow* OgreEngine::getQQuickWindow()
+{
+    return m_quickWindow;
 }
 
 void OgreEngine::setQuickWindow(QQuickWindow *window)

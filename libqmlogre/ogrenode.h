@@ -51,7 +51,7 @@ public:
 
     void preprocess();
 
-    void setCamera(Ogre::Camera *camera);
+    void setCamera(Ogre::Camera* camera);
 
 private:
     void resetViewport();

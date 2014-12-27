@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import Ogre 1.0
-import Example 1.0
 
 Rectangle {
     id: ogre

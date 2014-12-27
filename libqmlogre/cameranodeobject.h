@@ -49,6 +49,9 @@ public:
     // Not thread-safe
     void fitToContain(Ogre::SceneNode* node);
 
+    // Thread-safe
+    void focus(Ogre::SceneNode* node);
+
 private:
     void updateRotation();
 

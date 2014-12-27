@@ -22,6 +22,7 @@
 #include <OgreStringConverter.h>
 
 #include "../libqmlogre/ogreengine.h"
+#include "../libqmlogre/cameranodeobject.h"
 
 Q_DECLARE_METATYPE(Ogre::Vector3)
 Q_DECLARE_METATYPE(Ogre::Vector3*)
@@ -69,6 +70,25 @@ Scene::~Scene()
     }
 }
 
+void Scene::setCameraFocus(Actor* actor)
+{
+    if(!actor)
+    {
+        qWarning() << "Actor must be initialized";
+        return;
+    }
+
+    const QString cameraName("cam1");
+    CameraNodeObject* camera = mEngine->getQQuickWindow()->findChild<CameraNodeObject*>(cameraName);
+
+    if(!camera)
+    {
+        qFatal("Couldn't find camera with name (objectName=%s).", cameraName.toStdString().c_str());
+        return;
+    }
+
+    camera->focus(actor->getSceneNode());
+}
 
 bool Scene::frameStarted(const Ogre::FrameEvent& evt)
 {
@@ -145,12 +165,13 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin, const Ogre::Vector3& d
 static ailib::real_type euclideanHeuristic(const OgreHelper::NavigationGraph::node_type& n1,
                                            const OgreHelper::NavigationGraph::node_type& n2)
 {
-    return n1.getCentroid().distance(n2.getCentroid());
+    return n1.getCentroid().squaredDistance(n2.getCentroid());
 }
 
 void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
 {
-    const OgreHelper::TriangleNode* start = OgreHelper::getNavNodeClosestToPoint(mNavMesh, actor->getPosition());
+    const OgreHelper::NavigationGraph::node_type* start = OgreHelper::getNavNodeClosestToPoint(mNavMesh,
+                                                                                               actor->getPosition());
     if(!start)
     {
         qWarning() << "Actor [ "
@@ -159,7 +180,8 @@ void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
         return;
     }
 
-    const OgreHelper::TriangleNode* goal = OgreHelper::getNavNodeClosestToPoint(mNavMesh, target);
+    const OgreHelper::NavigationGraph::node_type* goal = OgreHelper::getNavNodeClosestToPoint(mNavMesh,
+                                                                                              target);
     if(!goal)
     {
         qWarning() << "Target position "
@@ -168,13 +190,23 @@ void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
         return;
     }
 
-    ailib::AStar<OgreHelper::NavigationGraph> astar;
-    ailib::AStar<OgreHelper::NavigationGraph>::path_type path = astar.findPath(mNavMesh,
-                                                                               start,
-                                                                               goal,
-                                                                               euclideanHeuristic);
+    ailib::AStar<OgreHelper::NavigationGraph> astar(mNavMesh);
+    ailib::AStar<OgreHelper::NavigationGraph>::path_type path;
 
-    qDebug() << "path size is " << path.size() << "hops.";
+    QTime startTime = QTime::currentTime();
+    uint32_t count = 0;
+    const uint32_t cycles = 10000;
+    while(count++ < cycles)
+    {
+        path = astar.findPath(start,
+                              goal,
+                              euclideanHeuristic);
+    }
+
+    qDebug() << "Paths calculated per second: "
+             << static_cast<float>(cycles) / (startTime.msecsTo(QTime::currentTime()) / 1000.f);
+
+    qDebug() << "Path size is " << path.size() << "hops.";
 
     if(path.empty())
     {
@@ -192,7 +224,7 @@ void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
     }
 
     QVector<Ogre::Vector3> qpath;
-    // Dont save the first entry as we immediately store it in "movement_target"
+    // Don't save the first entry as we immediately store it in "movement_target"
     ailib::AStar<OgreHelper::NavigationGraph>::path_type::const_iterator it = path.begin() + 1;
     for(; it != path.end(); ++it)
     {
@@ -446,22 +478,25 @@ void Scene::parseNavMesh(Actor* navmesh)
     mNavMesh = OgreHelper::makeNavGraphFromOgreNode(navmesh->getSceneNode());
     logger.stop("NavMesh parsing");
 
-    OgreHelper::NavigationGraph::node_collection::const_iterator it = mNavMesh.nodes.begin();
-    for(; it != mNavMesh.nodes.end(); ++it)
+    const OgreHelper::NavigationGraph::node_type* const firstNode = mNavMesh.getNodesBegin();
+    const OgreHelper::NavigationGraph::node_type* it = firstNode;
+    for(; it != mNavMesh.getNodesEnd(); ++it)
     {
         mDebugDrawer.drawCircle(it->getCentroid(), 0.1, 4, Ogre::ColourValue::Green, true);
 
-        qDebug() << "edgecount: " << it->edges.size();
-        ailib::BaseNode::edge_collection::const_iterator it2 = it->edges.begin();
-        for(; it2 != it->edges.end(); ++it2)
+        uint32_t currentIdx = it - firstNode;
+        qDebug() << "edgecount: " << mNavMesh.getNumEdges(currentIdx);
+        const ailib::Edge* it2 = mNavMesh.getSuccessorsBegin(currentIdx);
+        const ailib::Edge* const end = mNavMesh.getSuccessorsEnd(currentIdx);
+        for(; it2 != end; ++it2)
         {
             mDebugDrawer.drawLine(it->getCentroid(),
-                                  mNavMesh.nodes[it2->targetIndex].getCentroid(),
+                                  mNavMesh.getNode(it2->targetIndex)->getCentroid(),
                                   Ogre::ColourValue::Red);
         }
     }
 
-    qDebug() << "Navigation mesh loaded with " << mNavMesh.nodes.size() << " nodes.";
+    qDebug() << "Navigation mesh loaded with " << mNavMesh.getNumNodes() << " nodes.";
 }
 
 void Scene::setup()
