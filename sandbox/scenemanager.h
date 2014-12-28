@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTime>
+#include <QAtomicInt>
 
 class OgreEngine;
 class Scene;
@@ -28,14 +29,15 @@ public:
 
     Scene* getCurrentScene();
     const Scene* getCurrentScene() const;
-public slots:
+
     Scene* loadScene(const QString& name, const QString& sceneFile, const QString& logicFile);
+    void unloadCurrentScene();
 protected:
     void timerEvent(QTimerEvent *);
 private:
     OgreEngine* mOgreEngine;
     Scene* mCurrentScene;
-    bool mSceneStarted;
+    QAtomicInt mSceneStarted;
     float mSimulationSpeedFactor;
     QTime mLastUpdateTime;
 

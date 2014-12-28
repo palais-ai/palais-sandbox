@@ -243,7 +243,8 @@ void Application::onSceneLoaded(Scene* scene)
     mActorProxyModel.setSourceModel(scene);
     mApplicationEngine->rootContext()->setContextProperty("ActorModel", &mActorProxyModel);
     mApplicationEngine->rootContext()->setContextProperty("Scene", scene);
-    emit(onSceneLoadedChanged(true));
+
+    emit(onSceneLoadedChanged(getSceneLoaded()));
 }
 
 bool Application::getSceneLoaded() const

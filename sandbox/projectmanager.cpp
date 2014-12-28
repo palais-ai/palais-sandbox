@@ -21,6 +21,8 @@ ProjectManager::ProjectManager(OgreEngine* engine) :
     mKnowledgeService(mScenarioManager),
     mActorService(mScenarioManager)
 {
+    assert(thread() == engine->thread());
+
     QString serviceName = QDir::temp().absoluteFilePath("SandboxService");
     if (QFile::exists(serviceName))
     {
@@ -79,7 +81,7 @@ void ProjectManager::selectActorAtClickpoint(float mouseX, float mouseY, Ogre::C
 
 void ProjectManager::reloadProject()
 {
-    if(!mCurrentProjectUrl.isEmpty())
+    if(getSceneLoaded())
     {
         onOpenProject(mCurrentProjectUrl);
     }
@@ -182,7 +184,11 @@ void ProjectManager::onOpenProject(const QUrl& url)
         return;
     }
 
+    mCurrentProjectUrl.clear();
     mLastOpenedUrl = url;
+
+    pause();
+    mScenarioManager.unloadCurrentScene();
 
     emit(beforeSceneLoad(name, sceneFile, logicFile));
 }
@@ -195,8 +201,6 @@ void ProjectManager::onBeforeSceneLoadFinished(const QString& name,
            name.toStdString().c_str(),
            sceneFile.toStdString().c_str(),
            logicFile.toStdString().c_str());
-
-    pause();
 
     Scene* scene = mScenarioManager.loadScene(name, sceneFile, logicFile);
 

@@ -49,8 +49,9 @@ Scene::Scene(const QString& name,
         qFatal("Scene requires an engine instance.");
     }
 
-    getActors(mRoot);
+    assert(thread() == mEngine->thread()); // This object must reside in the same thread as the ogre engine
 
+    getActors(mRoot);
     Ogre::Root::getSingleton().addFrameListener(this);
 }
 
@@ -191,20 +192,9 @@ void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
     }
 
     ailib::AStar<OgreHelper::NavigationGraph> astar(mNavMesh);
-    ailib::AStar<OgreHelper::NavigationGraph>::path_type path;
-
-    QTime startTime = QTime::currentTime();
-    uint32_t count = 0;
-    const uint32_t cycles = 10000;
-    while(count++ < cycles)
-    {
-        path = astar.findPath(start,
-                              goal,
-                              euclideanHeuristic);
-    }
-
-    qDebug() << "Paths calculated per second: "
-             << static_cast<float>(cycles) / (startTime.msecsTo(QTime::currentTime()) / 1000.f);
+    ailib::AStar<OgreHelper::NavigationGraph>::path_type path = astar.findPath(start,
+                                                                               goal,
+                                                                               euclideanHeuristic);
 
     qDebug() << "Path size is " << path.size() << "hops.";
 
@@ -475,7 +465,8 @@ void Scene::parseNavMesh(Actor* navmesh)
 {
     TimedLogger logger;
     logger.start();
-    mNavMesh = OgreHelper::makeNavGraphFromOgreNode(navmesh->getSceneNode());
+    mNavMesh = OgreHelper::makeNavGraphFromOgreNode(navmesh->getSceneNode(),
+                                                    euclideanHeuristic);
     logger.stop("NavMesh parsing");
 
     const OgreHelper::NavigationGraph::node_type* const firstNode = mNavMesh.getNodesBegin();
@@ -485,7 +476,7 @@ void Scene::parseNavMesh(Actor* navmesh)
         mDebugDrawer.drawCircle(it->getCentroid(), 0.1, 4, Ogre::ColourValue::Green, true);
 
         uint32_t currentIdx = it - firstNode;
-        qDebug() << "edgecount: " << mNavMesh.getNumEdges(currentIdx);
+
         const ailib::Edge* it2 = mNavMesh.getSuccessorsBegin(currentIdx);
         const ailib::Edge* const end = mNavMesh.getSuccessorsEnd(currentIdx);
         for(; it2 != end; ++it2)

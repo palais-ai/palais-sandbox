@@ -31,6 +31,15 @@ SceneManager::SceneManager(OgreEngine* engine) :
     startTimer(1000.f / sMaximumTickRate);
 }
 
+void SceneManager::unloadCurrentScene()
+{
+    if(mCurrentScene)
+    {
+        delete mCurrentScene;
+        mCurrentScene = NULL;
+    }
+}
+
 Scene* SceneManager::loadScene(const QString& name,
                                const QString& sceneFile,
                                const QString& logicFile)
@@ -40,11 +49,7 @@ Scene* SceneManager::loadScene(const QString& name,
 
     if(mOgreEngine)
     {       
-        if(mCurrentScene)
-        {
-            delete mCurrentScene;
-            mCurrentScene = NULL;
-        }
+        unloadCurrentScene();
 
         Scene* nextScene = SceneLoader::loadScene(mOgreEngine,
                                                   Ogre::Root::getSingleton()

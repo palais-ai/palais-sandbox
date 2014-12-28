@@ -1,7 +1,7 @@
 #ifndef OGREHELPER_H
 #define OGREHELPER_H
 
-#include "graph.h"
+#include "astar.h"
 
 #include <QVector>
 
@@ -24,17 +24,20 @@ public:
              const Ogre::Vector3& v2,
              const Ogre::Vector3& v3);
 
+    Ogre::Vector3 a, b, c, centroid;
 
-    Ogre::Vector3 a, b, c;
-
-    Ogre::Vector3 getCentroid() const;
+    const Ogre::Vector3& getCentroid() const;
     Ogre::Vector3 fromBarycentric(float x, float y, float z) const;
     bool isProjectionInside(const Ogre::Vector3& point) const;
+private:
+    Ogre::Vector3 computeCentroid();
 };
 
-typedef ailib::Graph<Triangle, 0> NavigationGraph;
+typedef ailib::Graph<Triangle, 3> NavigationGraph;
 
-NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node);
+NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node,
+                                         ailib::AStar<NavigationGraph>::Heuristic heuristic);
+
 const NavigationGraph::node_type* getNavNodeClosestToPoint(const NavigationGraph& graph,
                                                            const Ogre::Vector3& point);
 

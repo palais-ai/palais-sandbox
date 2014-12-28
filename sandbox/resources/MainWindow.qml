@@ -37,6 +37,7 @@ ApplicationWindow {
             MenuItem {
                 text: "Reload project"
                 shortcut: "Ctrl+L"
+                enabled: ApplicationWrapper.sceneLoaded
 
                 onTriggered: ProjectManager.reloadProject();
             }

@@ -21,14 +21,6 @@
 
 using namespace meshmagick;
 
-namespace Ogre
-{
-static uint qHash(const Ogre::Vector3& key)
-{
-     return static_cast<uint>(key.x) ^ static_cast<uint>(key.z) + static_cast<uint>(key.y);
-}
-};
-
 namespace OgreHelper
 {
 class Edge
@@ -56,14 +48,21 @@ static uint qHash(const Edge& key)
 
 Triangle::Triangle(const Ogre::Vector3& v1,
                    const Ogre::Vector3& v2,
-                   const Ogre::Vector3& v3)
+                   const Ogre::Vector3& v3) :
+    a(v1),
+    b(v2),
+    c(v3),
+    centroid(computeCentroid())
 {
-    a = v1;
-    b = v2;
-    c = v3;
+    ;
 }
 
-Ogre::Vector3 Triangle::getCentroid() const
+const Ogre::Vector3& Triangle::getCentroid() const
+{
+    return centroid;
+}
+
+Ogre::Vector3 Triangle::computeCentroid()
 {
     const float lenA = c.squaredDistance(b),
                 lenB = a.squaredDistance(c),
@@ -125,22 +124,45 @@ const NavigationGraph::node_type* getNavNodeClosestToPoint(const NavigationGraph
     return NULL;
 }
 
-OgreHelper::NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node)
+static const Ogre::MeshPtr optimizeMesh(const Ogre::MeshPtr mesh)
 {
-    OgreHelper::NavigationGraph graph;
-
-    if(node->numAttachedObjects() > 0)
+    if(mesh.get())
     {
-        const Ogre::MeshPtr mesh = static_cast<Ogre::Entity*>(node->getAttachedObject(0))->getMesh();
-
         OgreEnvironment ogreEnv;
         ogreEnv.initialize(false, Ogre::LogManager::getSingleton().getDefaultLog());
         OptimiseTool optimiseTool;
+
+        optimiseTool.setPosTolerance(1e-06);
+        optimiseTool.setNormTolerance(1e-06);
+        optimiseTool.setUVTolerance(1e-06);
 
         // Remove duplicate vertices using libmeshmagick
         // This is important for the following algorithm to generate a discrete navigation graph from
         // the continuous navigation mesh.
         optimiseTool.processMesh(mesh);
+    }
+    else
+    {
+        qWarning("MeshPtr mustn't be null. Can't optimize an uninitialized Mesh.");
+    }
+
+    return mesh;
+}
+
+OgreHelper::NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node,
+                                                     ailib::AStar<OgreHelper::NavigationGraph>::Heuristic heuristic)
+{
+    OgreHelper::NavigationGraph graph;
+
+    if(node->numAttachedObjects() > 0)
+    {
+        const Ogre::MeshPtr mesh = optimizeMesh(static_cast<Ogre::Entity*>(node->getAttachedObject(0))->getMesh());
+
+        if(!mesh.get())
+        {
+            qWarning() << "Optimized mesh ptr was null. Returning empty nav graph.";
+            return graph;
+        }
 
         size_t vertexCount, indexCount;
         Ogre::Vector3* verticesPtr;
@@ -157,8 +179,8 @@ OgreHelper::NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node)
         QScopedArrayPointer<Ogre::Vector3> vertices(verticesPtr);
         QScopedArrayPointer<unsigned> indices(indicesPtr);
 
+        OgreHelper::NavigationGraph graph;
         QHash<Edge, QSet<uint32_t> > edgeConnections;
-
         for(size_t i = 0; i < indexCount; i+=3)
         {
             uint32_t idx = graph.addNode(OgreHelper::NavigationGraph::node_type(vertices[indices[i]],
@@ -187,15 +209,19 @@ OgreHelper::NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node)
 
                 const OgreHelper::NavigationGraph::node_type* n1 = graph.getNode(n1Idx);
                 const OgreHelper::NavigationGraph::node_type* n2 = graph.getNode(n2Idx);
+                const ailib::real_type distance = heuristic(*n1, *n2);
 
-                const float distance = n1->getCentroid().distance(n2->getCentroid());
                 graph.addEdge(n1Idx, n2Idx, distance);
                 graph.addEdge(n2Idx, n1Idx, distance);
             }
         }
+        return graph;
     }
-
-    return graph;
+    else
+    {
+        qWarning() << "No meshes were attached to the navmesh scene node. Returning an empty navgraph.";
+        return graph;
+    }
 }
 
 // CREDITS: Public domain license, from http://www.ogre3d.org/tikiwiki/tiki-index.php?page=RetrieveVertexData
@@ -286,32 +312,35 @@ void getMeshInformation(const Ogre::MeshPtr mesh,
 
         Ogre::IndexData* index_data = submesh->indexData;
         size_t numTris = index_data->indexCount / 3;
-        Ogre::HardwareIndexBufferSharedPtr ibuf = index_data->indexBuffer;
-
-        bool use32bitindexes = (ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT);
-
-        unsigned long* pLong = static_cast<unsigned long*>(ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
-        unsigned short* pShort = reinterpret_cast<unsigned short*>(pLong);
-
-        size_t offset = (submesh->useSharedVertices)? shared_offset : current_offset;
-
-        if ( use32bitindexes )
+        if(numTris > 0)
         {
-            for ( size_t k = 0; k < numTris*3; ++k)
-            {
-                indices[index_offset++] = pLong[k] + static_cast<unsigned long>(offset);
-            }
-        }
-        else
-        {
-            for ( size_t k = 0; k < numTris*3; ++k)
-            {
-                indices[index_offset++] = static_cast<unsigned long>(pShort[k]) +
-                                          static_cast<unsigned long>(offset);
-            }
-        }
+            Ogre::HardwareIndexBufferSharedPtr ibuf = index_data->indexBuffer;
 
-        ibuf->unlock();
+            bool use32bitindexes = (ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT);
+
+            unsigned long* pLong = static_cast<unsigned long*>(ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
+            unsigned short* pShort = reinterpret_cast<unsigned short*>(pLong);
+
+            size_t offset = (submesh->useSharedVertices)? shared_offset : current_offset;
+
+            if ( use32bitindexes )
+            {
+                for ( size_t k = 0; k < numTris*3; ++k)
+                {
+                    indices[index_offset++] = pLong[k] + static_cast<unsigned long>(offset);
+                }
+            }
+            else
+            {
+                for ( size_t k = 0; k < numTris*3; ++k)
+                {
+                    indices[index_offset++] = static_cast<unsigned long>(pShort[k]) +
+                                              static_cast<unsigned long>(offset);
+                }
+            }
+
+            ibuf->unlock();
+        }
         current_offset = next_offset;
     }
 }
