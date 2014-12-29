@@ -34,7 +34,9 @@ class CameraNodeObject;
 class OgreNode : public QSGGeometryNode
 {
 public:
-    OgreNode();
+    // The fboCreationDelay is used to throttle the framebuffer recreation rate
+    // when this QQuickItem's size is changed continuously.
+    OgreNode(float fboCreationDelay = 1.f);
     ~OgreNode();
 
     void setSize(const QSize &size);
@@ -70,7 +72,8 @@ private:
     Ogre::TexturePtr m_rttTexture;
 
     GLuint m_ogreFboId;
-
+    const float m_fboCreationDelay; // In seconds
+    float m_fboDelayAccumulator;
     bool m_dirtyFBO;
 };
 

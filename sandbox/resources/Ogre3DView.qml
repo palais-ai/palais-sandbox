@@ -53,7 +53,13 @@ Rectangle {
             }
         }
 
-        Ogre3DViewControls {
+        MainWindowControls {
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: 14
+        }
+
+        Ogre3DCameraControls {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.topMargin: 14

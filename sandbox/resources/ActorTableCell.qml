@@ -4,7 +4,13 @@ Rectangle {
     id: actorCell
     signal pressed()
     property color textColor: colors.lightGray
+    property int horizontalMargin: 8
+
     color: colors.darkGray
+
+    Behavior on color {
+        ColorAnimation { duration: 200 }
+    }
 
     MouseArea {
         id: cellMouseArea
@@ -23,7 +29,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: -separator.height
         anchors.left: parent.left
-        anchors.leftMargin: 8
+        anchors.leftMargin: horizontalMargin
         text: name
         //font.capitalization: Font.AllUppercase
         font.family: openSans.name
@@ -38,7 +44,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: -separator.height
         anchors.right: arrowRightIndicator.left
-        anchors.rightMargin: 8
+        anchors.rightMargin: horizontalMargin
         text: "\uf06e"
         font.family: fontAwesome.name
         font.pointSize: 12
@@ -79,7 +85,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: -separator.height
         anchors.right: parent.right
-        anchors.rightMargin: 8
+        anchors.rightMargin: horizontalMargin
         text: "\uf105"
         font.family: fontAwesome.name
         font.pointSize: 12

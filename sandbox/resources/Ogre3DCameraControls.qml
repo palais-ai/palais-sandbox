@@ -17,35 +17,30 @@ Rectangle {
         spacing: 12
         focus: true
         Keys.onPressed: {
-            if(event.key ===
-               (viewControls.state == '' ? Qt.Key_Left : Qt.Key_Right)) {
-                expandButton.changeState()
-            }
-
-            if (event.key === Qt.Key_Minus) {
+            switch(event.key) {
+            case Qt.Key_Left:
+                appWindow.changeControlAreaState()
+                break;
+            case Qt.Key_Right:
+                appWindow.changeInspectorState()
+                break;
+            case Qt.Key_Down:
+                appWindow.changeConsoleState()
+                break;
+            case Qt.Key_Minus:
                 zoomOutButton.performZoom()
                 event.accepted = true
-            }
-
-            if (event.key === Qt.Key_Plus) {
+                break;
+            case Qt.Key_Plus:
                 zoomInButton.performZoom()
                 event.accepted = true
-            }
-
-            if(event.key == Qt.Key_P && ApplicationWrapper.sceneLoaded) {
-                ApplicationWrapper.onPlayButtonPressed()
-                event.accepted = true
-            }
-        }
-
-        FAIconButton {
-            id: expandButton
-            unicode: "\uf060"
-            onPressed: changeState()
-
-            function changeState() {
-                if(!widthAnimation.running)
-                    viewControls.state =  viewControls.state == '' ? "HIDDEN" : ''
+                break;
+            case Qt.Key_P:
+                if(ApplicationWrapper.sceneLoaded) {
+                    ApplicationWrapper.onPlayButtonPressed()
+                    event.accepted = true
+                }
+                break;
             }
         }
 
@@ -68,11 +63,5 @@ Rectangle {
                 ogreitem.camera.zoom = Math.min(6, Math.max(0.1, ogreitem.camera.zoom + 0.25))
             }
         }
-    }
-
-    states: State {
-        name: "HIDDEN"
-        PropertyChanges { target: controlArea; width: 0 }
-        PropertyChanges { target: expandButton; unicode: "\uf061" }
     }
 }

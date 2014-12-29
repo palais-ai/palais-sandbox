@@ -64,8 +64,10 @@ ApplicationWindow {
 
     Item {
         id: colors
-        property color primaryColor: "#0355a9"
-        property color primaryColorLighter: "#4685e5"
+        property color primaryColor: "#3498db"
+        property color primaryColorDarker: "#2980b9"
+        property color primaryColorDarkest: "#006096"
+        property color primaryColorLighter: "#4dcaff"
         property color secondaryColor: "#467b24"
         property color secondaryColorLighter: "#7cef09"
         property color dimmedTextColor: "#3Dffffff"
@@ -76,6 +78,12 @@ ApplicationWindow {
         property color darkerGray: '#303030'
         property color black95: '#111111'
         property color black75: '#555555'
+    }
+
+    Item {
+        id: sizes
+        property int sidebarWidth: 210
+        property int sidebarCellHeight: 30
     }
 
     FontLoader {
@@ -108,19 +116,96 @@ ApplicationWindow {
         ControlArea {
             id: controlArea
             height: parent.height
-            width: 210
+            width: sizes.sidebarWidth
 
-            Behavior on width { NumberAnimation {  id:widthAnimation; duration: 120 } }
+            Behavior on width {
+                NumberAnimation {
+                    id: controlWidthAnimation
+                    duration: 120
+                }
+            }
+
+            states: State {
+                name: "HIDDEN"
+                PropertyChanges {
+                    target: controlArea
+                    width: 1
+                }
+            }
         }
 
-        Loader {
-            id: mainLoader
+        SplitView {
+            id: centerArea
             height: parent.height
-            width: parent.width - controlArea.width
+            width: parent.width - controlArea.width - inspectorArea.width
             anchors.left: controlArea.right
             anchors.top: parent.top
-            focus: true
-            source: "loading.qml"
+            orientation: Qt.Vertical
+
+            handleDelegate: ListSeparator {
+                handleSize: 2
+                handleColor: colors.black95
+            }
+
+            onResizingChanged: {
+                consoleArea.state = ''
+            }
+
+            Loader {
+                id: mainLoader
+                Layout.minimumHeight: 400
+                Layout.fillHeight: true
+                focus: true
+                source: "loading.qml"
+            }
+
+            ConsoleArea {
+                id: consoleArea
+                Layout.minimumHeight: 115
+
+                /**
+                Behavior on height {
+                    NumberAnimation {
+                        id: consoleHeightAnimation
+                        duration: 120
+                    }
+                }*/
+
+                states: State {
+                    name: "HIDDEN"
+                    PropertyChanges {
+                        target: consoleArea
+                        Layout.minimumHeight: 2
+                    }
+                    PropertyChanges {
+                        target: consoleArea
+                        height: 2
+                    }
+                }
+            }
+        }
+
+        InspectorArea {
+            id: inspectorArea
+            height: parent.height
+            width: sizes.sidebarWidth
+            anchors.left: centerArea.right
+            anchors.top: parent.top
+
+            Behavior on width {
+                NumberAnimation {
+                    id: inspectorWidthAnimation
+                    duration: 120
+                }
+            }
+
+            states: State {
+                name: "HIDDEN"
+                PropertyChanges {
+                    target: inspectorArea
+                    width: 1
+                }
+            }
         }
     }
 
@@ -144,6 +229,21 @@ ApplicationWindow {
         onAccepted: {
             openProjectDialog.projectFileSelected(openProjectDialog.fileUrl)
         }
+    }
+
+    function changeControlAreaState() {
+        if(!controlWidthAnimation.running)
+            controlArea.state = controlArea.state === '' ? "HIDDEN" : ''
+    }
+
+    function changeConsoleState() {
+        //if(!consoleHeightAnimation.running)
+        consoleArea.state = consoleArea.state === '' ? "HIDDEN" : ''
+    }
+
+    function changeInspectorState() {
+        if(!inspectorWidthAnimation.running)
+            inspectorArea.state = inspectorArea.state === '' ? "HIDDEN" : ''
     }
 
     function onOgreIsReady() {

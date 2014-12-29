@@ -14,6 +14,7 @@
 #include "ogrenode.h"
 
 #include <sstream>
+#include <cfloat>
 
 #include <Ogre.h>
 #include <OgreString.h>
@@ -23,8 +24,9 @@
 #include <QSurfaceFormat>
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
+#include <QTime>
 
-OgreNode::OgreNode()
+OgreNode::OgreNode(float fboCreationDelay)
     : QSGGeometryNode()
     , m_geometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4)
     , m_texture(0)
@@ -32,6 +34,8 @@ OgreNode::OgreNode()
     , m_camera(0)
     , m_renderTarget(0)
     , m_ogreFboId(0)
+    , m_fboCreationDelay(fboCreationDelay)
+    , m_fboDelayAccumulator(-1.f)
     , m_dirtyFBO(false)
 {
     setMaterial(&m_material);
@@ -151,6 +155,22 @@ void OgreNode::preprocess()
 
 void OgreNode::update()
 {
+    static QTime last = QTime::currentTime();
+
+    QTime now = QTime::currentTime();
+    if(m_fboDelayAccumulator > 0.f ||
+       fabs(m_fboDelayAccumulator) < FLT_EPSILON)
+    {
+        m_fboDelayAccumulator -= (last.msecsTo(now) / 1000.f);
+
+        // Delay ran out in this frame - update the frame buffer to its latest size.
+        if(m_fboDelayAccumulator < 0.f)
+        {
+            m_dirtyFBO = true;
+        }
+    }
+    last = now;
+
     if (m_dirtyFBO)
     {
         m_ogreEngineItem->lockEngine();
@@ -199,18 +219,23 @@ void OgreNode::updateFBO()
 
     int samples = getNumberOfFSAASamples();
 
-    // TODO: Don't recreate the texture on every frame during animations.
-    m_rttTexture = Ogre::TextureManager::getSingleton().createManual(textureName,
-                                                                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                                     Ogre::TEX_TYPE_2D,
-                                                                     m_size.width(),
-                                                                     m_size.height(),
-                                                                     0, // num mipmaps
-                                                                     Ogre::PF_R8G8B8A8,
-                                                                     Ogre::TU_RENDERTARGET,
-                                                                     0, // ManualLoader
-                                                                     false, // hwGammaCorrection
-                                                                     samples);
+    // Don't recreate the texture on every frame during animations / Continuous size changes
+    if(m_fboDelayAccumulator < 0.f)
+    {
+        m_rttTexture = Ogre::TextureManager::getSingleton().createManual(textureName,
+                                                                         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                         Ogre::TEX_TYPE_2D,
+                                                                         m_size.width(),
+                                                                         m_size.height(),
+                                                                         0, // num mipmaps
+                                                                         Ogre::PF_R8G8B8A8,
+                                                                         Ogre::TU_RENDERTARGET,
+                                                                         0, // ManualLoader
+                                                                         false, // hwGammaCorrection
+                                                                         samples);
+
+        m_fboDelayAccumulator = m_fboCreationDelay;
+    }
 
     m_renderTarget = m_rttTexture->getBuffer()->getRenderTarget();
     m_renderTarget->setActive(true);

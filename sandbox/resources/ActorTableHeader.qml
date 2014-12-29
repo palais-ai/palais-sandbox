@@ -3,10 +3,11 @@ import QtQuick.Layouts 1.1
 
 Rectangle {
     id: headerColumn
-    property real headerPadding: 16
     height: childrenRect.height
     width: parent.width
     color: "transparent"
+
+    property real headerPadding: 8
 
     Rectangle {
         id: pad1

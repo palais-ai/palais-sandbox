@@ -28,6 +28,8 @@ Q_DECLARE_METATYPE(Ogre::Vector3)
 Q_DECLARE_METATYPE(Ogre::Vector3*)
 Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
 Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
+Q_DECLARE_METATYPE(Ogre::Quaternion)
+Q_DECLARE_METATYPE(Ogre::Quaternion*)
 
 Scene::Scene(const QString& name,
              const QString& sceneFile,
