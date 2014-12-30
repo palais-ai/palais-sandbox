@@ -52,7 +52,9 @@ signals:
     void onPlayingChanged(bool isPlaying);
     void inspectorSelectionChanged(const QString& name,
                                    const QVariantMap& knowledge);
+    void timePassed(const QTime& time);
 public slots:
+    void onTimePassed(const QTime& time);
     void onOpenProject(const QUrl& url);
     void onBeforeSceneLoadFinished(const QString& name,
                                    const QString& sceneFile,

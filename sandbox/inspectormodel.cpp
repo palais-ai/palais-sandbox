@@ -1,6 +1,6 @@
 #include "inspectormodel.h"
 
-
+#include <QtQml>
 #include <QSharedPointer>
 
 Q_DECLARE_METATYPE(Ogre::Vector3)
@@ -9,12 +9,19 @@ Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
 Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
 Q_DECLARE_METATYPE(Ogre::Quaternion)
 Q_DECLARE_METATYPE(Ogre::Quaternion*)
-Q_DECLARE_METATYPE(QSharedPointer<OgreVector3Model>)
+Q_DECLARE_METATYPE(OgreVector3Model*)
+
+void OgreVector3Model::declareQML()
+{
+    qmlRegisterUncreatableType<OgreVector3Model>("Inspector", 1, 0,
+                                                 "OgreVector3",
+                                                 "Cant instantiate ogrevector3.");
+}
 
 OgreVector3Model::OgreVector3Model(const Ogre::Vector3& vector) :
     mVector(vector)
 {
-    setObjectName("OgreVector3");
+    setObjectName("Vector3");
 }
 
 float OgreVector3Model::getX() const
@@ -29,6 +36,11 @@ float OgreVector3Model::getY() const
 float OgreVector3Model::getZ() const
 {
     return mVector.z;
+}
+
+void InspectorModel::declareQML()
+{
+    OgreVector3Model::declareQML();
 }
 
 InspectorModel::InspectorModel(const QString& name,
@@ -88,8 +100,7 @@ QVariant InspectorModel::data(const QModelIndex &index, int role) const
 
         if(data.canConvert<Ogre::Vector3>())
         {
-            QSharedPointer<OgreVector3Model> shared(new OgreVector3Model(data.value<Ogre::Vector3>()));
-            return QVariant::fromValue(shared);
+            return QVariant::fromValue(new OgreVector3Model(data.value<Ogre::Vector3>()));
         }
 
         return data;

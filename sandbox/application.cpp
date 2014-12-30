@@ -67,6 +67,7 @@ int Application::onApplicationStarted(int argc, char **argv)
     mApplicationEngine = &engine;
 
     ConsoleModel::declareQML();
+    InspectorModel::declareQML();
     mApplicationEngine->rootContext()->setContextProperty("ConsoleModel", mConsoleModel.data());
     mApplicationEngine->rootContext()->setContextProperty("ApplicationWrapper", this);
     mApplicationEngine->load(QUrl("qrc:/qml/MainWindow.qml"));
@@ -124,6 +125,9 @@ void Application::initializeOgre()
     mProjectManager = new ProjectManager(mOgreEngine);
 
     mApplicationEngine->rootContext()->setContextProperty("ProjectManager", mProjectManager);
+
+    QObject::connect(mProjectManager, &ProjectManager::timePassed,
+                     mConsoleModel.data(), &ConsoleModel::onTimePassed);
 
     QObject::connect(mProjectManager, &ProjectManager::onPlayingChanged,
                      this, &Application::onPlayingChanged);

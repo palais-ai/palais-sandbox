@@ -24,6 +24,9 @@ ProjectManager::ProjectManager(OgreEngine* engine) :
 {
     assert(thread() == engine->thread());
 
+    connect(&mScenarioManager, &SceneManager::timePassed,
+            this, &ProjectManager::onTimePassed);
+
     QString serviceName = QDir::temp().absoluteFilePath("SandboxService");
     if (QFile::exists(serviceName))
     {
@@ -53,6 +56,11 @@ ProjectManager::~ProjectManager()
     {
         qWarning() << "Failed to remove the sandbox services on close.";
     }
+}
+
+void ProjectManager::onTimePassed(const QTime& time)
+{
+    emit timePassed(time);
 }
 
 Actor* ProjectManager::getSelectedActor()

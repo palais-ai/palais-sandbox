@@ -8,6 +8,13 @@ Rectangle {
 
     color: colors.darkGray
 
+    function typeNameForObject(value) {
+        if(value instanceof Object && value.hasOwnProperty("objectName")) {
+            return value.objectName
+        }
+        return typeof(value)
+    }
+
     Behavior on color {
         ColorAnimation { duration: 200 }
     }
@@ -25,9 +32,18 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: horizontalMargin
         text: key
-        //font.capitalization: Font.AllUppercase
         font.family: openSans.name
-        //font.weight: Font.DemiBold
+        font.pointSize: 11
+        color: textColor
+    }
+
+    NativeText {
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -separator.height
+        anchors.right: parent.right
+        anchors.rightMargin: horizontalMargin
+        text: typeNameForObject(value)
+        font.family: openSans.name
         font.pointSize: 11
         color: textColor
     }

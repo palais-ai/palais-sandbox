@@ -7,9 +7,10 @@ Rectangle {
         id: consoleListView
         anchors.fill: parent
         model: ConsoleModel
+        boundsBehavior: Flickable.StopAtBounds
 
         header: ConsoleTableHeader {
-            color: "blue"
+            width: parent.width
         }
 
         delegate: ConsoleTableCell {

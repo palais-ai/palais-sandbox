@@ -13,7 +13,9 @@ class OgreVector3Model : public QObject
     Q_PROPERTY(float z READ getZ)
 
 public:
-    OgreVector3Model(const Ogre::Vector3& vector);
+    static void declareQML();
+
+    OgreVector3Model(const Ogre::Vector3& vector = Ogre::Vector3());
 
     float getX() const;
     float getY() const;
@@ -33,6 +35,8 @@ public:
         ModelRoleKnowledgeKey,
         ModelRoleKnowledgeValue
     };
+
+    static void declareQML();
 
     InspectorModel(const QString& name,
                    const QVariantMap& knowledge);

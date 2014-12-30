@@ -5,9 +5,16 @@ ConsoleModel::ConsoleModel() :
 {
 }
 
+void ConsoleModel::onTimePassed(const QTime& passedTime)
+{
+    mPassedTime = mPassedTime.addMSecs(passedTime.msec());
+
+    emit onPassedTimeStringChanged(getPassedTimeString());
+}
+
 QString ConsoleModel::getPassedTimeString() const
 {
-    return mPassedTime.toString("hh:mm:ss.zzz");
+    return mPassedTime.toString("mm:ss.zzz");
 }
 
 void ConsoleModel::log(const QString& message, LogLevel level)

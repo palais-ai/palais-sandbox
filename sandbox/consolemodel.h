@@ -43,6 +43,8 @@ public:
     virtual int rowCount(const QModelIndex &parent) const;
 signals:
     void onPassedTimeStringChanged(QString passedTime);
+public slots:
+    void onTimePassed(const QTime& passedTime);
 private:
     struct LogEntry
     {

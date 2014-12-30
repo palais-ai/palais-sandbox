@@ -32,6 +32,8 @@ public:
 
     Scene* loadScene(const QString& name, const QString& sceneFile, const QString& logicFile);
     void unloadCurrentScene();
+signals:
+    void timePassed(const QTime& time);
 protected:
     void timerEvent(QTimerEvent *);
 private:

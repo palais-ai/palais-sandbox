@@ -100,6 +100,8 @@ void SceneManager::timerEvent(QTimerEvent*)
     {
         accumulator += mLastUpdateTime.msecsTo(now) * mSimulationSpeedFactor;
 
+        const float accumBefore = accumulator;
+
         float oneStep =  1000.f / sAITickRate;
         while(accumulator > oneStep)
         {
@@ -108,6 +110,10 @@ void SceneManager::timerEvent(QTimerEvent*)
             mCurrentScene->update(oneStep);
             accumulator -= oneStep;
         }
+
+        QTime passed(0, 0);
+        passed = passed.addMSecs(accumBefore - accumulator);
+        emit timePassed(passed);
     }
 
     mLastUpdateTime = now;

@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Console 1.0
+import Inspector 1.0
 
 Rectangle {
     width: childrenRect.width
