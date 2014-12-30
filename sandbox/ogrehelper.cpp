@@ -15,6 +15,7 @@
 #include <OgreMovableObject.h>
 #include <OgrePlane.h>
 #include <OgrePolygon.h>
+#include <OgreStringConverter.h>
 
 #include <MmOptimiseTool.h>
 #include <MmOgreEnvironment.h>
@@ -122,6 +123,46 @@ const NavigationGraph::node_type* getNavNodeClosestToPoint(const NavigationGraph
     }
 
     return NULL;
+}
+
+static ailib::real_type euclideanHeuristic(const OgreHelper::NavigationGraph::node_type& n1,
+                                           const OgreHelper::NavigationGraph::node_type& n2)
+{
+    return n1.getCentroid().squaredDistance(n2.getCentroid());
+}
+
+ailib::AStar<NavigationGraph>::path_type planPath(const NavigationGraph& navGraph,
+                                                  const Ogre::Vector3& from,
+                                                  const Ogre::Vector3& to,
+                                                  bool* isAlreadyThere)
+{
+    const NavigationGraph::node_type* start = getNavNodeClosestToPoint(navGraph, from);
+    if(!start)
+    {
+        qWarning() << "Target position "
+                   << Ogre::StringConverter::toString(from).c_str()
+                   << " is not covered by the navmesh. No valid path could be calculated.";
+        return ailib::AStar<NavigationGraph>::path_type();
+    }
+
+    const NavigationGraph::node_type* goal = getNavNodeClosestToPoint(navGraph, to);
+    if(!goal)
+    {
+        qWarning() << "Target position "
+                   << Ogre::StringConverter::toString(to).c_str()
+                   << " is not covered by the navmesh. No valid path could be calculated.";
+        return ailib::AStar<NavigationGraph>::path_type();
+    }
+
+    ailib::AStar<NavigationGraph> astar(navGraph);
+    ailib::AStar<NavigationGraph>::path_type path = astar.findPath(start, goal, euclideanHeuristic);
+
+    if(isAlreadyThere)
+    {
+        *isAlreadyThere = path.size() == 1 && path[0] == start;
+    }
+
+    return path;
 }
 
 static const Ogre::MeshPtr optimizeMesh(const Ogre::MeshPtr mesh)

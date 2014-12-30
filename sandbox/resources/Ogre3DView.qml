@@ -14,6 +14,7 @@ Rectangle {
         anchors.fill: parent;
         camera: cam1
         ogreEngine: OgreEngine
+        backgroundColor: colors.gray
 
         Behavior on opacity { NumberAnimation { } }
         Behavior on width { NumberAnimation { } }

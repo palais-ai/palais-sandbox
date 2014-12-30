@@ -17,22 +17,17 @@ RowLayout {
         id: cameraModeButton
         unicode: "\uf03d"
         iconSize: 20
-        onPressed: selectCameraMode()
-
-        function selectCameraMode() {
-            testDialog.open()
-        }
+        onPressed: Scene.setCameraFocus(ProjectManager.selectedActor)
     }
 
     ColumnLayout {
         spacing: 6
 
-        Text {
+        NativeText {
             text: "speed: " + speedSlider.value.toFixed(1)
             font.family: openSans.name;
             color: colors.dimmedTextColor
             Layout.alignment: Layout.Center
-            renderType: Text.NativeRendering
         }
 
         Slider {

@@ -25,7 +25,7 @@ Rectangle {
         }
     }
 
-    Text {
+    NativeText {
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: -separator.height
         anchors.left: parent.left
@@ -36,10 +36,9 @@ Rectangle {
         //font.weight: Font.DemiBold
         font.pointSize: 11
         color: textColor
-        //renderType: Text.NativeRendering
     }
 
-    Text {
+    NativeText {
         id: actorHideButton
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: -separator.height
@@ -49,7 +48,6 @@ Rectangle {
         font.family: fontAwesome.name
         font.pointSize: 12
         color: textColor
-        //renderType: Text.NativeRendering
 
         MouseArea {
             anchors.fill: parent
@@ -80,7 +78,7 @@ Rectangle {
         ]
     }
 
-    Text {
+    NativeText {
         id: arrowRightIndicator
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: -separator.height
@@ -90,7 +88,6 @@ Rectangle {
         font.family: fontAwesome.name
         font.pointSize: 12
         color: textColor
-        //renderType: Text.NativeRendering
     }
 
     ListSeparator {

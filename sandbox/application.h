@@ -3,10 +3,14 @@
 
 #include <QObject>
 #include <QIdentityProxyModel>
+#include <QScopedPointer>
+
 #include "timedlogger.h"
 
 class Scene;
 class ProjectManager;
+class InspectorModel;
+class ConsoleModel;
 
 namespace Ogre
 {
@@ -53,6 +57,8 @@ public slots:
                            const QString& sceneFile,
                            const QString& logicFile);
     void onPlayingChanged(bool isPlaying);
+    void onInspectorSelectionChanged(const QString& name,
+                                     const QVariantMap& knowledge);
 private:
     void initializeSceneManager();
     CameraNodeObject* getCameraWithName(const QString& name);
@@ -63,6 +69,8 @@ private:
     Ogre::SceneManager* mSceneManager;
     ProjectManager* mProjectManager;
     Ogre::Root* mRoot;
+    QScopedPointer<InspectorModel> mInspectorModel;
+    QScopedPointer<ConsoleModel> mConsoleModel;
     TimedLogger mTimeLogger;
 };
 

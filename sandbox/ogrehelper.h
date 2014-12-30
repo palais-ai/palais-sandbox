@@ -41,6 +41,11 @@ NavigationGraph makeNavGraphFromOgreNode(Ogre::SceneNode* node,
 const NavigationGraph::node_type* getNavNodeClosestToPoint(const NavigationGraph& graph,
                                                            const Ogre::Vector3& point);
 
+ailib::AStar<NavigationGraph>::path_type planPath(const NavigationGraph& navGraph,
+                                                  const Ogre::Vector3& from,
+                                                  const Ogre::Vector3& to,
+                                                  bool* isAlreadyThere = NULL);
+
 // CREDITS: Public domain license, from http://www.ogre3d.org/tikiwiki/tiki-index.php?page=RetrieveVertexData
 void getMeshInformation(const Ogre::MeshPtr mesh,
                         size_t &vertex_count,

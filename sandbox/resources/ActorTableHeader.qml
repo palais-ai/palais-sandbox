@@ -12,13 +12,13 @@ Rectangle {
     Rectangle {
         id: pad1
         width: parent.width
-        height: headerColumn.headerPadding
+        height: headerColumn.headerPadding - 2
         color: "transparent"
         anchors.top: parent.top
         anchors.left: parent.left
     }
 
-    Text {
+    NativeText {
         id: scenarioText
         Layout.alignment: Layout.Left
         text: ApplicationWrapper.sceneLoaded ? "Scenario" : "No Scene Is Loaded Yet."
@@ -30,12 +30,9 @@ Rectangle {
         anchors.top: pad1.bottom
         anchors.left: parent.left
         anchors.leftMargin: 8
-        renderType: Text.NativeRendering
-
-        //TextShadow {}
     }
 
-    Text {
+    NativeText {
         id: scenarioName
         text: Scene.name
         font.family: openSans.name
@@ -50,9 +47,6 @@ Rectangle {
         anchors.topMargin: -5
         anchors.left: parent.left
         anchors.leftMargin: 8
-        //renderType: Text.NativeRendering
-
-        //TextShadow {}
     }
 
     Rectangle {

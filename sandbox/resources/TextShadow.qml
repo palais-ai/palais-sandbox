@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
 
-Text {
+NativeText {
     property Text source: parent
     property color shadowColor: Qt.rgba(source.color.r, source.color.g, source.color.b, 0.5)
     property real xOffset: 0

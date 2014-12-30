@@ -25,7 +25,10 @@ SOURCES += main.cpp \
     actorservice.cpp \
     timedlogger.cpp \
     ogrehelper.cpp \
-    DebugDrawer.cpp
+    DebugDrawer.cpp \
+    fighterplanner.cpp \
+    inspectormodel.cpp \
+    consolemodel.cpp
 
 HEADERS += \
     application.h \
@@ -39,7 +42,10 @@ HEADERS += \
     actorservice.h \
     timedlogger.h \
     ogrehelper.h \
-    DebugDrawer.h
+    DebugDrawer.h \
+    fighterplanner.h \
+    inspectormodel.h \
+    consolemodel.h
 
 OTHER_FILES += \
     config/resources.cfg

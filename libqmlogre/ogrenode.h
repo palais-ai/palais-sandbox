@@ -54,6 +54,7 @@ public:
     void preprocess();
 
     void setCamera(Ogre::Camera* camera);
+    void setBackgroundColor(QColor color);
 
 private:
     void resetViewport();
@@ -65,6 +66,7 @@ private:
     QSGTexture* m_texture;
     OgreEngine* m_ogreEngineItem;
 
+    QColor m_backgroundColor;
     QSize m_size;
 
     Ogre::Camera* m_camera;

@@ -19,7 +19,8 @@ ProjectManager::ProjectManager(OgreEngine* engine) :
     QObject(0),
     mScenarioManager(engine),
     mKnowledgeService(mScenarioManager),
-    mActorService(mScenarioManager)
+    mActorService(mScenarioManager),
+    mSelectedActor(NULL)
 {
     assert(thread() == engine->thread());
 
@@ -54,6 +55,11 @@ ProjectManager::~ProjectManager()
     }
 }
 
+Actor* ProjectManager::getSelectedActor()
+{
+    return mSelectedActor;
+}
+
 void ProjectManager::selectActorAtClickpoint(float mouseX, float mouseY, Ogre::Camera* camera)
 {
     if(!camera)
@@ -66,12 +72,13 @@ void ProjectManager::selectActorAtClickpoint(float mouseX, float mouseY, Ogre::C
 
     Ogre::Ray mouseRay = camera->getCameraToViewportRay(mouseX, mouseY);
 
-    Actor* actor = mScenarioManager.getCurrentScene()->raycast(mouseRay.getOrigin(), mouseRay.getDirection()).actor;
+    mSelectedActor = mScenarioManager.getCurrentScene()->raycast(mouseRay.getOrigin(), mouseRay.getDirection()).actor;
 
-    if(actor)
+    if(mSelectedActor)
     {
-        qDebug() << "Clicked " << actor->getName();
-        actor->toggleHighlight(!actor->getSceneNode()->getShowBoundingBox());
+        qDebug() << "Clicked " << mSelectedActor->getName();
+        mSelectedActor->toggleHighlight(!mSelectedActor->getSceneNode()->getShowBoundingBox());
+        emit(inspectorSelectionChanged(mSelectedActor->getName(), mSelectedActor->getKnowledge()));
     }
     else
     {

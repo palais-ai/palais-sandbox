@@ -10,7 +10,7 @@ Rectangle {
     height: 40
     radius: 2
 
-    Text {
+    NativeText {
         id: buttonText
         anchors.centerIn: parent
         color: "white"

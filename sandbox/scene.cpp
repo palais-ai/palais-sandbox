@@ -73,6 +73,17 @@ Scene::~Scene()
     }
 }
 
+void Scene::makePlan(Actor* actor)
+{
+    if(!actor)
+    {
+        qWarning() << "Actor must be initialized";
+        return;
+    }
+
+
+}
+
 void Scene::setCameraFocus(Actor* actor)
 {
     if(!actor)
@@ -173,30 +184,11 @@ static ailib::real_type euclideanHeuristic(const OgreHelper::NavigationGraph::no
 
 void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
 {
-    const OgreHelper::NavigationGraph::node_type* start = OgreHelper::getNavNodeClosestToPoint(mNavMesh,
-                                                                                               actor->getPosition());
-    if(!start)
-    {
-        qWarning() << "Actor [ "
-                   << actor->getName()
-                   << " ]'s start position is not covered by the navmesh. No valid path could be calculated.";
-        return;
-    }
-
-    const OgreHelper::NavigationGraph::node_type* goal = OgreHelper::getNavNodeClosestToPoint(mNavMesh,
-                                                                                              target);
-    if(!goal)
-    {
-        qWarning() << "Target position "
-                   << Ogre::StringConverter::toString(target).c_str()
-                   << " is not covered by the navmesh. No valid path could be calculated.";
-        return;
-    }
-
-    ailib::AStar<OgreHelper::NavigationGraph> astar(mNavMesh);
-    ailib::AStar<OgreHelper::NavigationGraph>::path_type path = astar.findPath(start,
-                                                                               goal,
-                                                                               euclideanHeuristic);
+    bool isAlreadyThere;
+    ailib::AStar<OgreHelper::NavigationGraph>::path_type path = OgreHelper::planPath(mNavMesh,
+                                                                                     actor->getPosition(),
+                                                                                     target,
+                                                                                     &isAlreadyThere);
 
     qDebug() << "Path size is " << path.size() << "hops.";
 
@@ -208,7 +200,7 @@ void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
         return;
     }
 
-    if(path.size() == 1 && path[0] == start)
+    if(isAlreadyThere)
     {
         qDebug() << "Target triangle has already been reached.";
         actor->setKnowledge("movement_target", QVariant::fromValue(target));
@@ -409,7 +401,7 @@ void Scene::destroy(Actor* actor)
 
     const int index = mActors.values().indexOf(actor);
 
-    beginRemoveRows( QModelIndex(), index, index);
+    beginRemoveRows(QModelIndex(), index, index);
     mActors.remove(actor->getName());
     endRemoveRows();
 }

@@ -74,6 +74,7 @@ ApplicationWindow {
         property color slightlyDimmedTextColor: "#CCffffff"
         property color stronglyDimmedTextColor: "#40ffffff"
         property color lightGray: '#a7a7a7'
+        property color gray: '#4c4c4c'
         property color darkGray: '#3b3b3b'
         property color darkerGray: '#303030'
         property color black95: '#111111'
@@ -83,6 +84,7 @@ ApplicationWindow {
     Item {
         id: sizes
         property int sidebarWidth: 210
+        property int inspectorWidth: sidebarWidth
         property int sidebarCellHeight: 30
     }
 
@@ -111,7 +113,6 @@ ApplicationWindow {
 
     Item {
         anchors.fill: parent
-        //spacing: 0
 
         ControlArea {
             id: controlArea
@@ -143,7 +144,7 @@ ApplicationWindow {
             orientation: Qt.Vertical
 
             handleDelegate: ListSeparator {
-                handleSize: 2
+                handleSize: 1
                 handleColor: colors.black95
             }
 
@@ -188,7 +189,7 @@ ApplicationWindow {
         InspectorArea {
             id: inspectorArea
             height: parent.height
-            width: sizes.sidebarWidth
+            width: sizes.inspectorWidth
             anchors.left: centerArea.right
             anchors.top: parent.top
 

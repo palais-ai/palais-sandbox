@@ -76,6 +76,7 @@ public:
     Q_INVOKABLE RaycastResult raycast(const Ogre::Vector3& origin,
                                       const Ogre::Vector3& direction);
     Q_INVOKABLE void moveActor(Actor* actor, const Ogre::Vector3& target);
+    Q_INVOKABLE void makePlan(Actor* actor);
 
     void setup();
     void update(float time);

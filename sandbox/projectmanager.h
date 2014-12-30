@@ -10,6 +10,7 @@
 
 #include "../libqjsonrpc/src/qjsonrpclocalserver.h"
 
+class Actor;
 class OgreEngine;
 class Scene;
 
@@ -23,6 +24,7 @@ class ProjectManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool playing READ isPlaying NOTIFY onPlayingChanged)
+    Q_PROPERTY(Actor* selectedActor READ getSelectedActor)
 public:
     explicit ProjectManager(OgreEngine* engine);
     ~ProjectManager();
@@ -37,6 +39,8 @@ public:
     void pause();
     Q_INVOKABLE void setSimulationSpeed(float speedFactor);
     Q_INVOKABLE void reloadProject();
+
+    Actor* getSelectedActor();
 signals:
     void startSceneLoad(const QString& sceneFile,
                         const QString& logicFile);
@@ -46,6 +50,8 @@ signals:
                          const QString& sceneFile,
                          const QString& logicFile);
     void onPlayingChanged(bool isPlaying);
+    void inspectorSelectionChanged(const QString& name,
+                                   const QVariantMap& knowledge);
 public slots:
     void onOpenProject(const QUrl& url);
     void onBeforeSceneLoadFinished(const QString& name,
@@ -57,6 +63,7 @@ private:
     KnowledgeService mKnowledgeService;
     ActorService mActorService;
     QJsonRpcLocalServer mServer;
+    Actor* mSelectedActor;
 };
 
 #endif // PROJECTMANAGER_H

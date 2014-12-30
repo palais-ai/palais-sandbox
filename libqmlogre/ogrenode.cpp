@@ -31,6 +31,7 @@ OgreNode::OgreNode(float fboCreationDelay)
     , m_geometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4)
     , m_texture(0)
     , m_ogreEngineItem(0)
+    , m_backgroundColor(QColor::fromRgbF(0,0,0))
     , m_camera(0)
     , m_renderTarget(0)
     , m_ogreFboId(0)
@@ -125,7 +126,9 @@ void OgreNode::resetViewport()
 
     m_renderTarget->addViewport(m_camera);
     m_renderTarget->getViewport(0)->setClearEveryFrame(true);
-    m_renderTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue(0.5, 0.5, 0.5));
+    m_renderTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue(m_backgroundColor.redF(),
+                                                                          m_backgroundColor.greenF(),
+                                                                          m_backgroundColor.blueF()));
     m_renderTarget->getViewport(0)->setOverlaysEnabled(false);
 }
 
@@ -262,6 +265,11 @@ void OgreNode::updateFBO()
 void OgreNode::setCamera(Ogre::Camera *camera)
 {
     m_camera = camera;
+}
+
+void OgreNode::setBackgroundColor(QColor color)
+{
+    m_backgroundColor = color;
 }
 
 QSize OgreNode::size() const

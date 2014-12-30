@@ -17,6 +17,11 @@
         <file>ActorTable.qml</file>
         <file>ControlAreaBeforeLoad.qml</file>
         <file>CallToActionButton.qml</file>
+        <file>InspectorTableHeader.qml</file>
+        <file>InspectorTableCell.qml</file>
+        <file>NativeText.qml</file>
+        <file>ConsoleTableHeader.qml</file>
+        <file>ConsoleTableCell.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>sandbox-bg.jpg</file>

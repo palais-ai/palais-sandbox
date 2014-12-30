@@ -2,6 +2,8 @@
 #include "projectmanager.h"
 #include "scene.h"
 #include "actor.h"
+#include "inspectormodel.h"
+#include "consolemodel.h"
 
 #include <QtGui/QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -25,7 +27,9 @@ Application::Application(QObject *parent) :
     mOgreEngine(NULL),
     mSceneManager(NULL),
     mProjectManager(NULL),
-    mRoot(NULL)
+    mRoot(NULL),
+    mInspectorModel(NULL),
+    mConsoleModel(new ConsoleModel())
 {
     ;
 }
@@ -62,6 +66,8 @@ int Application::onApplicationStarted(int argc, char **argv)
     QQmlApplicationEngine engine;
     mApplicationEngine = &engine;
 
+    ConsoleModel::declareQML();
+    mApplicationEngine->rootContext()->setContextProperty("ConsoleModel", mConsoleModel.data());
     mApplicationEngine->rootContext()->setContextProperty("ApplicationWrapper", this);
     mApplicationEngine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
@@ -130,6 +136,9 @@ void Application::initializeOgre()
 
     QObject::connect(mProjectManager, SIGNAL(beforeSceneLoad(QString, QString, QString)),
                      this, SLOT(onBeforeSceneLoad(QString, QString, QString)));
+
+    QObject::connect(mProjectManager, &ProjectManager::inspectorSelectionChanged,
+                     this, &Application::onInspectorSelectionChanged);
 
     QObject::connect(this, SIGNAL(beforeSceneLoadFinished(QString, QString, QString)),
                      mProjectManager, SLOT(onBeforeSceneLoadFinished(QString,QString,QString)));
@@ -239,12 +248,29 @@ void Application::onSceneLoaded(Scene* scene)
     camera->fitToContain(mSceneManager->getRootSceneNode());
     mOgreEngine->unlockEngine();
 
-    // We need a proxy model, since the scene resides in the ogre thread, but updates must be made in the GUI thread.
+    mInspectorModel.reset(new InspectorModel("Scenario",
+                                             scene->getKnowledge()));
+
+    // We need a proxy model, since the scene resides in the ogre thread,
+    // but updates must be made in the GUI thread.
     mActorProxyModel.setSourceModel(scene);
     mApplicationEngine->rootContext()->setContextProperty("ActorModel", &mActorProxyModel);
     mApplicationEngine->rootContext()->setContextProperty("Scene", scene);
+    mApplicationEngine->rootContext()->setContextProperty("InspectorModel",
+                                                          mInspectorModel.data());
 
     emit(onSceneLoadedChanged(getSceneLoaded()));
+}
+
+void Application::onInspectorSelectionChanged(const QString& name,
+                                              const QVariantMap& knowledge)
+{
+    InspectorModel* oldModel = mInspectorModel.take();
+    mInspectorModel.reset(new InspectorModel(name, knowledge));
+    mApplicationEngine->rootContext()->setContextProperty("InspectorModel",
+                                                          mInspectorModel.data());
+
+    delete oldModel;
 }
 
 bool Application::getSceneLoaded() const

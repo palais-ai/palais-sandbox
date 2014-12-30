@@ -22,6 +22,7 @@ class OgreItem : public QQuickItem
     Q_OBJECT
 
     Q_PROPERTY(QObject* camera READ camera WRITE setCamera)
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor)
     Q_PROPERTY(OgreEngine* ogreEngine READ ogreEngine WRITE setOgreEngine)
 
 public:
@@ -29,6 +30,9 @@ public:
 
     QObject* camera() const;
     void setCamera(QObject* camera);
+
+    QColor backgroundColor() const;
+    void setBackgroundColor(QColor color);
 
     OgreEngine* ogreEngine() const;
     void setOgreEngine(OgreEngine* ogreEngine);
@@ -40,6 +44,7 @@ private slots:
     void windowChanged(QQuickWindow* window);
 
 private:
+    QColor m_backgroundColor;
     OgreCameraWrapper* m_camera;
     OgreNode* mLastNode;
     OgreEngine* m_ogreEngineItem;

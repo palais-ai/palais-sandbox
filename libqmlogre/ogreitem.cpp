@@ -12,6 +12,7 @@
 
 OgreItem::OgreItem(QQuickItem *parent)
     : QQuickItem(parent)
+    , m_backgroundColor(QColor::fromRgbF(0,0,0))
     , m_camera(0)
     , mLastNode(0)
     , m_ogreEngineItem(0)
@@ -25,6 +26,16 @@ OgreItem::OgreItem(QQuickItem *parent)
 void OgreItem::windowChanged(QQuickWindow *window)
 {
     connect(window, &QQuickWindow::frameSwapped, this, &OgreItem::update);
+}
+
+QColor OgreItem::backgroundColor() const
+{
+    return m_backgroundColor;
+}
+
+void OgreItem::setBackgroundColor(QColor color)
+{
+    m_backgroundColor = color;
 }
 
 OgreEngine* OgreItem::ogreEngine() const
@@ -54,6 +65,7 @@ QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 
     node->setSize(QSize(width(), height()));
     node->setCamera(m_camera->camera());
+    node->setBackgroundColor(m_backgroundColor);
     node->update();
 
     // mark texture dirty, otherwise Qt will not trigger a redraw (preprocess())

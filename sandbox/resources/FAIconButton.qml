@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-Text {
+NativeText {
     id: icon
 
     signal pressed()
@@ -11,7 +11,6 @@ Text {
     font.pointSize: iconSize
     text: unicode
     color: colors.dimmedTextColor
-    //renderType: Text.NativeRendering
     height: iconSize
     width: iconSize
     clip: true
