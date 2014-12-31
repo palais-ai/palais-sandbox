@@ -25,8 +25,6 @@ material Material.002
             lighting on
             normalise_normals off
             polygon_mode solid
-            scene_blend one zero
-            scene_blend_op add
             shading gouraud
             transparent_sorting on
 
@@ -35,7 +33,6 @@ material Material.002
                 texture crate.jpg
                 tex_address_mode wrap
                 scale 1.0 1.0
-                colour_op modulate
             }
         }
     }

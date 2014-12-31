@@ -24,6 +24,21 @@ private:
     Ogre::Vector3 mVector;
 };
 
+class OgreVector3ArrayModel : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(int length READ length)
+public:
+    static void declareQML();
+
+    OgreVector3ArrayModel(const QVector<Ogre::Vector3>& vectors = QVector<Ogre::Vector3>());
+
+    Q_INVOKABLE OgreVector3Model* get(size_t idx) const;
+    Q_INVOKABLE int length() const;
+private:
+    QVector<Ogre::Vector3> mVectors;
+};
+
 class InspectorModel : public QAbstractListModel
 {
     Q_OBJECT

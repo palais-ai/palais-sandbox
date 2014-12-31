@@ -2,8 +2,7 @@
 #include "actor.h"
 #include "application.h"
 #include "javascriptbindings.h"
-#include "ogrehelper.h"
-#include "timedlogger.h"
+#include "utility/timedlogger.h"
 #include "astar.h"
 
 #include <cassert>

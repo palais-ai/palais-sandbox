@@ -1,8 +1,34 @@
 #include "consolemodel.h"
 
-ConsoleModel::ConsoleModel() :
-    mPassedTime(0,0,0,0)
+ConsoleModel::LogEntry::LogEntry(const QString& message,
+                                 ConsoleModel::LogLevel level) :
+    message(message),
+    level(level)
 {
+    ;
+}
+
+void ConsoleModel::declareQML()
+{
+    qmlRegisterType<ConsoleModel>("Console", 1, 0,
+                                  "ConsoleModel");
+}
+
+ConsoleModel::ConsoleModel() :
+    mPassedTime(0,0,0,0),
+    mIsLogging(false)
+{
+}
+
+void ConsoleModel::onMessageReceived(LogLevel level, const QString& msg)
+{
+    // Guard from endless chains of logs when a log triggers another log.
+    if(!mIsLogging)
+    {
+        mIsLogging = true;
+        log(msg, level);
+        mIsLogging = false;
+    }
 }
 
 void ConsoleModel::onTimePassed(const QTime& passedTime)
@@ -23,6 +49,8 @@ void ConsoleModel::log(const QString& message, LogLevel level)
     beginInsertRows(QModelIndex(), index, index);
     mLog += LogEntry(message, level);
     endInsertRows();
+
+    emit onFinishedMessage();
 }
 
 QHash<int, QByteArray> ConsoleModel::roleNames() const

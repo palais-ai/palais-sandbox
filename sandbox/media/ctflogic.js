@@ -53,6 +53,7 @@ function onStart() {
 	spawnTeam(teamSize, spawn_team2.position)
 
 	print(Cube_000.position)
+	cubePosition = Cube_059.position
 
 	scene.setKnowledge("hi", true);
 	scene.setKnowledge("hi2", 1);
@@ -100,13 +101,10 @@ function updateActor(deltaTime, actor) {
 function update(deltaTime) {
 	testRaycast()
 
-	var actors = scene.actors
+	var actors = scene.getActorsArray()
 	for(var i = 0; i < actors.length; ++i) {
 		updateActor(deltaTime, actors[i]);
 	}
-
-	Cube_000.position = new Vector3(0, 0 , 5)
-	Cube_000.setScale(10)
 
 	clearInterval(timer)
 }

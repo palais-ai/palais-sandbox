@@ -15,7 +15,7 @@ void OgreVector3Model::declareQML()
 {
     qmlRegisterUncreatableType<OgreVector3Model>("Inspector", 1, 0,
                                                  "OgreVector3",
-                                                 "Cant instantiate ogrevector3.");
+                                                 "Can't instantiate ogrevector3.");
 }
 
 OgreVector3Model::OgreVector3Model(const Ogre::Vector3& vector) :
@@ -38,9 +38,33 @@ float OgreVector3Model::getZ() const
     return mVector.z;
 }
 
+void OgreVector3ArrayModel::declareQML()
+{
+    qmlRegisterUncreatableType<OgreVector3Model>("Inspector", 1, 0,
+                                                 "OgreVector3Array",
+                                                 "Can't instantiate ogrevector3array.");
+}
+
+OgreVector3ArrayModel::OgreVector3ArrayModel(const QVector<Ogre::Vector3>& vectors) :
+    mVectors(vectors)
+{
+    setObjectName("Array<Vector3>");
+}
+
+OgreVector3Model* OgreVector3ArrayModel::get(size_t idx) const
+{
+    return new OgreVector3Model(mVectors[idx]);
+}
+
+int OgreVector3ArrayModel::length() const
+{
+    return mVectors.size();
+}
+
 void InspectorModel::declareQML()
 {
     OgreVector3Model::declareQML();
+    OgreVector3ArrayModel::declareQML();
 }
 
 InspectorModel::InspectorModel(const QString& name,
@@ -100,7 +124,16 @@ QVariant InspectorModel::data(const QModelIndex &index, int role) const
 
         if(data.canConvert<Ogre::Vector3>())
         {
-            return QVariant::fromValue(new OgreVector3Model(data.value<Ogre::Vector3>()));
+            OgreVector3Model* model = new OgreVector3Model(data.value<Ogre::Vector3>());
+            QQmlEngine::setObjectOwnership(model, QQmlEngine::JavaScriptOwnership);
+            return QVariant::fromValue(model);
+        }
+
+        if(data.canConvert<QVector<Ogre::Vector3> >())
+        {
+            OgreVector3ArrayModel* model = new OgreVector3ArrayModel(data.value<QVector<Ogre::Vector3> >());
+            QQmlEngine::setObjectOwnership(model, QQmlEngine::JavaScriptOwnership);
+            return QVariant::fromValue(model);
         }
 
         return data;

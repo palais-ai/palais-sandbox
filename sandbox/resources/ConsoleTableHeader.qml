@@ -1,8 +1,8 @@
 import QtQuick 2.0
 
 Rectangle {
-    height: childrenRect.height
-    color: "transparent"
+    height: childrenRect.height + separator.anchors.topMargin
+    color: colors.darkGray
 
     NativeText {
         id: consoleText
@@ -32,6 +32,7 @@ Rectangle {
     }
 
     ListSeparator {
+        id: separator
         anchors.top: consoleText.bottom
         anchors.topMargin: 2
         handleColor: colors.black95

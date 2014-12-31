@@ -10,7 +10,7 @@ ApplicationWindow {
     height: 660
     visible: true
     title: "AI Sandbox"
-    color: "black"
+    color: colors.gray
 
     minimumWidth: 1024
     minimumHeight: 660
@@ -110,6 +110,11 @@ ApplicationWindow {
         source: "qrc:/fonts/FontAwesome/fontawesome-webfont.ttf"
     }
 
+    FontLoader {
+        id: sourceSans
+        source: "qrc:/fonts/source-sans/SourceCodePro-Regular.ttf"
+    }
+
 
     Item {
         anchors.fill: parent
@@ -162,7 +167,8 @@ ApplicationWindow {
 
             ConsoleArea {
                 id: consoleArea
-                Layout.minimumHeight: 115
+                z: mainLoader.z - 1
+                Layout.minimumHeight: 150
 
                 /**
                 Behavior on height {

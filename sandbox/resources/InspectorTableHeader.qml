@@ -13,7 +13,7 @@ Rectangle {
 
     NativeText {
         id: scenarioText
-        text: "Inspector"
+        text: "Knowledge"
         font.family: openSans.name
         font.capitalization: Font.AllUppercase
         font.pointSize: 12
@@ -74,13 +74,11 @@ Rectangle {
 
         NativeText {
             id: emptyText
-            width: headerColumn.width - emptyIcon.width - emptyIcon.anchors.leftMargin * 2
             anchors.top: parent.top
             anchors.left: emptyIcon.right
             anchors.leftMargin: 8
             text: "Contains " + InspectorModel.size + " knowledge items."
             font.family: openSans.name
-            wrapMode: Text.WordWrap
             font.pointSize: 12
             color: colors.lightGray
             visible: isSizeInformationVisible

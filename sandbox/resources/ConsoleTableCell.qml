@@ -3,12 +3,12 @@ import Console 1.0
 import Inspector 1.0
 
 Rectangle {
-    width: childrenRect.width
-    height: childrenRect.height
+    color: colors.darkGray
+    height: childrenRect.height + separator.anchors.topMargin
 
     NativeText {
         id: logIcon
-        anchors.verticalCenter: emptyText.verticalCenter
+        anchors.verticalCenter: logText.verticalCenter
         anchors.verticalCenterOffset: 2
         anchors.left: parent.left
         anchors.leftMargin: 8
@@ -20,13 +20,13 @@ Rectangle {
         function getIconForLogLevel(loglevel) {
             switch(loglevel)
             {
-            case Console.LogLevelInfo:
+            case ConsoleModel.LogLevelInfo:
                 return "\uf05a"
-            case Console.LogLevelDebug:
+            case ConsoleModel.LogLevelDebug:
                 return "\uf013"
-            case Console.LogLevelWarning:
+            case ConsoleModel.LogLevelWarning:
                 return "\uf071"
-            case Console.LogLevelError:
+            case ConsoleModel.LogLevelError:
                 return "\uf057"
             }
         }
@@ -34,12 +34,13 @@ Rectangle {
 
     NativeText {
         id: logText
-        width: headerColumn.width - emptyIcon.width - emptyIcon.anchors.leftMargin * 2
+        width: parent.width - logIcon.width - logIcon.anchors.leftMargin * 2
         anchors.top: parent.top
-        anchors.left: emptyIcon.right
+        anchors.topMargin: 2
+        anchors.left: logIcon.right
         anchors.leftMargin: 8
         text: message
-        font.family: openSans.name
+        font.family: sourceSans.name
         wrapMode: Text.WordWrap
         font.pointSize: 12
         color: colors.lightGray
@@ -48,5 +49,6 @@ Rectangle {
     ListSeparator {
         id: separator
         anchors.top: logText.bottom
+        anchors.topMargin: 2
     }
 }

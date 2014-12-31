@@ -38,7 +38,7 @@
         <file>open-sans/OpenSans-Regular.ttf</file>
         <file>open-sans/OpenSans-Semibold.ttf</file>
         <file>open-sans/OpenSans-SemiboldItalic.ttf</file>
-        <file>Deftone-Stylus/DEFTONE.ttf</file>
         <file>FontAwesome/fontawesome-webfont.ttf</file>
+        <file>source-sans/SourceCodePro-Regular.ttf</file>
     </qresource>
 </RCC>

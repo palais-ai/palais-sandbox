@@ -1,8 +1,8 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "ogrehelper.h"
-#include "DebugDrawer.h"
+#include "utility/ogrehelper.h"
+#include "utility/DebugDrawer.h"
 
 #include <QVariant>
 #include <QScriptEngine>
@@ -16,7 +16,8 @@
 class Actor;
 class OgreEngine;
 
-namespace Ogre {
+namespace Ogre
+{
 class SceneNode;
 class RaySceneQuery;
 }

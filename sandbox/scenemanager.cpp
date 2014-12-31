@@ -2,7 +2,7 @@
 #include "sceneloader.h"
 #include "scene.h"
 #include "application.h"
-#include "timedlogger.h"
+#include "utility/timedlogger.h"
 
 #include "../libqmlogre/ogreengine.h"
 

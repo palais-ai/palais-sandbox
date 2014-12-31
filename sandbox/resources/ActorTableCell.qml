@@ -9,7 +9,9 @@ Rectangle {
     color: colors.darkGray
 
     Behavior on color {
-        ColorAnimation { duration: 200 }
+        ColorAnimation {
+            duration: 200
+        }
     }
 
     MouseArea {
@@ -17,12 +19,6 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: actorCell.pressed()
-        onEntered: {
-            Scene.toggleHighlight(true, index);
-        }
-        onExited: {
-            Scene.toggleHighlight(false, index);
-        }
     }
 
     NativeText {

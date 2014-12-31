@@ -9,7 +9,8 @@ class OgreEngine;
 class Scene;
 class QTimerEvent;
 
-namespace Ogre {
+namespace Ogre
+{
 class SceneManager;
 }
 

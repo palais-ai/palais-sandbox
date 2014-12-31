@@ -3,7 +3,7 @@ import QtQuick 2.0
 Rectangle {
     id: inspectorCell
     signal pressed()
-    property color textColor: colors.lightGray
+    property color textColor: colors.slightlyDimmedTextColor
     property int horizontalMargin: 8
 
     color: colors.darkGray
@@ -44,8 +44,8 @@ Rectangle {
         anchors.rightMargin: horizontalMargin
         text: typeNameForObject(value)
         font.family: openSans.name
-        font.pointSize: 11
-        color: textColor
+        font.pointSize: 10
+        color: colors.lightGray
     }
 
     ListSeparator {

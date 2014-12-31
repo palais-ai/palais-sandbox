@@ -25,31 +25,14 @@ material Material.001
             lighting on
             normalise_normals off
             polygon_mode solid
-            scene_blend modulate
-            scene_blend_op add
-            shading gouraud
+            shading phong
             transparent_sorting on
 
             texture_unit 
             {
-                texture plane_pattern.jpg
-                tex_address_mode wrap
-                scale 0.1 0.1
-                colour_op modulate
-            }
-            texture_unit 
-            {
-                texture test.png
+                texture plane.jpg
                 tex_address_mode wrap
                 scale 1.0 1.0
-                colour_op modulate
-            }
-            texture_unit 
-            {
-                texture Lightmap.png
-                tex_address_mode wrap
-                scale 1.0 1.0
-                colour_op modulate
             }
         }
     }

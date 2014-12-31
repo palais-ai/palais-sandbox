@@ -4,13 +4,14 @@
 #include <QObject>
 #include <QIdentityProxyModel>
 #include <QScopedPointer>
-
-#include "timedlogger.h"
+#include <QSharedPointer>
 
 class Scene;
 class ProjectManager;
 class InspectorModel;
 class ConsoleModel;
+class TimedLogger;
+class LogHandler;
 
 namespace Ogre
 {
@@ -71,7 +72,8 @@ private:
     Ogre::Root* mRoot;
     QScopedPointer<InspectorModel> mInspectorModel;
     QScopedPointer<ConsoleModel> mConsoleModel;
-    TimedLogger mTimeLogger;
+    QScopedPointer<TimedLogger> mTimeLogger;
+    QSharedPointer<LogHandler> mLogHandler;
 };
 
 #endif // APPLICATION_H

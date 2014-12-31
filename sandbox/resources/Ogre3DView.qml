@@ -16,10 +16,6 @@ Rectangle {
         ogreEngine: OgreEngine
         backgroundColor: colors.gray
 
-        Behavior on opacity { NumberAnimation { } }
-        Behavior on width { NumberAnimation { } }
-        Behavior on height { NumberAnimation { } }
-
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -37,16 +33,22 @@ Rectangle {
                     prevY = mouse.y
                 }
                 if (pressedButtons & Qt.RightButton) {
-                    if (prevY > -1)
-                        ogreitem.camera.zoom = Math.min(6, Math.max(0.1, ogreitem.camera.zoom - (mouse.y - prevY) / 100));
+                    if (prevY > -1) {
+                        var cameraMovement = ogreitem.camera.zoom - (mouse.y - prevY) / 100
+                        ogreitem.camera.zoom = Math.min(6, Math.max(0.1, cameraMovement))
+                    }
+
                     prevY = mouse.y
                 }
             }
             onReleased: {
                 if(prevX == -1 && prevY == -1) {
-                    // No dragging has happened between press and release - interpret this, and only this, as a click on the 3D view
+                    // No dragging has happened between press and release.
+                    // We interpret this as a click on the 3D view.
                     // Coordinates must be in normalized screen coordinates.
-                    ApplicationWrapper.onOgreViewClicked((mouse.x + ogre.x) / ogre.width, (mouse.y + ogre.y) / ogre.height)
+                    var normX = (mouse.x + ogre.x) / ogre.width
+                    var normY = (mouse.y + ogre.y) / ogre.height
+                    ApplicationWrapper.onOgreViewClicked(normX, normY)
                 } else {
                     prevX = -1
                     prevY = -1

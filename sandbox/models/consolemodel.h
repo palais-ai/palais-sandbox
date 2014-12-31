@@ -9,15 +9,19 @@
 class ConsoleModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString passedTimeString READ getPassedTimeString NOTIFY onPassedTimeStringChanged)
+    Q_PROPERTY(QString passedTimeString
+               READ getPassedTimeString
+               NOTIFY onPassedTimeStringChanged)
 public:
-    enum ModelRole {
+    enum ModelRole
+    {
         ModelRoleIndex = Qt::UserRole + 1,
         ModelRoleLevel,
         ModelRoleMessage
     };
 
-    enum LogLevel {
+    enum LogLevel
+    {
         LogLevelDebug = 0,
         LogLevelInfo = 1,
         LogLevelWarning = 2,
@@ -25,11 +29,7 @@ public:
     };
     Q_ENUMS(LogLevel)
 
-    static void declareQML()
-    {
-        qmlRegisterType<ConsoleModel>("Console", 1, 0, "ConsoleModel");
-    }
-
+    static void declareQML();
     ConsoleModel();
 
     QString getPassedTimeString() const;
@@ -43,17 +43,14 @@ public:
     virtual int rowCount(const QModelIndex &parent) const;
 signals:
     void onPassedTimeStringChanged(QString passedTime);
+    void onFinishedMessage();
 public slots:
     void onTimePassed(const QTime& passedTime);
+    void onMessageReceived(LogLevel level, const QString& msg);
 private:
     struct LogEntry
     {
-        LogEntry(const QString& message, LogLevel level) :
-            message(message),
-            level(level)
-        {
-            ;
-        }
+        LogEntry(const QString& message, LogLevel level);
 
         QString message;
         LogLevel level;
@@ -61,6 +58,7 @@ private:
 
     QTime mPassedTime;
     QList<LogEntry> mLog;
+    bool mIsLogging;
 };
 
 #endif // CONSOLEMODEL_H

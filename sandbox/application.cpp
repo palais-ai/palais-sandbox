@@ -2,8 +2,10 @@
 #include "projectmanager.h"
 #include "scene.h"
 #include "actor.h"
-#include "inspectormodel.h"
-#include "consolemodel.h"
+#include "models/inspectormodel.h"
+#include "models/consolemodel.h"
+#include "utility/timedlogger.h"
+#include "utility/loghandler.h"
 
 #include <QtGui/QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -19,7 +21,42 @@
 #include <QtQml/QQmlContext>
 #include <Ogre.h>
 
+Q_DECLARE_METATYPE(ConsoleModel::LogLevel)
+
 const std::string Application::sSceneManagerName = "TheSceneManager";
+
+static QWeakPointer<LogHandler> g_logHandler;
+static void messageHandlerFun(QtMsgType type,
+                              const QMessageLogContext& context,
+                              const QString& msg)
+{
+    ConsoleModel::LogLevel level;
+
+
+    fprintf(stderr, "%s\n", msg.toLocal8Bit().constData());
+
+    switch (type)
+    {
+        case QtDebugMsg:
+            level = ConsoleModel::LogLevelDebug;
+            break;
+        case QtWarningMsg:
+        level = ConsoleModel::LogLevelWarning;
+            break;
+        case QtCriticalMsg:
+        level = ConsoleModel::LogLevelError;
+            break;
+        case QtFatalMsg:
+            level = ConsoleModel::LogLevelError;
+            abort();
+    }
+
+    QSharedPointer<LogHandler> strongHandler = g_logHandler.toStrongRef();
+    if(strongHandler)
+    {
+        strongHandler->broadcastNewMessageReceived(level, msg);
+    }
+}
 
 Application::Application(QObject *parent) :
     QObject(parent),
@@ -29,13 +66,23 @@ Application::Application(QObject *parent) :
     mProjectManager(NULL),
     mRoot(NULL),
     mInspectorModel(NULL),
-    mConsoleModel(new ConsoleModel())
+    mConsoleModel(new ConsoleModel()),
+    mTimeLogger(new TimedLogger()),
+    mLogHandler(new LogHandler())
 {
-    ;
+    qRegisterMetaType<ConsoleModel::LogLevel>();
+
+    g_logHandler = mLogHandler;
+    qInstallMessageHandler(messageHandlerFun);
+
+    connect(mLogHandler.data(), &LogHandler::newMessageReceived,
+            mConsoleModel.data(), &ConsoleModel::onMessageReceived);
 }
 
 Application::~Application()
 {
+    qInstallMessageHandler(0);
+
     if(mProjectManager)
     {
         delete mProjectManager;
@@ -59,7 +106,7 @@ Application::~Application()
 
 int Application::onApplicationStarted(int argc, char **argv)
 {
-    mTimeLogger.start();
+    mTimeLogger->start();
 
     QGuiApplication app(argc, argv);
 
@@ -93,7 +140,7 @@ void Application::initializeSceneManager()
 {
     mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
     mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-    mSceneManager->setAmbientLight(Ogre::ColourValue(0, 0, 0));
+    mSceneManager->setAmbientLight(Ogre::ColourValue(1, 1, 1));
 
     // This fixes some issues with ray casting when using shallow terrain.
     Ogre::AxisAlignedBox box;
@@ -175,7 +222,7 @@ void Application::onOgreIsReady()
 
     QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "onOgreIsReady");
 
-    mTimeLogger.stop("Application Startup");
+    mTimeLogger->stop("Application Startup");
 }
 
 void Application::onOgreViewClicked(float mouseX, float mouseY)
@@ -330,4 +377,3 @@ void Application::onPlayingChanged(bool isPlaying)
 {
     emit onScenePlayingChanged(isPlaying);
 }
-

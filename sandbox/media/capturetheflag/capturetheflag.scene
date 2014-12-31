@@ -1,5 +1,53 @@
-<scene export_time="1418507880.50612" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1418324939.425396" >
+<scene export_time="1419970770.653734" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1419969429.578359" >
   <nodes >
+    <node name="Point2" >
+      <position x="-6.995740" y="4.859993" z="-7.059111" />
+      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
+      <scale x="1.000000" y="1.000000" z="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <light name="Point2" powerScale="10.0" type="point" >
+        <position x="-6.995740" y="4.859993" z="-7.059111" />
+        <lightAttenuation constant="1.0" linear="0.04" quadratic="0.0" range="5000" />
+        <colourDiffuse b="1.0" g="1.0" r="1.0" />
+        <colourSpecular b="1.0" g="1.0" r="1.0" />
+      </light>
+    </node>
+    <node name="Point" >
+      <position x="7.034816" y="4.859993" z="6.862996" />
+      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
+      <scale x="1.000000" y="1.000000" z="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <light name="Point" powerScale="10.0" shadow="true" type="point" >
+        <position x="7.034816" y="4.859993" z="6.862996" />
+        <lightAttenuation constant="1.0" linear="0.04" quadratic="0.0" range="5000" />
+        <colourDiffuse b="1.0" g="1.0" r="1.0" />
+        <colourSpecular b="1.0" g="1.0" r="1.0" />
+        <colourShadow b="1.0" g="1.0" r="1.0" />
+      </light>
+    </node>
+    <node name="Sun" >
+      <position x="0.011189" y="12.339058" z="0.018486" />
+      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
+      <scale x="1.000000" y="1.000000" z="1.000000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <light name="Sun" powerScale="15.0" shadow="true" type="directional" >
+        <position x="0.011189" y="12.339058" z="0.018486" />
+        <lightAttenuation constant="1.0" linear="0.04" quadratic="0.0" range="5000" />
+        <direction x="0.0" y="-1.0" z="0.0" />
+        <colourDiffuse b="1.0" g="1.0" r="1.0" />
+        <colourSpecular b="1.0" g="1.0" r="1.0" />
+        <colourShadow b="1.0" g="1.0" r="1.0" />
+      </light>
+    </node>
     <node name="Navmesh" >
       <position x="0.000000" y="0.000000" z="-0.000000" />
       <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
@@ -29,22 +77,6 @@
         <actuators />
       </game>
       <entity actor="False" anisotropic_friction="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" friction_x="1.0" friction_y="1.0" friction_z="1.0" ghost="False" inertia_tensor="0.4000000059604645" lock_rot_x="False" lock_rot_y="False" lock_rot_z="False" lock_trans_x="False" lock_trans_y="False" lock_trans_z="False" mass="1.0" mass_radius="1.0" meshFile="Cube.mesh" name="Cube" physics_type="STATIC" velocity_max="0.0" velocity_min="0.0" />
-    </node>
-    <node name="Sun" >
-      <position x="-0.082551" y="8.783691" z="-0.269227" />
-      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
-      <scale x="1.000000" y="1.000000" z="1.000000" />
-      <game >
-        <sensors />
-        <actuators />
-      </game>
-      <light name="Sun" powerScale="1.0" type="directional" >
-        <position x="-0.082551" y="8.783691" z="-0.269227" />
-        <lightAttenuation constant="1.0" linear="0.04" quadratic="0.0" range="5000" />
-        <direction x="0.0" y="-1.0" z="0.0" />
-        <colourDiffuse b="1.0" g="1.0" r="1.0" />
-        <colourSpecular b="1.0" g="1.0" r="1.0" />
-      </light>
     </node>
     <node name="Cube.004" >
       <position x="1.692505" y="0.500000" z="0.929147" />
@@ -735,39 +767,6 @@
       </game>
       <entity actor="False" anisotropic_friction="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" friction_x="1.0" friction_y="1.0" friction_z="1.0" ghost="False" inertia_tensor="0.4000000059604645" lock_rot_x="False" lock_rot_y="False" lock_rot_z="False" lock_trans_x="False" lock_trans_y="False" lock_trans_z="False" mass="1.0" mass_radius="1.0" meshFile="Cube.029.mesh" name="Cube.029" physics_type="STATIC" velocity_max="0.0" velocity_min="0.0" />
     </node>
-    <node name="Point" >
-      <position x="-7.465674" y="13.239445" z="5.648348" />
-      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
-      <scale x="1.000000" y="1.000000" z="1.000000" />
-      <game >
-        <sensors />
-        <actuators />
-      </game>
-      <light name="Point" powerScale="10.0" shadow="true" type="point" >
-        <position x="-7.465674" y="13.239445" z="5.648348" />
-        <lightAttenuation constant="1.0" linear="0.04" quadratic="0.0" range="5000" />
-        <colourDiffuse b="1.0" g="1.0" r="1.0" />
-        <colourSpecular b="1.0" g="1.0" r="1.0" />
-        <colourShadow b="1.0" g="1.0" r="1.0" />
-      </light>
-    </node>
-    <node name="Area" >
-      <position x="-0.036093" y="15.881546" z="0.247428" />
-      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
-      <scale x="1.000000" y="1.000000" z="1.000000" />
-      <game >
-        <sensors />
-        <actuators />
-      </game>
-      <light name="Area" powerScale="10.0" shadow="true" type="directional" >
-        <position x="-0.036093" y="15.881546" z="0.247428" />
-        <lightAttenuation constant="1.0" linear="0.06666666666666667" quadratic="0.0" range="5000" />
-        <direction x="0.0" y="-1.0" z="0.0" />
-        <colourDiffuse b="1.0" g="1.0" r="1.0" />
-        <colourSpecular b="1.0" g="1.0" r="1.0" />
-        <colourShadow b="1.0" g="1.0" r="1.0" />
-      </light>
-    </node>
     <node name="Plane" >
       <position x="0.000000" y="0.000000" z="-0.000000" />
       <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
@@ -790,31 +789,16 @@
         <clipping far="100.0" farPlaneDist="100.0" near="0.10000000149011612" nearPlaneDist="0.10000000149011612" />
       </camera>
     </node>
-    <node name="Point.001" >
-      <position x="4.748117" y="12.105970" z="-6.953862" />
-      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
-      <scale x="1.000000" y="1.000000" z="1.000000" />
-      <game >
-        <sensors />
-        <actuators />
-      </game>
-      <light name="Point.001" powerScale="10.0" shadow="true" type="point" >
-        <position x="4.748117" y="12.105970" z="-6.953862" />
-        <lightAttenuation constant="1.0" linear="0.02857142857142857" quadratic="0.0" range="5000" />
-        <colourDiffuse b="1.0" g="1.0" r="1.0" />
-        <colourShadow b="1.0" g="1.0" r="1.0" />
-      </light>
-    </node>
   </nodes>
   <externals >
     <item type="material" >
-      <file name="/Users/patrick/Desktop/capturetheflag/Material.material" />
+      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Material.material" />
     </item>
     <item type="material" >
-      <file name="/Users/patrick/Desktop/capturetheflag/Material.002.material" />
+      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Material.002.material" />
     </item>
     <item type="material" >
-      <file name="/Users/patrick/Desktop/capturetheflag/Material.001.material" />
+      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Material.001.material" />
     </item>
   </externals>
   <environment >
