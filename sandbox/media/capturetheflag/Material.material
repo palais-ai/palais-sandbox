@@ -22,7 +22,7 @@ material Material
             illumination_stage 
             light_clip_planes off
             light_scissor off
-            lighting on
+            lighting off
             normalise_normals off
             polygon_mode wireframe
             shading gouraud

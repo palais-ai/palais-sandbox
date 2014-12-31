@@ -71,12 +71,14 @@ ApplicationWindow {
         property color secondaryColor: "#467b24"
         property color secondaryColorLighter: "#7cef09"
         property color dimmedTextColor: "#3Dffffff"
+        property color almostWhite: "#eeffffff"
         property color slightlyDimmedTextColor: "#CCffffff"
         property color stronglyDimmedTextColor: "#40ffffff"
         property color lightGray: '#a7a7a7'
         property color gray: '#4c4c4c'
         property color darkGray: '#3b3b3b'
         property color darkerGray: '#303030'
+        property color black90: '#1a1a1a'
         property color black95: '#111111'
         property color black75: '#555555'
     }

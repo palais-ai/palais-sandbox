@@ -18,6 +18,15 @@ Rectangle {
         anchors.leftMargin: 8
     }
 
+    FAIconButton {
+        unicode: "\uf014"
+        anchors.left: consoleText.right
+        anchors.leftMargin: 12
+        anchors.verticalCenter: consoleText.verticalCenter
+
+        onPressed: ConsoleModel.clear()
+    }
+
     NativeText {
         id: timeText
         text: ConsoleModel.passedTimeString

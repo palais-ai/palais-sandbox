@@ -45,6 +45,7 @@ signals:
     void onPassedTimeStringChanged(QString passedTime);
     void onFinishedMessage();
 public slots:
+    void clear();
     void onTimePassed(const QTime& passedTime);
     void onMessageReceived(LogLevel level, const QString& msg);
 private:

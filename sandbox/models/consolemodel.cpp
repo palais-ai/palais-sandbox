@@ -43,6 +43,15 @@ QString ConsoleModel::getPassedTimeString() const
     return mPassedTime.toString("mm:ss.zzz");
 }
 
+void ConsoleModel::clear()
+{
+    beginRemoveRows(QModelIndex(), 0, mLog.size() - 1);
+
+    mLog.clear();
+
+    endRemoveRows();
+}
+
 void ConsoleModel::log(const QString& message, LogLevel level)
 {
     int index = mLog.size();

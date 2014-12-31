@@ -40,11 +40,15 @@ ProjectManager::ProjectManager(OgreEngine* engine) :
     mServer.addService(&mActorService);
     if (mServer.listen(serviceName))
     {
-        qDebug() << "Local RPC service listening on " << serviceName << ".";
+        qDebug() << "Local RPC service listening on "
+                 << serviceName << ".";
     }
     else
     {
-        qWarning() << "Couldn't start the sandbox service on " << serviceName << ", because " << mServer.errorString();
+        qWarning() << "Couldn't start the sandbox service on "
+                   << serviceName
+                   << ", because "
+                   << mServer.errorString();
         mServer.close();
     }
 }
@@ -68,7 +72,9 @@ Actor* ProjectManager::getSelectedActor()
     return mSelectedActor;
 }
 
-void ProjectManager::selectActorAtClickpoint(float mouseX, float mouseY, Ogre::Camera* camera)
+void ProjectManager::selectActorAtClickpoint(float mouseX,
+                                             float mouseY,
+                                             Ogre::Camera* camera)
 {
     if(!camera)
     {
@@ -80,13 +86,22 @@ void ProjectManager::selectActorAtClickpoint(float mouseX, float mouseY, Ogre::C
 
     Ogre::Ray mouseRay = camera->getCameraToViewportRay(mouseX, mouseY);
 
-    mSelectedActor = mScenarioManager.getCurrentScene()->raycast(mouseRay.getOrigin(), mouseRay.getDirection()).actor;
+    Actor* oldSelected = mSelectedActor;
+    mSelectedActor = mScenarioManager.getCurrentScene()->raycast(mouseRay.getOrigin(),
+                                                                 mouseRay.getDirection()).actor;
 
     if(mSelectedActor)
     {
         qDebug() << "Clicked " << mSelectedActor->getName();
+
+        if(oldSelected && oldSelected != mSelectedActor)
+        {
+            oldSelected->toggleHighlight(false);
+        }
+
         mSelectedActor->toggleHighlight(!mSelectedActor->getSceneNode()->getShowBoundingBox());
-        emit(inspectorSelectionChanged(mSelectedActor->getName(), mSelectedActor->getKnowledge()));
+        emit(inspectorSelectionChanged(mSelectedActor->getName(),
+                                       mSelectedActor->getKnowledge()));
     }
     else
     {
@@ -137,7 +152,10 @@ void ProjectManager::onOpenProject(const QUrl& url)
 
     if(!file.open(QIODevice::ReadOnly))
     {
-        emit(sceneLoadFailed(QString("Failed to open the project file at %1.").arg(url.toLocalFile())));
+        QString errorMsg = QString("Failed to open the project file at %1.")
+                                    .arg(url.toLocalFile());
+
+        emit(sceneLoadFailed(errorMsg));
         return;
     }
 
@@ -149,8 +167,10 @@ void ProjectManager::onOpenProject(const QUrl& url)
 
     if(error.error != QJsonParseError::NoError)
     {
-        emit(sceneLoadFailed(QString("Failed to parse the project file at %0, because it isn't a JSON document.")
-                             .arg(url.toLocalFile())));
+        QString errorMsg = QString("Failed to parse the project file at %0,\
+                                    because it isn't a JSON document.")
+                                    .arg(url.toLocalFile());
+        emit(sceneLoadFailed(errorMsg));
         return;
     }
 
@@ -160,11 +180,13 @@ void ProjectManager::onOpenProject(const QUrl& url)
     QString sceneFile;
     if(obj.contains(visualPropertyName))
     {
-        sceneFile = url.adjusted(QUrl::RemoveFilename).toLocalFile() + obj[visualPropertyName].toString();
+        sceneFile = url.adjusted(QUrl::RemoveFilename).toLocalFile()
+                    + obj[visualPropertyName].toString();
     }
     else
     {
-        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.")
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0,\
+                                      because it is missing the mandatory property %1.")
                              .arg(url.toLocalFile()).arg(visualPropertyName)));
         return;
     }
@@ -177,11 +199,13 @@ void ProjectManager::onOpenProject(const QUrl& url)
                url.toLocalFile().toStdString().c_str(),
                url.adjusted(QUrl::RemoveFilename).toLocalFile().toStdString().c_str());
 
-        logicFile = url.adjusted(QUrl::RemoveFilename).toLocalFile() + obj[logicPropertyName].toString();
+        logicFile = url.adjusted(QUrl::RemoveFilename).toLocalFile()
+                    + obj[logicPropertyName].toString();
     }
     else
     {
-        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.")
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0,\
+                                      because it is missing the mandatory property %1.")
                              .arg(url.toLocalFile()).arg(logicPropertyName)));
         return;
     }
@@ -194,7 +218,8 @@ void ProjectManager::onOpenProject(const QUrl& url)
     }
     else
     {
-        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.")
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0,\
+                                      because it is missing the mandatory property %1.")
                              .arg(url.toLocalFile()).arg(namePropertyName)));
         return;
     }
@@ -221,7 +246,8 @@ void ProjectManager::onBeforeSceneLoadFinished(const QString& name,
 
     if(!scene)
     {
-        emit(sceneLoadFailed(QString("Failed to load scene %1.").arg(sceneFile)));
+        emit(sceneLoadFailed(QString("Failed to load scene %1.")
+                                     .arg(sceneFile)));
         return;
     }
 

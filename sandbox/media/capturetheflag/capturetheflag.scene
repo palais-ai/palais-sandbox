@@ -1,4 +1,4 @@
-<scene export_time="1419970770.653734" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1419969429.578359" >
+<scene export_time="1420052834.714213" exported_by="patrick" formatVersion="1.0.1" previous_export_time="1419969429.578359" >
   <nodes >
     <node name="Point2" >
       <position x="-6.995740" y="4.859993" z="-7.059111" />
@@ -57,26 +57,6 @@
         <actuators />
       </game>
       <entity actor="False" anisotropic_friction="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" friction_x="1.0" friction_y="1.0" friction_z="1.0" ghost="False" inertia_tensor="0.4000000059604645" lock_rot_x="False" lock_rot_y="False" lock_rot_z="False" lock_trans_x="False" lock_trans_y="False" lock_trans_z="False" mass="1.0" mass_radius="1.0" meshFile="Mesh.003.mesh" name="Mesh.003" physics_type="NAVMESH" velocity_max="0.0" velocity_min="0.0" />
-    </node>
-    <node name="spawn_team1" >
-      <position x="6.400911" y="1.002838" z="5.955466" />
-      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
-      <scale x="0.100000" y="0.100000" z="0.100000" />
-      <game >
-        <sensors />
-        <actuators />
-      </game>
-      <entity actor="False" anisotropic_friction="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" friction_x="1.0" friction_y="1.0" friction_z="1.0" ghost="False" inertia_tensor="0.4000000059604645" lock_rot_x="False" lock_rot_y="False" lock_rot_z="False" lock_trans_x="False" lock_trans_y="False" lock_trans_z="False" mass="1.0" mass_radius="1.0" meshFile="Cube.001.mesh" name="Cube.001" physics_type="STATIC" velocity_max="0.0" velocity_min="0.0" />
-    </node>
-    <node name="spawn_team2" >
-      <position x="-6.525959" y="1.002838" z="-6.405465" />
-      <rotation qw="1.000000" qx="0.000000" qy="0.000000" qz="-0.000000" />
-      <scale x="0.100000" y="0.100000" z="0.100000" />
-      <game >
-        <sensors />
-        <actuators />
-      </game>
-      <entity actor="False" anisotropic_friction="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" friction_x="1.0" friction_y="1.0" friction_z="1.0" ghost="False" inertia_tensor="0.4000000059604645" lock_rot_x="False" lock_rot_y="False" lock_rot_z="False" lock_trans_x="False" lock_trans_y="False" lock_trans_z="False" mass="1.0" mass_radius="1.0" meshFile="Cube.mesh" name="Cube" physics_type="STATIC" velocity_max="0.0" velocity_min="0.0" />
     </node>
     <node name="Cube.004" >
       <position x="1.692505" y="0.500000" z="0.929147" />
@@ -777,17 +757,25 @@
       </game>
       <entity actor="False" anisotropic_friction="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" friction_x="1.0" friction_y="1.0" friction_z="1.0" ghost="False" inertia_tensor="0.4000000059604645" lock_rot_x="False" lock_rot_y="False" lock_rot_z="False" lock_trans_x="False" lock_trans_y="False" lock_trans_z="False" mass="1.0" mass_radius="1.0" meshFile="Plane.mesh" name="Plane" physics_type="STATIC" velocity_max="0.0" velocity_min="0.0" />
     </node>
-    <node name="Camera" >
-      <position x="7.481132" y="5.343665" z="6.507640" />
-      <rotation qw="0.781600" qx="0.481707" qy="0.334251" qz="-0.212922" />
-      <scale x="1.000000" y="1.000000" z="1.000000" />
+    <node name="flag_green" >
+      <position x="-6.479202" y="0.000000" z="-6.481775" />
+      <rotation qw="0.382683" qx="0.000000" qy="0.923880" qz="-0.000000" />
+      <scale x="0.200000" y="0.200000" z="0.200000" />
       <game >
         <sensors />
         <actuators />
       </game>
-      <camera fov="0.5033799435163735" name="Camera" projectionType="perspective" >
-        <clipping far="100.0" farPlaneDist="100.0" near="0.10000000149011612" nearPlaneDist="0.10000000149011612" />
-      </camera>
+      <entity actor="False" anisotropic_friction="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" friction_x="1.0" friction_y="1.0" friction_z="1.0" ghost="False" inertia_tensor="0.4000000059604645" lock_rot_x="False" lock_rot_y="False" lock_rot_z="False" lock_trans_x="False" lock_trans_y="False" lock_trans_z="False" mass="1.0" mass_radius="1.0" meshFile="Cylinder.004.mesh" name="Cylinder.004" physics_type="STATIC" velocity_max="0.0" velocity_min="0.0" />
+    </node>
+    <node name="flag_red" >
+      <position x="6.380528" y="0.000000" z="5.994114" />
+      <rotation qw="0.923880" qx="0.000000" qy="-0.382683" qz="-0.000000" />
+      <scale x="0.200000" y="0.200000" z="0.200000" />
+      <game >
+        <sensors />
+        <actuators />
+      </game>
+      <entity actor="False" anisotropic_friction="False" damping_rot="0.10000000149011612" damping_trans="0.03999999910593033" friction_x="1.0" friction_y="1.0" friction_z="1.0" ghost="False" inertia_tensor="0.4000000059604645" lock_rot_x="False" lock_rot_y="False" lock_rot_z="False" lock_trans_x="False" lock_trans_y="False" lock_trans_z="False" mass="1.0" mass_radius="1.0" meshFile="Cylinder.000.mesh" name="Cylinder.000" physics_type="STATIC" velocity_max="0.0" velocity_min="0.0" />
     </node>
   </nodes>
   <externals >
@@ -800,10 +788,22 @@
     <item type="material" >
       <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Material.001.material" />
     </item>
+    <item type="material" >
+      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Wood.material" />
+    </item>
+    <item type="material" >
+      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/FlagMat.material" />
+    </item>
+    <item type="material" >
+      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/Wood.001.material" />
+    </item>
+    <item type="material" >
+      <file name="/Users/patrick/Documents/projects/AISandbox/sandbox/media/capturetheflag/FlagMat.001.material" />
+    </item>
   </externals>
   <environment >
     <colourAmbient b="0.0" g="0.0" r="0.0" />
-    <colourDiffuse b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
     <colourBackground b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
+    <colourDiffuse b="0.05087608844041824" g="0.05087608844041824" r="0.05087608844041824" />
   </environment>
 </scene>

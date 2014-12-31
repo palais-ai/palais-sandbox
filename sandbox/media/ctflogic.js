@@ -27,7 +27,7 @@ function spawnFighter(startPos, teamColor) {
 	lookAtPos.z *= 2
 	actor.lookAt(lookAtPos);
 
-	scene.moveActor(actor, teamColor == "red" ? spawn_team2.position : spawn_team1.position);
+	scene.moveActor(actor, teamColor == "red" ? flag_green.position : flag_red.position);
 }
 
 function spawnTeam(teamSize, startPos) {
@@ -49,8 +49,8 @@ function testRaycast() {
 var timer;
 function onStart() {
 	var teamSize = 5;
-	spawnTeam(teamSize, spawn_team1.position)
-	spawnTeam(teamSize, spawn_team2.position)
+	spawnTeam(teamSize, flag_red.position)
+	spawnTeam(teamSize, flag_green.position)
 
 	print(Cube_000.position)
 	cubePosition = Cube_059.position

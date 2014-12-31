@@ -3,7 +3,7 @@ import Console 1.0
 import Inspector 1.0
 
 Rectangle {
-    color: colors.darkGray
+    color: colors.darkerGray
     height: childrenRect.height + separator.anchors.topMargin
 
     NativeText {
@@ -15,7 +15,7 @@ Rectangle {
         text: getIconForLogLevel(level)
         font.family: fontAwesome.name
         font.pointSize: 12
-        color: colors.lightGray
+        color: colors.almostWhite
 
         function getIconForLogLevel(loglevel) {
             switch(loglevel)
@@ -43,11 +43,12 @@ Rectangle {
         font.family: sourceSans.name
         wrapMode: Text.WordWrap
         font.pointSize: 12
-        color: colors.lightGray
+        color: colors.almostWhite
     }
 
     ListSeparator {
         id: separator
+        handleColor: colors.black90
         anchors.top: logText.bottom
         anchors.topMargin: 2
     }
