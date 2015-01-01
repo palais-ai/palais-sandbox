@@ -126,6 +126,7 @@ win32 {
     QMAKE_LIBDIR += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR
     QMAKE_LIBDIR += $$OUT_PWD/../libdotsceneloader/$$M_BUILD_DIR
     QMAKE_LIBDIR += $$OUT_PWD/../libqjsonrpc/src/$$M_BUILD_DIR
+    QMAKE_LIBDIR += $$OUT_PWD/../libmeshmagick/$$M_BUILD_DIR
 }
 
 unix|win32: LIBS += -L$$OUT_PWD/../libqmlogre/ -lqmlogre
@@ -149,7 +150,7 @@ unix|win32: LIBS += -L$$OUT_PWD/../libmeshmagick/ -lmeshmagick
 INCLUDEPATH += $$PWD/../libmeshmagick/include
 DEPENDPATH += $$PWD/../libmeshmagick
 
-win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libmeshmagick/meshmagick.lib
+win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libmeshmagick/$$M_BUILD_DIR/meshmagick.lib
 else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libmeshmagick/libmeshmagick.a
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqjsonrpc/src/release/ -lqjsonrpc1
@@ -160,3 +161,4 @@ INCLUDEPATH += $$PWD/../libqjsonrpc/src
 DEPENDPATH += $$PWD/../libqjsonrpc/src
 
 INCLUDEPATH += ../../smastar/
+INCLUDEPATH += $$PWD

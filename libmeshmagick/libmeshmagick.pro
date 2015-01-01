@@ -3,6 +3,8 @@ TEMPLATE = lib
 CONFIG += staticlib
 TARGET = meshmagick
 
+DEFINES += MESHMAGICK_STATIC
+
 HEADERS += include/MeshMagick.h \
 include/MeshMagickPrerequisites.h \
 include/MmEditableBone.h \

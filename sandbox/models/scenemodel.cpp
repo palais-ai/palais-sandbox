@@ -1,6 +1,7 @@
 #include "scenemodel.h"
 
 #include <QtQml>
+#include <stdint.h>
 
 void SceneModel::declareQML()
 {
@@ -41,7 +42,7 @@ Qt::ItemFlags SceneModel::flags(const QModelIndex &index) const
 
 QVariant SceneModel::data(const QModelIndex &index, int role) const
 {
-    uint32_t idx = index.row();
+    int idx = index.row();
     switch(role)
     {
     case ModelRoleIndex:
