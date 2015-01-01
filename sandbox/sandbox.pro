@@ -12,7 +12,6 @@ MOC_DIR = ./.moc
 # This is important for win32 linkage.
 DEFINES -= QJSONRPC_BUILD
 DEFINES += QJSONRPC_SHARED
-CMAKE_CXX_FLAGS += -Wno-unused-variable
 
 SOURCES += main.cpp \
     application.cpp \
@@ -31,7 +30,8 @@ SOURCES += main.cpp \
     utility/DebugDrawer.cpp \
     utility/ogrehelper.cpp \
     utility/fighterplanner.cpp \
-    utility/loghandler.cpp
+    utility/loghandler.cpp \
+    models/scenemodel.cpp
 
 HEADERS += \
     application.h \
@@ -50,7 +50,8 @@ HEADERS += \
     utility/fighterplanner.h \
     utility/ogrehelper.h \
     utility/timedlogger.h \
-    utility/loghandler.h
+    utility/loghandler.h \
+    models/scenemodel.h
 
 OTHER_FILES += \
     config/resources.cfg

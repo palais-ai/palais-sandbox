@@ -41,8 +41,11 @@ Scene::Scene(const QString& name,
     mRoot(root),
     mEngine(engine),
     mRayQuery(Ogre::Root::getSingleton()
-                         .getSceneManager(Application::sSceneManagerName)->createRayQuery(Ogre::Ray())),
-    mDebugDrawer(Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName), 0.5f),
+                         .getSceneManager(Application::sSceneManagerName)
+                         ->createRayQuery(Ogre::Ray())),
+    mDebugDrawer(Ogre::Root::getSingleton()
+                            .getSceneManager(Application::sSceneManagerName),
+                 0.5f),
     mIsSetup(false)
 {
     if(!mEngine)
@@ -50,7 +53,8 @@ Scene::Scene(const QString& name,
         qFatal("Scene requires an engine instance.");
     }
 
-    assert(thread() == mEngine->thread()); // This object must reside in the same thread as the ogre engine
+    // This object must reside in the same thread as the ogre engine.
+    assert(thread() == mEngine->thread());
 
     getActors(mRoot);
     Ogre::Root::getSingleton().addFrameListener(this);
@@ -62,7 +66,9 @@ Scene::~Scene()
 
     if(mRayQuery)
     {
-        Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName)->destroyQuery(mRayQuery);
+        Ogre::Root::getSingleton()
+                   .getSceneManager(Application::sSceneManagerName)
+                   ->destroyQuery(mRayQuery);
         mRayQuery = NULL;
     }
 
@@ -92,11 +98,13 @@ void Scene::setCameraFocus(Actor* actor)
     }
 
     const QString cameraName("cam1");
-    CameraNodeObject* camera = mEngine->getQQuickWindow()->findChild<CameraNodeObject*>(cameraName);
+    CameraNodeObject* camera = mEngine->getQQuickWindow()
+                                      ->findChild<CameraNodeObject*>(cameraName);
 
     if(!camera)
     {
-        qFatal("Couldn't find camera with name (objectName=%s).", cameraName.toStdString().c_str());
+        qFatal("Couldn't find camera with name (objectName=%s).",
+               cameraName.toLocal8Bit().constData());
         return;
     }
 
@@ -105,22 +113,27 @@ void Scene::setCameraFocus(Actor* actor)
 
 bool Scene::frameStarted(const Ogre::FrameEvent& evt)
 {
+    Q_UNUSED(evt);
     mDebugDrawer.build();
+    return true;
 }
 
 bool Scene::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-    ;
+    Q_UNUSED(evt);
+    return true;
 }
 
 bool Scene::frameEnded(const Ogre::FrameEvent& evt)
 {
-    ;
+    Q_UNUSED(evt);
+    return true;
 }
 
 Actor* Scene::getActorForNode(Ogre::SceneNode* node) const
 {
-    for(QMap<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
+    QMap<QString, Actor*>::const_iterator it = mActors.begin();
+    for(; it != mActors.end(); ++it)
     {
         if(it.value()->getSceneNode() == node)
         {
@@ -130,7 +143,8 @@ Actor* Scene::getActorForNode(Ogre::SceneNode* node) const
     return NULL;
 }
 
-RaycastResult Scene::raycast(const Ogre::Vector3& origin, const Ogre::Vector3& direction)
+RaycastResult Scene::raycast(const Ogre::Vector3& origin,
+                             const Ogre::Vector3& direction)
 {
     mEngine->lockEngine();
 
@@ -152,7 +166,8 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin, const Ogre::Vector3& d
 
         if(!node)
         {
-            qWarning("No parent node attached to movable object %s in raycast query.", obj->getName().c_str());
+            qWarning("No parent node attached to movable object %s in raycast query.",
+                     obj->getName().c_str());
             mEngine->unlockEngine();
             return retVal;
         }
@@ -161,7 +176,8 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin, const Ogre::Vector3& d
 
         if(!actor)
         {
-            qWarning("No actor found for scene node %s in raycast query.", node->getName().c_str());
+            qWarning("No actor found for scene node %s in raycast query.",
+                     node->getName().c_str());
             mEngine->unlockEngine();
             return retVal;
         }
@@ -184,10 +200,11 @@ static ailib::real_type euclideanHeuristic(const OgreHelper::NavigationGraph::no
 void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
 {
     bool isAlreadyThere;
-    ailib::AStar<OgreHelper::NavigationGraph>::path_type path = OgreHelper::planPath(mNavMesh,
-                                                                                     actor->getPosition(),
-                                                                                     target,
-                                                                                     &isAlreadyThere);
+    ailib::AStar<OgreHelper::NavigationGraph>::path_type path;
+    path = OgreHelper::planPath(mNavMesh,
+                                actor->getPosition(),
+                                target,
+                                &isAlreadyThere);
 
     qDebug() << "Path size is " << path.size() << "hops.";
 
@@ -213,6 +230,7 @@ void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
     {
         qpath += (*it)->getCentroid();
     }
+
     actor->setKnowledge("current_path", QVariant::fromValue(qpath));
     actor->setKnowledge("movement_target", QVariant::fromValue(qpath.first()));
 }
@@ -265,46 +283,6 @@ int Scene::size() const
 const QString& Scene::getName() const
 {
     return mName;
-}
-
-QHash<int, QByteArray> Scene::roleNames() const
-{
-    QHash<int, QByteArray> roles;
-    roles[ModelRoleName] = "name";
-    roles[ModelRoleIndex] = "index";
-    return roles;
-}
-
-Qt::ItemFlags Scene::flags(const QModelIndex &index) const
-{
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-}
-
-QVariant Scene::data(const QModelIndex &index, int role) const
-{
-    Actor* actor = mActors.values().at(index.row());
-
-    switch(role)
-    {
-    case ModelRoleName:
-        return actor->getName();
-    case ModelRoleIndex:
-        return index.row();
-    default:
-        return QVariant(QVariant::Invalid);
-    }
-}
-
-QVariant Scene::headerData(int section,
-                           Qt::Orientation orientation,
-                           int role) const
-{
-    return QVariant(QVariant::Invalid);
-}
-
-int Scene::rowCount(const QModelIndex &parent) const
-{
-    return mActors.size();
 }
 
 const QMap<QString, Actor*>& Scene::getActors() const
@@ -360,13 +338,12 @@ Actor* Scene::instantiate(const QString& name,
 
     QMap<QString, Actor*> actorsCopy = mActors;
     actorsCopy[name] = retVal;
-    const int index = actorsCopy.values().indexOf(retVal);
 
-    beginInsertRows( QModelIndex(), index, index);
     mActors[name] = retVal;
-    endInsertRows();
 
     JavaScriptBindings::addActorBinding(retVal, mLogicScript);
+
+    emit actorAdded(name);
 
     return retVal;
 }
@@ -398,11 +375,9 @@ void Scene::destroy(Actor* actor)
 
     JavaScriptBindings::removeActorBinding(actor, mLogicScript);
 
-    const int index = mActors.values().indexOf(actor);
-
-    beginRemoveRows(QModelIndex(), index, index);
     mActors.remove(actor->getName());
-    endRemoveRows();
+
+    emit actorRemoved(actor->getName());
 }
 
 Actor* Scene::getActor(unsigned int index)
@@ -425,6 +400,14 @@ QObjectList Scene::getActorsArray() const
 QVariantMap& Scene::getKnowledge()
 {
     return mKnowledge;
+}
+
+void Scene::onRequestEmitCurrentActors()
+{
+    foreach(Actor* actor, mActors)
+    {
+        emit actorAdded(actor->getName());
+    }
 }
 
 void Scene::getActors(Ogre::SceneNode* root)

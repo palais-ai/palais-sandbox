@@ -26,7 +26,8 @@ SceneManager::SceneManager(OgreEngine* engine) :
     mLastUpdateTime(QTime::currentTime())
 {
     assert(engine);
-    assert(thread() == mOgreEngine->thread()); // This object must reside in the same thread as the ogre engine
+    // This object must reside in the same thread as the ogre engine
+    assert(thread() == mOgreEngine->thread());
 
     startTimer(1000.f / sMaximumTickRate);
 }
@@ -51,9 +52,11 @@ Scene* SceneManager::loadScene(const QString& name,
     {       
         unloadCurrentScene();
 
+        Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton()
+                                                .getSceneManager(Application::sSceneManagerName);
+
         Scene* nextScene = SceneLoader::loadScene(mOgreEngine,
-                                                  Ogre::Root::getSingleton()
-                                                             .getSceneManager(Application::sSceneManagerName),
+                                                  scnMgr,
                                                   name,
                                                   sceneFile,
                                                   logicFile);
@@ -127,7 +130,8 @@ void SceneManager::setSimulationSpeed(float speedFactor)
     }
     else
     {
-        qWarning("Tried to set simulation speed to %.2f, which is out of the valid range [%.2f, %.2f].",
+        qWarning("Tried to set simulation speed to %.2f, \
+                  which is out of the valid range [%.2f, %.2f].",
                  speedFactor, sMinimumSpeedFactor, sMaximumSpeedFactor);
     }
 }

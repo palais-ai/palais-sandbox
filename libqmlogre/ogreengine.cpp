@@ -88,7 +88,8 @@ void OgreEngine::startEngine()
     ogreRoot->loadPlugin(renderSystemPath);
     ogreRoot->loadPlugin(octtreePath);
 
-    Ogre::RenderSystem *renderSystem = ogreRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
+    const Ogre::String renderSysName = "OpenGL Rendering Subsystem";
+    Ogre::RenderSystem *renderSystem = ogreRoot->getRenderSystemByName(renderSysName);
 
 #if defined(Q_OS_WIN)
     renderSystem->setConfigOption("FSAA","0");
@@ -98,7 +99,9 @@ void OgreEngine::startEngine()
 
     if(!renderSystem)
     {
-        throw std::runtime_error("Render system not found. The RenderSystemGL shared library is most likely not being found.");
+        throw std::runtime_error("Render system not found. \
+                                  The RenderSystemGL shared library \
+                                  is most likely not being found.");
     }
 
     ogreRoot->setRenderSystem(renderSystem);
@@ -233,7 +236,9 @@ QOpenGLContext* OgreEngine::ogreContext() const
     return m_ogreContext;
 }
 
-QSGTexture* OgreEngine::createTextureFromId(uint id, const QSize &size, QQuickWindow::CreateTextureOptions options) const
+QSGTexture* OgreEngine::createTextureFromId(uint id,
+                                            const QSize &size,
+                                            QQuickWindow::CreateTextureOptions options) const
 {
     return m_quickWindow->createTextureFromId(id, size, options);
 }

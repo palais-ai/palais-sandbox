@@ -54,7 +54,8 @@ public:
 
     QSGTexture* createTextureFromId(uint id,
                                     const QSize& size,
-                                    QQuickWindow::CreateTextureOptions options = QQuickWindow::CreateTextureOption(0)) const;
+                                    QQuickWindow::CreateTextureOptions options
+                                        = QQuickWindow::CreateTextureOption(0)) const;
 
     void setupResources(void);
 

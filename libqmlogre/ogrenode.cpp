@@ -126,9 +126,11 @@ void OgreNode::resetViewport()
 
     m_renderTarget->addViewport(m_camera);
     m_renderTarget->getViewport(0)->setClearEveryFrame(true);
-    m_renderTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue(m_backgroundColor.redF(),
-                                                                          m_backgroundColor.greenF(),
-                                                                          m_backgroundColor.blueF()));
+
+    const Ogre::ColourValue bgColor(m_backgroundColor.redF(),
+                                    m_backgroundColor.greenF(),
+                                    m_backgroundColor.blueF());
+    m_renderTarget->getViewport(0)->setBackgroundColour(bgColor);
     m_renderTarget->getViewport(0)->setOverlaysEnabled(false);
 }
 
@@ -225,17 +227,18 @@ void OgreNode::updateFBO()
     // Don't recreate the texture on every frame during animations / Continuous size changes
     if(m_fboDelayAccumulator < 0.f)
     {
-        m_rttTexture = Ogre::TextureManager::getSingleton().createManual(textureName,
-                                                                         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                                         Ogre::TEX_TYPE_2D,
-                                                                         m_size.width(),
-                                                                         m_size.height(),
-                                                                         0, // num mipmaps
-                                                                         Ogre::PF_R8G8B8A8,
-                                                                         Ogre::TU_RENDERTARGET,
-                                                                         0, // ManualLoader
-                                                                         false, // hwGammaCorrection
-                                                                         samples);
+        Ogre::TextureManager& texMgr = Ogre::TextureManager::getSingleton();
+        m_rttTexture = texMgr.createManual(textureName,
+                                           Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                           Ogre::TEX_TYPE_2D,
+                                           m_size.width(),
+                                           m_size.height(),
+                                           0, // num mipmaps
+                                           Ogre::PF_R8G8B8A8,
+                                           Ogre::TU_RENDERTARGET,
+                                           0, // ManualLoader
+                                           false, // hwGammaCorrection
+                                           samples);
 
         m_fboDelayAccumulator = m_fboCreationDelay;
     }

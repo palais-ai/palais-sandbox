@@ -46,7 +46,8 @@ ailib::AStar<NavigationGraph>::path_type planPath(const NavigationGraph& navGrap
                                                   const Ogre::Vector3& to,
                                                   bool* isAlreadyThere = NULL);
 
-// CREDITS: Public domain license, from http://www.ogre3d.org/tikiwiki/tiki-index.php?page=RetrieveVertexData
+// CREDITS: Public domain license, from
+// http://www.ogre3d.org/tikiwiki/tiki-index.php?page=RetrieveVertexData
 void getMeshInformation(const Ogre::MeshPtr mesh,
                         size_t &vertex_count,
                         Ogre::Vector3* &vertices,

@@ -44,6 +44,7 @@ Rectangle {
         font.family: fontAwesome.name
         font.pointSize: 12
         color: textColor
+        state: visible ? '' : 'HIDDEN'
 
         MouseArea {
             anchors.fill: parent

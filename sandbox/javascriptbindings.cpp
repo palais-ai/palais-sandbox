@@ -170,7 +170,8 @@ void addBindings(QScriptEngine& engine, Scene* scene)
 
     const QMap<QString, Actor*>& actors = scene->getActors();
 
-    for(QMap<QString, Actor*>::const_iterator it = actors.begin(); it != actors.end(); ++it)
+    QMap<QString, Actor*>::const_iterator it = actors.begin();
+    for(; it != actors.end(); ++it)
     {
         addActorBinding(it.value(), engine);
     }
@@ -180,10 +181,14 @@ void timers_register(QScriptEngine& engine)
 {
     QObject::connect(&engine, &QScriptEngine::destroyed, &ScriptTimer::onEngineDestroyed);
 
-    engine.globalObject().setProperty("setTimeout", engine.newFunction(script_setTimeout));
-    engine.globalObject().setProperty("setInterval", engine.newFunction(script_setInterval));
-    engine.globalObject().setProperty("clearTimeout", engine.newFunction(script_clearTimeout));
-    engine.globalObject().setProperty("clearInterval", engine.newFunction(script_clearInterval));
+    engine.globalObject().setProperty("setTimeout",
+                                      engine.newFunction(script_setTimeout));
+    engine.globalObject().setProperty("setInterval",
+                                      engine.newFunction(script_setInterval));
+    engine.globalObject().setProperty("clearTimeout",
+                                      engine.newFunction(script_clearTimeout));
+    engine.globalObject().setProperty("clearInterval",
+                                      engine.newFunction(script_clearInterval));
 }
 
 void timers_update(float deltaTime)
@@ -199,15 +204,23 @@ void checkScriptEngineException(QScriptEngine& engine, const QString& context)
         if(context.isEmpty())
         {
             qWarning() << "Exception in loaded logic file "
-                       << ", ERROR:" << engine.uncaughtException().toString()
-                       << ", on line " << engine.uncaughtExceptionLineNumber()
-                       << ", backtrace: " << engine.uncaughtExceptionBacktrace().join("\n");
+                       << ", ERROR:"
+                       << engine.uncaughtException().toString()
+                       << ", on line "
+                       << engine.uncaughtExceptionLineNumber()
+                       << ", backtrace: "
+                       << engine.uncaughtExceptionBacktrace().join("\n");
         }
         else
         {
-            qWarning() << "Exception in " << context << ", ERROR:" << engine.uncaughtException().toString()
-                       << ", on line " << engine.uncaughtExceptionLineNumber()
-                       << ", backtrace: " << engine.uncaughtExceptionBacktrace().join("\n");
+            qWarning() << "Exception in "
+                       << context
+                       << ", ERROR:"
+                       << engine.uncaughtException().toString()
+                       << ", on line "
+                       << engine.uncaughtExceptionLineNumber()
+                       << ", backtrace: "
+                       << engine.uncaughtExceptionBacktrace().join("\n");
         }
         engine.clearExceptions();
     }
@@ -318,7 +331,8 @@ QScriptValue RaycastResult_prototype_distance(QScriptContext *context, QScriptEn
     if (!res)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "RaycastResult.prototype.distance: this object is not a RaycastResult");
+                                   "RaycastResult.prototype.distance: \
+                                    this object is not a RaycastResult");
     }
 
     return res->distance;
@@ -332,7 +346,8 @@ QScriptValue RaycastResult_prototype_actor(QScriptContext *context, QScriptEngin
     if (!res)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "RaycastResult.prototype.distance: this object is not a RaycastResult");
+                                   "RaycastResult.prototype.distance: \
+                                    this object is not a RaycastResult");
     }
 
     if(!res->actor)
@@ -351,7 +366,8 @@ QScriptValue RaycastResult_prototype_hasHit(QScriptContext *context, QScriptEngi
     if (!res)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "RaycastResult.prototype.distance: this object is not a RaycastResult");
+                                   "RaycastResult.prototype.distance: \
+                                    this object is not a RaycastResult");
     }
 
     return res->actor != NULL;
@@ -365,7 +381,8 @@ void Actor_register_prototype(QScriptEngine& engine)
     QScriptValue prototype = engine.newQObject((Actor*)0);
     engine.setDefaultPrototype(actorTypeId, prototype);
 
-    engine.globalObject().setProperty("Actor", engine.newFunction(Vector3_prototype_ctor));
+    engine.globalObject().setProperty("Actor",
+                                      engine.newFunction(Vector3_prototype_ctor));
 }
 
 void Vector3_register_prototype(QScriptEngine& engine)
@@ -389,7 +406,8 @@ void Vector3_register_prototype(QScriptEngine& engine)
     engine.setDefaultPrototype(qMetaTypeId<Ogre::Vector3>(), obj);
     engine.setDefaultPrototype(qMetaTypeId<Ogre::Vector3*>(), obj);
 
-    engine.globalObject().setProperty("Vector3", engine.newFunction(Vector3_prototype_ctor));
+    engine.globalObject().setProperty("Vector3",
+                                      engine.newFunction(Vector3_prototype_ctor));
 
     qScriptRegisterSequenceMetaType<QVector<Ogre::Vector3> >(&engine);
     qScriptRegisterSequenceMetaType<QVector<Ogre::Vector3*> >(&engine);
@@ -434,7 +452,8 @@ QScriptValue Vector3_prototype_x(QScriptContext *context, QScriptEngine *engine)
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.x: this object is not a Ogre::Vector3");
+                                   "Vector3.prototype.x: \
+                                    this object is not a Ogre::Vector3");
     }
 
     QScriptValue obj = context->thisObject();
@@ -468,7 +487,8 @@ QScriptValue Vector3_prototype_y(QScriptContext *context, QScriptEngine *engine)
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.y: this object is not a Ogre::Vector3");
+                                   "Vector3.prototype.y: \
+                                   this object is not a Ogre::Vector3");
     }
 
     QScriptValue obj = context->thisObject();
@@ -502,7 +522,8 @@ QScriptValue Vector3_prototype_z(QScriptContext *context, QScriptEngine *engine)
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.z: this object is not a Ogre::Vector3");
+                                   "Vector3.prototype.z: \
+                                    this object is not a Ogre::Vector3");
     }
 
     QScriptValue obj = context->thisObject();
@@ -536,11 +557,16 @@ QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: this object is not a Ogre::Vector3");
+                                   "Vector3.prototype.toString: \
+                                    this object is not a Ogre::Vector3");
     }
 
     QString t;
-    return QString("Vector3 @%0 (x: %1, y: %2, z: %3)").arg(t.sprintf("%08p", v)).arg(v->x).arg(v->y).arg(v->z);
+    return QString("Vector3 @%0 (x: %1, y: %2, z: %3)")
+                  .arg(t.sprintf("%08p", v))
+                  .arg(v->x)
+                  .arg(v->y)
+                  .arg(v->z);
 }
 
 QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engine)
@@ -551,7 +577,8 @@ QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engin
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: this object is not a Ogre::Vector3");
+                                   "Vector3.prototype.toString: \
+                                    this object is not a Ogre::Vector3");
     }
 
     if (context->argumentCount() == 1)
@@ -560,7 +587,8 @@ QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engin
         if (!v2)
         {
             return context->throwError(QScriptContext::TypeError,
-                                       "Vector3.prototype.toString: Argument #0 object is not a Ogre::Vector3");
+                                       "Vector3.prototype.toString: \
+                                        Argument #0 object is not a Ogre::Vector3");
         }
 
         *v += *v2;
@@ -579,7 +607,8 @@ QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: this object is not a Ogre::Vector3");
+                                   "Vector3.prototype.toString: \
+                                    this object is not a Ogre::Vector3");
     }
 
     if (context->argumentCount() == 1)
@@ -588,7 +617,8 @@ QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *
         if (!v2)
         {
             return context->throwError(QScriptContext::TypeError,
-                                       "Vector3.prototype.toString: Argument #0 object is not a Ogre::Vector3");
+                                       "Vector3.prototype.toString: \
+                                        Argument #0 object is not a Ogre::Vector3");
         }
 
         *v -= *v2;
@@ -607,7 +637,8 @@ QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: this object is not a Ogre::Vector3");
+                                   "Vector3.prototype.toString: \
+                                    this object is not a Ogre::Vector3");
     }
 
     if (context->argumentCount() == 1)
@@ -643,7 +674,8 @@ QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine 
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: this object is not a Ogre::Vector3");
+                                   "Vector3.prototype.toString: \
+                                    this object is not a Ogre::Vector3");
     }
 
     v->normalise();
@@ -660,7 +692,8 @@ QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: this object is not a Ogre::Vector3");
+                                   "Vector3.prototype.toString: \
+                                    this object is not a Ogre::Vector3");
     }
 
     if (context->argumentCount() == 1)
@@ -683,19 +716,25 @@ void addActorBinding(Actor* actor, QScriptEngine& engine)
 {
     if(!actor)
     {
-        qWarning("Tried to add a null actor to the scripting environment. The addition was not performed.");
+        qWarning() << "Tried to add a null actor to the scripting environment."
+                   << " The addition was not performed.";
         return;
     }
 
-    qDebug() << "Adding actor " << cleanIdentifier(actor->getName()) << " to the scripting system.";
-    engine.globalObject().setProperty(cleanIdentifier(actor->getName()), engine.newQObject(actor));
+    qDebug() << "Adding actor "
+             << cleanIdentifier(actor->getName())
+             << " to the scripting system.";
+
+    engine.globalObject().setProperty(cleanIdentifier(actor->getName()),
+                                      engine.newQObject(actor));
 }
 
 void removeActorBinding(Actor* actor, QScriptEngine& engine)
 {
     if(!actor)
     {
-        qWarning("Tried to remove a null actor to the scripting environment. The removal was not performed.");
+        qWarning() << "Tried to remove a null actor to the scripting environment."
+                   << "The removal was not performed.";
         return;
     }
 

@@ -29,7 +29,11 @@ Scene* SceneLoader::loadScene(OgreEngine* engine,
     {
         loadSceneVisuals(engine, sceneManager, sceneFile);
 
-        QScopedPointer<Scene> scene(new Scene(name, sceneFile, logicFile, sceneManager->getRootSceneNode(), engine));
+        QScopedPointer<Scene> scene(new Scene(name,
+                                              sceneFile,
+                                              logicFile,
+                                              sceneManager->getRootSceneNode(),
+                                              engine));
 
         try
         {
@@ -50,7 +54,9 @@ Scene* SceneLoader::loadScene(OgreEngine* engine,
     }
 }
 
-void SceneLoader::loadSceneVisuals(OgreEngine* engine, Ogre::SceneManager* sceneManager, const QString& sceneFile)
+void SceneLoader::loadSceneVisuals(OgreEngine* engine,
+                                   Ogre::SceneManager* sceneManager,
+                                   const QString& sceneFile)
 {
     if(engine && sceneManager)
     {

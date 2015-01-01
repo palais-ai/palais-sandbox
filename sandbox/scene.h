@@ -7,7 +7,6 @@
 #include <QVariant>
 #include <QScriptEngine>
 #include <QMap>
-#include <QAbstractListModel>
 
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
@@ -29,14 +28,16 @@ public:
     float distance;
 };
 
-class Scene : public QAbstractListModel, public Ogre::FrameListener
+class Scene : public QObject,
+              public Ogre::FrameListener
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ getName)
     Q_PROPERTY(QVariantMap knowledge READ getKnowledge)
     Q_PROPERTY(QObjectList actors READ getActorsArray)
 public:
-    enum ModelRole {
+    enum ModelRole
+    {
         ModelRoleName = Qt::UserRole + 1,
         ModelRoleIndex
     };
@@ -53,13 +54,6 @@ public:
     virtual bool frameStarted(const Ogre::FrameEvent& evt);
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
     virtual bool frameEnded(const Ogre::FrameEvent& evt);
-
-    // List Model impl
-    virtual QHash<int, QByteArray> roleNames() const;
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-    virtual QVariant data(const QModelIndex &index, int role) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    virtual int rowCount(const QModelIndex &parent) const;
 
     Q_INVOKABLE void toggleHighlight(bool highlighted, int index);
     Q_INVOKABLE int size() const;
@@ -99,6 +93,11 @@ public:
     Q_INVOKABLE QObjectList getActorsArray() const;
     QVariantMap& getKnowledge();
     const QString& getName() const;
+signals:
+    void actorAdded(const QString& actorName);
+    void actorRemoved(const QString& actorName);
+public slots:
+    void onRequestEmitCurrentActors();
 private:
     void getActors(Ogre::SceneNode* root);
     Actor* getActorForNode(Ogre::SceneNode* node) const;

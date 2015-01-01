@@ -44,7 +44,8 @@ void CameraNodeObject::createCameraWithCurrentSceneManager()
     if(!Ogre::Root::getSingletonPtr())
         return;
 
-    Ogre::SceneManager *sceneManager = Ogre::Root::getSingleton().getSceneManager(Application::sSceneManagerName);
+    Ogre::SceneManager *sceneManager = Ogre::Root::getSingleton()
+                                                  .getSceneManager(Application::sSceneManagerName);
 
     // let's use the current memory address to create a unique name
     QString instanceName;
@@ -111,7 +112,9 @@ void CameraNodeObject::fitToContain(Ogre::SceneNode* node)
 
     // Scale view to fit
     mInitialPosition = Ogre::Vector3(1, 1, 0);
-    mInitialPosition = mInitialPosition.normalise() * ((boundingRadius / 2.f) / tan(m_camera->getFOVy().valueRadians() / 2.f));
+    mInitialPosition = mInitialPosition.normalise()
+                       * ((boundingRadius / 2.f) /
+                          tan(m_camera->getFOVy().valueRadians() / 2.f));
 
     // Reset zoom level
     m_zoom = 1;

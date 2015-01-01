@@ -4,6 +4,7 @@
 #include "actor.h"
 #include "models/inspectormodel.h"
 #include "models/consolemodel.h"
+#include "models/scenemodel.h"
 #include "utility/timedlogger.h"
 #include "utility/loghandler.h"
 
@@ -30,9 +31,9 @@ static void messageHandlerFun(QtMsgType type,
                               const QMessageLogContext& context,
                               const QString& msg)
 {
+    Q_UNUSED(context);
+
     ConsoleModel::LogLevel level;
-
-
     fprintf(stderr, "%s\n", msg.toLocal8Bit().constData());
 
     switch (type)
@@ -65,6 +66,7 @@ Application::Application(QObject *parent) :
     mSceneManager(NULL),
     mProjectManager(NULL),
     mRoot(NULL),
+    mSceneModel(NULL),
     mInspectorModel(NULL),
     mConsoleModel(new ConsoleModel()),
     mTimeLogger(new TimedLogger()),
@@ -115,8 +117,9 @@ int Application::onApplicationStarted(int argc, char **argv)
 
     ConsoleModel::declareQML();
     InspectorModel::declareQML();
-    mApplicationEngine->rootContext()->setContextProperty("ConsoleModel", mConsoleModel.data());
-    mApplicationEngine->rootContext()->setContextProperty("ApplicationWrapper", this);
+    QQmlContext* rootCtx = mApplicationEngine->rootContext();
+    rootCtx->setContextProperty("ConsoleModel", mConsoleModel.data());
+    rootCtx->setContextProperty("ApplicationWrapper", this);
     mApplicationEngine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
     QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
@@ -124,14 +127,19 @@ int Application::onApplicationStarted(int argc, char **argv)
     window->setPersistentOpenGLContext(true);
     window->setPersistentSceneGraph(true);
 
-    mApplicationEngine->rootContext()->setContextProperty("ApplicationWindow", window);
+    rootCtx->setContextProperty("ApplicationWindow", window);
 
     qmlRegisterType<Actor>();
 
     // start Ogre once we are in the rendering thread (Ogre must live in the rendering thread)
-    connect(window, &QQuickWindow::frameSwapped, this, &Application::initializeOgre, Qt::DirectConnection);
-    connect(this, &Application::ogreInitialized, this, &Application::onOgreIsReady, Qt::DirectConnection);
-    connect(mApplicationEngine, &QQmlApplicationEngine::quit, &app, &QGuiApplication::quit);
+    connect(window, &QQuickWindow::frameSwapped,
+            this, &Application::initializeOgre, Qt::DirectConnection);
+
+    connect(this, &Application::ogreInitialized,
+            this, &Application::onOgreIsReady, Qt::DirectConnection);
+
+    connect(mApplicationEngine, &QQmlApplicationEngine::quit,
+            &app, &QGuiApplication::quit);
 
     return app.exec();
 }
@@ -153,15 +161,18 @@ void Application::initializeOgre()
 {
     QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
 
-    // we only want to initialize once
+    // We only want to initialize once.
     disconnect(window, &QQuickWindow::frameSwapped, this, &Application::initializeOgre);
 
     TimedLogger engineStartupLogger;
 
-    // start up Ogre
+    // Start up Ogre.
     mOgreEngine = new OgreEngine(window);
 
     mOgreEngine->startEngine();
+
+    Ogre::LogManager::getSingleton().getDefaultLog()->addListener(mLogHandler.data());
+
     mRoot = mOgreEngine->getRoot();
     mOgreEngine->setupResources();
 
@@ -227,12 +238,17 @@ void Application::onOgreIsReady()
 
 void Application::onOgreViewClicked(float mouseX, float mouseY)
 {
-    if(getSceneLoaded()) {
-        mProjectManager->selectActorAtClickpoint(mouseX, mouseY, getCameraWithName("cam1")->camera());
+    if(getSceneLoaded())
+    {
+        mProjectManager->selectActorAtClickpoint(mouseX,
+                                                 mouseY,
+                                                 getCameraWithName("cam1")->camera());
     }
 }
 
-void Application::onBeforeSceneLoad(const QString& name, const QString& sceneFile, const QString& logicFile)
+void Application::onBeforeSceneLoad(const QString& name,
+                                    const QString& sceneFile,
+                                    const QString& logicFile)
 {
     qDebug("Before scene load");
 
@@ -302,10 +318,17 @@ void Application::onSceneLoaded(Scene* scene)
     mInspectorModel.reset(new InspectorModel("Scenario",
                                              scene->getKnowledge()));
 
-    // We need a proxy model, since the scene resides in the ogre thread,
-    // but updates must be made in the GUI thread.
-    mActorProxyModel.setSourceModel(scene);
-    mApplicationEngine->rootContext()->setContextProperty("ActorModel", &mActorProxyModel);
+    mSceneModel.reset(new SceneModel());
+    connect(scene, &Scene::actorAdded,
+            mSceneModel.data(), &SceneModel::onActorAdded);
+    connect(scene, &Scene::actorRemoved,
+            mSceneModel.data(), &SceneModel::onActorRemoved);
+    connect(mSceneModel.data(), &SceneModel::requestEmitCurrentActors,
+            scene, &Scene::onRequestEmitCurrentActors);
+    mSceneModel->requestCurrentActors();
+
+    mApplicationEngine->rootContext()->setContextProperty("ActorModel",
+                                                          mSceneModel.data());
     mApplicationEngine->rootContext()->setContextProperty("Scene", scene);
     mApplicationEngine->rootContext()->setContextProperty("InspectorModel",
                                                           mInspectorModel.data());

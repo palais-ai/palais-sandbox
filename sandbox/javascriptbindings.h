@@ -20,17 +20,21 @@ class Vector3;
 /**
  * @brief The ScriptTimer class
  *
- * @note Timers manage their lifetime automatically. Only interval timers have to be removed by the user,
- * else they will only be cleaned up after the corresponding script is destroyed. The update(float) method
- * should be called by the currently active scene to ensure that the script timers are evaluated at the scene's
- * simulation speed.
+ * @note Timers manage their lifetime automatically.
+ * Only interval timers have to be removed explicitly,
+ * Otherwise they will only be cleaned up after the corresponding script is destroyed.
+ * The update(float) method should be called by the currently active scene to ensure
+ * that the script timers are evaluated at the scene's simulation speed.
  */
 class ScriptTimer : public QObject
 {
     Q_OBJECT
 
 public:
-    static int newTimer(int interval, bool oneShot, QScriptEngine& engine, const QScriptValue& function);
+    static int newTimer(int interval,
+                        bool oneShot,
+                        QScriptEngine& engine,
+                        const QScriptValue& function);
     static bool removeTimer(int handle);
 
     // Updates all active timers. Call this regularily.
@@ -47,7 +51,10 @@ private:
     static QList<ScriptTimer*> sScriptTimers;
     static int gHandleCounter;
 
-    ScriptTimer(int interval, bool oneShot, QScriptEngine& engine, const QScriptValue& function);
+    ScriptTimer(int interval,
+                bool oneShot,
+                QScriptEngine& engine,
+                const QScriptValue& function);
 
     float mTimeLeft;
     const float mInitialTime;

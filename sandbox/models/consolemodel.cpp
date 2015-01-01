@@ -73,6 +73,7 @@ QHash<int, QByteArray> ConsoleModel::roleNames() const
 
 Qt::ItemFlags ConsoleModel::flags(const QModelIndex &index) const
 {
+    Q_UNUSED(index);
     return 0;
 }
 
@@ -95,10 +96,14 @@ QVariant ConsoleModel::headerData(int section,
                                     Qt::Orientation orientation,
                                     int role) const
 {
+    Q_UNUSED(section);
+    Q_UNUSED(orientation);
+    Q_UNUSED(role);
     return QVariant(QVariant::Invalid);
 }
 
 int ConsoleModel::rowCount(const QModelIndex& parent) const
 {
+    Q_UNUSED(parent);
     return mLog.size();
 }

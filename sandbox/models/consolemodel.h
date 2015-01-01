@@ -9,9 +9,8 @@
 class ConsoleModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString passedTimeString
-               READ getPassedTimeString
-               NOTIFY onPassedTimeStringChanged)
+    Q_PROPERTY(QString passedTimeString READ getPassedTimeString
+                                        NOTIFY onPassedTimeStringChanged)
 public:
     enum ModelRole
     {

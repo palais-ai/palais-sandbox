@@ -9,6 +9,8 @@ Rectangle {
     color: colors.darkGray
 
     function typeNameForObject(value) {
+        print(value)
+        print(value.objectName)
         if(value instanceof Object && value.hasOwnProperty("objectName")) {
             return value.objectName
         }

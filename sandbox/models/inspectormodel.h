@@ -45,7 +45,8 @@ class InspectorModel : public QAbstractListModel
     Q_PROPERTY(QString name READ getName NOTIFY onNameChanged)
     Q_PROPERTY(int size READ getSize NOTIFY onSizeChanged)
 public:
-    enum ModelRole {
+    enum ModelRole
+    {
         ModelRoleIndex = Qt::UserRole + 1,
         ModelRoleKnowledgeKey,
         ModelRoleKnowledgeValue

@@ -105,6 +105,7 @@ QHash<int, QByteArray> InspectorModel::roleNames() const
 
 Qt::ItemFlags InspectorModel::flags(const QModelIndex &index) const
 {
+    Q_UNUSED(index);
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
@@ -131,9 +132,32 @@ QVariant InspectorModel::data(const QModelIndex &index, int role) const
 
         if(data.canConvert<QVector<Ogre::Vector3> >())
         {
-            OgreVector3ArrayModel* model = new OgreVector3ArrayModel(data.value<QVector<Ogre::Vector3> >());
+            QVector<Ogre::Vector3> value = data.value<QVector<Ogre::Vector3> >();
+            OgreVector3ArrayModel* model = new OgreVector3ArrayModel(value);
             QQmlEngine::setObjectOwnership(model, QQmlEngine::JavaScriptOwnership);
             return QVariant::fromValue(model);
+        }
+
+        if(data.canConvert<QList<QVariant> >())
+        {
+            QList<QVariant> value = data.toList();
+
+            if(value.size() != 0)
+            {
+                QVariant& data = value.first();
+
+                if(data.canConvert<Ogre::Vector3>())
+                {
+                    QVector<Ogre::Vector3> converted;
+                    foreach(QVariant variant, value)
+                    {
+                        converted += variant.value<Ogre::Vector3>();
+                    }
+                    OgreVector3ArrayModel* model = new OgreVector3ArrayModel(converted);
+                    QQmlEngine::setObjectOwnership(model, QQmlEngine::JavaScriptOwnership);
+                    return QVariant::fromValue(model);
+                }
+            }
         }
 
         return data;
@@ -147,10 +171,14 @@ QVariant InspectorModel::headerData(int section,
                                     Qt::Orientation orientation,
                                     int role) const
 {
+    Q_UNUSED(section);
+    Q_UNUSED(orientation);
+    Q_UNUSED(role);
     return QVariant(QVariant::Invalid);
 }
 
 int InspectorModel::rowCount(const QModelIndex& parent) const
 {
+    Q_UNUSED(parent);
     return mKnowledge.size();
 }

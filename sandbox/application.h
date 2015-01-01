@@ -2,12 +2,12 @@
 #define APPLICATION_H
 
 #include <QObject>
-#include <QIdentityProxyModel>
 #include <QScopedPointer>
 #include <QSharedPointer>
 
 class Scene;
 class ProjectManager;
+class SceneModel;
 class InspectorModel;
 class ConsoleModel;
 class TimedLogger;
@@ -65,11 +65,11 @@ private:
     CameraNodeObject* getCameraWithName(const QString& name);
 
     QQmlApplicationEngine* mApplicationEngine;
-    QIdentityProxyModel mActorProxyModel;
     OgreEngine* mOgreEngine;
     Ogre::SceneManager* mSceneManager;
     ProjectManager* mProjectManager;
     Ogre::Root* mRoot;
+    QScopedPointer<SceneModel> mSceneModel;
     QScopedPointer<InspectorModel> mInspectorModel;
     QScopedPointer<ConsoleModel> mConsoleModel;
     QScopedPointer<TimedLogger> mTimeLogger;
