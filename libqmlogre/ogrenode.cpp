@@ -136,6 +136,12 @@ void OgreNode::resetViewport()
 
 void OgreNode::preprocess()
 {
+    if(!m_ogreEngineItem || !m_camera)
+    {
+        qWarning("No engine or camera supplied to OgreNode.");
+        return;
+    }
+
     m_ogreEngineItem->lockEngine();
 
     if (!m_renderTarget)

@@ -67,11 +67,6 @@ void ProjectManager::onTimePassed(const QTime& time)
     emit timePassed(time);
 }
 
-Actor* ProjectManager::getSelectedActor()
-{
-    return mSelectedActor;
-}
-
 void ProjectManager::selectActorAtClickpoint(float mouseX,
                                              float mouseY,
                                              Ogre::Camera* camera)
@@ -97,15 +92,56 @@ void ProjectManager::selectActorAtClickpoint(float mouseX,
         if(oldSelected && oldSelected != mSelectedActor)
         {
             oldSelected->toggleHighlight(false);
+            emit actorChangedSelected(oldSelected->getName(), false);
         }
 
-        mSelectedActor->toggleHighlight(!mSelectedActor->getSceneNode()->getShowBoundingBox());
-        emit(inspectorSelectionChanged(mSelectedActor->getName(),
-                                       mSelectedActor->getKnowledge()));
+        const bool newState = !mSelectedActor->getSceneNode()->getShowBoundingBox();
+
+        mSelectedActor->toggleHighlight(newState);
+        emit actorChangedSelected(mSelectedActor->getName(),
+                                  newState);
+        emit inspectorSelectionChanged(mSelectedActor->getName(),
+                                       mSelectedActor->getKnowledge());
     }
     else
     {
         qDebug() << "No hit.";
+    }
+}
+
+void ProjectManager::onActorChangeSelected(const QString& actorName,
+                                           bool selected)
+{
+    Scene* current = mScenarioManager.getCurrentScene();
+    Actor* newSelected = current->getActor(actorName);
+
+    if(!newSelected)
+    {
+        qWarning("Can't select actor %s, because its not part of the scene.",
+                 actorName.toLocal8Bit().constData());
+        return;
+    }
+
+    newSelected->toggleHighlight(selected);
+    if(newSelected == mSelectedActor && !selected)
+    {
+        emit actorChangedSelected(mSelectedActor->getName(), false);
+        emit inspectorSelectionChanged(current->getName(),
+                                       current->getKnowledge());
+        mSelectedActor = NULL;
+    }
+    else if(selected)
+    {
+        if(mSelectedActor)
+        {
+            mSelectedActor->toggleHighlight(false);
+            emit actorChangedSelected(mSelectedActor->getName(), false);
+        }
+
+        mSelectedActor = newSelected;
+        emit actorChangedSelected(mSelectedActor->getName(), true);
+        emit inspectorSelectionChanged(mSelectedActor->getName(),
+                                       mSelectedActor->getKnowledge());
     }
 }
 
@@ -187,7 +223,8 @@ void ProjectManager::onOpenProject(const QUrl& url)
     {
         emit(sceneLoadFailed(QString("Failed to load the project file at %0,\
                                       because it is missing the mandatory property %1.")
-                             .arg(url.toLocalFile()).arg(visualPropertyName)));
+                             .arg(url.toLocalFile())
+                             .arg(visualPropertyName)));
         return;
     }
 
@@ -206,7 +243,8 @@ void ProjectManager::onOpenProject(const QUrl& url)
     {
         emit(sceneLoadFailed(QString("Failed to load the project file at %0,\
                                       because it is missing the mandatory property %1.")
-                             .arg(url.toLocalFile()).arg(logicPropertyName)));
+                             .arg(url.toLocalFile())
+                             .arg(logicPropertyName)));
         return;
     }
 
@@ -220,7 +258,8 @@ void ProjectManager::onOpenProject(const QUrl& url)
     {
         emit(sceneLoadFailed(QString("Failed to load the project file at %0,\
                                       because it is missing the mandatory property %1.")
-                             .arg(url.toLocalFile()).arg(namePropertyName)));
+                             .arg(url.toLocalFile())
+                             .arg(namePropertyName)));
         return;
     }
 

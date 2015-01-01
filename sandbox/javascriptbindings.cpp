@@ -167,14 +167,6 @@ void addBindings(QScriptEngine& engine, Scene* scene)
 
     Vector3_register_prototype(engine);
     RaycastResult_register_prototype(engine);
-
-    const QMap<QString, Actor*>& actors = scene->getActors();
-
-    QMap<QString, Actor*>::const_iterator it = actors.begin();
-    for(; it != actors.end(); ++it)
-    {
-        addActorBinding(it.value(), engine);
-    }
 }
 
 void timers_register(QScriptEngine& engine)

@@ -115,6 +115,7 @@ int Application::onApplicationStarted(int argc, char **argv)
     QQmlApplicationEngine engine;
     mApplicationEngine = &engine;
 
+    SceneModel::declareQML();
     ConsoleModel::declareQML();
     InspectorModel::declareQML();
     QQmlContext* rootCtx = mApplicationEngine->rootContext();
@@ -318,18 +319,29 @@ void Application::onSceneLoaded(Scene* scene)
     mInspectorModel.reset(new InspectorModel("Scenario",
                                              scene->getKnowledge()));
 
-    mSceneModel.reset(new SceneModel());
+    mSceneModel.reset(new SceneModel(scene->getName()));
+
     connect(scene, &Scene::actorAdded,
             mSceneModel.data(), &SceneModel::onActorAdded);
     connect(scene, &Scene::actorRemoved,
             mSceneModel.data(), &SceneModel::onActorRemoved);
+    connect(scene, &Scene::actorChangedVisibility,
+            mSceneModel.data(), &SceneModel::onActorChangedVisiblity);
     connect(mSceneModel.data(), &SceneModel::requestEmitCurrentActors,
             scene, &Scene::onRequestEmitCurrentActors);
+    connect(mSceneModel.data(), &SceneModel::requestSelectionChange,
+            mProjectManager, &ProjectManager::onActorChangeSelected);
+    connect(mProjectManager, &ProjectManager::actorChangedSelected,
+            mSceneModel.data(), &SceneModel::onActorChangedSelection);
+    connect(mSceneModel.data(), &SceneModel::requestVisiblitiyChange,
+            scene, &Scene::onActorChangeVisible);
+    connect(scene, &Scene::actorChangedVisibility,
+            mSceneModel.data(), &SceneModel::onActorChangedVisiblity);
+
     mSceneModel->requestCurrentActors();
 
     mApplicationEngine->rootContext()->setContextProperty("ActorModel",
                                                           mSceneModel.data());
-    mApplicationEngine->rootContext()->setContextProperty("Scene", scene);
     mApplicationEngine->rootContext()->setContextProperty("InspectorModel",
                                                           mInspectorModel.data());
 

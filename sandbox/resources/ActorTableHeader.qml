@@ -34,7 +34,7 @@ Rectangle {
 
     NativeText {
         id: scenarioName
-        text: Scene.name
+        text: ActorModel.name
         font.family: openSans.name
         font.capitalization: Font.AllUppercase
         font.pointSize: 16

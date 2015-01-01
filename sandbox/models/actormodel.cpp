@@ -19,6 +19,10 @@ bool ActorModel::isVisible() const
     return mIsVisible;
 }
 
+void ActorModel::setVisible(bool visible)
+{
+    mIsVisible = visible;
+}
 
 bool ActorModel::isSelected() const
 {

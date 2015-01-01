@@ -2,7 +2,6 @@
 
 #include <cassert>
 
-#include <QMutexLocker>
 #include <QDebug>
 #include <QVector>
 
@@ -14,8 +13,6 @@ Q_DECLARE_METATYPE(Ogre::Vector3)
 Q_DECLARE_METATYPE(Ogre::Vector3*)
 Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
 Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
-
-extern QMutex g_engineMutex;
 
 Actor::Actor(Ogre::SceneNode* node) :
     mNode(node)
@@ -43,8 +40,6 @@ void Actor::disableAnimation(const QString& name)
 
 void Actor::setAnimationEnabled(const QString& name, bool enabled)
 {
-    QMutexLocker locker(&g_engineMutex);
-
     Ogre::Entity* entity = static_cast<Ogre::Entity*>(mNode->getAttachedObject(0));
 
     Ogre::AnimationStateSet* set = entity->getAllAnimationStates();
@@ -65,8 +60,6 @@ void Actor::setAnimationEnabled(const QString& name, bool enabled)
 
 void Actor::lookAt(const Ogre::Vector3& target)
 {
-    QMutexLocker locker(&g_engineMutex);
-
     mNode->lookAt(target, Ogre::Node::TS_WORLD);
 }
 
@@ -82,15 +75,13 @@ void Actor::hide()
 
 void Actor::setVisible(bool visible)
 {
-    QMutexLocker locker(&g_engineMutex);
-
     mNode->setVisible(visible);
+
+    emit visibilityChanged(this, visible);
 }
 
 void Actor::update(float deltaTime)
 {
-    QMutexLocker locker(&g_engineMutex);
-
     if(mNode->numAttachedObjects() == 0)
     {
         return;
@@ -130,63 +121,46 @@ void Actor::update(float deltaTime)
 
 const Ogre::Vector3& Actor::getPosition() const
 {
-    QMutexLocker locker(&g_engineMutex);
-
     return mNode->getPosition();
 }
 
 void Actor::setPosition(const Ogre::Vector3& position)
 {
-    QMutexLocker locker(&g_engineMutex);
-
     mNode->setPosition(position);
 }
 
 const Ogre::Quaternion& Actor::getRotation() const
 {
-    QMutexLocker locker(&g_engineMutex);
-
     return mNode->getOrientation();
 }
 
 void Actor::setRotation(const Ogre::Quaternion& rotation)
 {
-    QMutexLocker locker(&g_engineMutex);
-
     mNode->setOrientation(rotation);
 }
 
 const Ogre::Vector3& Actor::getScale() const
 {
-    QMutexLocker locker(&g_engineMutex);
-
     return mNode->getScale();
 }
 
 void Actor::setScale(const Ogre::Vector3& scale)
 {
-    QMutexLocker locker(&g_engineMutex);
-
     mNode->setScale(scale);
 }
 
 void Actor::setScale(float factor)
 {
-    QMutexLocker locker(&g_engineMutex);
     mNode->setScale(factor, factor, factor);
 }
 
 void Actor::toggleHighlight(bool highlighted)
 {
-    QMutexLocker locker(&g_engineMutex);
-
     mNode->showBoundingBox(highlighted);
 }
 
 QString Actor::getName() const
 {
-    QMutexLocker locker(&g_engineMutex);
-
     return mNode->getName().c_str();
 }
 

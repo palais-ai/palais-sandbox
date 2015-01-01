@@ -6,10 +6,12 @@
 class ActorModel
 {
 public:
-    ActorModel(const QString& name = "", bool isVisible = false);
+    ActorModel(const QString& name = "",
+               bool isVisible = false);
 
     const QString& getName() const;
     bool isVisible() const;
+    void setVisible(bool visible);
     bool isSelected() const;
     void setSelected(bool selected);
 private:

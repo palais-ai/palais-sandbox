@@ -275,11 +275,6 @@ void Scene::toggleHighlight(bool highlighted, int index)
     }
 }
 
-int Scene::size() const
-{
-    return mActors.size();
-}
-
 const QString& Scene::getName() const
 {
     return mName;
@@ -314,7 +309,7 @@ Actor* Scene::instantiate(const QString& name,
 
     try
     {
-    Ogre::MeshManager::getSingleton().load(meshFile, "General");
+        Ogre::MeshManager::getSingleton().load(meshFile, "General");
     }
     catch(Ogre::Exception &/*e*/)
     {
@@ -334,14 +329,7 @@ Actor* Scene::instantiate(const QString& name,
 
     mEngine->unlockEngine();
 
-    Actor* retVal = new Actor(node);
-
-    QMap<QString, Actor*> actorsCopy = mActors;
-    actorsCopy[name] = retVal;
-
-    mActors[name] = retVal;
-
-    JavaScriptBindings::addActorBinding(retVal, mLogicScript);
+    Actor* retVal = addActor(node);
 
     emit actorAdded(name);
 
@@ -385,6 +373,37 @@ Actor* Scene::getActor(unsigned int index)
     return mActors.values()[index];
 }
 
+Actor* Scene::getActor(const QString& actorName)
+{
+    if(mActors.contains(actorName))
+    {
+        return mActors[actorName];
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+void Scene::onActorChangeVisible(const QString& actorName, bool visible)
+{
+    Actor* actor = getActor(actorName);
+
+    if(!actor)
+    {
+        qWarning("Can't change visiblity of actor %s, because it isn't in the scene.",
+                 actorName.toLocal8Bit().constData());
+        return;
+    }
+
+    actor->setVisible(visible);
+}
+
+void Scene::onActorVisibilityChanged(Actor* actor, bool visible)
+{
+    emit actorChangedVisibility(actor->getName(), visible);
+}
+
 QObjectList Scene::getActorsArray() const
 {
     QObjectList list;
@@ -410,6 +429,19 @@ void Scene::onRequestEmitCurrentActors()
     }
 }
 
+Actor* Scene::addActor(Ogre::SceneNode* node)
+{
+    QString name = node->getName().c_str();
+
+    mActors[name] = new Actor(node);
+    connect(mActors[name], &Actor::visibilityChanged,
+            this, &Scene::onActorVisibilityChanged);
+
+    JavaScriptBindings::addActorBinding(mActors[name], mLogicScript);
+
+    return mActors[name];
+}
+
 void Scene::getActors(Ogre::SceneNode* root)
 {
     if(!root)
@@ -426,9 +458,7 @@ void Scene::getActors(Ogre::SceneNode* root)
         // Recursively add children
         getActors(child);
 
-        QString name = child->getName().c_str();
-
-        mActors[name] = new Actor(child);
+        QString name = addActor(child)->getName();
 
         if(name.toLower() == "navmesh")
         {

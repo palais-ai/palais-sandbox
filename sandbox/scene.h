@@ -56,7 +56,6 @@ public:
     virtual bool frameEnded(const Ogre::FrameEvent& evt);
 
     Q_INVOKABLE void toggleHighlight(bool highlighted, int index);
-    Q_INVOKABLE int size() const;
 
     Q_INVOKABLE Actor* instantiate(const QString& name,
                                    const QString& meshName,
@@ -90,15 +89,21 @@ public:
     QScriptEngine& getScriptEngine();
     const QMap<QString, Actor*>& getActors() const;
     Q_INVOKABLE Actor* getActor(unsigned int index);
+    Actor* getActor(const QString& actorName);
     Q_INVOKABLE QObjectList getActorsArray() const;
     QVariantMap& getKnowledge();
     const QString& getName() const;
 signals:
     void actorAdded(const QString& actorName);
     void actorRemoved(const QString& actorName);
+    void actorChangedVisibility(const QString& actorName, bool visible);
 public slots:
     void onRequestEmitCurrentActors();
+    void onActorChangeVisible(const QString& actorName,
+                              bool visible);
+    void onActorVisibilityChanged(Actor* actor, bool visible);
 private:
+    Actor* addActor(Ogre::SceneNode* node);
     void getActors(Ogre::SceneNode* root);
     Actor* getActorForNode(Ogre::SceneNode* node) const;
     void parseNavMesh(Actor* navmesh);

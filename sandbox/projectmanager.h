@@ -24,7 +24,6 @@ class ProjectManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool playing READ isPlaying NOTIFY onPlayingChanged)
-    Q_PROPERTY(Actor* selectedActor READ getSelectedActor)
 public:
     explicit ProjectManager(OgreEngine* engine);
     ~ProjectManager();
@@ -39,8 +38,6 @@ public:
     void pause();
     Q_INVOKABLE void setSimulationSpeed(float speedFactor);
     Q_INVOKABLE void reloadProject();
-
-    Actor* getSelectedActor();
 signals:
     void startSceneLoad(const QString& sceneFile,
                         const QString& logicFile);
@@ -53,7 +50,11 @@ signals:
     void inspectorSelectionChanged(const QString& name,
                                    const QVariantMap& knowledge);
     void timePassed(const QTime& time);
+    void actorChangedSelected(const QString& actorName,
+                              bool selected);
 public slots:
+    void onActorChangeSelected(const QString& actorName,
+                               bool selected);
     void onTimePassed(const QTime& time);
     void onOpenProject(const QUrl& url);
     void onBeforeSceneLoadFinished(const QString& name,

@@ -9,6 +9,7 @@
 class SceneModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
 public:
     enum ModelRole
     {
@@ -18,8 +19,10 @@ public:
         ModelRoleIsSelected
     };
 
-    SceneModel();
+    static void declareQML();
+    SceneModel(const QString& name = "");
 
+    const QString& getName() const;
     void requestCurrentActors();
 
     // List Model impl
@@ -28,13 +31,25 @@ public:
     virtual QVariant data(const QModelIndex &index, int role) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual int rowCount(const QModelIndex &parent) const;
+
+    Q_INVOKABLE void setVisibleRequested(int index, bool visible);
+    Q_INVOKABLE void setSelectedRequested(int index, bool selected);
 signals:
+    void nameChanged();
     void requestEmitCurrentActors();
+    void requestVisiblitiyChange(const QString& actorName, bool visible);
+    void requestSelectionChange(const QString& actorName, bool selected);
+    void modelChanged(int idx, bool visible);
 public slots:
     void onActorAdded(const QString& actorName);
     void onActorRemoved(const QString& actorName);
+    void onActorChangedVisiblity(const QString& actorName, bool visible);
+    void onActorChangedSelection(const QString& actorName, bool selected);
 private:
+    int indexForActorName(const QString& actorName) const;
+
     QVector<ActorModel> mActors;
+    QString mName;
 };
 
 #endif // SCENEMODEL_H

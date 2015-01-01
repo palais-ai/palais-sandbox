@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import SceneModel 1.0
 
 Rectangle {
     id: actorCell
@@ -7,6 +8,10 @@ Rectangle {
     property int horizontalMargin: 8
 
     color: colors.darkGray
+
+    onPressed: {
+        ActorModel.setSelectedRequested(index, !isSelected);
+    }
 
     Behavior on color {
         ColorAnimation {
@@ -38,24 +43,23 @@ Rectangle {
         id: actorHideButton
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: -separator.height
-        anchors.right: arrowRightIndicator.left
+        anchors.right: parent.right
         anchors.rightMargin: horizontalMargin
         text: "\uf06e"
         font.family: fontAwesome.name
         font.pointSize: 12
         color: textColor
-        state: visible ? '' : 'HIDDEN'
 
         MouseArea {
             anchors.fill: parent
-            onClicked: {
-                var actor = Scene.getActor(index)
-                if(actorHideButton.state == '') {
-                    actor.hide()
-                    actorHideButton.state = 'HIDDEN'
-                } else {
-                    actor.show()
-                    actorHideButton.state = ''
+            onClicked: ActorModel.setVisibleRequested(index, !isVisible)
+        }
+
+        Connections {
+            target: ActorModel
+            onModelChanged: {
+                if(idx == index) {
+                    actorHideButton.state = visible ? '' : 'HIDDEN'
                 }
             }
         }
@@ -73,18 +77,6 @@ Rectangle {
                 }
             }
         ]
-    }
-
-    NativeText {
-        id: arrowRightIndicator
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: -separator.height
-        anchors.right: parent.right
-        anchors.rightMargin: horizontalMargin
-        text: "\uf105"
-        font.family: fontAwesome.name
-        font.pointSize: 12
-        color: textColor
     }
 
     ListSeparator {

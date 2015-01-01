@@ -55,6 +55,8 @@ public:
 
     QVariantMap& getKnowledge();
     void setKnowledge(const QVariantMap& map);
+signals:
+    void visibilityChanged(Actor* self, bool visible);
 private:
     Ogre::SceneNode* mNode;
     QVariantMap mKnowledge;
