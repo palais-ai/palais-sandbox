@@ -11,20 +11,23 @@ NativeText {
     font.pointSize: iconSize
     text: unicode
     color: colors.dimmedTextColor
-    height: iconSize
-    width: iconSize
-    clip: true
 
     states: [
         State {
                 name: "HOVER"
                 when: iconMouseArea.containsMouse
-                PropertyChanges { target: icon; color: colors.slightlyDimmedTextColor }
+                PropertyChanges {
+                    target: icon
+                    color: colors.slightlyDimmedTextColor
+                }
         },
         State {
                 name: "DISABLED"
                 when: !icon.enabled
-                PropertyChanges { target: icon; color: colors.stronglyDimmedTextColor }
+                PropertyChanges {
+                    target: icon
+                    color: colors.stronglyDimmedTextColor
+                }
         }
     ]
 

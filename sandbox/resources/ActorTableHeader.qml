@@ -9,6 +9,7 @@ Rectangle {
 
     property real headerPadding: 8
 
+    // Need actual elements for padding to make childrenRect calculate the proper height.
     Rectangle {
         id: pad1
         width: parent.width
@@ -28,12 +29,14 @@ Rectangle {
         font.weight: Font.Light
         color: colors.lightGray
         anchors.top: pad1.bottom
+        anchors.topMargin: headerColumn.headerPadding - 2
         anchors.left: parent.left
         anchors.leftMargin: 8
     }
 
     NativeText {
         id: scenarioName
+        width: headerColumn.width - anchors.leftMargin*2
         text: ActorModel.name
         font.family: openSans.name
         font.capitalization: Font.AllUppercase

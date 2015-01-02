@@ -27,6 +27,7 @@ Rectangle {
 
     NativeText {
         id: scenarioName
+        width: headerColumn.width - anchors.leftMargin*2
         text: InspectorModel.name
         font.family: openSans.name
         font.capitalization: Font.AllUppercase
@@ -62,9 +63,7 @@ Rectangle {
         NativeText {
             id: emptyIcon
             anchors.verticalCenter: emptyText.verticalCenter
-            anchors.verticalCenterOffset: 2
             anchors.left: parent.left
-            anchors.leftMargin: 8
             text: "\uf05a"
             font.family: fontAwesome.name
             font.pointSize: 12
@@ -74,6 +73,8 @@ Rectangle {
 
         NativeText {
             id: emptyText
+            width: headerColumn.width - 8*3 - emptyIcon.width
+            wrapMode: Text.WordWrap
             anchors.top: parent.top
             anchors.left: emptyIcon.right
             anchors.leftMargin: 8

@@ -26,6 +26,7 @@ RowLayout {
         NativeText {
             text: "speed: " + speedSlider.value.toFixed(1)
             font.family: openSans.name;
+            font.pointSize: 11
             color: colors.dimmedTextColor
             Layout.alignment: Layout.Center
         }
