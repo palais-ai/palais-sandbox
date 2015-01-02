@@ -17,6 +17,7 @@ namespace Ogre
 {
 class SceneManager;
 class Root;
+class Camera;
 }
 
 class OgreEngine;
@@ -48,6 +49,10 @@ signals:
                                  const QString& logicFile);
     void onSceneLoadedChanged(bool sceneLoaded);
     void onScenePlayingChanged(bool scenePlaying);
+    void sceneSetupFinished();
+    void selectActorAtClickpoint(float mouseX,
+                                 float mouseY,
+                                 Ogre::Camera* camera);
 public slots:
     void initializeOgre();
     void onOgreIsReady();

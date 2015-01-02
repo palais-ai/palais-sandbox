@@ -15,6 +15,7 @@
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QSGOpaqueTextureMaterial>
+#include <QScopedPointer>
 
 #include <OgreTexture.h>
 
@@ -63,7 +64,7 @@ private:
     QSGTextureMaterial m_material;
     QSGOpaqueTextureMaterial m_materialO;
     QSGGeometry m_geometry;
-    QSGTexture* m_texture;
+    QScopedPointer<QSGTexture> m_texture;
     OgreEngine* m_ogreEngineItem;
 
     QColor m_backgroundColor;

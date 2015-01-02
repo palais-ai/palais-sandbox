@@ -8,6 +8,8 @@
 #include "utility/timedlogger.h"
 #include "utility/loghandler.h"
 
+#include <QCoreApplication>
+#include <QtQml/QQmlContext>
 #include <QtGui/QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtQml>
@@ -18,8 +20,6 @@
 #include "../libqmlogre/ogreengine.h"
 #include "../libqmlogre/cameranodeobject.h"
 
-#include <QCoreApplication>
-#include <QtQml/QQmlContext>
 #include <Ogre.h>
 
 Q_DECLARE_METATYPE(ConsoleModel::LogLevel)
@@ -163,7 +163,8 @@ void Application::initializeOgre()
     QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
 
     // We only want to initialize once.
-    disconnect(window, &QQuickWindow::frameSwapped, this, &Application::initializeOgre);
+    disconnect(window, &QQuickWindow::frameSwapped,
+               this, &Application::initializeOgre);
 
     TimedLogger engineStartupLogger;
 
@@ -188,8 +189,14 @@ void Application::initializeOgre()
     QObject::connect(mProjectManager, &ProjectManager::timePassed,
                      mConsoleModel.data(), &ConsoleModel::onTimePassed);
 
+    QObject::connect(this, &Application::sceneSetupFinished,
+                     mProjectManager, &ProjectManager::onSceneSetupFinished);
+
     QObject::connect(mProjectManager, &ProjectManager::onPlayingChanged,
                      this, &Application::onPlayingChanged);
+
+    QObject::connect(this, &Application::selectActorAtClickpoint,
+                     mProjectManager, &ProjectManager::onSelectActorAtClickpoint);
 
     QObject::connect(mProjectManager, SIGNAL(sceneLoaded(Scene*)),
                      this, SLOT(onSceneLoaded(Scene*)));
@@ -241,10 +248,9 @@ void Application::onOgreViewClicked(float mouseX, float mouseY)
 {
     if(getSceneLoaded())
     {
-        // TODO: Refactor this to a signal/slot based approach, as its not thread-safe
-        mProjectManager->selectActorAtClickpoint(mouseX,
-                                                 mouseY,
-                                                 getCameraWithName("cam1")->camera());
+        emit selectActorAtClickpoint(mouseX,
+                                     mouseY,
+                                     getCameraWithName("cam1")->camera());
     }
 }
 
@@ -254,6 +260,8 @@ void Application::onBeforeSceneLoad(const QString& name,
 {
     qDebug("Before scene load");
 
+    // TODO: This section forms a race condition between OgreNode::preprocess and OgreNode::update
+    // The code should be moved to the engine thread.
     mOgreEngine->lockEngine();
 
     mRoot = mOgreEngine->getRoot();
@@ -347,6 +355,7 @@ void Application::onSceneLoaded(Scene* scene)
                                                           mInspectorModel.data());
 
     emit(onSceneLoadedChanged(getSceneLoaded()));
+    emit(sceneSetupFinished());
 }
 
 void Application::onInspectorSelectionChanged(const QString& name,

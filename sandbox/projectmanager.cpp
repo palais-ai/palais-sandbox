@@ -8,6 +8,7 @@
 #include <QString>
 #include <QDebug>
 #include <QDir>
+#include <QThread>
 
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
@@ -26,6 +27,10 @@ ProjectManager::ProjectManager(OgreEngine* engine) :
 
     connect(&mScenarioManager, &SceneManager::timePassed,
             this, &ProjectManager::onTimePassed);
+    connect(this, &ProjectManager::signalReloadProject,
+            this, &ProjectManager::onReloadProject);
+    connect(this, &ProjectManager::signalSetSimulationSpeed,
+            this, &ProjectManager::onSetSimulationSpeed);
 
     QString serviceName = QDir::temp().absoluteFilePath("SandboxService");
     if (QFile::exists(serviceName))
@@ -62,15 +67,29 @@ ProjectManager::~ProjectManager()
     }
 }
 
+void ProjectManager::setSimulationSpeed(float speedFactor)
+{
+    // Queue signal to call on the engine thread.
+    emit signalSetSimulationSpeed(speedFactor);
+}
+
+void ProjectManager::reloadProject()
+{
+    // Queue signal to call on the engine thread.
+    emit signalReloadProject();
+}
+
 void ProjectManager::onTimePassed(const QTime& time)
 {
     emit timePassed(time);
 }
 
-void ProjectManager::selectActorAtClickpoint(float mouseX,
+void ProjectManager::onSelectActorAtClickpoint(float mouseX,
                                              float mouseY,
                                              Ogre::Camera* camera)
 {
+    assert(QThread::currentThread() == thread());
+
     if(!camera)
     {
         qWarning("Cant determine an actor to select without a corresponding camera.");
@@ -81,27 +100,15 @@ void ProjectManager::selectActorAtClickpoint(float mouseX,
 
     Ogre::Ray mouseRay = camera->getCameraToViewportRay(mouseX, mouseY);
 
-    Actor* oldSelected = mSelectedActor;
-    mSelectedActor = mScenarioManager.getCurrentScene()->raycast(mouseRay.getOrigin(),
-                                                                 mouseRay.getDirection()).actor;
+    Actor* hitActor = mScenarioManager.getCurrentScene()->raycast(mouseRay.getOrigin(),
+                                                                  mouseRay.getDirection()).actor;
 
-    if(mSelectedActor)
+    if(hitActor)
     {
-        qDebug() << "Clicked " << mSelectedActor->getName();
+        qDebug() << "Clicked " << hitActor->getName();
 
-        if(oldSelected && oldSelected != mSelectedActor)
-        {
-            oldSelected->toggleHighlight(false);
-            emit actorChangedSelected(oldSelected->getName(), false);
-        }
-
-        const bool newState = !mSelectedActor->getSceneNode()->getShowBoundingBox();
-
-        mSelectedActor->toggleHighlight(newState);
-        emit actorChangedSelected(mSelectedActor->getName(),
-                                  newState);
-        emit inspectorSelectionChanged(mSelectedActor->getName(),
-                                       mSelectedActor->getKnowledge());
+        onActorChangeSelected(hitActor->getName(),
+                              !hitActor->getSceneNode()->getShowBoundingBox());
     }
     else
     {
@@ -112,6 +119,8 @@ void ProjectManager::selectActorAtClickpoint(float mouseX,
 void ProjectManager::onActorChangeSelected(const QString& actorName,
                                            bool selected)
 {
+    assert(QThread::currentThread() == thread());
+
     Scene* current = mScenarioManager.getCurrentScene();
     Actor* newSelected = current->getActor(actorName);
 
@@ -145,10 +154,12 @@ void ProjectManager::onActorChangeSelected(const QString& actorName,
     }
 }
 
-void ProjectManager::reloadProject()
+void ProjectManager::onReloadProject()
 {
-    if(getSceneLoaded())
+    assert(QThread::currentThread() == thread());
+    if(!mCurrentProjectUrl.isEmpty())
     {
+        qDebug() << "Reloading " << mCurrentProjectUrl;
         onOpenProject(mCurrentProjectUrl);
     }
 }
@@ -177,13 +188,17 @@ void ProjectManager::pause()
     emit onPlayingChanged(isPlaying());
 }
 
-void ProjectManager::setSimulationSpeed(float speedFactor)
+void ProjectManager::onSetSimulationSpeed(float speedFactor)
 {
+    assert(QThread::currentThread() == thread());
+
     mScenarioManager.setSimulationSpeed(speedFactor);
 }
 
-void ProjectManager::onOpenProject(const QUrl& url)
+void ProjectManager::onOpenProject(const QUrl url)
 {
+    assert(QThread::currentThread() == thread());
+
     QFile file(url.toLocalFile());
 
     if(!file.open(QIODevice::ReadOnly))
@@ -263,11 +278,13 @@ void ProjectManager::onOpenProject(const QUrl& url)
         return;
     }
 
-    mCurrentProjectUrl.clear();
+
     mLastOpenedUrl = url;
+    mCurrentProjectUrl.clear();
 
     pause();
     mScenarioManager.unloadCurrentScene();
+    mSelectedActor = NULL;
 
     emit(beforeSceneLoad(name, sceneFile, logicFile));
 }
@@ -276,6 +293,8 @@ void ProjectManager::onBeforeSceneLoadFinished(const QString& name,
                                                const QString& sceneFile,
                                                const QString& logicFile)
 {
+    assert(QThread::currentThread() == thread());
+
     qDebug("Loading project %s with visuals (%s) and logic (%s).",
            name.toStdString().c_str(),
            sceneFile.toStdString().c_str(),
@@ -290,7 +309,10 @@ void ProjectManager::onBeforeSceneLoadFinished(const QString& name,
         return;
     }
 
-    mCurrentProjectUrl = mLastOpenedUrl;
-
     emit(sceneLoaded(scene));
+}
+
+void ProjectManager::onSceneSetupFinished()
+{
+    mCurrentProjectUrl = mLastOpenedUrl;
 }

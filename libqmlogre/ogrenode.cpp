@@ -61,11 +61,6 @@ OgreNode::~OgreNode()
     {
         Ogre::TextureManager::getSingleton().remove("RttTex");
     }
-
-    if(m_texture)
-    {
-        delete m_texture;
-    }
 }
 
 void OgreNode::setOgreEngineItem(OgreEngine *ogreRootItem)
@@ -230,7 +225,7 @@ void OgreNode::updateFBO()
 
     int samples = getNumberOfFSAASamples();
 
-    // Don't recreate the texture on every frame during animations / Continuous size changes
+    // Don't recreate the texture on every frame during animations / Continuous size changes.
     if(m_fboDelayAccumulator < 0.f)
     {
         Ogre::TextureManager& texMgr = Ogre::TextureManager::getSingleton();
@@ -260,15 +255,10 @@ void OgreNode::updateFBO()
 
     Ogre::GLTexture* nativeTexture = static_cast<Ogre::GLTexture*>(m_rttTexture.get());
 
-    if(m_texture)
-    {
-        delete m_texture;
-    }
+    m_texture.reset(m_ogreEngineItem->createTextureFromId(nativeTexture->getGLID(), m_size));
 
-    m_texture = m_ogreEngineItem->createTextureFromId(nativeTexture->getGLID(), m_size);
-
-    m_material.setTexture(m_texture);
-    m_materialO.setTexture(m_texture);
+    m_material.setTexture(m_texture.data());
+    m_materialO.setTexture(m_texture.data());
 }
 
 void OgreNode::setCamera(Ogre::Camera *camera)

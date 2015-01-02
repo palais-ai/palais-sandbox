@@ -28,15 +28,15 @@ public:
     explicit ProjectManager(OgreEngine* engine);
     ~ProjectManager();
 
-    // Coordinates are in normalized screen coordinates.
-    void selectActorAtClickpoint(float mouseX,
-                                 float mouseY,
-                                 Ogre::Camera* camera);
     bool getSceneLoaded() const;
     bool isPlaying() const;
     void play();
     void pause();
+
+    // Thread-safe
     Q_INVOKABLE void setSimulationSpeed(float speedFactor);
+
+    // Thread-safe
     Q_INVOKABLE void reloadProject();
 signals:
     void startSceneLoad(const QString& sceneFile,
@@ -52,14 +52,23 @@ signals:
     void timePassed(const QTime& time);
     void actorChangedSelected(const QString& actorName,
                               bool selected);
+    void signalSetSimulationSpeed(float speedFactor);
+    void signalReloadProject();
 public slots:
+    void onSetSimulationSpeed(float speedFactor);
+    void onReloadProject();
     void onActorChangeSelected(const QString& actorName,
                                bool selected);
     void onTimePassed(const QTime& time);
-    void onOpenProject(const QUrl& url);
+    void onOpenProject(const QUrl url);
     void onBeforeSceneLoadFinished(const QString& name,
                                    const QString& sceneFile,
                                    const QString& logicFile);
+    void onSceneSetupFinished();
+    // Coordinates are in normalized screen coordinates.
+    void onSelectActorAtClickpoint(float mouseX,
+                                   float mouseY,
+                                   Ogre::Camera* camera);
 private:
     QUrl mLastOpenedUrl, mCurrentProjectUrl;
     SceneManager mScenarioManager;
