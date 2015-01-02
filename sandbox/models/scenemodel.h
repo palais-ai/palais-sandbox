@@ -39,7 +39,6 @@ signals:
     void requestEmitCurrentActors();
     void requestVisiblitiyChange(const QString& actorName, bool visible);
     void requestSelectionChange(const QString& actorName, bool selected);
-    void modelChanged(int idx, bool visible);
 public slots:
     void onActorAdded(const QString& actorName);
     void onActorRemoved(const QString& actorName);

@@ -3,6 +3,8 @@
 #include <QtQml>
 #include <QSharedPointer>
 
+#include "OgreStringConverter.h"
+
 Q_DECLARE_METATYPE(Ogre::Vector3)
 Q_DECLARE_METATYPE(Ogre::Vector3*)
 Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
@@ -22,6 +24,15 @@ OgreVector3Model::OgreVector3Model(const Ogre::Vector3& vector) :
     mVector(vector)
 {
     setObjectName("Vector3");
+}
+
+QVariantList OgreVector3Model::getTextualRepresentation() const
+{
+    QVariantList list;
+
+    list << QString("%1, %2, %3").arg(mVector.x).arg(mVector.y).arg(mVector.z);
+
+    return list;
 }
 
 float OgreVector3Model::getX() const
@@ -49,6 +60,18 @@ OgreVector3ArrayModel::OgreVector3ArrayModel(const QVector<Ogre::Vector3>& vecto
     mVectors(vectors)
 {
     setObjectName("Array<Vector3>");
+}
+
+QVariantList OgreVector3ArrayModel::getTextualRepresentation() const
+{
+    QVariantList list;
+
+    foreach(Ogre::Vector3 vec, mVectors)
+    {
+        list += QString("%1, %2, %3").arg(vec.x).arg(vec.y).arg(vec.z);
+    }
+
+    return list;
 }
 
 OgreVector3Model* OgreVector3ArrayModel::get(size_t idx) const

@@ -1,5 +1,3 @@
-var numCalls = 1;
-
 function partial(func /*, 0..n args */) {
 	var args = Array.prototype.slice.call(arguments, 1);
 	return function() {
@@ -8,6 +6,7 @@ function partial(func /*, 0..n args */) {
 	};
 }
 
+var numCalls = 1;
 var fighterCount = 0;
 function spawnFighter(startPos, teamColor) {
 	var actor = scene.instantiate("player_team" + numCalls + "_" + fighterCount++,

@@ -1,5 +1,5 @@
 import QtQuick 2.0
 
 Text {
-    renderType: Text.NativeRendering
+    renderType: Qt.platform.os === "osx" ? Text.NativeRendering : Text.QtRendering
 }

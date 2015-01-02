@@ -2,10 +2,18 @@
 #define INSPECTORMODEL_H
 
 #include <QAbstractListModel>
+#include <QVector>
 
 #include <OgreVector3.h>
 
-class OgreVector3Model : public QObject
+class TextualModel : public QObject
+{
+    Q_OBJECT
+public:
+    virtual QVariantList getTextualRepresentation() const = 0;
+};
+
+class OgreVector3Model : public TextualModel
 {
     Q_OBJECT
     Q_PROPERTY(float x READ getX)
@@ -17,6 +25,8 @@ public:
 
     OgreVector3Model(const Ogre::Vector3& vector = Ogre::Vector3());
 
+    Q_INVOKABLE QVariantList getTextualRepresentation() const;
+
     float getX() const;
     float getY() const;
     float getZ() const;
@@ -24,7 +34,7 @@ private:
     Ogre::Vector3 mVector;
 };
 
-class OgreVector3ArrayModel : public QObject
+class OgreVector3ArrayModel : public TextualModel
 {
     Q_OBJECT
     Q_PROPERTY(int length READ length)
@@ -32,6 +42,8 @@ public:
     static void declareQML();
 
     OgreVector3ArrayModel(const QVector<Ogre::Vector3>& vectors = QVector<Ogre::Vector3>());
+
+    Q_INVOKABLE QVariantList getTextualRepresentation() const;
 
     Q_INVOKABLE OgreVector3Model* get(size_t idx) const;
     Q_INVOKABLE int length() const;

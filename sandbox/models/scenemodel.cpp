@@ -107,7 +107,6 @@ void SceneModel::onActorChangedVisiblity(const QString& actorName, bool visible)
         QVector<int> roles;
         roles += ModelRoleIsVisible;
         emit dataChanged(createIndex(i,i), createIndex(i,i), roles);
-        emit modelChanged(i, visible);
     }
     else
     {

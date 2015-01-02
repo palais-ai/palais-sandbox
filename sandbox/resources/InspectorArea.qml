@@ -15,10 +15,8 @@ Rectangle {
 
         delegate: InspectorTableCell {
             width: sizes.sidebarWidth - separator.width
-            height: sizes.sidebarCellHeight
         }
     }
-
 
     ListSeparator {
         id: separator

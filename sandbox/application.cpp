@@ -241,6 +241,7 @@ void Application::onOgreViewClicked(float mouseX, float mouseY)
 {
     if(getSceneLoaded())
     {
+        // TODO: Refactor this to a signal/slot based approach, as its not thread-safe
         mProjectManager->selectActorAtClickpoint(mouseX,
                                                  mouseY,
                                                  getCameraWithName("cam1")->camera());
@@ -253,14 +254,14 @@ void Application::onBeforeSceneLoad(const QString& name,
 {
     qDebug("Before scene load");
 
+    mOgreEngine->lockEngine();
+
     mRoot = mOgreEngine->getRoot();
 
     if(!mRoot)
     {
         qFatal("An Ogre Root must be instantiated before scene load.");
     }
-
-    mOgreEngine->lockEngine();
 
     if(mSceneManager)
     {
