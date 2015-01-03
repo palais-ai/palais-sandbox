@@ -136,6 +136,11 @@ void SceneManager::setSimulationSpeed(float speedFactor)
     }
 }
 
+OgreEngine* SceneManager::getOgreEngine()
+{
+    return mOgreEngine;
+}
+
 Scene* SceneManager::getCurrentScene()
 {
     return mCurrentScene;

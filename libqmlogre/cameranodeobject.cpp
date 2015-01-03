@@ -26,7 +26,6 @@ extern QMutex g_engineMutex;
 
 CameraNodeObject::CameraNodeObject(QObject *parent) :
     QObject(parent),
-    OgreCameraWrapper(),
     mInitialPosition(0,0,0),
     m_node(0),
     m_camera(0),
@@ -41,13 +40,20 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
 
 void CameraNodeObject::createCameraWithCurrentSceneManager()
 {
-    if(!Ogre::Root::getSingletonPtr())
+    Ogre::Root* root = Ogre::Root::getSingletonPtr();
+    if(!root)
     {
+        qFatal("We need an ogre root to create a camera with.");
         return;
     }
 
-    Ogre::SceneManager *sceneManager = Ogre::Root::getSingleton()
-                                                  .getSceneManager(Application::sSceneManagerName);
+    if(!root->hasSceneManager(Application::sSceneManagerName))
+    {
+        qFatal("We need a scene manager to create a camera with.");
+        return;
+    }
+
+    Ogre::SceneManager *sceneManager = root->getSceneManager(Application::sSceneManagerName);
 
     // let's use the current memory address to create a unique name
     QString instanceName;
@@ -63,6 +69,8 @@ void CameraNodeObject::createCameraWithCurrentSceneManager()
     m_node->attachObject(camera);
 
     fitToContain(sceneManager->getRootSceneNode());
+
+    emit cameraChanged(m_camera);
 }
 
 void CameraNodeObject::focus(Ogre::SceneNode* node)

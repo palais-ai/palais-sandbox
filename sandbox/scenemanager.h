@@ -28,6 +28,8 @@ public:
     // __speedFactor__ must be in range between __sMinimumSpeedFactor__ and __sMaximumSpeedFactor__
     void setSimulationSpeed(float speedFactor);
 
+    OgreEngine* getOgreEngine();
+
     Scene* getCurrentScene();
     const Scene* getCurrentScene() const;
 

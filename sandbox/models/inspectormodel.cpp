@@ -91,11 +91,10 @@ void InspectorModel::declareQML()
 }
 
 InspectorModel::InspectorModel(const QString& name,
-                               const QVariantMap& knowledge) :
-    mName(name),
-    mKnowledge(knowledge)
+                               const KnowledgeModel* knowledge) :
+    mCurrentModel(NULL)
 {
-    ;
+    setModel(name, knowledge);
 }
 
 const QString& InspectorModel::getName() const
@@ -103,18 +102,74 @@ const QString& InspectorModel::getName() const
     return mName;
 }
 
-int InspectorModel::getSize() const
+void InspectorModel::setModel(const QString& name,
+                              const KnowledgeModel* knowledge)
 {
-    return mKnowledge.size();
+    if(mCurrentModel)
+    {
+        disconnect(mCurrentModel, &KnowledgeModel::knowledgeAdded,
+                   this, &InspectorModel::onKnowledgeAdded);
+
+        disconnect(mCurrentModel, &KnowledgeModel::knowledgeChanged,
+                   this, &InspectorModel::onKnowledgeChanged);
+
+        disconnect(mCurrentModel, &KnowledgeModel::knowledgeRemoved,
+                   this, &InspectorModel::onKnowledgeRemoved);
+
+        disconnect(mCurrentModel, &QObject::destroyed,
+                   this, &InspectorModel::onCurrentModelDestroyed);
+    }
+
+    mName = name;
+    mCurrentModel = knowledge;
+    mKnowledge = knowledge->getKnowledge();
+
+    connect(knowledge, &KnowledgeModel::knowledgeAdded,
+            this, &InspectorModel::onKnowledgeAdded);
+
+    connect(knowledge, &KnowledgeModel::knowledgeChanged,
+            this, &InspectorModel::onKnowledgeChanged);
+
+    connect(knowledge, &KnowledgeModel::knowledgeRemoved,
+            this, &InspectorModel::onKnowledgeRemoved);
+
+    connect(knowledge, &QObject::destroyed,
+            this, &InspectorModel::onCurrentModelDestroyed);
+
+    emit(nameChanged(name));
 }
 
-void InspectorModel::setModel(const QString& name,
-                              const QVariantMap& knowledge)
+void InspectorModel::onKnowledgeAdded(const QString& key, const QVariant& value)
 {
-    mName = name;
-    mKnowledge = knowledge;
+    int index = mKnowledge.size();
+    beginInsertRows(QModelIndex(), index, index);
+    mKnowledge[key] = value;
+    endInsertRows();
+}
 
-    emit(onNameChanged(name));
+void InspectorModel::onKnowledgeChanged(const QString& key, const QVariant& value)
+{
+    QList<QString> keys = mKnowledge.keys();
+    int i = keys.indexOf(key);
+
+    mKnowledge[key] = value;
+
+    emit dataChanged(createIndex(i,i), createIndex(i,i));
+}
+
+void InspectorModel::onKnowledgeRemoved(const QString& key)
+{
+    QList<QString> keys = mKnowledge.keys();
+    int index = keys.indexOf(key);
+
+    beginRemoveRows(QModelIndex(), index, index);
+    mKnowledge.remove(key);
+    endRemoveRows();
+}
+
+void InspectorModel::onCurrentModelDestroyed()
+{
+    mCurrentModel = NULL;
 }
 
 QHash<int, QByteArray> InspectorModel::roleNames() const

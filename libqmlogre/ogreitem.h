@@ -10,12 +10,11 @@
 #ifndef OGREITEM_H
 #define OGREITEM_H
 
-#include "ogreengine.h"
-#include "ogrecamerawrapper.h"
-
 #include <QtQuick/QQuickItem>
 
+class OgreEngine;
 class OgreNode;
+class CameraNodeObject;
 
 class OgreItem : public QQuickItem
 {
@@ -45,7 +44,7 @@ private slots:
 
 private:
     QColor m_backgroundColor;
-    OgreCameraWrapper* m_camera;
+    CameraNodeObject* m_camera;
     OgreNode* mLastNode;
     OgreEngine* m_ogreEngineItem;
 };

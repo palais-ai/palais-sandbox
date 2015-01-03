@@ -31,7 +31,8 @@ SOURCES += main.cpp \
     utility/ogrehelper.cpp \
     utility/fighterplanner.cpp \
     utility/loghandler.cpp \
-    models/scenemodel.cpp
+    models/scenemodel.cpp \
+    models/knowledgemodel.cpp
 
 HEADERS += \
     application.h \
@@ -51,7 +52,8 @@ HEADERS += \
     utility/ogrehelper.h \
     utility/timedlogger.h \
     utility/loghandler.h \
-    models/scenemodel.h
+    models/scenemodel.h \
+    models/knowledgemodel.h
 
 OTHER_FILES += \
     config/resources.cfg

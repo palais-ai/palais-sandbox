@@ -9,6 +9,10 @@
 
 #include "ogreitem.h"
 #include "ogrenode.h"
+#include "ogreengine.h"
+#include "cameranodeobject.h"
+
+#include <OgreCamera.h>
 
 OgreItem::OgreItem(QQuickItem *parent)
     : QQuickItem(parent)
@@ -20,12 +24,14 @@ OgreItem::OgreItem(QQuickItem *parent)
     setFlag(ItemHasContents);
     setSmooth(false);
 
-    connect(this, &QQuickItem::windowChanged, this, &OgreItem::windowChanged);
+    connect(this, &QQuickItem::windowChanged,
+            this, &OgreItem::windowChanged);
 }
 
 void OgreItem::windowChanged(QQuickWindow *window)
 {
-    connect(window, &QQuickWindow::frameSwapped, this, &OgreItem::update);
+    connect(window, &QQuickWindow::frameSwapped,
+            this, &OgreItem::update);
 }
 
 QColor OgreItem::backgroundColor() const
@@ -60,11 +66,13 @@ QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     if (!node)
     {
         node = mLastNode = new OgreNode();
+        node->setCamera(m_camera->camera());
         node->setOgreEngineItem(m_ogreEngineItem);
+        connect(m_camera, &CameraNodeObject::cameraChanged,
+                mLastNode, &OgreNode::onCameraChanged);
     }
 
     node->setSize(QSize(width(), height()));
-    node->setCamera(m_camera->camera());
     node->setBackgroundColor(m_backgroundColor);
     node->update();
 
@@ -76,11 +84,19 @@ QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 
 void OgreItem::setCamera(QObject *camera)
 {
-    m_camera = dynamic_cast<OgreCameraWrapper*>(camera);
+    if(m_camera && mLastNode)
+    {
+        disconnect(m_camera, &CameraNodeObject::cameraChanged,
+                   mLastNode, &OgreNode::onCameraChanged);
+    }
+
+    m_camera = dynamic_cast<CameraNodeObject*>(camera);
 
     if(mLastNode)
     {
         mLastNode->setCamera(m_camera->camera());
+        connect(m_camera, &CameraNodeObject::cameraChanged,
+                mLastNode, &OgreNode::onCameraChanged);
     }
 }
 

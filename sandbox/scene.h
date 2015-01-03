@@ -3,8 +3,8 @@
 
 #include "utility/ogrehelper.h"
 #include "utility/DebugDrawer.h"
+#include "models/knowledgemodel.h"
 
-#include <QVariant>
 #include <QScriptEngine>
 #include <QMap>
 
@@ -28,12 +28,11 @@ public:
     float distance;
 };
 
-class Scene : public QObject,
+class Scene : public KnowledgeModel,
               public Ogre::FrameListener
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ getName)
-    Q_PROPERTY(QVariantMap knowledge READ getKnowledge)
     Q_PROPERTY(QObjectList actors READ getActorsArray)
 public:
     enum ModelRole
@@ -76,23 +75,13 @@ public:
     void update(float time);
     void performAction(const QString& actionName, const QVariant& params = QVariant());
 
-    Q_INVOKABLE bool hasKnowledge(const QString& knowledgeKey) const;
-    Q_INVOKABLE QVariant getKnowledge(const QString& knowledgeKey) const;
-    Q_INVOKABLE void setKnowledge(const QString& knowledgeKey, const QVariant& value);
-
-    bool hasActorKnowledge(const QString& actorName, const QString& knowledgeKey) const;
-    QVariant getActorKnowledge(const QString& actorName, const QString& knowledgeKey) const;
-    void setActorKnowledge(const QString& actorName,
-                           const QString& knowledgeKey,
-                           const QVariant& value);
-
     QScriptEngine& getScriptEngine();
+    const QString& getName() const;
+
     const QMap<QString, Actor*>& getActors() const;
     Q_INVOKABLE Actor* getActor(unsigned int index);
     Actor* getActor(const QString& actorName);
     Q_INVOKABLE QObjectList getActorsArray() const;
-    QVariantMap& getKnowledge();
-    const QString& getName() const;
 signals:
     void actorAdded(const QString& actorName);
     void actorRemoved(const QString& actorName);
@@ -116,7 +105,6 @@ private:
     QScriptEngine mLogicScript;
     QMap<QString, Actor*> mActors;
     OgreHelper::NavigationGraph mNavMesh;
-    QVariantMap mKnowledge;
     DebugDrawer mDebugDrawer;
     bool mIsSetup;
 };

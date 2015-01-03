@@ -1,6 +1,7 @@
 #include "actorservice.h"
 #include "scenemanager.h"
 #include "scene.h"
+#include "actor.h"
 
 ActorService::ActorService(SceneManager& sceneManager, QObject *parent) :
     QJsonRpcService(parent),
@@ -22,7 +23,7 @@ QVariant ActorService::getKnowledge(const QString& actorName, const QString& kno
         return QVariant(QVariant::Invalid);
     }
 
-    if(!scene->hasActorKnowledge(actorName, knowledgeKey))
+    if(!scene->getActor(actorName)->hasKnowledge(knowledgeKey))
     {
         QJsonRpcMessage request = currentRequest().request();
         QJsonRpcMessage msg = request.createErrorResponse(QJsonRpc::UserError,
@@ -33,7 +34,7 @@ QVariant ActorService::getKnowledge(const QString& actorName, const QString& kno
         return QVariant(QVariant::Invalid);
     }
 
-    return scene->getActorKnowledge(actorName, knowledgeKey);
+    return scene->getActor(actorName)->getKnowledge(knowledgeKey);
 }
 
 void ActorService::setKnowledge(const QString& actorName, const QString& knowledgeKey, const QVariant& value)
@@ -48,7 +49,7 @@ void ActorService::setKnowledge(const QString& actorName, const QString& knowled
         return;
     }
 
-    scene->setActorKnowledge(actorName, knowledgeKey, value);
+    scene->getActor(actorName)->setKnowledge(knowledgeKey, value);
 }
 
 QVariant ActorService::performAction(const QString& actorName, const QString& actionName, const QVariant& params)

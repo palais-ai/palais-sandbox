@@ -164,39 +164,6 @@ QString Actor::getName() const
     return mNode->getName().c_str();
 }
 
-
-bool Actor::hasKnowledge(const QString& key) const
-{
-    return mKnowledge.contains(key);
-}
-
-QVariant Actor::getKnowledge(const QString& key) const
-{
-    const QVariant& retVal = mKnowledge[key];
-
-    return retVal;
-}
-
-void Actor::removeKnowledge(const QString& key)
-{
-    mKnowledge.remove(key);
-}
-
-void Actor::setKnowledge(const QString& key, const QVariant& value)
-{
-    mKnowledge[key] = value;
-}
-
-QVariantMap& Actor::getKnowledge()
-{
-    return mKnowledge;
-}
-
-void Actor::setKnowledge(const QVariantMap& map)
-{
-    mKnowledge = map;
-}
-
 QString Actor::toString() const
 {
     return "Actor (name: \"" + getName() + "\")";

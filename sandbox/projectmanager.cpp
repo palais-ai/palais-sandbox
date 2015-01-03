@@ -1,6 +1,7 @@
 #include "projectmanager.h"
 #include "scene.h"
 #include "actor.h"
+#include "application.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -15,6 +16,7 @@
 #include <OgreCamera.h>
 
 #include "../libqmlogre/ogreengine.h"
+#include "../libqmlogre/cameranodeobject.h"
 
 ProjectManager::ProjectManager(OgreEngine* engine) :
     QObject(0),
@@ -65,6 +67,36 @@ ProjectManager::~ProjectManager()
     {
         qWarning() << "Failed to remove the sandbox services on close.";
     }
+
+    Ogre::Root& root = Ogre::Root::getSingleton();
+    if(root.hasSceneManager(Application::sSceneManagerName))
+    {
+        Ogre::SceneManager* mgr = root.getSceneManager(Application::sSceneManagerName);
+        root.destroySceneManager(mgr);
+    }
+}
+
+void ProjectManager::initializeSceneManager()
+{
+    assert(QThread::currentThread() == thread());
+
+    Ogre::Root& root = Ogre::Root::getSingleton();
+    Ogre::SceneManager* mgr = NULL;
+    if(root.hasSceneManager(Application::sSceneManagerName))
+    {
+        mgr = root.getSceneManager(Application::sSceneManagerName);
+        root.destroySceneManager(mgr);
+    }
+
+    mgr = root.createSceneManager(Ogre::ST_GENERIC, Application::sSceneManagerName);
+    mgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+    mgr->setAmbientLight(Ogre::ColourValue(1, 1, 1));
+
+    // This fixes some issues with ray casting when using shallow terrain.
+    Ogre::AxisAlignedBox box;
+    Ogre::Vector3 max(100000, 100000, 100000);
+    box.setExtents(-max, max);
+    mgr->setOption("Size", &box);
 }
 
 void ProjectManager::setSimulationSpeed(float speedFactor)
@@ -85,23 +117,30 @@ void ProjectManager::onTimePassed(const QTime& time)
 }
 
 void ProjectManager::onSelectActorAtClickpoint(float mouseX,
-                                             float mouseY,
-                                             Ogre::Camera* camera)
+                                               float mouseY)
 {
     assert(QThread::currentThread() == thread());
 
-    if(!camera)
+
+    CameraNodeObject* cameraNode = getCameraWithName("cam1");
+    if(!cameraNode)
     {
-        qWarning("Cant determine an actor to select without a corresponding camera.");
+        qWarning("Cant determine an actor to select without a corresponding CameraNode.");
         return;
     }
 
-    qDebug() << "mouse x: " << mouseX << ", mouse y: " << mouseY;
+    Ogre::Camera* camera = cameraNode->camera();
+    if(!camera)
+    {
+        qWarning("Cant determine an actor to select without a corresponding ogre camera.");
+        return;
+    }
 
     Ogre::Ray mouseRay = camera->getCameraToViewportRay(mouseX, mouseY);
 
-    Actor* hitActor = mScenarioManager.getCurrentScene()->raycast(mouseRay.getOrigin(),
-                                                                  mouseRay.getDirection()).actor;
+    Scene* current = mScenarioManager.getCurrentScene();
+    Actor* hitActor = current->raycast(mouseRay.getOrigin(),
+                                       mouseRay.getDirection()).actor;
 
     if(hitActor)
     {
@@ -135,8 +174,7 @@ void ProjectManager::onActorChangeSelected(const QString& actorName,
     if(newSelected == mSelectedActor && !selected)
     {
         emit actorChangedSelected(mSelectedActor->getName(), false);
-        emit inspectorSelectionChanged(current->getName(),
-                                       current->getKnowledge());
+        emit inspectorSelectionChanged(current->getName(), current);
         mSelectedActor = NULL;
     }
     else if(selected)
@@ -150,7 +188,7 @@ void ProjectManager::onActorChangeSelected(const QString& actorName,
         mSelectedActor = newSelected;
         emit actorChangedSelected(mSelectedActor->getName(), true);
         emit inspectorSelectionChanged(mSelectedActor->getName(),
-                                       mSelectedActor->getKnowledge());
+                                       mSelectedActor);
     }
 }
 
@@ -286,14 +324,17 @@ void ProjectManager::onOpenProject(const QUrl url)
     mScenarioManager.unloadCurrentScene();
     mSelectedActor = NULL;
 
-    emit(beforeSceneLoad(name, sceneFile, logicFile));
-}
+    QString cameraName("cam1");
+    CameraNodeObject* camera = getCameraWithName(cameraName);
 
-void ProjectManager::onBeforeSceneLoadFinished(const QString& name,
-                                               const QString& sceneFile,
-                                               const QString& logicFile)
-{
-    assert(QThread::currentThread() == thread());
+    if(!camera)
+    {
+        QString msg = QString("Couldn't find first camera (id=%1).").arg(cameraName);
+        emit sceneLoadFailed(msg);
+        return;
+    }
+
+    prepareScene(camera);
 
     qDebug("Loading project %s with visuals (%s) and logic (%s).",
            name.toStdString().c_str(),
@@ -309,7 +350,46 @@ void ProjectManager::onBeforeSceneLoadFinished(const QString& name,
         return;
     }
 
+    Ogre::Root& root = Ogre::Root::getSingleton();
+    camera->fitToContain(root.getSceneManager(Application::sSceneManagerName)
+                             ->getRootSceneNode());
+
     emit(sceneLoaded(scene));
+}
+
+void ProjectManager::prepareScene(CameraNodeObject* camera)
+{
+    if(!camera)
+    {
+        qFatal("Need a camera to prepare scene.");
+        return;
+    }
+
+    Ogre::Root* root = Ogre::Root::getSingletonPtr();
+
+    if(!root)
+    {
+        qFatal("An Ogre Root must be instantiated before scene load.");
+    }
+
+    initializeSceneManager();
+
+    // Update current camera to use the new scene manager.
+    camera->createCameraWithCurrentSceneManager();
+}
+
+CameraNodeObject* ProjectManager::getCameraWithName(const QString& cameraName)
+{
+    QQuickWindow *window = mScenarioManager.getOgreEngine()->getQQuickWindow();
+    CameraNodeObject* camera = window->findChild<CameraNodeObject*>(cameraName);
+
+    if(!camera)
+    {
+        qFatal("Couldn't find camera with name (objectName=%s).",
+               cameraName.toLocal8Bit().constData());
+    }
+
+    return camera;
 }
 
 void ProjectManager::onSceneSetupFinished()

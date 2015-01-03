@@ -26,7 +26,6 @@ material Material.002
             normalise_normals off
             polygon_mode solid
             shading gouraud
-            transparent_sorting on
 
             texture_unit 
             {

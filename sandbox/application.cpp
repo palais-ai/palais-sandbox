@@ -8,6 +8,8 @@
 #include "utility/timedlogger.h"
 #include "utility/loghandler.h"
 
+#include <cassert>
+
 #include <QCoreApplication>
 #include <QtQml/QQmlContext>
 #include <QtGui/QGuiApplication>
@@ -15,10 +17,10 @@
 #include <QtQml>
 #include <QTime>
 #include <QDebug>
+#include <QThread>
 
 #include "../libqmlogre/ogreitem.h"
 #include "../libqmlogre/ogreengine.h"
-#include "../libqmlogre/cameranodeobject.h"
 
 #include <Ogre.h>
 
@@ -63,7 +65,6 @@ Application::Application(QObject *parent) :
     QObject(parent),
     mApplicationEngine(NULL),
     mOgreEngine(NULL),
-    mSceneManager(NULL),
     mProjectManager(NULL),
     mRoot(NULL),
     mSceneModel(NULL),
@@ -88,11 +89,6 @@ Application::~Application()
     if(mProjectManager)
     {
         delete mProjectManager;
-    }
-
-    if (mSceneManager)
-    {
-        mRoot->destroySceneManager(mSceneManager);
     }
 
     if(mRoot)
@@ -145,19 +141,7 @@ int Application::onApplicationStarted(int argc, char **argv)
     return app.exec();
 }
 
-void Application::initializeSceneManager()
-{
-    mSceneManager = mRoot->createSceneManager(Ogre::ST_GENERIC, sSceneManagerName);
-    mSceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-    mSceneManager->setAmbientLight(Ogre::ColourValue(1, 1, 1));
-
-    // This fixes some issues with ray casting when using shallow terrain.
-    Ogre::AxisAlignedBox box;
-    Ogre::Vector3 max(100000, 100000, 100000);
-    box.setExtents(-max, max);
-    mSceneManager->setOption("Size", &box);
-}
-
+// This function is executed in the OgreEngine's thread.
 void Application::initializeOgre()
 {
     QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
@@ -178,11 +162,10 @@ void Application::initializeOgre()
     mRoot = mOgreEngine->getRoot();
     mOgreEngine->setupResources();
 
-    initializeSceneManager();
+    mProjectManager = new ProjectManager(mOgreEngine);
+    mProjectManager->initializeSceneManager();
 
     engineStartupLogger.stop("Ogre3D startup");
-
-    mProjectManager = new ProjectManager(mOgreEngine);
 
     mApplicationEngine->rootContext()->setContextProperty("ProjectManager", mProjectManager);
 
@@ -204,14 +187,8 @@ void Application::initializeOgre()
     QObject::connect(mProjectManager, SIGNAL(sceneLoadFailed(QString)),
                      this, SLOT(onSceneLoadFailed(QString)));
 
-    QObject::connect(mProjectManager, SIGNAL(beforeSceneLoad(QString, QString, QString)),
-                     this, SLOT(onBeforeSceneLoad(QString, QString, QString)));
-
     QObject::connect(mProjectManager, &ProjectManager::inspectorSelectionChanged,
                      this, &Application::onInspectorSelectionChanged);
-
-    QObject::connect(this, SIGNAL(beforeSceneLoadFinished(QString, QString, QString)),
-                     mProjectManager, SLOT(onBeforeSceneLoadFinished(QString,QString,QString)));
 
     QString dialogName("openProjectDialog");
     QObject* projectDialog = window->findChild<QObject*>(dialogName);
@@ -229,6 +206,7 @@ void Application::initializeOgre()
     emit(ogreInitialized());
 }
 
+// This function is executed in the OgreEngine's thread.
 void Application::onOgreIsReady()
 {
     if(!mApplicationEngine)
@@ -248,85 +226,19 @@ void Application::onOgreViewClicked(float mouseX, float mouseY)
 {
     if(getSceneLoaded())
     {
-        emit selectActorAtClickpoint(mouseX,
-                                     mouseY,
-                                     getCameraWithName("cam1")->camera());
+        emit selectActorAtClickpoint(mouseX, mouseY);
     }
-}
-
-void Application::onBeforeSceneLoad(const QString& name,
-                                    const QString& sceneFile,
-                                    const QString& logicFile)
-{
-    qDebug("Before scene load");
-
-    // TODO: This section forms a race condition between OgreNode::preprocess and OgreNode::update
-    // The code should be moved to the engine thread.
-    mOgreEngine->lockEngine();
-
-    mRoot = mOgreEngine->getRoot();
-
-    if(!mRoot)
-    {
-        qFatal("An Ogre Root must be instantiated before scene load.");
-    }
-
-    if(mSceneManager)
-    {
-        mRoot->destroySceneManager(mSceneManager);
-    }
-
-    initializeSceneManager();
-
-    CameraNodeObject* camera = getCameraWithName("cam1");
-    camera->createCameraWithCurrentSceneManager();
-
-    mOgreEngine->unlockEngine();
-
-    emit(beforeSceneLoadFinished(name, sceneFile, logicFile));
-}
-
-CameraNodeObject* Application::getCameraWithName(const QString& cameraName)
-{
-    QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
-    CameraNodeObject* camera = window->findChild<CameraNodeObject*>(cameraName);
-
-    if(!camera)
-    {
-        qFatal("Couldn't find camera with name (objectName=%s).", cameraName.toStdString().c_str());
-    }
-
-    return camera;
 }
 
 void Application::onSceneLoaded(Scene* scene)
 {
-    if(!mSceneManager)
-    {
-        qFatal("Scene manager must be instantiated when a scene finished loading.");
-        return;
-    }
-
     if(!scene)
     {
         qFatal("SceneLoaded signal was sent but scene wasn't instantiated.");
         return;
     }
 
-    QString cameraName("cam1");
-    CameraNodeObject* camera = getCameraWithName(cameraName);
-
-    if(!camera)
-    {
-        qFatal("Couldn't find first camera (id=%s).", cameraName.toStdString().c_str());
-    }
-
-    mOgreEngine->lockEngine();
-    camera->fitToContain(mSceneManager->getRootSceneNode());
-    mOgreEngine->unlockEngine();
-
-    mInspectorModel.reset(new InspectorModel("Scenario",
-                                             scene->getKnowledge()));
+    mInspectorModel.reset(new InspectorModel(scene->getName(), scene));
 
     mSceneModel.reset(new SceneModel(scene->getName()));
 
@@ -359,7 +271,7 @@ void Application::onSceneLoaded(Scene* scene)
 }
 
 void Application::onInspectorSelectionChanged(const QString& name,
-                                              const QVariantMap& knowledge)
+                                              const KnowledgeModel* knowledge)
 {
     InspectorModel* oldModel = mInspectorModel.take();
     mInspectorModel.reset(new InspectorModel(name, knowledge));

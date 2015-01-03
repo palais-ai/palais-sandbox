@@ -13,15 +13,13 @@
 #include <QObject>
 #include <OgreVector3.h>
 
-#include "ogrecamerawrapper.h"
-
 namespace Ogre
 {
 class SceneNode;
 class Camera;
 }
 
-class CameraNodeObject : public QObject, public OgreCameraWrapper
+class CameraNodeObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(qreal yaw READ yaw WRITE setYaw)
@@ -43,6 +41,7 @@ public:
     void setYaw(qreal y);
     void setPitch(qreal p);
     void setZoom(qreal z);
+
     void setWireframeMode(bool enabled);
     bool getWireframeMode() const;
 
@@ -52,6 +51,8 @@ public:
     // Thread-safe
     void focus(Ogre::SceneNode* node);
 
+signals:
+    void cameraChanged(Ogre::Camera* camera);
 private:
     void updateRotation();
 

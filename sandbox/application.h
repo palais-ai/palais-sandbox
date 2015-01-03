@@ -12,6 +12,7 @@ class InspectorModel;
 class ConsoleModel;
 class TimedLogger;
 class LogHandler;
+class KnowledgeModel;
 
 namespace Ogre
 {
@@ -51,27 +52,19 @@ signals:
     void onScenePlayingChanged(bool scenePlaying);
     void sceneSetupFinished();
     void selectActorAtClickpoint(float mouseX,
-                                 float mouseY,
-                                 Ogre::Camera* camera);
+                                 float mouseY);
 public slots:
     void initializeOgre();
     void onOgreIsReady();
     void onSceneLoaded(Scene* scene);
     void onSceneLoadFailed(const QString& message);
     void onPlayButtonPressed();
-    void onBeforeSceneLoad(const QString& name,
-                           const QString& sceneFile,
-                           const QString& logicFile);
     void onPlayingChanged(bool isPlaying);
     void onInspectorSelectionChanged(const QString& name,
-                                     const QVariantMap& knowledge);
+                                     const KnowledgeModel* knowledge);
 private:
-    void initializeSceneManager();
-    CameraNodeObject* getCameraWithName(const QString& name);
-
     QQmlApplicationEngine* mApplicationEngine;
     OgreEngine* mOgreEngine;
-    Ogre::SceneManager* mSceneManager;
     ProjectManager* mProjectManager;
     Ogre::Root* mRoot;
     QScopedPointer<SceneModel> mSceneModel;

@@ -1,6 +1,8 @@
 #ifndef INSPECTORMODEL_H
 #define INSPECTORMODEL_H
 
+#include "models/knowledgemodel.h"
+
 #include <QAbstractListModel>
 #include <QVector>
 
@@ -54,8 +56,7 @@ private:
 class InspectorModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString name READ getName NOTIFY onNameChanged)
-    Q_PROPERTY(int size READ getSize NOTIFY onSizeChanged)
+    Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
 public:
     enum ModelRole
     {
@@ -67,13 +68,12 @@ public:
     static void declareQML();
 
     InspectorModel(const QString& name,
-                   const QVariantMap& knowledge);
+                   const KnowledgeModel* knowledge);
 
     void setModel(const QString& name,
-                 const QVariantMap& knowledge);
+                 const KnowledgeModel* knowledge);
 
     const QString& getName() const;
-    int getSize() const;
 
     // List Model impl
     virtual QHash<int, QByteArray> roleNames() const;
@@ -82,10 +82,15 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual int rowCount(const QModelIndex &parent) const;
 signals:
-    void onNameChanged(const QString& name);
-    void onSizeChanged(int size);
+    void nameChanged(const QString& name);
+private slots:
+    void onKnowledgeAdded(const QString& key, const QVariant& value);
+    void onKnowledgeChanged(const QString& key, const QVariant& value);
+    void onKnowledgeRemoved(const QString& key);
+    void onCurrentModelDestroyed();
 private:
     QString mName;
+    const KnowledgeModel* mCurrentModel;
     QVariantMap mKnowledge;
 };
 

@@ -261,6 +261,11 @@ void OgreNode::updateFBO()
     m_materialO.setTexture(m_texture.data());
 }
 
+void OgreNode::onCameraChanged(Ogre::Camera* newCamera)
+{
+    m_camera = newCamera;
+}
+
 void OgreNode::setCamera(Ogre::Camera *camera)
 {
     m_camera = camera;

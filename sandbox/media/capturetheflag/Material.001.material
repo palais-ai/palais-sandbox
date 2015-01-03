@@ -26,7 +26,6 @@ material Material.001
             normalise_normals off
             polygon_mode solid
             shading phong
-            transparent_sorting on
 
             texture_unit 
             {

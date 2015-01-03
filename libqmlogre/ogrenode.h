@@ -12,6 +12,7 @@
 
 #include "ogreengine.h"
 
+#include <QObject>
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QSGOpaqueTextureMaterial>
@@ -32,8 +33,10 @@ class RenderWindow;
 
 class CameraNodeObject;
 
-class OgreNode : public QSGGeometryNode
+class OgreNode : public QObject,
+                 public QSGGeometryNode
 {
+    Q_OBJECT
 public:
     // The fboCreationDelay is used to throttle the framebuffer recreation rate
     // when this QQuickItem's size is changed continuously.
@@ -57,6 +60,8 @@ public:
     void setCamera(Ogre::Camera* camera);
     void setBackgroundColor(QColor color);
 
+public slots:
+    void onCameraChanged(Ogre::Camera* newCamera);
 private:
     void resetViewport();
     int getNumberOfFSAASamples();

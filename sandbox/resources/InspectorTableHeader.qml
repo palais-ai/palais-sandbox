@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 Rectangle {
     property real headerPadding: 8
-    property bool isSizeInformationVisible: InspectorModel.size === 0
+    property bool isSizeInformationVisible: inspectorListView.count === 0
 
     id: headerColumn
     height: isSizeInformationVisible ?
@@ -78,7 +78,7 @@ Rectangle {
             anchors.top: parent.top
             anchors.left: emptyIcon.right
             anchors.leftMargin: 8
-            text: "Contains " + InspectorModel.size + " knowledge items."
+            text: "Contains " + inspectorListView.count + " knowledge items."
             font.family: openSans.name
             font.pointSize: 12
             color: colors.lightGray

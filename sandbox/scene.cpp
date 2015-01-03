@@ -416,11 +416,6 @@ QObjectList Scene::getActorsArray() const
     return list;
 }
 
-QVariantMap& Scene::getKnowledge()
-{
-    return mKnowledge;
-}
-
 void Scene::onRequestEmitCurrentActors()
 {
     foreach(Actor* actor, mActors)
@@ -558,41 +553,6 @@ void Scene::performAction(const QString& actionName,
         JavaScriptBindings::checkScriptEngineException(mLogicScript,
                                                        "performAction( " + actionName + " )");
     }
-}
-
-bool Scene::hasKnowledge(const QString& knowledgeKey) const
-{
-    return mKnowledge.contains(knowledgeKey);
-}
-
-QVariant Scene::getKnowledge(const QString& knowledgeKey) const
-{
-    return mKnowledge[knowledgeKey];
-}
-
-void Scene::setKnowledge(const QString& knowledgeKey,
-                         const QVariant& value)
-{
-    mKnowledge[knowledgeKey] = value;
-}
-
-bool Scene::hasActorKnowledge(const QString& actorName,
-                              const QString& knowledgeKey) const
-{
-    return mActors[actorName]->hasKnowledge(knowledgeKey);
-}
-
-QVariant Scene::getActorKnowledge(const QString& actorName,
-                                  const QString& knowledgeKey) const
-{
-    return mActors[actorName]->getKnowledge(knowledgeKey);
-}
-
-void Scene::setActorKnowledge(const QString& actorName,
-                              const QString& knowledgeKey,
-                              const QVariant& value)
-{
-    mActors[actorName]->setKnowledge(knowledgeKey, value);
 }
 
 QScriptEngine& Scene::getScriptEngine()

@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 ListView {
     id: listView
-    width: parent.width - separator.width
+    width: parent.width
     height: parent.height
     model: ActorModel
 
