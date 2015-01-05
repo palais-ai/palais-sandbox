@@ -1,14 +1,16 @@
 #include "scene.h"
 #include "actor.h"
-#include "application.h"
 #include "javascriptbindings.h"
-#include "utility/timedlogger.h"
-#include "astar.h"
+#include "DebugDrawer.h"
+
+#include "../libqmlogre/cameranodeobject.h"
+#include "../libqmlogre/ogreengine.h"
 
 #include <cassert>
 
 #include <QDebug>
 #include <QVector>
+#include <QQuickWindow>
 
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>
@@ -20,32 +22,19 @@
 #include <OgreSceneQuery.h>
 #include <OgreStringConverter.h>
 
-#include "../libqmlogre/ogreengine.h"
-#include "../libqmlogre/cameranodeobject.h"
-
-Q_DECLARE_METATYPE(Ogre::Vector3)
-Q_DECLARE_METATYPE(Ogre::Vector3*)
-Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
-Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
-Q_DECLARE_METATYPE(Ogre::Quaternion)
-Q_DECLARE_METATYPE(Ogre::Quaternion*)
-
 Scene::Scene(const QString& name,
              const QString& sceneFile,
              const QString& logicFile,
              Ogre::SceneNode* root,
-             OgreEngine* engine) :
+             OgreEngine* engine,
+             const QString& sceneManagerName) :
     mName(name),
     mSceneFile(sceneFile),
     mLogicFile(logicFile),
-    mRoot(root),
     mEngine(engine),
-    mRayQuery(Ogre::Root::getSingleton()
-                         .getSceneManager(Application::sSceneManagerName)
-                         ->createRayQuery(Ogre::Ray())),
-    mDebugDrawer(Ogre::Root::getSingleton()
-                            .getSceneManager(Application::sSceneManagerName),
-                 0.5f),
+    mSceneManagerName(sceneManagerName),
+    mRoot(root),
+    mRayQuery(getOgreSceneManager()->createRayQuery(Ogre::Ray())),
     mIsSetup(false)
 {
     if(!mEngine)
@@ -66,9 +55,7 @@ Scene::~Scene()
 
     if(mRayQuery)
     {
-        Ogre::Root::getSingleton()
-                   .getSceneManager(Application::sSceneManagerName)
-                   ->destroyQuery(mRayQuery);
+        getOgreSceneManager()->destroyQuery(mRayQuery);
         mRayQuery = NULL;
     }
 
@@ -78,15 +65,23 @@ Scene::~Scene()
     }
 }
 
-void Scene::makePlan(Actor* actor)
+Ogre::SceneManager* Scene::getOgreSceneManager() const
 {
-    if(!actor)
-    {
-        qWarning() << "Actor must be initialized";
-        return;
-    }
+    return Ogre::Root::getSingleton()
+            .getSceneManager(mSceneManagerName.toStdString());
+}
 
+DebugDrawer* Scene::createDebugDrawer(const QString& name)
+{
+    mDrawers += new DebugDrawer(name.toStdString(), getOgreSceneManager(), 0.5);
+    return mDrawers.last();
+}
 
+void Scene::destroyDebugDrawer(DebugDrawer* drawer)
+{
+    int idx = mDrawers.indexOf(drawer);
+    delete mDrawers[idx];
+    mDrawers.remove(idx);
 }
 
 void Scene::setCameraFocus(Actor* actor)
@@ -114,7 +109,10 @@ void Scene::setCameraFocus(Actor* actor)
 bool Scene::frameStarted(const Ogre::FrameEvent& evt)
 {
     Q_UNUSED(evt);
-    mDebugDrawer.build();
+    foreach(DebugDrawer* drawer, mDrawers)
+    {
+        drawer->build();
+    }
     return true;
 }
 
@@ -146,8 +144,6 @@ Actor* Scene::getActorForNode(Ogre::SceneNode* node) const
 RaycastResult Scene::raycast(const Ogre::Vector3& origin,
                              const Ogre::Vector3& direction)
 {
-    mEngine->lockEngine();
-
     Ogre::Ray ray(origin, direction.normalisedCopy());
 
     mRayQuery->setRay(ray);
@@ -168,7 +164,6 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin,
         {
             qWarning("No parent node attached to movable object %s in raycast query.",
                      obj->getName().c_str());
-            mEngine->unlockEngine();
             return retVal;
         }
 
@@ -178,7 +173,6 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin,
         {
             qWarning("No actor found for scene node %s in raycast query.",
                      node->getName().c_str());
-            mEngine->unlockEngine();
             return retVal;
         }
 
@@ -187,52 +181,7 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin,
     }
 
     mRayQuery->clearResults();
-    mEngine->unlockEngine();
     return retVal;
-}
-
-static ailib::real_type euclideanHeuristic(const OgreHelper::NavigationGraph::node_type& n1,
-                                           const OgreHelper::NavigationGraph::node_type& n2)
-{
-    return n1.getCentroid().squaredDistance(n2.getCentroid());
-}
-
-void Scene::moveActor(Actor* actor, const Ogre::Vector3& target)
-{
-    bool isAlreadyThere;
-    ailib::AStar<OgreHelper::NavigationGraph>::path_type path;
-    path = OgreHelper::planPath(mNavMesh,
-                                actor->getPosition(),
-                                target,
-                                &isAlreadyThere);
-
-    qDebug() << "Path size is " << path.size() << "hops.";
-
-    if(path.empty())
-    {
-        qWarning() << "Could not find a path for actor [ "
-                   << actor->getName() << " ] to reach "
-                   << Ogre::StringConverter::toString(target).c_str();
-        return;
-    }
-
-    if(isAlreadyThere)
-    {
-        qDebug() << "Target triangle has already been reached.";
-        actor->setKnowledge("movement_target", QVariant::fromValue(target));
-        return;
-    }
-
-    QVector<Ogre::Vector3> qpath;
-    // Don't save the first entry as we immediately store it in "movement_target"
-    ailib::AStar<OgreHelper::NavigationGraph>::path_type::const_iterator it = path.begin() + 1;
-    for(; it != path.end(); ++it)
-    {
-        qpath += (*it)->getCentroid();
-    }
-
-    actor->setKnowledge("current_path", QVariant::fromValue(qpath));
-    actor->setKnowledge("movement_target", QVariant::fromValue(qpath.first()));
 }
 
 // CREDITS: http://www.ogre3d.org/forums/viewtopic.php?f=2&t=53647&start=0
@@ -299,10 +248,7 @@ Actor* Scene::instantiate(const QString& name,
         return NULL;
     }
 
-    mEngine->lockEngine();
-
-    Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton()
-                                            .getSceneManager(Application::sSceneManagerName);
+    Ogre::SceneManager* scnMgr = getOgreSceneManager();
 
     Ogre::String meshFile = meshName.toStdString() + ".mesh";
     qDebug() << "Loading mesh at " << QString::fromStdString(meshFile);
@@ -327,8 +273,6 @@ Actor* Scene::instantiate(const QString& name,
     entity->setCastShadows(true);
     node->attachObject(entity);
 
-    mEngine->unlockEngine();
-
     Actor* retVal = addActor(node);
 
     emit actorAdded(name);
@@ -351,15 +295,10 @@ void Scene::destroy(Actor* actor)
         return;
     }
 
-    mEngine->lockEngine();
-
-    Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton()
-                                            .getSceneManager(Application::sSceneManagerName);
+    Ogre::SceneManager* scnMgr = getOgreSceneManager();
 
     destroyAllAttachedMovableObjects(actor->getSceneNode());
     scnMgr->destroySceneNode(actor->getSceneNode());
-
-    mEngine->unlockEngine();
 
     JavaScriptBindings::removeActorBinding(actor, mLogicScript);
 
@@ -434,6 +373,8 @@ Actor* Scene::addActor(Ogre::SceneNode* node)
 
     JavaScriptBindings::addActorBinding(mActors[name], mLogicScript);
 
+    emit actorAdded(name);
+
     return mActors[name];
 }
 
@@ -453,42 +394,8 @@ void Scene::getActors(Ogre::SceneNode* root)
         // Recursively add children
         getActors(child);
 
-        QString name = addActor(child)->getName();
-
-        if(name.toLower() == "navmesh")
-        {
-            parseNavMesh(mActors[name]);
-        }
+        addActor(child);
     }
-}
-
-void Scene::parseNavMesh(Actor* navmesh)
-{
-    TimedLogger logger;
-    logger.start();
-    mNavMesh = OgreHelper::makeNavGraphFromOgreNode(navmesh->getSceneNode(),
-                                                    euclideanHeuristic);
-    logger.stop("NavMesh parsing");
-
-    const OgreHelper::NavigationGraph::node_type* const firstNode = mNavMesh.getNodesBegin();
-    const OgreHelper::NavigationGraph::node_type* it = firstNode;
-    for(; it != mNavMesh.getNodesEnd(); ++it)
-    {
-        mDebugDrawer.drawCircle(it->getCentroid(), 0.1, 4, Ogre::ColourValue::Green, true);
-
-        uint32_t currentIdx = it - firstNode;
-
-        const ailib::Edge* it2 = mNavMesh.getSuccessorsBegin(currentIdx);
-        const ailib::Edge* const end = mNavMesh.getSuccessorsEnd(currentIdx);
-        for(; it2 != end; ++it2)
-        {
-            mDebugDrawer.drawLine(it->getCentroid(),
-                                  mNavMesh.getNode(it2->targetIndex)->getCentroid(),
-                                  Ogre::ColourValue::Red);
-        }
-    }
-
-    qDebug() << "Navigation mesh loaded with " << mNavMesh.getNumNodes() << " nodes.";
 }
 
 void Scene::setup()

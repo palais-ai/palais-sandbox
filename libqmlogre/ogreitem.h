@@ -10,13 +10,15 @@
 #ifndef OGREITEM_H
 #define OGREITEM_H
 
+#include "qmlogre_global.h"
+
 #include <QtQuick/QQuickItem>
 
 class OgreEngine;
 class OgreNode;
 class CameraNodeObject;
 
-class OgreItem : public QQuickItem
+class DLL_EXPORT OgreItem : public QQuickItem
 {
     Q_OBJECT
 

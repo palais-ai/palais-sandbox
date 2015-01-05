@@ -3,6 +3,7 @@
 #include "scene.h"
 #include "application.h"
 #include "utility/timedlogger.h"
+#include "javascriptbindings.h"
 
 #include "../libqmlogre/ogreengine.h"
 
@@ -29,6 +30,8 @@ SceneManager::SceneManager(OgreEngine* engine) :
     // This object must reside in the same thread as the ogre engine
     assert(thread() == mOgreEngine->thread());
 
+    mPluginManager.loadPlugins();
+
     startTimer(1000.f / sMaximumTickRate);
 }
 
@@ -36,6 +39,7 @@ void SceneManager::unloadCurrentScene()
 {
     if(mCurrentScene)
     {
+        mPluginManager.sceneEnded(*mCurrentScene);
         delete mCurrentScene;
         mCurrentScene = NULL;
     }
@@ -66,6 +70,10 @@ Scene* SceneManager::loadScene(const QString& name,
             qWarning("Scene %s could not be loaded.", name.toStdString().c_str());
             return NULL;
         }
+
+        mPluginManager.sceneStarted(*nextScene);
+        JavaScriptBindings::checkScriptEngineException(nextScene->getScriptEngine(),
+                                                       "Plugin onSceneStarted");
 
         logger.stop("Scene load");
         return mCurrentScene = nextScene;
@@ -111,6 +119,7 @@ void SceneManager::timerEvent(QTimerEvent*)
             // We update at constant rates to keep the results the same,
             // independent of simulation speed.
             mCurrentScene->update(oneStep);
+            mPluginManager.update(*mCurrentScene, oneStep);
             accumulator -= oneStep;
         }
 

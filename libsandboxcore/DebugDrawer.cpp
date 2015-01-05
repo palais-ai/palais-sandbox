@@ -215,8 +215,16 @@ int IcoSphere::addToVertices(std::list<VertexPair> *target, const Ogre::Vector3 
  
 // ===============================================================================================
 
-DebugDrawer::DebugDrawer(Ogre::SceneManager *_sceneManager, float _fillAlpha)
-   : sceneManager(_sceneManager), fillAlpha(_fillAlpha), manualObject(0), linesIndex(0), trianglesIndex(0), isEnabled(true)
+DebugDrawer::DebugDrawer(const Ogre::String& _name,
+                         Ogre::SceneManager *_sceneManager,
+                         float _fillAlpha)
+   : name(_name),
+     sceneManager(_sceneManager),
+     fillAlpha(_fillAlpha),
+     manualObject(0),
+     linesIndex(0),
+     trianglesIndex(0),
+     isEnabled(true)
 {
     initialise();
 }
@@ -225,27 +233,32 @@ DebugDrawer::~DebugDrawer()
 {
 	shutdown();
 }
+
+Ogre::String DebugDrawer::getName() const
+{
+    return name;
+}
  
 void DebugDrawer::initialise()
 {
-        manualObject = sceneManager->createManualObject("debug_object");
-        sceneManager->getRootSceneNode()->createChildSceneNode("debug_object")->attachObject(manualObject);
-        manualObject->setDynamic(true);
+    manualObject = sceneManager->createManualObject(name);
+    sceneManager->getRootSceneNode()->createChildSceneNode(name)->attachObject(manualObject);
+    manualObject->setDynamic(true);
 
-		icoSphere.create(DEFAULT_ICOSPHERE_RECURSION_LEVEL);
- 
-        manualObject->begin("debug_draw", Ogre::RenderOperation::OT_LINE_LIST);
-        manualObject->position(Ogre::Vector3::ZERO);
-        manualObject->colour(Ogre::ColourValue::ZERO);
-        manualObject->index(0);
-        manualObject->end();
-        manualObject->begin("debug_draw", Ogre::RenderOperation::OT_TRIANGLE_LIST);
-        manualObject->position(Ogre::Vector3::ZERO);
-        manualObject->colour(Ogre::ColourValue::ZERO);
-        manualObject->index(0);
-        manualObject->end();
- 
-		linesIndex = trianglesIndex = 0;
+    icoSphere.create(DEFAULT_ICOSPHERE_RECURSION_LEVEL);
+
+    manualObject->begin("debug_draw", Ogre::RenderOperation::OT_LINE_LIST);
+    manualObject->position(Ogre::Vector3::ZERO);
+    manualObject->colour(Ogre::ColourValue::ZERO);
+    manualObject->index(0);
+    manualObject->end();
+    manualObject->begin("debug_draw", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+    manualObject->position(Ogre::Vector3::ZERO);
+    manualObject->colour(Ogre::ColourValue::ZERO);
+    manualObject->index(0);
+    manualObject->end();
+
+    linesIndex = trianglesIndex = 0;
 }
  
 void DebugDrawer::setIcoSphereRecursionLevel(int recursionLevel)
@@ -255,7 +268,7 @@ void DebugDrawer::setIcoSphereRecursionLevel(int recursionLevel)
  
 void DebugDrawer::shutdown()
 {
-    sceneManager->destroySceneNode("debug_object");
+    sceneManager->destroySceneNode(name);
     sceneManager->destroyManualObject(manualObject);
 }
  
@@ -603,35 +616,48 @@ void DebugDrawer::drawTetrahedron(const Ogre::Vector3 &centre,
  
 void DebugDrawer::build()
 {
-	manualObject->beginUpdate(0);
-	if (lineVertices.size() > 0 && isEnabled)
-	{
-		manualObject->estimateVertexCount(lineVertices.size());
-		manualObject->estimateIndexCount(lineIndices.size());
-		for (std::list<VertexPair>::iterator i = lineVertices.begin(); i != lineVertices.end(); i++)
-		{
-				manualObject->position(i->first);
-				manualObject->colour(i->second);
-		}
-		for (std::list<int>::iterator i = lineIndices.begin(); i != lineIndices.end(); i++)
-			manualObject->index(*i);
-	}
-	manualObject->end();
+    // Added size tracking between build calls - for caching purposes.
+    static size_t lineIndicesSize = 0, vertexIndicesSize = 0;
+
+    if(lineIndicesSize != lineIndices.size())
+    {
+        manualObject->beginUpdate(0);
+        if (lineVertices.size() > 0 && isEnabled)
+        {
+            manualObject->estimateVertexCount(lineVertices.size());
+            manualObject->estimateIndexCount(lineIndices.size());
+            for (std::list<VertexPair>::iterator i = lineVertices.begin(); i != lineVertices.end(); i++)
+            {
+                    manualObject->position(i->first);
+                    manualObject->colour(i->second);
+            }
+            for (std::list<int>::iterator i = lineIndices.begin(); i != lineIndices.end(); i++)
+                manualObject->index(*i);
+        }
+        manualObject->end();
+
+        lineIndicesSize = lineIndices.size();
+    }
  
-	manualObject->beginUpdate(1);
-	if (triangleVertices.size() > 0 && isEnabled)
-	{
-		manualObject->estimateVertexCount(triangleVertices.size());
-		manualObject->estimateIndexCount(triangleIndices.size());
-		for (std::list<VertexPair>::iterator i = triangleVertices.begin(); i != triangleVertices.end(); i++)
-		{
-				manualObject->position(i->first);
-				manualObject->colour(i->second.r, i->second.g, i->second.b, fillAlpha);
-		}
-		for (std::list<int>::iterator i = triangleIndices.begin(); i != triangleIndices.end(); i++)
-			manualObject->index(*i);
-	}
-	manualObject->end();
+    if(vertexIndicesSize != triangleIndices.size())
+    {
+        manualObject->beginUpdate(1);
+        if (triangleVertices.size() > 0 && isEnabled)
+        {
+            manualObject->estimateVertexCount(triangleVertices.size());
+            manualObject->estimateIndexCount(triangleIndices.size());
+            for (std::list<VertexPair>::iterator i = triangleVertices.begin(); i != triangleVertices.end(); i++)
+            {
+                    manualObject->position(i->first);
+                    manualObject->colour(i->second.r, i->second.g, i->second.b, fillAlpha);
+            }
+            for (std::list<int>::iterator i = triangleIndices.begin(); i != triangleIndices.end(); i++)
+                manualObject->index(*i);
+        }
+        manualObject->end();
+
+        vertexIndicesSize = triangleIndices.size();
+    }
 }
  
 void DebugDrawer::clear()

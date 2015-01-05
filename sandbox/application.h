@@ -10,9 +10,9 @@ class ProjectManager;
 class SceneModel;
 class InspectorModel;
 class ConsoleModel;
+class KnowledgeModel;
 class TimedLogger;
 class LogHandler;
-class KnowledgeModel;
 
 namespace Ogre
 {

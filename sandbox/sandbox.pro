@@ -17,43 +17,33 @@ SOURCES += main.cpp \
     application.cpp \
     scenemanager.cpp \
     sceneloader.cpp \
-    scene.cpp \
     projectmanager.cpp \
-    actor.cpp \
-    javascriptbindings.cpp \
     knowledgeservice.cpp \
     actorservice.cpp \
     models/actormodel.cpp \
     models/consolemodel.cpp \
     models/inspectormodel.cpp \
     utility/timedlogger.cpp \
-    utility/DebugDrawer.cpp \
-    utility/ogrehelper.cpp \
-    utility/fighterplanner.cpp \
     utility/loghandler.cpp \
     models/scenemodel.cpp \
-    models/knowledgemodel.cpp
+    PluginManager.cpp
 
 HEADERS += \
     application.h \
     scenemanager.h \
     sceneloader.h \
-    scene.h \
     projectmanager.h \
-    actor.h \
-    javascriptbindings.h \
     knowledgeservice.h \
     actorservice.h \
     models/actormodel.h \
     models/consolemodel.h \
     models/inspectormodel.h \
-    utility/DebugDrawer.h \
-    utility/fighterplanner.h \
-    utility/ogrehelper.h \
     utility/timedlogger.h \
     utility/loghandler.h \
     models/scenemodel.h \
-    models/knowledgemodel.h
+    PluginInterface.h \
+    utility/MetatypeDeclarations.h \
+    PluginManager.h
 
 OTHER_FILES += \
     config/resources.cfg
@@ -79,7 +69,12 @@ macx {
         ConfigFiles.files += config/resources.cfg
         ConfigFiles.path = Contents/MacOS
 
-        PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib $$OUT_PWD/../libqjsonrpc/src/libqjsonrpc.1.dylib
+        PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib
+        PluginFiles.files += $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib
+        PluginFiles.files += $$OUT_PWD/../libqjsonrpc/src/libqjsonrpc.1.dylib
+        PluginFiles.files += $$OUT_PWD/../libqmlogre/libqmlogre.1.dylib
+        PluginFiles.files += $$OUT_PWD/../libsandboxcore/libsandboxcore.1.dylib
+        PluginFiles.files += $$OUT_PWD/../plugin_pathfinding/libplugin_pathfinding.dylib
         PluginFiles.path = Contents/Plugins
 
         MediaFiles.files += $$files(media/*)
@@ -104,6 +99,9 @@ macx {
 
         package.path = $$DESTDIR
         package.files += $$OUT_PWD/../libqjsonrpc/src/$$M_BUILD_DIR/qjsonrpc1.dll
+        package.files += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR/libqmlogre1.dll
+        package.files += $$OUT_PWD/../libsandboxcore/$$M_BUILD_DIR/libsandboxcore1.dll
+        package.files += $$OUT_PWD/../plugin_pathfinding/$$M_BUILD_DIR/libplugin_pathfinding.dll
         package.files += $$OGREDIR/bin/release/opt/*.dll $$OGREDIR/bin/release/*.dll
         package.files += $$OGREDIR/bin/debug/opt/*.dll $$OGREDIR/bin/debug/*.dll
         package.files += $$[QT_INSTALL_LIBS]/../bin/*.dll
@@ -124,20 +122,11 @@ macx {
 
 RESOURCES += resources/resources.qrc
 
+INCLUDEPATH += $$PWD
+
 win32 {
-    QMAKE_LIBDIR += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR
     QMAKE_LIBDIR += $$OUT_PWD/../libdotsceneloader/$$M_BUILD_DIR
-    QMAKE_LIBDIR += $$OUT_PWD/../libqjsonrpc/src/$$M_BUILD_DIR
-    QMAKE_LIBDIR += $$OUT_PWD/../libmeshmagick/$$M_BUILD_DIR
 }
-
-unix|win32: LIBS += -L$$OUT_PWD/../libqmlogre/ -lqmlogre
-
-INCLUDEPATH += $$PWD/../libqmlogre
-DEPENDPATH += $$PWD/../libqmlogre
-
-win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR/qmlogre.lib
-else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libqmlogre/libqmlogre.a
 
 unix|win32: LIBS += -L$$OUT_PWD/../libdotsceneloader/ -ldotsceneloader
 
@@ -147,14 +136,6 @@ DEPENDPATH += $$PWD/../libdotsceneloader
 win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/$$M_BUILD_DIR/dotsceneloader.lib
 else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/libdotsceneloader.a
 
-unix|win32: LIBS += -L$$OUT_PWD/../libmeshmagick/ -lmeshmagick
-
-INCLUDEPATH += $$PWD/../libmeshmagick/include
-DEPENDPATH += $$PWD/../libmeshmagick
-
-win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libmeshmagick/$$M_BUILD_DIR/meshmagick.lib
-else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libmeshmagick/libmeshmagick.a
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqjsonrpc/src/release/ -lqjsonrpc1
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqjsonrpc/src/debug/ -lqjsonrpc1
 else:unix: LIBS += -L$$OUT_PWD/../libqjsonrpc/src/ -lqjsonrpc
@@ -162,5 +143,17 @@ else:unix: LIBS += -L$$OUT_PWD/../libqjsonrpc/src/ -lqjsonrpc
 INCLUDEPATH += $$PWD/../libqjsonrpc/src
 DEPENDPATH += $$PWD/../libqjsonrpc/src
 
-INCLUDEPATH += ../../smastar/
-INCLUDEPATH += $$PWD
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqmlogre/release/ -lqmlogre
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqmlogre/debug/ -lqmlogre
+else:unix: LIBS += -L$$OUT_PWD/../libqmlogre/ -lqmlogre
+
+INCLUDEPATH += $$PWD/../libqmlogre
+DEPENDPATH += $$PWD/../libqmlogre
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libsandboxcore/release/ -lsandboxcore
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libsandboxcore/debug/ -lsandboxcore
+else:unix: LIBS += -L$$OUT_PWD/../libsandboxcore/ -lsandboxcore
+
+INCLUDEPATH += $$PWD/../libsandboxcore
+DEPENDPATH += $$PWD/../libsandboxcore
+

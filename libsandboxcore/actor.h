@@ -1,7 +1,7 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
-#include "models/knowledgemodel.h"
+#include "knowledgemodel.h"
 
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
@@ -11,7 +11,7 @@ namespace Ogre
 class SceneNode;
 }
 
-class Actor : public KnowledgeModel
+class DLL_EXPORT Actor : public KnowledgeModel
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ getName)

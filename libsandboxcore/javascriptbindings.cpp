@@ -1,6 +1,7 @@
 #include "javascriptbindings.h"
 #include "scene.h"
 #include "actor.h"
+#include "utility/MetatypeDeclarations.h"
 
 #include <QScriptEngine>
 #include <QTextStream>
@@ -11,12 +12,6 @@
 #include <OgreQuaternion.h>
 #include <OgreVector3.h>
 
-Q_DECLARE_METATYPE(Ogre::Vector3)
-Q_DECLARE_METATYPE(Ogre::Vector3*)
-Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
-Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
-Q_DECLARE_METATYPE(Ogre::Quaternion)
-Q_DECLARE_METATYPE(Ogre::Quaternion*)
 Q_DECLARE_METATYPE(Actor*)
 Q_DECLARE_METATYPE(RaycastResult)
 Q_DECLARE_METATYPE(RaycastResult*)
@@ -712,10 +707,6 @@ void addActorBinding(Actor* actor, QScriptEngine& engine)
                    << " The addition was not performed.";
         return;
     }
-
-    qDebug() << "Adding actor "
-             << cleanIdentifier(actor->getName())
-             << " to the scripting system.";
 
     engine.globalObject().setProperty(cleanIdentifier(actor->getName()),
                                       engine.newQObject(actor));

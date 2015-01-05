@@ -1,17 +1,10 @@
 #include "inspectormodel.h"
+#include "utility/MetatypeDeclarations.h"
 
 #include <QtQml>
 #include <QSharedPointer>
 
 #include "OgreStringConverter.h"
-
-Q_DECLARE_METATYPE(Ogre::Vector3)
-Q_DECLARE_METATYPE(Ogre::Vector3*)
-Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
-Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
-Q_DECLARE_METATYPE(Ogre::Quaternion)
-Q_DECLARE_METATYPE(Ogre::Quaternion*)
-Q_DECLARE_METATYPE(OgreVector3Model*)
 
 void OgreVector3Model::declareQML()
 {
@@ -59,7 +52,7 @@ void OgreVector3ArrayModel::declareQML()
 OgreVector3ArrayModel::OgreVector3ArrayModel(const QVector<Ogre::Vector3>& vectors) :
     mVectors(vectors)
 {
-    setObjectName("Array<Vector3>");
+    setObjectName(QString("Vector3[%1]").arg(vectors.size()));
 }
 
 QVariantList OgreVector3ArrayModel::getTextualRepresentation() const

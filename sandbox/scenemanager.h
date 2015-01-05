@@ -1,6 +1,8 @@
 #ifndef SCENEMANAGER_H
 #define SCENEMANAGER_H
 
+#include "PluginManager.h"
+
 #include <QObject>
 #include <QTime>
 #include <QAtomicInt>
@@ -40,6 +42,7 @@ signals:
 protected:
     void timerEvent(QTimerEvent *);
 private:
+    PluginManager mPluginManager;
     OgreEngine* mOgreEngine;
     Scene* mCurrentScene;
     QAtomicInt mSceneStarted;

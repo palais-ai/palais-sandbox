@@ -26,7 +26,7 @@ function spawnFighter(startPos, teamColor) {
 	lookAtPos.z *= 2
 	actor.lookAt(lookAtPos);
 
-	scene.moveActor(actor, teamColor == "red" ? flag_green.position : flag_red.position);
+	pathfinding.moveActor(actor, teamColor == "red" ? flag_green.position : flag_red.position);
 }
 
 function spawnTeam(teamSize, startPos) {
@@ -54,58 +54,22 @@ function onStart() {
 	print(Cube_000.position)
 	cubePosition = Cube_059.position
 
-	scene.setKnowledge("hi", true);
-	scene.setKnowledge("hi2", 1);
-	scene.setKnowledge("hi3", 2.0);
-	scene.setKnowledge("hi4", new Vector3(3,3,3));
+	scene.setKnowledge("bool", true);
+	scene.setKnowledge("int", 1);
+	scene.setKnowledge("float", 2.1);
+	scene.setKnowledge("floatarr", [2.0, 2.0, 2.0]);
+	scene.setKnowledge("string", "hi");
+	scene.setKnowledge("vec3", new Vector3(3,3,3));
+	scene.setKnowledge("vec3array", [new Vector3(3,3,3), new Vector3(3,3,3)])
 
-	timer = setInterval(1000, function() {print("test timer")})
+	timer = setInterval(1000, function() {
+		print("test timer")
+	});
+	clearInterval(timer);
 }
 
-function updateActor(deltaTime, actor) {
-	var actorSpeed = 0.5 
-	if(actor.hasKnowledge("movement_target")) {
-		var target = actor.getKnowledge("movement_target")
-		var current = actor.position
-
-		if(current.distanceTo(target) < 0.01) {
-			if(actor.hasKnowledge("current_path")) {
-				var path = actor.getKnowledge("current_path")
-				var next = path[0]
-
-				if(path.length == 1) {
-					actor.removeKnowledge("current_path")
-				}
-				else {
-					path.splice(0, 1)
-					actor.setKnowledge("current_path", path)
-				}
-
-				actor.setKnowledge("movement_target", next);
-				target = next;
-			}
-			else {
-				actor.removeKnowledge("movement_target");
-				actor.disableAnimation("my_animation");
-				print("Reached goal.");
-			}
-		}
-
-		var step = target.subtract(current).normalize().multiply(actorSpeed * deltaTime);
-
-		actor.position = current.add(step);
-	}
-} 
-
 function update(deltaTime) {
-	testRaycast()
-
-	var actors = scene.getActorsArray()
-	for(var i = 0; i < actors.length; ++i) {
-		updateActor(deltaTime, actors[i]);
-	}
-
-	clearInterval(timer)
+	;
 }
 
 function shoot(actor, target) {

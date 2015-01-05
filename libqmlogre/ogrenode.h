@@ -10,6 +10,8 @@
 #ifndef OGRENODE_H
 #define OGRENODE_H
 
+#include "qmlogre_global.h"
+
 #include "ogreengine.h"
 
 #include <QObject>
@@ -33,8 +35,8 @@ class RenderWindow;
 
 class CameraNodeObject;
 
-class OgreNode : public QObject,
-                 public QSGGeometryNode
+class DLL_EXPORT OgreNode : public QObject,
+                            public QSGGeometryNode
 {
     Q_OBJECT
 public:

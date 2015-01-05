@@ -3,8 +3,10 @@ QT += qml quick
 TEMPLATE = lib
 TARGET = qmlogre
 
+DEFINES += QMLOGRE_LIBRARY
+macx:QMAKE_LFLAGS_SONAME = -Wl,-install_name,@executable_path/../Plugins/
+
 #CONFIG += c++11
-CONFIG += staticlib
 
 CONFIG(debug, debug|release) {
     DEFINES += DEBUG
@@ -25,7 +27,8 @@ HEADERS += \
     ogreitem.h \
     ogrenode.h \
     cameranodeobject.h \
-    ogreengine.h
+    ogreengine.h \
+    qmlogre_global.h
 
 # Copy all headers to build folder
 Headers.path = $$OUT_PWD/include

@@ -1,9 +1,14 @@
-// CREDITS: Adapted from http://ogre3d.org/tikiwiki/Debug+Drawing+Utility+Class
+#ifndef DEBUGDRAWER_H
+#define DEBUGDRAWER_H
 
+// CREDITS: Adapted from http://ogre3d.org/tikiwiki/Debug+Drawing+Utility+Class
 #pragma once
  
+#include "libsandboxcore_global.h"
+
 #include <OgreVector3.h>
 #include <OgreColourValue.h>
+#include <OgreString.h>
 
 #include <map>
 #include <list>
@@ -19,7 +24,7 @@ typedef std::pair<Ogre::Vector3, Ogre::ColourValue> VertexPair;
 
 #define DEFAULT_ICOSPHERE_RECURSION_LEVEL	1
 
-class IcoSphere
+class DLL_EXPORT IcoSphere
 {
 public:
 	struct TriangleIndices
@@ -68,12 +73,14 @@ private:
 	int index;
 };
  
-class DebugDrawer
+class DLL_EXPORT DebugDrawer
 {
 public:
-	DebugDrawer(Ogre::SceneManager *_sceneManager, float _fillAlpha);
+    DebugDrawer(const Ogre::String& name, Ogre::SceneManager *_sceneManager, float _fillAlpha);
 	~DebugDrawer();
  
+    Ogre::String getName() const;
+
 	void build();
  
 	void setIcoSphereRecursionLevel(int recursionLevel);
@@ -93,7 +100,7 @@ public:
 	void clear();
  
 private:
- 
+    Ogre::String name;
 	Ogre::SceneManager *sceneManager;
 	Ogre::ManualObject *manualObject;
 	float fillAlpha;
@@ -133,3 +140,5 @@ private:
  
 	void addQuadIndices(int index1, int index2, int index3, int index4);
 };
+
+#endif // DEBUGDRAWER_H

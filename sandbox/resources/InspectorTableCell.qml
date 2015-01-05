@@ -17,6 +17,8 @@ Rectangle {
         if(value instanceof Object &&
            value.hasOwnProperty("objectName")) {
             return value.objectName
+        } else if(value instanceof Array) {
+            return typeof(value[0]) + "[" + value.length + "]"
         }
         return typeof(value)
     }
@@ -67,8 +69,11 @@ Rectangle {
         model: {
             if(value.hasOwnProperty("getTextualRepresentation")) {
                 return value.getTextualRepresentation();
+            } else if(value instanceof Array) {
+                return value;
+            } else {
+                return [value];
             }
-            return [value];
         }
 
         style: ComboBoxStyle {

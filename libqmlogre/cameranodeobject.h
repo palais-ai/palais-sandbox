@@ -10,6 +10,8 @@
 #ifndef CAMERANODEOBJECT_H
 #define CAMERANODEOBJECT_H
 
+#include "qmlogre_global.h"
+
 #include <QObject>
 #include <OgreVector3.h>
 
@@ -19,7 +21,7 @@ class SceneNode;
 class Camera;
 }
 
-class CameraNodeObject : public QObject
+class DLL_EXPORT CameraNodeObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(qreal yaw READ yaw WRITE setYaw)

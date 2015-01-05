@@ -73,7 +73,7 @@ Rectangle {
 
         NativeText {
             id: emptyText
-            width: headerColumn.width - 8*3 - emptyIcon.width
+            width: sizes.inspectorWidth  - 8*3 - emptyIcon.width
             wrapMode: Text.WordWrap
             anchors.top: parent.top
             anchors.left: emptyIcon.right

@@ -19,6 +19,7 @@
 #include <Ogre.h>
 #include <QOpenGLFunctions>
 #include <QDir>
+#include <QQuickWindow>
 
 QMutex g_engineMutex;
 

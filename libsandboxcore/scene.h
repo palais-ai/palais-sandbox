@@ -1,10 +1,10 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "utility/ogrehelper.h"
-#include "utility/DebugDrawer.h"
-#include "models/knowledgemodel.h"
+#include "ogrehelper.h"
+#include "knowledgemodel.h"
 
+#include <QVector>
 #include <QScriptEngine>
 #include <QMap>
 
@@ -14,22 +14,24 @@
 
 class Actor;
 class OgreEngine;
+class DebugDrawer;
 
 namespace Ogre
 {
 class SceneNode;
 class RaySceneQuery;
+class SceneManager;
 }
 
-class RaycastResult
+class DLL_EXPORT RaycastResult
 {
 public:
     Actor* actor;
     float distance;
 };
 
-class Scene : public KnowledgeModel,
-              public Ogre::FrameListener
+class DLL_EXPORT Scene : public KnowledgeModel,
+                         public Ogre::FrameListener
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ getName)
@@ -45,9 +47,14 @@ public:
           const QString& sceneFile,
           const QString& logicFile,
           Ogre::SceneNode* root,
-          OgreEngine* ogreEngine);
+          OgreEngine* engine,
+          const QString& sceneManagerName);
 
     ~Scene();
+
+    Ogre::SceneManager* getOgreSceneManager() const;
+    DebugDrawer* createDebugDrawer(const QString& name);
+    void destroyDebugDrawer(DebugDrawer* drawer);
 
     // Frame Listener
     virtual bool frameStarted(const Ogre::FrameEvent& evt);
@@ -68,8 +75,6 @@ public:
     // Reports the first hit actor in the scene.
     Q_INVOKABLE RaycastResult raycast(const Ogre::Vector3& origin,
                                       const Ogre::Vector3& direction);
-    Q_INVOKABLE void moveActor(Actor* actor, const Ogre::Vector3& target);
-    Q_INVOKABLE void makePlan(Actor* actor);
 
     void setup();
     void update(float time);
@@ -78,6 +83,7 @@ public:
     QScriptEngine& getScriptEngine();
     const QString& getName() const;
 
+    Actor* addActor(Ogre::SceneNode* node);
     const QMap<QString, Actor*>& getActors() const;
     Q_INVOKABLE Actor* getActor(unsigned int index);
     Actor* getActor(const QString& actorName);
@@ -92,20 +98,19 @@ public slots:
                               bool visible);
     void onActorVisibilityChanged(Actor* actor, bool visible);
 private:
-    Actor* addActor(Ogre::SceneNode* node);
     void getActors(Ogre::SceneNode* root);
     Actor* getActorForNode(Ogre::SceneNode* node) const;
     void parseNavMesh(Actor* navmesh);
     void destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode);
 
     QString mName, mSceneFile, mLogicFile;
-    Ogre::SceneNode* mRoot;
     OgreEngine* mEngine;
+    QString mSceneManagerName;
+    Ogre::SceneNode* mRoot;
     Ogre::RaySceneQuery* mRayQuery;
     QScriptEngine mLogicScript;
     QMap<QString, Actor*> mActors;
-    OgreHelper::NavigationGraph mNavMesh;
-    DebugDrawer mDebugDrawer;
+    QVector<DebugDrawer*> mDrawers;
     bool mIsSetup;
 };
 

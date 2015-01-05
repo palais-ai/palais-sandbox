@@ -1,7 +1,7 @@
 #ifndef INSPECTORMODEL_H
 #define INSPECTORMODEL_H
 
-#include "models/knowledgemodel.h"
+#include "knowledgemodel.h"
 
 #include <QAbstractListModel>
 #include <QVector>

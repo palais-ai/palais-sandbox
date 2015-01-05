@@ -37,7 +37,7 @@ RowLayout {
             maximumValue: 5
             stepSize: 0.1
             value: 1
-            opacity: 0.8
+            opacity: 1
             onValueChanged: ProjectManager.setSimulationSpeed(speedSlider.value)
         }
     }

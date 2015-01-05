@@ -10,6 +10,8 @@
 #ifndef OGREENGINEITEM_H
 #define OGREENGINEITEM_H
 
+#include "qmlogre_global.h"
+
 #include <QObject>
 #include <QQuickWindow>
 #include <QOpenGLContext>
@@ -29,7 +31,7 @@ class RenderWindow;
  * @brief The OgreEngineItem class
  * Must only be constructed from within Qt QML rendering thread.
  */
-class OgreEngine : public QObject
+class DLL_EXPORT OgreEngine : public QObject
 {
     Q_OBJECT
 

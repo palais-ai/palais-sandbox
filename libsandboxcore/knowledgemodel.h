@@ -1,10 +1,12 @@
 #ifndef KNOWLEDGEMODEL_H
 #define KNOWLEDGEMODEL_H
 
+#include "libsandboxcore_global.h"
+
 #include <QObject>
 #include <QVariant>
 
-class KnowledgeModel : public QObject
+class DLL_EXPORT KnowledgeModel : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariantMap knowledge READ getKnowledge)

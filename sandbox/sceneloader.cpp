@@ -2,6 +2,7 @@
 #include "scene.h"
 #include "actor.h"
 #include "javascriptbindings.h"
+#include "application.h"
 
 #include <exception>
 
@@ -29,11 +30,13 @@ Scene* SceneLoader::loadScene(OgreEngine* engine,
     {
         loadSceneVisuals(engine, sceneManager, sceneFile);
 
+        QString sceneMgrName = QString("%1").arg(Application::sSceneManagerName.c_str());
         QScopedPointer<Scene> scene(new Scene(name,
                                               sceneFile,
                                               logicFile,
                                               sceneManager->getRootSceneNode(),
-                                              engine));
+                                              engine,
+                                              sceneMgrName));
 
         try
         {

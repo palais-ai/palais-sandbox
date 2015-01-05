@@ -1,0 +1,12 @@
+#ifndef LIBSANDBOXCORE_GLOBAL_H
+#define LIBSANDBOXCORE_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(LIBSANDBOXCORE_LIBRARY)
+#  define DLL_EXPORT Q_DECL_EXPORT
+#else
+#  define DLL_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // LIBSANDBOXCORE_GLOBAL_H

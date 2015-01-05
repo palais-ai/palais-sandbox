@@ -9,11 +9,6 @@
 #include <OgreAnimation.h>
 #include <OgreEntity.h>
 
-Q_DECLARE_METATYPE(Ogre::Vector3)
-Q_DECLARE_METATYPE(Ogre::Vector3*)
-Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
-Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
-
 Actor::Actor(Ogre::SceneNode* node) :
     mNode(node)
 {
