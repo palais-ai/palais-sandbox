@@ -7,7 +7,7 @@
 QT += core script
 QT -= gui
 
-TARGET = plugin_pathfinding
+TARGET = plugin_planning
 TEMPLATE = lib
 CONFIG += plugin
 
@@ -18,12 +18,12 @@ MOC_DIR = ./.moc
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
 
 SOURCES += \
-    pathfinding.cpp \
-    PathfindingPlugin.cpp
+    PlanningPlugin.cpp \
+    Planning.cpp
 
 HEADERS += \
-    pathfinding.h \
-    PathfindingPlugin.h
+    PlanningPlugin.h \
+    Planning.h
 
 include(../linkOgreSDK.pri)
 

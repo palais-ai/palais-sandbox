@@ -39,12 +39,6 @@ function spawnTeam(teamSize, startPos) {
 	numCalls++;
 }
 
-function testRaycast() {
-	var result = scene.raycast(new Vector3(0,0,0), new Vector3(1,0,0))
-	var result2 = scene.raycast(new Vector3(0,0,0), new Vector3(0,1,0))
-	var result3 = scene.raycast(new Vector3(0,0,0), new Vector3(0,0,1))
-}
-
 var timer;
 function onStart() {
 	var teamSize = 5;
@@ -60,12 +54,14 @@ function onStart() {
 	scene.setKnowledge("floatarr", [2.0, 2.0, 2.0]);
 	scene.setKnowledge("string", "hi");
 	scene.setKnowledge("vec3", new Vector3(3,3,3));
-	scene.setKnowledge("vec3array", [new Vector3(3,3,3), new Vector3(3,3,3)])
+	scene.setKnowledge("vec3array", [new Vector3(3,3,3), new Vector3(3,3,3)]);
 
-	timer = setInterval(1000, function() {
-		print("test timer")
-	});
-	clearInterval(timer);
+	var planner = new Planner();
+	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
+	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
+	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
+	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
+	planner.makePlan(Cube_000, {"test" : 5, "x" : true, "yzx" : new Vector3(3,3,3)});
 }
 
 function update(deltaTime) {

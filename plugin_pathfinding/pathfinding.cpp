@@ -27,10 +27,6 @@ static ailib::real_type euclideanHeuristic(const Pathfinding::NavigationGraph::n
     return n1.getCentroid().squaredDistance(n2.getCentroid());
 }
 
-Pathfinding::Pathfinding()
-{
-}
-
 void Pathfinding::updateActor(Actor &actor, float deltaTime)
 {
     static const float defaultActorSpeed = 0.5;

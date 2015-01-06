@@ -6,6 +6,8 @@ TARGET = qmlogre
 DEFINES += QMLOGRE_LIBRARY
 macx:QMAKE_LFLAGS_SONAME = -Wl,-install_name,@executable_path/../Plugins/
 
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
+
 #CONFIG += c++11
 
 CONFIG(debug, debug|release) {

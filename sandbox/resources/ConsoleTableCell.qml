@@ -14,7 +14,7 @@ Rectangle {
         text: getIconForLogLevel(level)
         font.family: fontAwesome.name
         font.pointSize: 12
-        color: colors.almostWhite
+        color: getIconColorForLogLevel(level)
 
         function getIconForLogLevel(loglevel) {
             switch(loglevel)
@@ -27,6 +27,20 @@ Rectangle {
                 return "\uf071"
             case ConsoleModel.LogLevelError:
                 return "\uf057"
+            }
+        }
+
+
+        function getIconColorForLogLevel(loglevel) {
+            switch(loglevel)
+            {
+            case ConsoleModel.LogLevelInfo:
+            case ConsoleModel.LogLevelDebug:
+                return colors.almostWhite;
+            case ConsoleModel.LogLevelWarning:
+                return "yellow"
+            case ConsoleModel.LogLevelError:
+                return "red"
             }
         }
     }

@@ -64,10 +64,8 @@ void OgreEngine::startEngine()
     activateOgreContext();
 
     QString basePath = QCoreApplication::applicationDirPath();
-    qDebug() << "The base path is " << basePath;
 
     m_resources_cfg = (basePath + "/resources.cfg").toStdString();
-    qDebug() << "Resources path is " << QString::fromStdString(m_resources_cfg);
 
     Ogre::Root *ogreRoot = new Ogre::Root("", m_resources_cfg);
 
@@ -82,9 +80,6 @@ void OgreEngine::startEngine()
     const std::string renderSystemPath = (basePath + "/RenderSystem_GL").toStdString();
     const std::string octtreePath = (basePath + "/Plugin_OctreeSceneManager").toStdString();
 #endif
-
-    qDebug() << "Render System path is " << QString::fromStdString(renderSystemPath);
-    qDebug() << "Octtree Plugin path is " << QString::fromStdString(octtreePath);
 
     ogreRoot->loadPlugin(renderSystemPath);
     ogreRoot->loadPlugin(octtreePath);
@@ -267,9 +262,11 @@ void OgreEngine::setupResources(void)
             archName = i->second;
             archName = (basePath + "/" + QString::fromStdString(archName)).toStdString();
 
+            /*
             qDebug() << "archName: " << QString::fromStdString(archName);
             qDebug() << "typeName: " << QString::fromStdString(typeName);
             qDebug() << "secName: " << QString::fromStdString(secName);
+            */
 
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
                 archName, typeName, secName);

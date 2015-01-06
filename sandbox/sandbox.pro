@@ -13,6 +13,8 @@ MOC_DIR = ./.moc
 DEFINES -= QJSONRPC_BUILD
 DEFINES += QJSONRPC_SHARED
 
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
+
 SOURCES += main.cpp \
     application.cpp \
     scenemanager.cpp \
@@ -75,6 +77,7 @@ macx {
         PluginFiles.files += $$OUT_PWD/../libqmlogre/libqmlogre.1.dylib
         PluginFiles.files += $$OUT_PWD/../libsandboxcore/libsandboxcore.1.dylib
         PluginFiles.files += $$OUT_PWD/../plugin_pathfinding/libplugin_pathfinding.dylib
+        PluginFiles.files += $$OUT_PWD/../plugin_planning/libplugin_planning.dylib
         PluginFiles.path = Contents/Plugins
 
         MediaFiles.files += $$files(media/*)
@@ -102,6 +105,7 @@ macx {
         package.files += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR/libqmlogre1.dll
         package.files += $$OUT_PWD/../libsandboxcore/$$M_BUILD_DIR/libsandboxcore1.dll
         package.files += $$OUT_PWD/../plugin_pathfinding/$$M_BUILD_DIR/libplugin_pathfinding.dll
+        package.files += $$OUT_PWD/../plugin_planning/$$M_BUILD_DIR/libplugin_planning.dll
         package.files += $$OGREDIR/bin/release/opt/*.dll $$OGREDIR/bin/release/*.dll
         package.files += $$OGREDIR/bin/debug/opt/*.dll $$OGREDIR/bin/debug/*.dll
         package.files += $$[QT_INSTALL_LIBS]/../bin/*.dll

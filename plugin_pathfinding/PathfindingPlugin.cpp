@@ -10,16 +10,18 @@ PathfindingPlugin::PathfindingPlugin(QObject *parent) :
 
 void PathfindingPlugin::onLoad(const PluginInterface& interface)
 {
-
+    Q_UNUSED(interface);
 }
 
 void PathfindingPlugin::onUnload(const PluginInterface& interface)
 {
-
+    Q_UNUSED(interface);
 }
 
 void PathfindingPlugin::onSceneStarted(const PluginInterface& interface, Scene& scene)
 {
+    Q_UNUSED(interface);
+
     mPathfindingDrawer = scene.createDebugDrawer("navigation_graph");
 
     QMapIterator<QString, Actor*> it(scene.getActors());
@@ -46,10 +48,12 @@ void PathfindingPlugin::onSceneStarted(const PluginInterface& interface, Scene& 
 
 void PathfindingPlugin::onSceneEnded(const PluginInterface& interface, Scene& scene)
 {
+    Q_UNUSED(interface);
     scene.destroyDebugDrawer(mPathfindingDrawer);
 }
 
 void PathfindingPlugin::update(const PluginInterface& interface, Scene& scene, float deltaTime)
 {
+    Q_UNUSED(interface);
     mPathfinding.update(scene, deltaTime);
 }

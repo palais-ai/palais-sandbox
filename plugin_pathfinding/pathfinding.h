@@ -40,8 +40,6 @@ class Pathfinding : public QObject
 public:
     typedef ailib::Graph<Triangle, 3> NavigationGraph;
 
-    Pathfinding();
-
     void update(Scene& scene, float deltaTime);
     void updateActor(Actor& actor, float deltaTime);
 

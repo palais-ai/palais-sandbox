@@ -47,7 +47,7 @@ static void messageHandlerFun(QtMsgType type,
         level = ConsoleModel::LogLevelWarning;
             break;
         case QtCriticalMsg:
-        level = ConsoleModel::LogLevelError;
+            level = ConsoleModel::LogLevelError;
             break;
         case QtFatalMsg:
             level = ConsoleModel::LogLevelError;

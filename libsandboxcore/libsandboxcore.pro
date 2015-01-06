@@ -14,6 +14,8 @@ TEMPLATE = lib
 DEFINES += LIBSANDBOXCORE_LIBRARY
 macx:QMAKE_LFLAGS_SONAME = -Wl,-install_name,@executable_path/../Plugins/
 
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
+
 SOURCES += \
     actor.cpp \
     javascriptbindings.cpp \

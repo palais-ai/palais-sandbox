@@ -12,6 +12,8 @@ VERSION = $${QJSONRPC_VERSION}
 #win32:DESTDIR = $$OUT_PWD
 macx:QMAKE_LFLAGS_SONAME = -Wl,-install_name,@executable_path/../Plugins/
 
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
+
 # check if we need to build qjson
 lessThan(QT_MAJOR_VERSION, 5) {
     include(json/json.pri)

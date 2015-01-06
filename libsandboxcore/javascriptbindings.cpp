@@ -190,24 +190,24 @@ void checkScriptEngineException(QScriptEngine& engine, const QString& context)
         engine.uncaughtExceptionLineNumber();
         if(context.isEmpty())
         {
-            qWarning() << "Exception in loaded logic file "
-                       << ", ERROR:"
-                       << engine.uncaughtException().toString()
-                       << ", on line "
-                       << engine.uncaughtExceptionLineNumber()
-                       << ", backtrace: "
-                       << engine.uncaughtExceptionBacktrace().join("\n");
+            qCritical() << "Exception in loaded logic file "
+                        << ", ERROR:"
+                        << engine.uncaughtException().toString()
+                        << ", on line "
+                        << engine.uncaughtExceptionLineNumber()
+                        << ", backtrace: "
+                        << engine.uncaughtExceptionBacktrace().join("\n");
         }
         else
         {
-            qWarning() << "Exception in "
-                       << context
-                       << ", ERROR:"
-                       << engine.uncaughtException().toString()
-                       << ", on line "
-                       << engine.uncaughtExceptionLineNumber()
-                       << ", backtrace: "
-                       << engine.uncaughtExceptionBacktrace().join("\n");
+            qCritical() << "Exception in "
+                        << context
+                        << ", ERROR:"
+                        << engine.uncaughtException().toString()
+                        << ", on line "
+                        << engine.uncaughtExceptionLineNumber()
+                        << ", backtrace: "
+                        << engine.uncaughtExceptionBacktrace().join("\n");
         }
         engine.clearExceptions();
     }
@@ -312,6 +312,8 @@ void RaycastResult_register_prototype(QScriptEngine& engine)
 
 QScriptValue RaycastResult_prototype_distance(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     // Cast to a pointer to be able to modify the underlying C++ value
     RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
 
@@ -347,6 +349,8 @@ QScriptValue RaycastResult_prototype_actor(QScriptContext *context, QScriptEngin
 
 QScriptValue RaycastResult_prototype_hasHit(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     // Cast to a pointer to be able to modify the underlying C++ value
     RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
 
@@ -367,9 +371,6 @@ void Actor_register_prototype(QScriptEngine& engine)
 
     QScriptValue prototype = engine.newQObject((Actor*)0);
     engine.setDefaultPrototype(actorTypeId, prototype);
-
-    engine.globalObject().setProperty("Actor",
-                                      engine.newFunction(Vector3_prototype_ctor));
 }
 
 void Vector3_register_prototype(QScriptEngine& engine)
@@ -538,6 +539,8 @@ QScriptValue Vector3_prototype_z(QScriptContext *context, QScriptEngine *engine)
 
 QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *engine)
 {
+    Q_UNUSED(engine);
+
     // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
@@ -549,8 +552,7 @@ QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *
     }
 
     QString t;
-    return QString("Vector3 @%0 (x: %1, y: %2, z: %3)")
-                  .arg(t.sprintf("%08p", v))
+    return QString("Vector3 (x: %1, y: %2, z: %3)")
                   .arg(v->x)
                   .arg(v->y)
                   .arg(v->z);

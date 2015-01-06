@@ -49,7 +49,7 @@ Rectangle {
         id: actorHideButton
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
-        anchors.rightMargin: horizontalMargin
+        anchors.rightMargin: horizontalMargin * 3
         text: "\uf06e"
         font.family: fontAwesome.name
         font.pointSize: 12

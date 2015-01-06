@@ -38,6 +38,8 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
 
 void CameraNodeObject::createCameraWithCurrentSceneManager()
 {
+    static int sCameraCounter = 0;
+
     Ogre::Root* root = Ogre::Root::getSingletonPtr();
     if(!root)
     {
@@ -53,13 +55,12 @@ void CameraNodeObject::createCameraWithCurrentSceneManager()
 
     Ogre::SceneManager *sceneManager = root->getSceneManager("TheSceneManager");
 
-    // let's use the current memory address to create a unique name
     QString instanceName;
-    instanceName.sprintf("camera_%08p", this);
+    instanceName.sprintf("camera_%d", sCameraCounter++);
 
     Ogre::Camera *camera = sceneManager->createCamera(instanceName.toLatin1().data());
     camera->setNearClipDistance(1);
-    camera->setFarClipDistance(99999);
+    camera->setFarClipDistance(1000);
     camera->setAspectRatio(1);
 
     m_camera = camera;

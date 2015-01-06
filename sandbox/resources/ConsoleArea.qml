@@ -71,13 +71,6 @@ Rectangle {
                  }
              }
 
-            NumberAnimation {
-                id: scrollAnim
-                target: consoleListView
-                property: "contentY"
-                duration: 500
-            }
-
             Connections {
                 target: ConsoleModel
                 onOnFinishedMessage: timer.restart()
