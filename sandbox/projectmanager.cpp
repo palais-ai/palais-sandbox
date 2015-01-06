@@ -99,6 +99,24 @@ void ProjectManager::initializeSceneManager()
     mgr->setOption("Size", &box);
 }
 
+void ProjectManager::onFocusSelectedActor()
+{
+    if(!mSelectedActor)
+    {
+        qWarning("Cant focus selected actor, because none is selected.");
+        return;
+    }
+
+    CameraNodeObject* cameraNode = getCameraWithName("cam1");
+    if(!cameraNode)
+    {
+        qWarning("Cant focus selected actor without a corresponding CameraNode.");
+        return;
+    }
+
+    cameraNode->focus(mSelectedActor->getSceneNode());
+}
+
 void ProjectManager::setSimulationSpeed(float speedFactor)
 {
     // Queue signal to call on the engine thread.
@@ -351,7 +369,7 @@ void ProjectManager::onOpenProject(const QUrl url)
     }
 
     Ogre::Root& root = Ogre::Root::getSingleton();
-    camera->fitToContain(root.getSceneManager(Application::sSceneManagerName)
+    camera->focus(root.getSceneManager(Application::sSceneManagerName)
                              ->getRootSceneNode());
 
     emit(sceneLoaded(scene));

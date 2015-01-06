@@ -61,7 +61,7 @@ function onStart() {
 	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
 	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
 	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
-	planner.makePlan(Cube_000, {"test" : 5, "x" : true, "yzx" : new Vector3(3,3,3)});
+	//planner.makePlan(Cube_000, {"test" : 5, "x" : true, "yzx" : new Vector3(3,3,3)});
 }
 
 function update(deltaTime) {

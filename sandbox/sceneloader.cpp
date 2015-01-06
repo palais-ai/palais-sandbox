@@ -44,7 +44,7 @@ Scene* SceneLoader::loadScene(OgreEngine* engine,
         }
         catch(const std::runtime_error& ex)
         {
-            qWarning(ex.what());
+            qWarning("%s", ex.what());
             return NULL;
         }
 
@@ -63,7 +63,6 @@ void SceneLoader::loadSceneVisuals(OgreEngine* engine,
 {
     if(engine && sceneManager)
     {
-        engine->lockEngine();
         // Resources with textures must be loaded within Ogre's GL context
         engine->activateOgreContext();
 
@@ -71,7 +70,6 @@ void SceneLoader::loadSceneVisuals(OgreEngine* engine,
         dsloader.parseDotScene(Ogre::String(sceneFile.toUtf8()), "General", sceneManager);
 
         engine->doneOgreContext();
-        engine->unlockEngine();
     }
     else
     {

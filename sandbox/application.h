@@ -53,6 +53,7 @@ signals:
     void sceneSetupFinished();
     void selectActorAtClickpoint(float mouseX,
                                  float mouseY);
+    void focusOnSelectedActor();
 public slots:
     void initializeOgre();
     void onOgreIsReady();

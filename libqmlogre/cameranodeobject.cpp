@@ -16,27 +16,21 @@
 #include <OgreAxisAlignedBox.h>
 
 #include <QDebug>
-#include <QMutexLocker>
+#include <QThread>
 
 #include <cmath>
 
-extern QMutex g_engineMutex;
+extern QThread* g_engineThread;
 
-CameraNodeObject::CameraNodeObject(QObject *parent) :
-    QObject(parent),
-    mInitialPosition(0,0,0),
-    m_node(0),
-    m_camera(0),
-    m_yaw(0),
-    m_pitch(0),
-    m_zoom(1)
+CameraHandler::CameraHandler() :
+    mInitialDistance(0),
+    mNode(0),
+    mCamera(0)
 {
-    QMutexLocker locker(&g_engineMutex);
-
-    createCameraWithCurrentSceneManager();
+    moveToThread(g_engineThread);
 }
 
-void CameraNodeObject::createCameraWithCurrentSceneManager()
+void CameraHandler::onCreateCameraWithCurrentSceneManager()
 {
     static int sCameraCounter = 0;
 
@@ -59,34 +53,63 @@ void CameraNodeObject::createCameraWithCurrentSceneManager()
     instanceName.sprintf("camera_%d", sCameraCounter++);
 
     Ogre::Camera *camera = sceneManager->createCamera(instanceName.toLatin1().data());
-    camera->setNearClipDistance(1);
-    camera->setFarClipDistance(1000);
+    camera->setNearClipDistance(2);
+    camera->setFarClipDistance(750);
     camera->setAspectRatio(1);
 
-    m_camera = camera;
-    m_node = sceneManager->getRootSceneNode()->createChildSceneNode();
-    m_node->attachObject(camera);
+    mCamera = camera;
+    mNode = sceneManager->getRootSceneNode()->createChildSceneNode();
+    mNode->attachObject(camera);
 
     fitToContain(sceneManager->getRootSceneNode());
 
-    emit cameraChanged(m_camera);
+    emit setupChanged(mCamera, mNode);
 }
 
-void CameraNodeObject::focus(Ogre::SceneNode* node)
+void CameraHandler::onRelativeYawChanged(qreal y)
 {
-    QMutexLocker locker(&g_engineMutex);
+    Ogre::Real dist = getDistanceToAutoTrackingTarget();
 
+    mCamera->setPosition(mCamera->getAutoTrackTarget()->_getDerivedPosition());
+    mCamera->yaw(Ogre::Degree(y));
+    mCamera->moveRelative(Ogre::Vector3(0, 0, dist));
+}
+
+void CameraHandler::onRelativePitchChanged(qreal p)
+{
+    Ogre::Real dist = getDistanceToAutoTrackingTarget();
+
+    mCamera->setPosition(mCamera->getAutoTrackTarget()->_getDerivedPosition());
+    mCamera->pitch(Ogre::Degree(p));
+    mCamera->moveRelative(Ogre::Vector3(0, 0, dist));
+}
+
+void CameraHandler::onZoomChanged(qreal z)
+{
+    mCamera->setPosition(mCamera->getAutoTrackTarget()->_getDerivedPosition());
+    mCamera->moveRelative(Ogre::Vector3(0, 0, z * mInitialDistance));
+
+    emit zoomChanged(z);
+}
+
+void CameraHandler::onFocusSceneNode(Ogre::SceneNode* node)
+{
     fitToContain(node);
 }
 
-void CameraNodeObject::fitToContain(Ogre::SceneNode* node)
+void CameraHandler::fitToContain(Ogre::SceneNode* node)
 {
     if(!node)
     {
         return;
     }
 
-    m_camera->setAutoTracking(true, node);
+    mCamera->setAutoTracking(true, node);
+    mCamera->setFixedYawAxis(true);
+    mCamera->setPosition(node->_getDerivedPosition());
+    mCamera->setOrientation(node->_getDerivedOrientation());
+    mCamera->yaw(Ogre::Degree(45));
+    mCamera->pitch(-Ogre::Degree(45));
 
     Ogre::SceneNode::ChildNodeIterator children = node->getChildIterator();
     Ogre::AxisAlignedBox aabb;
@@ -119,102 +142,144 @@ void CameraNodeObject::fitToContain(Ogre::SceneNode* node)
         }
     }
 
-    // Scale view to fit
-    mInitialPosition = Ogre::Vector3(1, 1, 0);
-    mInitialPosition = mInitialPosition.normalise()
-                       * ((boundingRadius / 2.f) /
-                          tan(m_camera->getFOVy().valueRadians() / 2.f));
+    if(mInitialDistance == 0)
+    {
+        // Scale view to fit
+        mInitialDistance = ((boundingRadius) /
+                            tan(mCamera->getFOVy().valueRadians() / 2.f));
+    }
 
     // Reset zoom level
-    m_zoom = 1;
-    m_camera->move(mInitialPosition);
+    mCamera->moveRelative(Ogre::Vector3(0, 0, mInitialDistance));
+
+    emit zoomChanged(1);
+}
+
+float CameraHandler::getDistanceToAutoTrackingTarget() const
+{
+    return (mCamera->getPosition()
+            - mCamera->getAutoTrackTarget()->_getDerivedPosition()).length();;
+}
+
+CameraNodeObject::CameraNodeObject(QObject *parent) :
+    QObject(parent),
+    mZoom(0),
+    mNode(0),
+    mCamera(0),
+    mHandler(new CameraHandler)
+{
+    // First one instantiation has to be direct.
+    connect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+            mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager,
+            Qt::DirectConnection);
+    connect(this, &CameraNodeObject::requestRelativeYawChanged,
+            mHandler.data(), &CameraHandler::onRelativeYawChanged);
+    connect(this, &CameraNodeObject::requestRelativePitchChanged,
+            mHandler.data(), &CameraHandler::onRelativePitchChanged);
+    connect(this, &CameraNodeObject::requestZoomChanged,
+            mHandler.data(), &CameraHandler::onZoomChanged);
+    connect(this, &CameraNodeObject::requestFocusSceneNode,
+            mHandler.data(), &CameraHandler::onFocusSceneNode);
+
+    connect(mHandler.data(), &CameraHandler::zoomChanged,
+            this, &CameraNodeObject::onZoomChanged);
+    connect(mHandler.data(), &CameraHandler::setupChanged,
+            this, &CameraNodeObject::onSetupChanged,
+            Qt::DirectConnection);
+
+    createCameraWithCurrentSceneManager();
+
+    // The next one's should be auto-resolved.
+    disconnect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+               mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager);
+    connect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+            mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager);
+
+    disconnect(mHandler.data(), &CameraHandler::setupChanged,
+               this, &CameraNodeObject::onSetupChanged);
+    connect(mHandler.data(), &CameraHandler::setupChanged,
+            this, &CameraNodeObject::onSetupChanged);
+}
+
+void CameraNodeObject::createCameraWithCurrentSceneManager()
+{
+    if(QThread::currentThread() == g_engineThread)
+    {
+        disconnect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+                mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager);
+        // Ensure this signal is handled synchronously if called from the engine's thread.
+        connect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+                mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager,
+                Qt::DirectConnection);
+
+        disconnect(mHandler.data(), &CameraHandler::setupChanged,
+                   this, &CameraNodeObject::onSetupChanged);
+        connect(mHandler.data(), &CameraHandler::setupChanged,
+                this, &CameraNodeObject::onSetupChanged,
+                Qt::DirectConnection);
+    }
+
+    emit requestCreateCameraWithCurrentSceneManager();
+
+    if(QThread::currentThread() == g_engineThread)
+    {
+        // The next one's should be auto-resolved.
+        disconnect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+                mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager);
+        connect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+                mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager);
+
+        disconnect(mHandler.data(), &CameraHandler::setupChanged,
+                   this, &CameraNodeObject::onSetupChanged);
+        connect(mHandler.data(), &CameraHandler::setupChanged,
+                this, &CameraNodeObject::onSetupChanged);
+    }
+}
+
+void CameraNodeObject::focus(Ogre::SceneNode* node)
+{
+    emit requestFocusSceneNode(node);
 }
 
 Ogre::SceneNode* CameraNodeObject::sceneNode() const
 {
-    return m_node;
+    return mNode;
 }
 
 Ogre::Camera* CameraNodeObject::camera() const
 {
-    return m_camera;
+    return mCamera;
 }
 
-qreal CameraNodeObject::yaw() const
+void CameraNodeObject::yaw(qreal y)
 {
-    QMutexLocker locker(&g_engineMutex);
-
-    return m_yaw;
+    emit requestRelativeYawChanged(y);
 }
 
-qreal CameraNodeObject::pitch() const
+void CameraNodeObject::pitch(qreal p)
 {
-    QMutexLocker locker(&g_engineMutex);
-
-    return m_pitch;
+    emit requestRelativePitchChanged(p);
 }
 
-qreal CameraNodeObject::zoom() const
+void CameraNodeObject::zoom(qreal z)
 {
-    QMutexLocker locker(&g_engineMutex);
-
-    return m_zoom;
+    emit requestZoomChanged(z);
 }
 
-void CameraNodeObject::setYaw(qreal y)
+qreal CameraNodeObject::getZoom() const
 {
-    QMutexLocker locker(&g_engineMutex);
-
-    m_yaw = y;
-    updateRotation();
+    return mZoom;
 }
 
-void CameraNodeObject::setPitch(qreal p)
+void CameraNodeObject::onZoomChanged(qreal zoom)
 {
-    QMutexLocker locker(&g_engineMutex);
-
-    m_pitch = p;
-    updateRotation();
+    mZoom = zoom;
 }
 
-void CameraNodeObject::updateRotation()
+void CameraNodeObject::onSetupChanged(Ogre::Camera* camera, Ogre::SceneNode* sceneNode)
 {
-    m_node->resetOrientation();
-    m_node->yaw(Ogre::Radian(Ogre::Degree(m_yaw)));
-    m_node->pitch(Ogre::Radian(Ogre::Degree(m_pitch)));
-}
+    mCamera = camera;
+    mNode = sceneNode;
 
-void CameraNodeObject::setZoom(qreal z)
-{
-    QMutexLocker locker(&g_engineMutex);
-
-    m_zoom = z;
-    m_node->resetOrientation();
-    m_camera->setPosition(mInitialPosition * (1 / m_zoom));
-
-    updateRotation();
-}
-
-void CameraNodeObject::setWireframeMode(bool enabled)
-{
-    QMutexLocker locker(&g_engineMutex);
-
-    if(m_camera)
-    {
-        m_camera->setPolygonMode(enabled ? Ogre::PM_WIREFRAME : Ogre::PM_SOLID);
-    }
-}
-
-bool CameraNodeObject::getWireframeMode() const
-{
-    QMutexLocker locker(&g_engineMutex);
-
-    if(m_camera)
-    {
-        return m_camera->getPolygonMode() == Ogre::PM_WIREFRAME;
-    }
-    else
-    {
-        return false;
-    }
+    emit cameraChanged(camera);
 }

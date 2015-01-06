@@ -70,6 +70,7 @@ public slots:
     // Coordinates are in normalized screen coordinates.
     void onSelectActorAtClickpoint(float mouseX,
                                    float mouseY);
+    void onFocusSelectedActor();
 private:
     void prepareScene(CameraNodeObject* camera);
     CameraNodeObject* getCameraWithName(const QString& name);

@@ -13,15 +13,15 @@
 
 #include <exception>
 
+#include <Ogre.h>
 #include <OgreAnimation.h>
 
 #include <QDebug>
-#include <Ogre.h>
 #include <QOpenGLFunctions>
 #include <QDir>
 #include <QQuickWindow>
 
-QMutex g_engineMutex;
+QThread* g_engineThread;
 
 OgreEngine::OgreEngine(QQuickWindow *window)
     : QObject(),
@@ -32,6 +32,7 @@ OgreEngine::OgreEngine(QQuickWindow *window)
     qmlRegisterType<OgreEngine>("OgreEngine", 1, 0, "OgreEngine");
     qmlRegisterType<CameraNodeObject>("Ogre", 1, 0, "Camera");
 
+    g_engineThread = thread();
     setQuickWindow(window);
 }
 
@@ -215,16 +216,6 @@ void OgreEngine::doneOgreContext()
     m_qtContext->functions()->glUseProgram(0);
 
     m_quickWindow->resetOpenGLState();
-}
-
-void OgreEngine::lockEngine()
-{
-    g_engineMutex.lock();
-}
-
-void OgreEngine::unlockEngine()
-{
-    g_engineMutex.unlock();
 }
 
 QOpenGLContext* OgreEngine::ogreContext() const

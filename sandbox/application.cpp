@@ -181,6 +181,9 @@ void Application::initializeOgre()
     QObject::connect(this, &Application::selectActorAtClickpoint,
                      mProjectManager, &ProjectManager::onSelectActorAtClickpoint);
 
+    QObject::connect(this, &Application::focusOnSelectedActor,
+                     mProjectManager, &ProjectManager::onFocusSelectedActor);
+
     QObject::connect(mProjectManager, SIGNAL(sceneLoaded(Scene*)),
                      this, SLOT(onSceneLoaded(Scene*)));
 

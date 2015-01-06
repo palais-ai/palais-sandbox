@@ -13,6 +13,8 @@
 #include "qmlogre_global.h"
 
 #include <QObject>
+#include <QScopedPointer>
+
 #include <OgreVector3.h>
 
 namespace Ogre
@@ -21,13 +23,36 @@ class SceneNode;
 class Camera;
 }
 
+// Handles camera updates, operating in a thread-safe manner on the ogre engine thread.
+class CameraHandler : public QObject
+{
+    Q_OBJECT
+public:
+    CameraHandler();
+
+    qreal getZoom() const;
+signals:
+    void zoomChanged(qreal zoomLevel);
+    void setupChanged(Ogre::Camera* camera, Ogre::SceneNode* node);
+public slots:
+    void onCreateCameraWithCurrentSceneManager();
+    void onRelativeYawChanged(qreal yaw);
+    void onRelativePitchChanged(qreal pitch);
+    void onZoomChanged(qreal zoom);
+    void onFocusSceneNode(Ogre::SceneNode* node);
+private:
+    void fitToContain(Ogre::SceneNode* node);
+    float getDistanceToAutoTrackingTarget() const;
+
+    float mInitialDistance;
+    Ogre::SceneNode* mNode;
+    Ogre::Camera* mCamera;
+};
+
 class DLL_EXPORT CameraNodeObject : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(qreal yaw READ yaw WRITE setYaw)
-    Q_PROPERTY(qreal pitch READ pitch WRITE setPitch)
-    Q_PROPERTY(qreal zoom READ zoom WRITE setZoom)
-    Q_PROPERTY(bool wireframeMode READ getWireframeMode WRITE setWireframeMode)
+    Q_PROPERTY(qreal zoom READ getZoom WRITE zoom)
 public:
     explicit CameraNodeObject(QObject *parent = 0);
 
@@ -37,35 +62,26 @@ public:
     Ogre::Camera* camera() const;
 
     // Thread-safe
-    qreal yaw() const;
-    qreal pitch() const;
-    qreal zoom() const;
-    void setYaw(qreal y);
-    void setPitch(qreal p);
-    void setZoom(qreal z);
-
-    void setWireframeMode(bool enabled);
-    bool getWireframeMode() const;
-
-    // Not thread-safe
-    void fitToContain(Ogre::SceneNode* node);
-
-    // Thread-safe
-    void focus(Ogre::SceneNode* node);
-
+    Q_INVOKABLE void yaw(qreal y); // Radians
+    Q_INVOKABLE void pitch(qreal p); // Radians
+    Q_INVOKABLE void zoom(qreal z); // Times of original distance (fit to contain = 1)
+    qreal getZoom() const;
+    Q_INVOKABLE void focus(Ogre::SceneNode* node);
 signals:
     void cameraChanged(Ogre::Camera* camera);
+    void requestCreateCameraWithCurrentSceneManager();
+    void requestRelativeYawChanged(qreal y);
+    void requestRelativePitchChanged(qreal p);
+    void requestZoomChanged(qreal z);
+    void requestFocusSceneNode(Ogre::SceneNode* node);
+public slots:
+    void onZoomChanged(qreal zoom);
+    void onSetupChanged(Ogre::Camera* camera, Ogre::SceneNode* sceneNode);
 private:
-    void updateRotation();
-
-    Ogre::Vector3 mInitialPosition;
-
-    Ogre::SceneNode* m_node;
-    Ogre::Camera* m_camera;
-
-    qreal m_yaw;
-    qreal m_pitch;
-    qreal m_zoom;
+    qreal mZoom;
+    Ogre::SceneNode* mNode;
+    Ogre::Camera* mCamera;
+    QScopedPointer<CameraHandler> mHandler;
 };
 
 #endif // CAMERANODEOBJECT_H

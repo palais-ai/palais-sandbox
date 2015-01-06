@@ -49,9 +49,6 @@ public:
     void activateOgreContext();
     void doneOgreContext();
 
-    void lockEngine();
-    void unlockEngine();
-
     QOpenGLContext* ogreContext() const;
 
     QSGTexture* createTextureFromId(uint id,

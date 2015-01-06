@@ -25,17 +25,20 @@ Rectangle {
 
             onPositionChanged: {
                 if (pressedButtons & Qt.LeftButton) {
-                    if (prevX > -1)
-                        ogreitem.camera.yaw -= (mouse.x - prevX) / 2
-                    if (prevY > -1)
-                        ogreitem.camera.pitch -= (mouse.y - prevY) / 2
+                    if (prevX > -1) {
+                        ogreitem.camera.yaw(-(mouse.x - prevX) / 2)
+                    }
+                    if (prevY > -1) {
+                        ogreitem.camera.pitch(-(mouse.y - prevY) / 2)
+                    }
                     prevX = mouse.x
                     prevY = mouse.y
                 }
                 if (pressedButtons & Qt.RightButton) {
                     if (prevY > -1) {
-                        var cameraMovement = ogreitem.camera.zoom - (mouse.y - prevY) / 100
-                        ogreitem.camera.zoom = Math.min(6, Math.max(0.1, cameraMovement))
+                        var cameraMovement = ogreitem.camera.zoom + (mouse.y - prevY) / 200
+                        var zoomLevel = Math.min(6, Math.max(0.1, cameraMovement));
+                        ogreitem.camera.zoom = zoomLevel
                     }
 
                     prevY = mouse.y

@@ -137,8 +137,6 @@ void OgreNode::preprocess()
         return;
     }
 
-    m_ogreEngineItem->lockEngine();
-
     if (!m_renderTarget)
     {
         qWarning("No render target.");
@@ -155,8 +153,6 @@ void OgreNode::preprocess()
     m_ogreEngineItem->getRoot()->_fireFrameEnded();
 
     doneOgreContext();
-
-    m_ogreEngineItem->unlockEngine();
 }
 
 void OgreNode::update()
@@ -179,15 +175,11 @@ void OgreNode::update()
 
     if (m_dirtyFBO)
     {
-        m_ogreEngineItem->lockEngine();
-
         activateOgreContext();
         updateFBO();
         m_ogreFboId = getOgreFboId();
         m_dirtyFBO = false;
         doneOgreContext();
-
-        m_ogreEngineItem->unlockEngine();
     }
 }
 

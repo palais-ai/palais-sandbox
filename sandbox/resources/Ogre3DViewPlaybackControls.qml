@@ -17,7 +17,7 @@ RowLayout {
         id: cameraModeButton
         unicode: "\uf03d"
         iconSize: 20
-        onPressed: Scene.setCameraFocus(ProjectManager.selectedActor)
+        onPressed: ApplicationWrapper.focusOnSelectedActor()
     }
 
     ColumnLayout {
