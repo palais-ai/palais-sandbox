@@ -3,9 +3,6 @@ import QtQuick.Controls 1.0
 import QtQuick.Controls.Styles 1.0
 
 ScrollView {
-    width: parent.width
-    height: parent.height
-
     style: ScrollViewStyle {
         transientScrollBars: true
         handle: Item {

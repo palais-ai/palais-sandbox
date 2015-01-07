@@ -76,6 +76,7 @@ int SceneModel::rowCount(const QModelIndex& parent) const
 
 void SceneModel::onActorAdded(const QString& actorName)
 {
+    qDebug() << "adding actorName [model]";
     int index = mActors.size();
     beginInsertRows(QModelIndex(), index, index);
     mActors += ActorModel(actorName, true);

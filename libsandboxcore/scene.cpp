@@ -275,8 +275,6 @@ Actor* Scene::instantiate(const QString& name,
 
     Actor* retVal = addActor(node);
 
-    emit actorAdded(name);
-
     return retVal;
 }
 

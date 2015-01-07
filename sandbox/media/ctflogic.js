@@ -9,10 +9,10 @@ function partial(func /*, 0..n args */) {
 var numCalls = 1;
 var fighterCount = 0;
 function spawnFighter(startPos, teamColor) {
-	var actor = scene.instantiate("player_team" + numCalls + "_" + fighterCount++,
+	var actor = scene.instantiate("player_team_" + teamColor + "_" + fighterCount++,
 								  "Soldier2" + teamColor, 
 								  startPos);
-
+	print(actor.name)
 	actor.enableAnimation("my_animation");
 	actor.setScale(0.2);
 
