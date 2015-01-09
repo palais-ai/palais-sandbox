@@ -30,6 +30,11 @@ public:
     const Ogre::Vector3& getCentroid() const;
     Ogre::Vector3 fromBarycentric(float x, float y, float z) const;
     bool isProjectionInside(const Ogre::Vector3& point) const;
+    FORCE_INLINE bool operator==(const Triangle& other) const
+    {
+        // Using pointer comparison because polygons in the navmesh are unique.
+        return this == &other;
+    }
 private:
     Ogre::Vector3 computeCentroid();
 };

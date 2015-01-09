@@ -224,7 +224,9 @@ Pathfinding::planPath(const Ogre::Vector3& from,
     }
 
     ailib::AStar<NavigationGraph> astar(mGraph);
-    ailib::AStar<NavigationGraph>::path_type path = astar.findPath(start, goal, euclideanHeuristic);
+    ailib::AStar<NavigationGraph>::path_type path = astar.findPath(start,
+                                                                   *goal,
+                                                                   euclideanHeuristic);
 
     if(isAlreadyThere)
     {

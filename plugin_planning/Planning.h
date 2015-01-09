@@ -7,6 +7,7 @@
 #include <QVariant>
 
 #include "GOAP.h"
+#include "AStar.h"
 
 class Actor;
 class Scene;
@@ -46,7 +47,12 @@ public:
     explicit Planner(QObject *parent = 0);
     ~Planner();
 
-    Q_INVOKABLE void makePlan(Actor* actor, const QVariantMap& endState);
+    Q_INVOKABLE void makePlan(Actor* actor,
+                              const QVariantMap& endState);
+
+    ailib::AStar<planner_type::graph_type>::path_type findPlan(const QVariantMap& startState,
+                                                               const QVariantMap& endState,
+                                                               bool* isAlreadyThere);
 
     void addAction(ScriptAction* action);
     void update(Scene& scene, float deltaTime);

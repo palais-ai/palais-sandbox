@@ -1,7 +1,6 @@
 #include "Planning.h"
 #include "scene.h"
 #include "actor.h"
-#include "AStar.h"
 
 #include <QScriptEngine>
 #include <QDebug>
@@ -132,8 +131,25 @@ ScriptAction::ScriptAction(const QScriptValue& precondition,
 
 bool ScriptAction::isPreconditionFulfilled(const planner_state_type& state) const
 {
-    QScriptValue value = mPrecondition.engine()->toScriptValue(state);
-    return mPrecondition.call(QScriptValue(), QScriptValueList() << value).toBool();
+    QScriptEngine* engine = mPrecondition.engine();
+
+    if(!engine)
+    {
+        qWarning("Precondition script function was invalidated.");
+        return false;
+    }
+
+    QScriptValue value = engine->toScriptValue<QVariantMap>(QVariantMap(state));
+    QScriptValue retVal = mPrecondition.call(QScriptValue(), QScriptValueList() << value);
+
+    if(retVal.isUndefined() || retVal.isNull())
+    {
+        qWarning("Script precondition didn't give a valid return value.");
+        return false;
+    }
+
+    bool returnCode = retVal.toBool();
+    return returnCode;
 }
 
 void ScriptAction::applyPostcondition(planner_state_type& state) const
@@ -168,20 +184,69 @@ void Planner::addAction(ScriptAction* action)
     mPlanner.addAction(action);
 }
 
-void Planner::makePlan(Actor* actor, const planner_state_type& endState)
+ailib::AStar<Planner::planner_type::graph_type>::path_type
+Planner::findPlan(const QVariantMap& startState,
+                  const QVariantMap& endState,
+                  bool* isAlreadyThere)
 {
-    QVariantMap knowledge = actor->getKnowledge();
-    QVariantMap endStateCopy = endState;
-    mPlanner.buildGraph(knowledge, endStateCopy, 5);
+    const int32_t maxDepth = 5;
+    size_t startIdx = mPlanner.buildGraph(startState, endState, maxDepth);
+
+    qDebug() << "[PLANNER] Built a planning state graph with "
+             << mPlanner.getGraph().getNumNodes()
+             << " nodes. (maxdepth="
+             << maxDepth
+             << ")";
 
     ailib::AStar<planner_type::graph_type> astar(mPlanner.getGraph());
     ailib::AStar<planner_type::graph_type>::path_type path;
-    path = astar.findPath(&knowledge, &endStateCopy);
+    path = astar.findPath(mPlanner.getGraph().getNode(startIdx), endState);
+
+    if(path.empty())
+    {
+        qWarning("Could not make a plan that leads to the desired end state.");
+        qWarning() << "Start state: " << startState;
+        qWarning() << "End state: " << endState;
+    }
+
+    if(isAlreadyThere)
+    {
+        *isAlreadyThere = path.size() == 1 && *path[0] == startState;
+    }
+
+    return path;
+}
+
+void Planner::makePlan(Actor* actor,
+                       const planner_state_type& endState)
+{
+    QVariantMap knowledge = actor->getKnowledge();
+
+    bool isAlreadyThere;
+    ailib::AStar<planner_type::graph_type>::path_type path;
+    path = findPlan(knowledge, endState, &isAlreadyThere);
+
+    if(path.empty())
+    {
+        qDebug("No possible solution found.");
+    }
+    else if(isAlreadyThere)
+    {
+        qDebug("Goal has already been reached.");
+    }
+    else
+    {
+        // TODO: Kickoff to sequentially perform actions,
+        // recalculate the plan if unexpected state changes happen.
+        qDebug() << "[PLANNER] Found planning solutions with "
+                 << path.size() << " steps.";
+    }
 }
 
 void Planner::update(Scene& scene, float deltaTime)
 {
-
+    Q_UNUSED(scene);
+    Q_UNUSED(deltaTime);
 }
 
 void Planning::onDestroyed(QObject* obj)

@@ -58,16 +58,16 @@ function onStart() {
 	var planner = new Planner();
 	planner.addAction(function(state) {
 		return true
-	}, function(state){
-		state["postcondition_hi"] = true; 
+	}, function(state) {
+		state["test"] = 5;
+		state["x"] = true;
+		state["yzx"] = new Vector3(3,3,3);
 		return state;
 	}, function(state) {
 		return 5
 	});
-	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
-	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
-	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
-	//planner.makePlan(Cube_000, {"test" : 5, "x" : true, "yzx" : new Vector3(3,3,3)});
+
+	planner.makePlan(Cube_000, {"test" : 5, "x" : true, "yzx" : new Vector3(3,3,3)});
 
 	Navmesh.hide()
 }

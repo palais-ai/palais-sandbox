@@ -35,5 +35,4 @@ void PlanningPlugin::update(const PluginInterface& interface, Scene& scene, floa
 {
     Q_UNUSED(interface);
     Planning::update(scene, deltaTime);
-    scene.getScriptEngine().collectGarbage();
 }
