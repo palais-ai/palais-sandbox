@@ -56,11 +56,20 @@ function onStart() {
 	scene.setKnowledge("vec3array", [new Vector3(3,3,3), new Vector3(3,3,3)]);
 
 	var planner = new Planner();
-	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
+	planner.addAction(function(state) {
+		return true
+	}, function(state){
+		state["postcondition_hi"] = true; 
+		return state;
+	}, function(state) {
+		return 5
+	});
 	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
 	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
 	planner.addAction(function(state) {return true}, function(state){state["postcondition_hi"] = true; return state;}, function(state) {return 5})
 	//planner.makePlan(Cube_000, {"test" : 5, "x" : true, "yzx" : new Vector3(3,3,3)});
+
+	Navmesh.hide()
 }
 
 function update(deltaTime) {

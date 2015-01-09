@@ -21,8 +21,6 @@
 ProjectManager::ProjectManager(OgreEngine* engine) :
     QObject(0),
     mScenarioManager(engine),
-    mKnowledgeService(mScenarioManager),
-    mActorService(mScenarioManager),
     mSelectedActor(NULL)
 {
     assert(thread() == engine->thread());
@@ -33,41 +31,10 @@ ProjectManager::ProjectManager(OgreEngine* engine) :
             this, &ProjectManager::onReloadProject);
     connect(this, &ProjectManager::signalSetSimulationSpeed,
             this, &ProjectManager::onSetSimulationSpeed);
-
-    QString serviceName = QDir::temp().absoluteFilePath("SandboxService");
-    if (QFile::exists(serviceName))
-    {
-        if (!QFile::remove(serviceName))
-        {
-            qWarning() << "Couldn't delete local temporary service file.";
-        }
-    }
-
-    mServer.addService(&mKnowledgeService);
-    mServer.addService(&mActorService);
-    if (mServer.listen(serviceName))
-    {
-        qDebug() << "Local RPC service listening on "
-                 << serviceName << ".";
-    }
-    else
-    {
-        qWarning() << "Couldn't start the sandbox service on "
-                   << serviceName
-                   << ", because "
-                   << mServer.errorString();
-        mServer.close();
-    }
 }
 
 ProjectManager::~ProjectManager()
 {
-    if(!mServer.removeService(&mKnowledgeService) ||
-       !mServer.removeService(&mActorService))
-    {
-        qWarning() << "Failed to remove the sandbox services on close.";
-    }
-
     Ogre::Root& root = Ogre::Root::getSingleton();
     if(root.hasSceneManager(Application::sSceneManagerName))
     {

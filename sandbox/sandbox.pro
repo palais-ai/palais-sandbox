@@ -20,8 +20,6 @@ SOURCES += main.cpp \
     scenemanager.cpp \
     sceneloader.cpp \
     projectmanager.cpp \
-    knowledgeservice.cpp \
-    actorservice.cpp \
     models/actormodel.cpp \
     models/consolemodel.cpp \
     models/inspectormodel.cpp \
@@ -35,8 +33,6 @@ HEADERS += \
     scenemanager.h \
     sceneloader.h \
     projectmanager.h \
-    knowledgeservice.h \
-    actorservice.h \
     models/actormodel.h \
     models/consolemodel.h \
     models/inspectormodel.h \
@@ -73,7 +69,6 @@ macx {
 
         PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib
         PluginFiles.files += $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib
-        PluginFiles.files += $$OUT_PWD/../libqjsonrpc/src/libqjsonrpc.1.dylib
         PluginFiles.files += $$OUT_PWD/../libqmlogre/libqmlogre.1.dylib
         PluginFiles.files += $$OUT_PWD/../libsandboxcore/libsandboxcore.1.dylib
         PluginFiles.files += $$OUT_PWD/../plugin_pathfinding/libplugin_pathfinding.dylib
@@ -101,7 +96,6 @@ macx {
         message(QDIRs are in $$[QT_INSTALL_LIBS])
 
         package.path = $$DESTDIR
-        package.files += $$OUT_PWD/../libqjsonrpc/src/$$M_BUILD_DIR/qjsonrpc1.dll
         package.files += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR/libqmlogre1.dll
         package.files += $$OUT_PWD/../libsandboxcore/$$M_BUILD_DIR/libsandboxcore1.dll
         package.files += $$OUT_PWD/../plugin_pathfinding/$$M_BUILD_DIR/libplugin_pathfinding.dll
@@ -139,13 +133,6 @@ DEPENDPATH += $$PWD/../libdotsceneloader
 
 win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/$$M_BUILD_DIR/dotsceneloader.lib
 else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/libdotsceneloader.a
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqjsonrpc/src/release/ -lqjsonrpc1
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqjsonrpc/src/debug/ -lqjsonrpc1
-else:unix: LIBS += -L$$OUT_PWD/../libqjsonrpc/src/ -lqjsonrpc
-
-INCLUDEPATH += $$PWD/../libqjsonrpc/src
-DEPENDPATH += $$PWD/../libqjsonrpc/src
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqmlogre/release/ -lqmlogre
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqmlogre/debug/ -lqmlogre

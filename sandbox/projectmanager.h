@@ -2,13 +2,9 @@
 #define PROJECTMANAGER_H
 
 #include "scenemanager.h"
-#include "actorservice.h"
-#include "knowledgeservice.h"
 
 #include <QObject>
 #include <QUrl>
-
-#include "../libqjsonrpc/src/qjsonrpclocalserver.h"
 
 class Actor;
 class OgreEngine;
@@ -77,9 +73,6 @@ private:
 
     QUrl mLastOpenedUrl, mCurrentProjectUrl;
     SceneManager mScenarioManager;
-    KnowledgeService mKnowledgeService;
-    ActorService mActorService;
-    QJsonRpcLocalServer mServer;
     Actor* mSelectedActor;
 };
 
