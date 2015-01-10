@@ -95,13 +95,14 @@ void SceneLoader::loadSceneLogic(Scene* scene, const QString& logicFile)
     file.close();
 
     QScriptEngine& engine = scene->getScriptEngine();
-    engine.evaluate(QScriptProgram(QString(ba), logicFile));
-
-    JavaScriptBindings::checkScriptEngineException(engine, "Script evaluation");
 
     JavaScriptBindings::addBindings(engine, scene);
 
     JavaScriptBindings::checkScriptEngineException(engine, "JS Bindings installation");
 
     qDebug("JS Bindings have been installed.");
+
+    engine.evaluate(QScriptProgram(QString(ba), logicFile));
+
+    JavaScriptBindings::checkScriptEngineException(engine, "Script evaluation");
 }

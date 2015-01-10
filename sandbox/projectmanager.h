@@ -68,6 +68,8 @@ public slots:
                                    float mouseY);
     void onFocusSelectedActor();
 private:
+    static std::string sCurrentResourceGroupName;
+    void loadResources(const QStringList& paths);
     void prepareScene(CameraNodeObject* camera);
     CameraNodeObject* getCameraWithName(const QString& name);
 

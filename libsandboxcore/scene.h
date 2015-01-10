@@ -88,6 +88,9 @@ public:
     Q_INVOKABLE Actor* getActor(unsigned int index);
     Actor* getActor(const QString& actorName);
     Q_INVOKABLE QObjectList getActorsArray() const;
+
+    const QString& getLogicFile() const;
+    const QString& getSceneFile() const;
 signals:
     void actorAdded(const QString& actorName);
     void actorRemoved(const QString& actorName);

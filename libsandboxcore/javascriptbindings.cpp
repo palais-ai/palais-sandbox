@@ -8,6 +8,11 @@
 #include <QDebug>
 #include <QList>
 #include <QVector>
+#include <QFile>
+#include <QFileInfo>
+#include <QDir>
+#include <QUrl>
+#include <QScriptContextInfo>
 
 #include <OgreQuaternion.h>
 #include <OgreVector3.h>
@@ -144,6 +149,16 @@ QList<ScriptTimer*> ScriptTimer::sScriptTimers;
 namespace JavaScriptBindings
 {
 
+static void installModuleSystem(QScriptEngine& engine, Scene* scene)
+{
+    QUrl url = QUrl::fromLocalFile(scene->getLogicFile());
+    const QString currentWorkingDirectory = url.adjusted(QUrl::RemoveFilename).toLocalFile();
+    QStringList path;
+    path << currentWorkingDirectory;
+    engine.globalObject().setProperty("__PATH__", engine.toScriptValue(path));
+    engine.globalObject().setProperty("__MODULES__", engine.toScriptValue(QStringList()));
+}
+
 void addBindings(QScriptEngine& engine, Scene* scene)
 {
     if(!scene)
@@ -152,6 +167,7 @@ void addBindings(QScriptEngine& engine, Scene* scene)
         return;
     }
 
+    installModuleSystem(engine, scene);
     timers_register(engine);
 
     Actor_register_prototype(engine);
@@ -159,9 +175,111 @@ void addBindings(QScriptEngine& engine, Scene* scene)
     QScriptValue sceneVal = engine.newQObject(scene);
 
     engine.globalObject().setProperty("scene", sceneVal);
+    engine.globalObject().setProperty("require", engine.newFunction(script_require));
 
     Vector3_register_prototype(engine);
     RaycastResult_register_prototype(engine);
+}
+
+static bool loadScript(QScriptEngine *engine, const QString& filename)
+{
+    QFile file(filename);
+
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        qWarning() << "Failed to open include file [" << filename << "].";
+        return false;
+    }
+
+    QByteArray ba = file.readAll();
+    file.close();
+
+    // Set context to parent context
+    // See http://www.qtcentre.org/threads/20432-Can-I-include-a-script-from-script
+    QScriptContext *context = engine->currentContext();
+    QScriptContext *parent= context->parentContext();
+
+    if(parent != 0)
+    {
+        context->setActivationObject(context->parentContext()->activationObject());
+        context->setThisObject(context->parentContext()->thisObject());
+    }
+
+    engine->evaluate(ba, filename);
+    checkScriptEngineException(*engine, "loading [" + filename + "]");
+    return true;
+}
+
+static void loadScriptIfNotLoaded(QScriptEngine *engine, const QString& filename)
+{
+    QScriptValue modulesValue = engine->globalObject().property("__MODULES__");
+    QStringList modules = engine->fromScriptValue<QStringList>(modulesValue);
+
+    if(!modules.contains(filename))
+    {
+        loadScript(engine, filename);
+        modules << filename;
+        engine->globalObject().setProperty("__MODULES__", engine->toScriptValue(modules));
+        qDebug() << "Loaded " << "[" << filename << "].";
+    }
+    else
+    {
+        qDebug() << "[" << filename << "] was already loaded.";
+    }
+}
+
+QScriptValue script_require(QScriptContext *context, QScriptEngine *engine)
+{
+    if(context->argumentCount() > 0)
+    {
+        QScriptValue arg0 = context->argument(0);
+
+        if(arg0.isString())
+        {
+            const QString filename = arg0.toString();
+            const QFileInfo fInfo(filename);
+            QScriptValue pathValue = engine->globalObject().property("__PATH__");
+            const QStringList paths = engine->fromScriptValue<QStringList>(pathValue);
+            bool loaded = false;
+            foreach(QString dir, paths)
+            {
+                QFileInfo info(dir);
+
+                if(info.exists())
+                {
+                    QDir includeDir = info.dir();
+                    includeDir.cd(fInfo.dir().path());
+                    QString filepath = includeDir.absoluteFilePath(fInfo.fileName());
+                    if(QFileInfo(filepath).exists())
+                    {
+                        loadScriptIfNotLoaded(engine, filepath);
+                        loaded = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    qWarning() << "__PATH__ directory [" << dir << "] doesn't exist."
+                               << "Your __PATH__ is misconfigured.";
+                }
+            }
+
+            if(!loaded)
+            {
+                qWarning() << "The module [" << filename << "] could not be loaded. "
+                           << "It wasn't found in your __PATH__.";
+            }
+        }
+        else
+        {
+            qWarning() << "The argument to require() must be a string. The command was ignored.";
+        }
+    }
+    else
+    {
+        qWarning() << "require() needs to have an argument.";
+    }
+    return engine->undefinedValue();
 }
 
 void timers_register(QScriptEngine& engine)

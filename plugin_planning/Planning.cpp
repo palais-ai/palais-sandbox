@@ -18,6 +18,9 @@ QScriptValue Planner_prototype_ctor(QScriptContext *context, QScriptEngine *engi
 
     QScriptValue value = engine->newQObject(planner, QScriptEngine::ScriptOwnership);
     value.setProperty("addAction", engine->newFunction(planning_add_action));
+    value.setProperty("defaultPrecondition", engine->newFunction(planning_default_precondition));
+    value.setProperty("defaultPostCondition", engine->newFunction(planning_default_postcondition));
+    value.setProperty("defaultCost", engine->newFunction(planning_default_cost));
 
     return value;
 }

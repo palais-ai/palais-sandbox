@@ -5,11 +5,13 @@
 
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QFile>
 #include <QString>
 #include <QDebug>
 #include <QDir>
 #include <QThread>
+#include <QFileInfo>
 
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
@@ -17,6 +19,8 @@
 
 #include "../libqmlogre/ogreengine.h"
 #include "../libqmlogre/cameranodeobject.h"
+
+std::string ProjectManager::sCurrentResourceGroupName = "CurrentScene";
 
 ProjectManager::ProjectManager(OgreEngine* engine) :
     QObject(0),
@@ -301,13 +305,38 @@ void ProjectManager::onOpenProject(const QUrl url)
         return;
     }
 
+    QString resourcesPropertyName("resources");
+    QStringList resources;
+    if(obj.contains(resourcesPropertyName))
+    {
+        QJsonArray array = obj[resourcesPropertyName].toArray();
+        foreach(QJsonValue val, array)
+        {
+            resources << (url.adjusted(QUrl::RemoveFilename).toLocalFile() + val.toString());
+        }
+    }
 
+
+    const bool isReopen = mCurrentProjectUrl == url;
     mLastOpenedUrl = url;
     mCurrentProjectUrl.clear();
 
     pause();
     mScenarioManager.unloadCurrentScene();
     mSelectedActor = NULL;
+
+    Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
+    if(!isReopen && rgm.resourceGroupExists(sCurrentResourceGroupName))
+    {
+        Ogre::StringVectorPtr locs = rgm.findResourceLocation(sCurrentResourceGroupName, "*");
+
+        foreach(std::string loc, *locs)
+        {
+            rgm.removeResourceLocation(loc);
+        }
+
+        rgm.destroyResourceGroup(sCurrentResourceGroupName);
+    }
 
     QString cameraName("cam1");
     CameraNodeObject* camera = getCameraWithName(cameraName);
@@ -320,6 +349,7 @@ void ProjectManager::onOpenProject(const QUrl url)
     }
 
     prepareScene(camera);
+    loadResources(resources);
 
     qDebug("Loading project %s with visuals (%s) and logic (%s).",
            name.toStdString().c_str(),
@@ -340,6 +370,30 @@ void ProjectManager::onOpenProject(const QUrl url)
                              ->getRootSceneNode());
 
     emit(sceneLoaded(scene));
+}
+
+void ProjectManager::loadResources(const QStringList& paths)
+{
+    Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
+    foreach(QString path, paths)
+    {
+        QFileInfo info(path);
+
+        if(info.exists())
+        {
+            rgm.addResourceLocation(path.toStdString(),
+                                    "FileSystem",
+                                    sCurrentResourceGroupName);
+            qDebug() << "Loaded resource location at [" << path << "].";
+        }
+        else
+        {
+            qWarning() << "Couldn't add resource location ["
+                       << path << "] because it doesn't exist.";
+        }
+    }
+
+    rgm.initialiseResourceGroup(sCurrentResourceGroupName);
 }
 
 void ProjectManager::prepareScene(CameraNodeObject* camera)

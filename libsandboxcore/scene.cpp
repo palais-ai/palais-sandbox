@@ -53,6 +53,13 @@ Scene::~Scene()
 {
     Ogre::Root::getSingleton().removeFrameListener(this);
 
+    foreach(DebugDrawer* drawer, mDrawers)
+    {
+        qWarning() << "User forgot to destroy debug drawer [" << drawer->getName().c_str() << "]."
+                   << "Cleaning up automatically.";
+        delete drawer;
+    }
+
     if(mRayQuery)
     {
         getOgreSceneManager()->destroyQuery(mRayQuery);
@@ -80,8 +87,16 @@ DebugDrawer* Scene::createDebugDrawer(const QString& name)
 void Scene::destroyDebugDrawer(DebugDrawer* drawer)
 {
     int idx = mDrawers.indexOf(drawer);
-    delete mDrawers[idx];
-    mDrawers.remove(idx);
+
+    if(idx != -1)
+    {
+        delete mDrawers[idx];
+        mDrawers.remove(idx);
+    }
+    else
+    {
+        qWarning("Tried to remove inexistant debug drawer.");
+    }
 }
 
 void Scene::setCameraFocus(Actor* actor)
@@ -463,5 +478,15 @@ void Scene::performAction(const QString& actionName,
 QScriptEngine& Scene::getScriptEngine()
 {
     return mLogicScript;
+}
+
+const QString& Scene::getLogicFile() const
+{
+    return mLogicFile;
+}
+
+const QString& Scene::getSceneFile() const
+{
+    return mSceneFile;
 }
 

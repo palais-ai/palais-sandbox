@@ -22,6 +22,7 @@
         <file>NativeText.qml</file>
         <file>ConsoleTableHeader.qml</file>
         <file>ConsoleTableCell.qml</file>
+        <file>InspectorAreaTable.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>sandbox-bg.jpg</file>

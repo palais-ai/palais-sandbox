@@ -107,7 +107,9 @@ private:
 	IcoSphere icoSphere;
 	
 	bool isEnabled;
- 
+    // Added size tracking between build calls - for caching purposes.
+    size_t lineIndicesSize, vertexIndicesSize;
+
 	std::list<VertexPair> lineVertices, triangleVertices;
 	std::list<int> lineIndices, triangleIndices;
  

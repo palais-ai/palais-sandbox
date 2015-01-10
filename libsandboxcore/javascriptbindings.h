@@ -77,6 +77,8 @@ void timers_update(float deltaTime); //< To be called by the active scene
 QScriptValue script_addTimer_private(QScriptContext *context, QScriptEngine *engine, bool oneShot);
 QScriptValue script_removeTimer_private(QScriptContext *context, QScriptEngine *engine);
 
+QScriptValue script_require(QScriptContext *context, QScriptEngine *engine);
+
 QScriptValue script_setTimeout(QScriptContext *context, QScriptEngine *engine);
 QScriptValue script_setInterval(QScriptContext *context, QScriptEngine *engine);
 QScriptValue script_clearTimeout(QScriptContext *context, QScriptEngine *engine);

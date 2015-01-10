@@ -220,11 +220,13 @@ DebugDrawer::DebugDrawer(const Ogre::String& _name,
                          float _fillAlpha)
    : name(_name),
      sceneManager(_sceneManager),
-     fillAlpha(_fillAlpha),
      manualObject(0),
+     fillAlpha(_fillAlpha),
+     isEnabled(true),
+     lineIndicesSize(0),
+     vertexIndicesSize(0),
      linesIndex(0),
-     trianglesIndex(0),
-     isEnabled(true)
+     trianglesIndex(0)
 {
     initialise();
 }
@@ -616,9 +618,6 @@ void DebugDrawer::drawTetrahedron(const Ogre::Vector3 &centre,
  
 void DebugDrawer::build()
 {
-    // Added size tracking between build calls - for caching purposes.
-    static size_t lineIndicesSize = 0, vertexIndicesSize = 0;
-
     if(lineIndicesSize != lineIndices.size())
     {
         manualObject->beginUpdate(0);
