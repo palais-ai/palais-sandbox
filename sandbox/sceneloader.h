@@ -5,6 +5,7 @@
 
 class Scene;
 class OgreEngine;
+class PluginManager;
 
 namespace Ogre
 {
@@ -18,14 +19,17 @@ public:
                             Ogre::SceneManager* sceneManager,
                             const QString& name,
                             const QString& sceneFile,
-                            const QString& logicFile);
+                            const QString& logicFile,
+                            PluginManager& plugins
+                            );
 private:
     static void loadSceneVisuals(OgreEngine* engine,
                                  Ogre::SceneManager* sceneManager,
                                  const QString& sceneFile);
 
     static void loadSceneLogic(Scene* scene,
-                               const QString& logicFile);
+                               const QString& logicFile,
+                               PluginManager& plugins);
 
     SceneLoader();
 };

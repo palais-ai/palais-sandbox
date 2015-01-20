@@ -29,7 +29,6 @@ Rectangle {
         font.weight: Font.Light
         color: colors.lightGray
         anchors.top: pad1.bottom
-        anchors.topMargin: headerColumn.headerPadding - 2
         anchors.left: parent.left
         anchors.leftMargin: 8
     }

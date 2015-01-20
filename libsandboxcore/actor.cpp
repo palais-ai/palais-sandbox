@@ -35,7 +35,23 @@ void Actor::disableAnimation(const QString& name)
 
 void Actor::setAnimationEnabled(const QString& name, bool enabled)
 {
-    Ogre::Entity* entity = static_cast<Ogre::Entity*>(mNode->getAttachedObject(0));
+    if(mNode->numAttachedObjects() == 0)
+    {
+        qWarning() << "Can't enable animation [" << name
+                   << "] on actor [" << getName() << "]"
+                   << " because it doesn't have any attached objects.";
+        return;
+    }
+
+    Ogre::Entity* entity = dynamic_cast<Ogre::Entity*>(mNode->getAttachedObject(0));
+
+    if(!entity)
+    {
+        qWarning() << "Can't enable animation [" << name
+                   << "] on actor [" << getName() << "]"
+                   << " because its attachment isn't an entity.";
+        return;
+    }
 
     Ogre::AnimationStateSet* set = entity->getAllAnimationStates();
     if(!set->hasAnimationState(name.toStdString()))
@@ -66,6 +82,16 @@ void Actor::show()
 void Actor::hide()
 {
     setVisible(false);
+}
+
+void Actor::setCastShadows(bool hasShadows)
+{
+    Ogre::SceneNode::ObjectIterator it = mNode->getAttachedObjectIterator();
+    while(it.hasMoreElements())
+    {
+        Ogre::MovableObject* obj = static_cast<Ogre::MovableObject*>(it.getNext());
+        obj->setCastShadows(hasShadows);
+    }
 }
 
 void Actor::setVisible(bool visible)
@@ -101,14 +127,6 @@ void Actor::update(float deltaTime)
 
         if(state->getEnabled())
         {
-            /**
-            qDebug() << "Updating animation "
-                     << QString::fromStdString(state->getAnimationName())
-                     << " by "
-                     << deltaTime
-                     << " seconds. Current time is "
-                     << state->getTimePosition();
-            */
             state->addTime(deltaTime);
         }
     }

@@ -54,7 +54,7 @@ QScriptValue planning_default_postcondition(QScriptContext *context, QScriptEngi
 {
      Q_UNUSED(context);
      Q_UNUSED(engine);
-    return 1;
+     return 1;
 }
 
 QScriptValue planning_add_action(QScriptContext *context, QScriptEngine *engine)
@@ -68,45 +68,33 @@ QScriptValue planning_add_action(QScriptContext *context, QScriptEngine *engine)
                                    "Planner.add_action: this object is not a Planner");
     }
 
-    QScriptValue precondition, postcondition, cost;
-    if(context->argumentCount() > 0)
+    QScriptValue precondition, postcondition, cost, perform;
+    if(context->argumentCount() >= 4)
     {
-        QScriptValue arg0 = context->argument(0);
-        if(arg0.isFunction())
+        for(int i = 0; i < 4; ++i)
         {
-            precondition = arg0;
-        }
-        else
-        {
-            qWarning() << "The first argument to Planner.addAction must be a function.";
-            return engine->undefinedValue();
-        }
+            QScriptValue val = context->argument(i);
 
-        if(context->argumentCount() > 1)
-        {
-            QScriptValue arg1 = context->argument(1);
-            if(arg1.isFunction())
+            if(!val.isFunction())
             {
-                postcondition = arg1;
-            }
-            else
-            {
-                qWarning() << "The second argument to Planner.addAction must be a function.";
-                return engine->undefinedValue();
+                return context->throwError(QScriptContext::TypeError,
+                                           "Planner.add_action: arguments must be functions.");
             }
 
-            if(context->argumentCount() > 2)
+            switch(i)
             {
-                QScriptValue arg2 = context->argument(2);
-                if(arg0.isFunction())
-                {
-                    cost = arg2;
-                }
-                else
-                {
-                    qWarning() << "The third argument to Planner.addAction must be a function.";
-                    return engine->undefinedValue();
-                }
+            case 0:
+                precondition = val;
+                break;
+            case 1:
+                postcondition = val;
+                break;
+            case 2:
+                cost = val;
+                break;
+            case 3:
+                perform = val;
+                break;
             }
         }
     }
@@ -115,19 +103,22 @@ QScriptValue planning_add_action(QScriptContext *context, QScriptEngine *engine)
         precondition = engine->newFunction(planning_default_precondition);
         postcondition = engine->newFunction(planning_default_postcondition);
         cost = engine->newFunction(planning_default_cost);
+        perform = engine->newFunction(planning_default_cost);
     }
 
-    planner->addAction(new ScriptAction(precondition, postcondition, cost));
+    planner->addAction(new ScriptAction(precondition, postcondition, cost, perform));
 
     return engine->undefinedValue();
 }
 
 ScriptAction::ScriptAction(const QScriptValue& precondition,
                            const QScriptValue& postcondition,
-                           const QScriptValue& cost) :
+                           const QScriptValue& cost,
+                           const QScriptValue& perform) :
     mPrecondition(precondition),
     mPostcondition(postcondition),
-    mCost(cost)
+    mCost(cost),
+    mPerform(perform)
 {
     ;
 }
@@ -167,6 +158,12 @@ float ScriptAction::getCost(const planner_state_type& state) const
     return mPostcondition.call(QScriptValue(), QScriptValueList() << value).toNumber();
 }
 
+void ScriptAction::perform(Actor* actor)
+{
+    QScriptValue value = mPerform.engine()->toScriptValue(actor);
+    mPerform.call(QScriptValue(), QScriptValueList() << value);
+}
+
 Planner::Planner(QObject *parent) :
     QObject(parent)
 {
@@ -187,7 +184,26 @@ void Planner::addAction(ScriptAction* action)
     mPlanner.addAction(action);
 }
 
-ailib::AStar<Planner::planner_type::graph_type>::path_type
+static bool variantMapComparator(const QVariantMap& node,
+                                 const QVariantMap& goal)
+{
+    QVariantMap::const_iterator it = goal.constBegin();
+
+    for(; it != goal.end(); ++it)
+    {
+        if(node.contains(it.key()) && node[it.key()] == it.value())
+        {
+            continue;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+ailib::AStar<Planner::planner_type::graph_type>::connections_type
 Planner::findPlan(const QVariantMap& startState,
                   const QVariantMap& endState,
                   bool* isAlreadyThere)
@@ -201,9 +217,13 @@ Planner::findPlan(const QVariantMap& startState,
              << maxDepth
              << ")";
 
+    ailib::AStar<planner_type::graph_type>::connections_type connections;
     ailib::AStar<planner_type::graph_type> astar(mPlanner.getGraph());
     ailib::AStar<planner_type::graph_type>::path_type path;
-    path = astar.findPath(mPlanner.getGraph().getNode(startIdx), endState);
+    path = astar.findPath(mPlanner.getGraph().getNode(startIdx),
+                          endState,
+                          &variantMapComparator,
+                          &connections);
 
     if(path.empty())
     {
@@ -217,7 +237,7 @@ Planner::findPlan(const QVariantMap& startState,
         *isAlreadyThere = path.size() == 1 && *path[0] == startState;
     }
 
-    return path;
+    return connections;
 }
 
 void Planner::makePlan(Actor* actor,
@@ -226,10 +246,10 @@ void Planner::makePlan(Actor* actor,
     QVariantMap knowledge = actor->getKnowledge();
 
     bool isAlreadyThere;
-    ailib::AStar<planner_type::graph_type>::path_type path;
-    path = findPlan(knowledge, endState, &isAlreadyThere);
+    ailib::AStar<planner_type::graph_type>::connections_type connections;
+    connections = findPlan(knowledge, endState, &isAlreadyThere);
 
-    if(path.empty())
+    if(connections.empty())
     {
         qDebug("No possible solution found.");
     }
@@ -242,7 +262,16 @@ void Planner::makePlan(Actor* actor,
         // TODO: Kickoff to sequentially perform actions,
         // recalculate the plan if unexpected state changes happen.
         qDebug() << "[PLANNER] Found planning solutions with "
-                 << path.size() << " steps.";
+                 << connections.size() << " steps.";
+
+        const planner_type::graph_type& graph = mPlanner.getGraph();
+        ailib::AStar<planner_type::graph_type>::connections_type::const_iterator it;
+        for(it = connections.begin(); it != connections.end(); ++it)
+        {
+            qDebug() << it->edgeIndex;
+            qDebug() << graph.getNumEdges(it->fromNode);
+            static_cast<ScriptAction*>((graph.getSuccessorsBegin(it->fromNode) + it->edgeIndex)->userData)->perform(actor);
+        }
     }
 }
 

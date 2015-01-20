@@ -27,7 +27,7 @@ class GOAPPlanner
 public:
     typedef STATE state_type;
     typedef Action<state_type> action_type;
-    typedef Graph<state_type, MAX_ACTIONS> graph_type;
+    typedef Graph<state_type, MAX_ACTIONS, UserDataEdge<action_type> > graph_type;
 
     void addAction(action_type* action)
     {
@@ -41,6 +41,7 @@ public:
 
     size_t buildGraph(const state_type& startState, const state_type& endState, uint32_t maxDepth)
     {
+        UNUSED(endState);
         mGraph = graph_type(); //< Clear before build
         size_t startIdx = mGraph.addNode(startState);
         recursiveBuildGraph(startIdx, maxDepth, 0);
@@ -53,16 +54,17 @@ private:
     {
         const state_type currentState = *mGraph.getNode(currentIdx);
 
-        for(typename std::vector<action_type*>::const_iterator it = mActions.begin(); it != mActions.end(); ++it)
+        typename std::vector<action_type*>::iterator it;
+        for(it = mActions.begin(); it != mActions.end(); ++it)
         {
-            const action_type* action = *it;
+            action_type* action = *it;
 
             if(action->isPreconditionFulfilled(currentState))
             {
                 state_type nextState = currentState;
                 action->applyPostcondition(nextState);
                 const size_t nextIdx = mGraph.addNode(nextState);
-                mGraph.addEdge(currentIdx, nextIdx, action->getCost(currentState));
+                mGraph.addEdge(currentIdx, nextIdx, action->getCost(currentState), action);
 
                 if(currentDepth < maxDepth)
                 {

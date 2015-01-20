@@ -18,6 +18,7 @@
 
 #include <Ogre.h>
 #include <OgreString.h>
+#include <OgreRenderTarget.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
@@ -129,6 +130,32 @@ void OgreNode::resetViewport()
     m_renderTarget->getViewport(0)->setOverlaysEnabled(false);
 }
 
+QImage OgreNode::renderToImage()
+{
+    const uint32_t w = m_renderTarget->getWidth();
+    const uint32_t h = m_renderTarget->getHeight();
+
+    QImage retVal(w, h, QImage::Format_RGB888);
+
+    if(retVal.isNull())
+    {
+        // Callers handle the allocation error.
+        return retVal;
+    }
+
+    // Set dest format
+    const Ogre::PixelBox encodeDest = Ogre::PixelBox(w,
+                                                     h,
+                                                     1,
+                                                     Ogre::PF_B8G8R8,
+                                                     retVal.bits());
+
+    // Do the copy, NOTE: Differs from the slides (other ogre version?)
+    m_renderTarget->copyContentsToMemory(encodeDest, Ogre::RenderTarget::FB_AUTO);
+
+    return retVal;
+}
+
 void OgreNode::preprocess()
 {
     if(!m_ogreEngineItem || !m_camera)
@@ -227,7 +254,7 @@ void OgreNode::updateFBO()
                                            m_size.width(),
                                            m_size.height(),
                                            0, // num mipmaps
-                                           Ogre::PF_R8G8B8A8,
+                                           Ogre::PF_FLOAT32_RGBA,
                                            Ogre::TU_RENDERTARGET,
                                            0, // ManualLoader
                                            false, // hwGammaCorrection

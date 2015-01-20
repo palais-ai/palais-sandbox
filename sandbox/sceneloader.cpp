@@ -3,6 +3,7 @@
 #include "actor.h"
 #include "javascriptbindings.h"
 #include "application.h"
+#include "PluginManager.h"
 
 #include <exception>
 
@@ -24,7 +25,8 @@ Scene* SceneLoader::loadScene(OgreEngine* engine,
                               Ogre::SceneManager* sceneManager,
                               const QString& name,
                               const QString& sceneFile,
-                              const QString& logicFile)
+                              const QString& logicFile,
+                              PluginManager& plugins)
 {
     if(engine && sceneManager)
     {
@@ -40,7 +42,7 @@ Scene* SceneLoader::loadScene(OgreEngine* engine,
 
         try
         {
-            loadSceneLogic(scene.data(), logicFile);
+            loadSceneLogic(scene.data(), logicFile, plugins);
         }
         catch(const std::runtime_error& ex)
         {
@@ -77,7 +79,9 @@ void SceneLoader::loadSceneVisuals(OgreEngine* engine,
     }
 }
 
-void SceneLoader::loadSceneLogic(Scene* scene, const QString& logicFile)
+void SceneLoader::loadSceneLogic(Scene* scene,
+                                 const QString& logicFile,
+                                 PluginManager& plugins)
 {
     if(!scene)
     {
@@ -97,10 +101,13 @@ void SceneLoader::loadSceneLogic(Scene* scene, const QString& logicFile)
     QScriptEngine& engine = scene->getScriptEngine();
 
     JavaScriptBindings::addBindings(engine, scene);
-
     JavaScriptBindings::checkScriptEngineException(engine, "JS Bindings installation");
 
     qDebug("JS Bindings have been installed.");
+
+    plugins.sceneStarted(*scene);
+    JavaScriptBindings::checkScriptEngineException(engine,
+                                                   "Plugin onSceneStarted");
 
     engine.evaluate(QScriptProgram(QString(ba), logicFile));
 

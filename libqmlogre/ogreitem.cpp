@@ -54,7 +54,12 @@ QObject* OgreItem::camera() const
     return dynamic_cast<QObject*>(m_camera);
 }
 
-QSGNode *OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
+QImage OgreItem::saveCurrentImage()
+{
+    return mLastNode->renderToImage();
+}
+
+QSGNode* OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
     if (width() <= 0 || height() <= 0 || !m_camera || !m_camera->camera() || !m_ogreEngineItem)
     {

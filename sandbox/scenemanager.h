@@ -47,6 +47,7 @@ private:
     Scene* mCurrentScene;
     QAtomicInt mSceneStarted;
     float mSimulationSpeedFactor;
+    float mAccumulator;
     QTime mLastUpdateTime;
 
     static const float sMinimumSpeedFactor;

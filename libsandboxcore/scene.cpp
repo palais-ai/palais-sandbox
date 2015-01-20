@@ -308,15 +308,12 @@ void Scene::destroy(Actor* actor)
         return;
     }
 
-    Ogre::SceneManager* scnMgr = getOgreSceneManager();
-
     destroyAllAttachedMovableObjects(actor->getSceneNode());
-    scnMgr->destroySceneNode(actor->getSceneNode());
+    actor->getSceneNode()->getCreator()->destroySceneNode(actor->getSceneNode());
 
     JavaScriptBindings::removeActorBinding(actor, mLogicScript);
 
     mActors.remove(actor->getName());
-
     emit actorRemoved(actor->getName());
 }
 
@@ -380,11 +377,13 @@ Actor* Scene::addActor(Ogre::SceneNode* node)
 {
     QString name = node->getName().c_str();
 
-    mActors[name] = new Actor(node);
-    connect(mActors[name], &Actor::visibilityChanged,
+    Actor* newActor = new Actor(node);
+    mActors[name] = newActor;
+    connect(newActor, &Actor::visibilityChanged,
             this, &Scene::onActorVisibilityChanged);
 
-    JavaScriptBindings::addActorBinding(mActors[name], mLogicScript);
+    mDynamics.addPhysicsBody(newActor->getSceneNode());
+    JavaScriptBindings::addActorBinding(newActor, mLogicScript);
 
     emit actorAdded(name);
 
@@ -434,6 +433,8 @@ void Scene::update(float time)
         setup();
         mIsSetup = true;
     }
+
+    mDynamics.update(time);
 
     float deltaTimeInSeconds = time / 1000.f;
     QScriptValue fun = mLogicScript.globalObject().property("update");

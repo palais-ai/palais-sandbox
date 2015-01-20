@@ -24,6 +24,7 @@ SceneManager::SceneManager(OgreEngine* engine) :
     mCurrentScene(NULL),
     mSceneStarted(false),
     mSimulationSpeedFactor(1),
+    mAccumulator(0),
     mLastUpdateTime(QTime::currentTime())
 {
     assert(engine);
@@ -63,17 +64,14 @@ Scene* SceneManager::loadScene(const QString& name,
                                                   scnMgr,
                                                   name,
                                                   sceneFile,
-                                                  logicFile);
+                                                  logicFile,
+                                                  mPluginManager);
 
         if(!nextScene)
         {
             qWarning("Scene %s could not be loaded.", name.toStdString().c_str());
             return NULL;
         }
-
-        mPluginManager.sceneStarted(*nextScene);
-        JavaScriptBindings::checkScriptEngineException(nextScene->getScriptEngine(),
-                                                       "Plugin onSceneStarted");
 
         logger.stop("Scene load");
         return mCurrentScene = nextScene;
@@ -103,28 +101,26 @@ bool SceneManager::isPlaying() const
 
 void SceneManager::timerEvent(QTimerEvent*)
 {
-    static float accumulator = 0;
-
     QTime now = QTime::currentTime();
 
     if(mCurrentScene && mSceneStarted)
     {
-        accumulator += mLastUpdateTime.msecsTo(now) * mSimulationSpeedFactor;
+        mAccumulator += mLastUpdateTime.msecsTo(now) * mSimulationSpeedFactor;
 
-        const float accumBefore = accumulator;
+        const float accumBefore = mAccumulator;
 
         float oneStep =  1000.f / sAITickRate;
-        while(accumulator > oneStep)
+        while(mAccumulator > oneStep)
         {
             // We update at constant rates to keep the results the same,
             // independent of simulation speed.
             mCurrentScene->update(oneStep);
             mPluginManager.update(*mCurrentScene, oneStep);
-            accumulator -= oneStep;
+            mAccumulator -= oneStep;
         }
 
         QTime passed(0, 0);
-        passed = passed.addMSecs(accumBefore - accumulator);
+        passed = passed.addMSecs(accumBefore - mAccumulator);
         emit timePassed(passed);
     }
 

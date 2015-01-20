@@ -55,31 +55,40 @@ CONFIG(release, debug|release) {
 include(../linkOgreSDK.pri)
 
 macx {
+    BULLETDIR = $$(BULLET_HOME)
+    isEmpty(BULLETDIR) {
+        error($$TARGET needs bullet to be built. Please set the environment variable BULLET_HOME pointing to your bullet root directory.)
+    }
+
     OGREDIR = $$(OGRE_HOME)
     isEmpty(OGREDIR) {
         error($$TARGET needs Ogre to be built. Please set the environment variable OGRE_HOME pointing to your Ogre root directory.)
-    } else {
-        message(Packaging Ogre libraries in $$OGREDIR)
-
-        FrameworkFiles.files += $$OGREDIR/lib/release/Ogre.framework
-        FrameworkFiles.path = Contents/Frameworks
-
-        ConfigFiles.files += config/resources.cfg
-        ConfigFiles.path = Contents/MacOS
-
-        PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib
-        PluginFiles.files += $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib
-        PluginFiles.files += $$OUT_PWD/../libqmlogre/libqmlogre.1.dylib
-        PluginFiles.files += $$OUT_PWD/../libsandboxcore/libsandboxcore.1.dylib
-        PluginFiles.files += $$OUT_PWD/../plugin_pathfinding/libplugin_pathfinding.dylib
-        PluginFiles.files += $$OUT_PWD/../plugin_planning/libplugin_planning.dylib
-        PluginFiles.path = Contents/Plugins
-
-        MediaFiles.files += $$files(media/*)
-        MediaFiles.path = Contents/MacOS/Resources
-
-        QMAKE_BUNDLE_DATA += FrameworkFiles ConfigFiles PluginFiles MediaFiles
     }
+
+    message(Packaging Ogre libraries in $$OGREDIR)
+    message(Packaging bullet libraries in $$BULLETDIR)
+
+    FrameworkFiles.files += $$OGREDIR/lib/release/Ogre.framework
+    FrameworkFiles.path = Contents/Frameworks
+
+    ConfigFiles.files += config/resources.cfg
+    ConfigFiles.path = Contents/MacOS
+
+    PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib
+    PluginFiles.files += $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib
+    PluginFiles.files += $$files($$BULLETDIR/src/BulletCollision/*.dylib)
+    PluginFiles.files += $$files($$BULLETDIR/src/BulletDynamics/*.dylib)
+    PluginFiles.files += $$files($$BULLETDIR/src/LinearMath/*.dylib)
+    PluginFiles.files += $$OUT_PWD/../libqmlogre/libqmlogre.1.dylib
+    PluginFiles.files += $$OUT_PWD/../libsandboxcore/libsandboxcore.1.dylib
+    PluginFiles.files += $$OUT_PWD/../plugin_pathfinding/libplugin_pathfinding.dylib
+    PluginFiles.files += $$OUT_PWD/../plugin_planning/libplugin_planning.dylib
+    PluginFiles.path = Contents/Plugins
+
+    MediaFiles.files += $$files(media/*)
+    MediaFiles.path = Contents/MacOS/Resources
+
+    QMAKE_BUNDLE_DATA += FrameworkFiles ConfigFiles PluginFiles MediaFiles
 } else:unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += OGRE
@@ -102,6 +111,9 @@ macx {
         package.files += $$OUT_PWD/../plugin_planning/$$M_BUILD_DIR/libplugin_planning.dll
         package.files += $$OGREDIR/bin/release/opt/*.dll $$OGREDIR/bin/release/*.dll
         package.files += $$OGREDIR/bin/debug/opt/*.dll $$OGREDIR/bin/debug/*.dll
+        package.files += $$BULLETDIR/src/BulletCollision/*.dll
+        package.files += $$BULLETDIR/src/BulletDynamics/*.dll
+        package.files += $$BULLETDIR/src/LinearMath/*.dll
         package.files += $$[QT_INSTALL_LIBS]/../bin/*.dll
         package.CONFIG = no_check_exist
 

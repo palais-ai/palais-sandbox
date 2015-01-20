@@ -26,7 +26,9 @@ QThread* g_engineThread;
 OgreEngine::OgreEngine(QQuickWindow *window)
     : QObject(),
       m_resources_cfg(Ogre::StringUtil::BLANK),
-      mRoot(0)
+      mRoot(0),
+      m_ogreContext(0),
+      m_qtContext(0)
 {
     qmlRegisterType<OgreItem>("Ogre", 1, 0, "OgreItem");
     qmlRegisterType<OgreEngine>("OgreEngine", 1, 0, "OgreEngine");

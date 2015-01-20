@@ -14,6 +14,7 @@
 #include <OgreNode.h>
 #include <OgreCamera.h>
 #include <OgreAxisAlignedBox.h>
+#include <OgreStringConverter.h>
 
 #include <QDebug>
 #include <QThread>
@@ -80,7 +81,23 @@ void CameraHandler::onRelativePitchChanged(qreal p)
     Ogre::Real dist = getDistanceToAutoTrackingTarget();
 
     mCamera->setPosition(mCamera->getAutoTrackTarget()->_getDerivedPosition());
-    mCamera->pitch(Ogre::Degree(p));
+
+    const Ogre::Radian after(mCamera->getOrientation().getPitch() + Ogre::Degree(p));
+    const Ogre::Radian lowerLimit(-Ogre::Math::PI/2 + 0.01);
+    const Ogre::Radian upperLimit(Ogre::Math::PI/2 - 0.01);
+
+    qDebug() << Ogre::StringConverter::toString(after.valueDegrees()).c_str() << ":" << Ogre::StringConverter::toString(Ogre::Real(p)).c_str();
+    qDebug() << Ogre::StringConverter::toString(lowerLimit.valueDegrees()).c_str() << ":" << Ogre::StringConverter::toString(upperLimit.valueDegrees()).c_str();
+
+    if(after < lowerLimit || after > upperLimit)
+    {
+        // Don't rotate to prevent gimbal lock.
+    }
+    else
+    {
+        mCamera->pitch(Ogre::Degree(p));
+    }
+
     mCamera->moveRelative(Ogre::Vector3(0, 0, dist));
 }
 

@@ -194,6 +194,11 @@ QVariant InspectorModel::data(const QModelIndex &index, int role) const
     {
         QVariant data = mKnowledge[keys[index.row()]];
 
+        if(!data.isValid())
+        {
+            return data;
+        }
+
         if(data.canConvert<Ogre::Vector3>())
         {
             OgreVector3Model* model = new OgreVector3Model(data.value<Ogre::Vector3>());
@@ -228,6 +233,25 @@ QVariant InspectorModel::data(const QModelIndex &index, int role) const
                     QQmlEngine::setObjectOwnership(model, QQmlEngine::JavaScriptOwnership);
                     return QVariant::fromValue(model);
                 }
+            }
+        }
+
+        if(data.canConvert<QObject*>())
+        {
+            if(data.isNull())
+            {
+                qWarning() << "NULL qObject encountered in knowledge. Can't display.";
+                return QVariant::fromValue(static_cast<QObject*>(0));
+            }
+
+            QObject* qobject = data.value<QObject*>();
+            if(qobject->thread() != thread())
+            {
+                qWarning() << "QObjects that are accessed through QML "
+                           << "must live in the QMLEngine's thread."
+                           << "Consider adding a wrapper class."
+                           << "The QObject will not be displayed.";
+                return QVariant::fromValue(static_cast<QObject*>(0));
             }
         }
 

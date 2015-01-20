@@ -4,3 +4,4 @@ OS X 10.10 Build Instructions:
 - Get Qt 5+
 - Get bullet 2.82
 - launchctl setenv OGRE_HOME ${PATH_TO_OgreSDK}
+- launchctl setenv BULLET_HOME ${PATH_TO_BulletSDK}

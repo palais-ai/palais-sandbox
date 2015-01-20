@@ -9,7 +9,7 @@ ApplicationWindow {
     width: 1024
     height: 660
     visible: true
-    title: "AI Sandbox"
+    title: "Palais"
     color: colors.gray
 
     minimumWidth: 1024
@@ -23,19 +23,14 @@ ApplicationWindow {
             enabled: isOgreInitialized
 
             MenuItem {
-                text: "Open project"
+                text: "Open scenario"
                 shortcut: "Ctrl+O"
 
                 onTriggered: openProjectDialog.open()
             }
 
             MenuItem {
-                text: "Save"
-                shortcut: "Ctrl+S"
-            }
-
-            MenuItem {
-                text: "Reload project"
+                text: "Reload scenario"
                 shortcut: "Ctrl+L"
                 enabled: ApplicationWrapper.sceneLoaded
                 onTriggered: ProjectManager.reloadProject()
@@ -45,18 +40,20 @@ ApplicationWindow {
             title: "Edit"
 
             MenuItem {
-                text: "Cut"
-                shortcut: "Ctrl+X"
+                text: "Unselect actor"
+                shortcut: "Ctrl+U"
+                enabled: ApplicationWrapper.sceneLoaded && ActorModel.actorSelected
+                onTriggered: ProjectManager.unselectActor()
             }
+        }
+        Menu {
+            title: "View"
 
             MenuItem {
-                text: "Copy"
-                shortcut: "Ctrl+C"
-            }
-
-            MenuItem {
-                text: "Paste"
-                shortcut: "Ctrl+V"
+                text: "Save rendering"
+                shortcut: "Ctrl+R"
+                enabled: ApplicationWrapper.sceneLoaded
+                onTriggered: saveRenderingDialog.open()
             }
         }
     }
@@ -236,6 +233,21 @@ ApplicationWindow {
 
         onAccepted: {
             openProjectDialog.projectFileSelected(openProjectDialog.fileUrl)
+        }
+    }
+
+    FileDialog {
+        id: saveRenderingDialog
+        objectName: "saveRenderingDialog"
+        title: "Please choose a file"
+        visible: false
+        selectMultiple: false
+        selectExisting: false
+
+        signal renderingFileSelected(url fileurl)
+
+        onAccepted: {
+            saveRenderingDialog.renderingFileSelected(saveRenderingDialog.fileUrl)
         }
     }
 

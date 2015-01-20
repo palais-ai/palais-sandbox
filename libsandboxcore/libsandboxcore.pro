@@ -22,7 +22,8 @@ SOURCES += \
     knowledgemodel.cpp \
     ogrehelper.cpp \
     scene.cpp \
-    DebugDrawer.cpp
+    DebugDrawer.cpp \
+    scenedynamics.cpp
 
 HEADERS +=\
     libsandboxcore_global.h \
@@ -31,9 +32,11 @@ HEADERS +=\
     knowledgemodel.h \
     ogrehelper.h \
     scene.h \
-    DebugDrawer.h
+    DebugDrawer.h \
+    scenedynamics.h
 
 include(../linkOgreSDK.pri)
+include(../linkBulletSDK.pri)
 
 INCLUDEPATH += ../sandbox/
 

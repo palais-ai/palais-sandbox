@@ -28,8 +28,8 @@ class CameraNodeObject;
 class Application : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool sceneLoaded READ getSceneLoaded NOTIFY onSceneLoadedChanged)
-    Q_PROPERTY(bool scenePlaying READ getScenePlaying NOTIFY onScenePlayingChanged)
+    Q_PROPERTY(bool sceneLoaded READ getSceneLoaded NOTIFY sceneLoadedChanged)
+    Q_PROPERTY(bool scenePlaying READ getScenePlaying NOTIFY scenePlayingChanged)
 public:
     static const std::string sSceneManagerName;
 
@@ -48,8 +48,8 @@ signals:
     void beforeSceneLoadFinished(const QString& name,
                                  const QString& sceneFile,
                                  const QString& logicFile);
-    void onSceneLoadedChanged(bool sceneLoaded);
-    void onScenePlayingChanged(bool scenePlaying);
+    void sceneLoadedChanged(bool sceneLoaded);
+    void scenePlayingChanged(bool scenePlaying);
     void sceneSetupFinished();
     void selectActorAtClickpoint(float mouseX,
                                  float mouseY);

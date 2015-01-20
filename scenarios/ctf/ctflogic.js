@@ -1,10 +1,11 @@
 require("global.js")
 require("actions.js")
 
+Navmesh.hide()
+
 var numCalls = 1;
-var fighterCount = 0;
-function spawnFighter(startPos, teamColor) {
-	var actor = scene.instantiate("player_team_" + teamColor + "_" + fighterCount++,
+function spawnFighter(startPos, teamColor, index) {
+	var actor = scene.instantiate("player_team_" + teamColor + "_" + index,
 								  "Soldier2" + teamColor, 
 								  startPos);
 	actor.enableAnimation("my_animation");
@@ -19,7 +20,25 @@ function spawnFighter(startPos, teamColor) {
 	lookAtPos.y *= 2
 	lookAtPos.z *= 2
 	actor.lookAt(lookAtPos);
+	actor.setKnowledge("team_color", teamColor);
+	actor.setKnowledge("position", actor.position);
+	var otherFlag = teamColor == "red" ? flag_green.position : flag_red.position;
+	var ownFlag = teamColor == "red" ? flag_red.position : flag_green.position;
 
+	var planner = new Planner();
+	var moveToOwnFlagAction = new MoveToFlagAction(ownFlag);
+	var moveToOtherFlagAction = new MoveToFlagAction(otherFlag);
+	planner.addAction(moveToOwnFlagAction.precondition,
+				      moveToOwnFlagAction.postcondition,
+				      moveToOwnFlagAction.cost,
+				      moveToOwnFlagAction.perform);
+
+	planner.addAction(moveToOtherFlagAction.precondition,
+				      moveToOtherFlagAction.postcondition,
+				      moveToOtherFlagAction.cost,
+				      moveToOtherFlagAction.perform);
+
+	planner.makePlan(actor, {"made_points" : true});
 	pathfinding.moveActor(actor, teamColor == "red" ? flag_green.position : flag_red.position);
 }
 
@@ -28,7 +47,7 @@ function spawnTeam(teamSize, startPos) {
 
 	var spawnDelay = 1000; // in ms
 	for(var i = 0; i < teamSize; ++i) {
-		setTimeout(spawnDelay*i, partial(spawnFighter, startPos, meshSuffix));
+		setTimeout(spawnDelay*i, partial(spawnFighter, startPos, meshSuffix, i));
 	}
 	numCalls++;
 }
@@ -50,24 +69,7 @@ function onStart() {
 	scene.setKnowledge("vec3", new Vector3(3,3,3));
 	scene.setKnowledge("vec3array", [new Vector3(3,3,3), new Vector3(3,3,3)]);
 
-	var planner = new Planner();
-
-	// ACTION: MoveTo-Flag
-	planner.addAction(function(state) {
-		return !("cant_move" in state)
-	}, function(state) {
-		state["position"] = flag_red.position;
-		return state;
-	}, function(state) {
-		if("position" in state) {
-			return state["position"].distanceTo(flag_red.position)
-		}
-		return flag_green.position.distanceTo(flag_red.position) // Assume max distance
-	});
-
-	planner.makePlan(Cube_000, {"test" : 5, "x" : true, "yzx" : new Vector3(3,3,3)});
-
-	Navmesh.hide()
+	Plane.setCastShadows(false)
 }
 
 function update(deltaTime) {

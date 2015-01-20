@@ -11,6 +11,7 @@ Rectangle {
 
     OgreItem {
         id: ogreitem
+        objectName: "ogreItem"
         anchors.fill: parent;
         camera: cam1
         ogreEngine: OgreEngine

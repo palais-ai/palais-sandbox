@@ -51,6 +51,8 @@ public:
     void update();
     void updateFBO();
 
+    // QImage's "isNull" returns true if the allocation failed.
+    QImage renderToImage();
     GLuint getOgreFboId();
 
     void setOgreEngineItem(OgreEngine* ogreRootItem);

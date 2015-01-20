@@ -8,11 +8,6 @@ material Material.002
     {
         pass Material.002
         {
-            ambient 0.800000011920929 0.800000011920929 0.800000011920929 1.0
-            diffuse 0.800000011920929 0.800000011920929 0.800000011920929 1.0
-            specular 1.0 1.0 1.0 1.0 12.5
-            emissive 0.0 0.0 0.0 1.0
-
             alpha_to_coverage off
             colour_write on
             cull_hardware clockwise
@@ -25,7 +20,7 @@ material Material.002
             lighting on
             normalise_normals off
             polygon_mode solid
-            shading gouraud
+            shading phong
 
             texture_unit 
             {

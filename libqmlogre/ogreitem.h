@@ -32,6 +32,9 @@ public:
     QObject* camera() const;
     void setCamera(QObject* camera);
 
+    // QImage's "isNull" returns true if the allocation failed.
+    QImage saveCurrentImage();
+
     QColor backgroundColor() const;
     void setBackgroundColor(QColor color);
 

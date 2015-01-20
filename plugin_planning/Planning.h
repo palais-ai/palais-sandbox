@@ -29,13 +29,16 @@ class ScriptAction : public ailib::Action<planner_state_type>
 public:
     ScriptAction(const QScriptValue& precondition,
                  const QScriptValue& postcondition,
-                 const QScriptValue& cost);
+                 const QScriptValue& cost,
+                 const QScriptValue& perform);
 
     virtual bool isPreconditionFulfilled(const planner_state_type& state) const;
     virtual void applyPostcondition(planner_state_type& state) const;
     virtual float getCost(const planner_state_type& state) const;
+
+    void perform(Actor* actor);
 private:
-    mutable QScriptValue mPrecondition, mPostcondition, mCost;
+    mutable QScriptValue mPrecondition, mPostcondition, mCost, mPerform;
 };
 
 class Planner : public QObject
@@ -50,9 +53,9 @@ public:
     Q_INVOKABLE void makePlan(Actor* actor,
                               const QVariantMap& endState);
 
-    ailib::AStar<planner_type::graph_type>::path_type findPlan(const QVariantMap& startState,
-                                                               const QVariantMap& endState,
-                                                               bool* isAlreadyThere);
+    ailib::AStar<planner_type::graph_type>::connections_type findPlan(const QVariantMap& startState,
+                                                                      const QVariantMap& endState,
+                                                                      bool* isAlreadyThere);
 
     void addAction(ScriptAction* action);
     void update(Scene& scene, float deltaTime);

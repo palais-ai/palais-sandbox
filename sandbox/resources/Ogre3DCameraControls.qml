@@ -50,7 +50,7 @@ Rectangle {
             onPressed: performZoom()
 
             function performZoom() {
-                ogreitem.camera.zoom = Math.min(6, Math.max(0.1, ogreitem.camera.zoom - 0.25))
+                ogreitem.camera.zoom = Math.min(6, Math.max(0.1, ogreitem.camera.zoom + 0.25))
             }
         }
 
@@ -60,7 +60,7 @@ Rectangle {
             onPressed: performZoom()
 
             function performZoom() {
-                ogreitem.camera.zoom = Math.min(6, Math.max(0.1, ogreitem.camera.zoom + 0.25))
+                ogreitem.camera.zoom = Math.min(6, Math.max(0.1, ogreitem.camera.zoom - 0.25))
             }
         }
     }

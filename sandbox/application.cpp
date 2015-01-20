@@ -193,17 +193,34 @@ void Application::initializeOgre()
     QObject::connect(mProjectManager, &ProjectManager::inspectorSelectionChanged,
                      this, &Application::onInspectorSelectionChanged);
 
-    QString dialogName("openProjectDialog");
-    QObject* projectDialog = window->findChild<QObject*>(dialogName);
+    {
+        QString dialogName("openProjectDialog");
+        QObject* projectDialog = window->findChild<QObject*>(dialogName);
 
-    if(projectDialog)
-    {
-        QObject::connect(projectDialog, SIGNAL(projectFileSelected(QUrl)),
-                         mProjectManager, SLOT(onOpenProject(QUrl)));
+        if(projectDialog)
+        {
+            QObject::connect(projectDialog, SIGNAL(projectFileSelected(QUrl)),
+                             mProjectManager, SLOT(onOpenProject(QUrl)));
+        }
+        else
+        {
+            qFatal("Couldn't find project dialog (id=%s).", dialogName.toStdString().c_str());
+        }
     }
-    else
+
     {
-        qFatal("Couldn't find project dialog (id=%s).", dialogName.toStdString().c_str());
+        QString dialogName("saveRenderingDialog");
+        QObject* projectDialog = window->findChild<QObject*>(dialogName);
+
+        if(projectDialog)
+        {
+            QObject::connect(projectDialog, SIGNAL(renderingFileSelected(QUrl)),
+                             mProjectManager, SLOT(onSaveRenderView(QUrl)));
+        }
+        else
+        {
+            qFatal("Couldn't find rendering dialog (id=%s).", dialogName.toStdString().c_str());
+        }
     }
 
     emit(ogreInitialized());
@@ -249,6 +266,8 @@ void Application::onSceneLoaded(Scene* scene)
             mSceneModel.data(), &SceneModel::onActorAdded);
     connect(scene, &Scene::actorRemoved,
             mSceneModel.data(), &SceneModel::onActorRemoved);
+    connect(scene, &Scene::actorRemoved,
+            mProjectManager, &ProjectManager::onActorRemoved);
     connect(scene, &Scene::actorChangedVisibility,
             mSceneModel.data(), &SceneModel::onActorChangedVisiblity);
     connect(mSceneModel.data(), &SceneModel::requestEmitCurrentActors,
@@ -269,7 +288,7 @@ void Application::onSceneLoaded(Scene* scene)
     mApplicationEngine->rootContext()->setContextProperty("InspectorModel",
                                                           mInspectorModel.data());
 
-    emit(onSceneLoadedChanged(getSceneLoaded()));
+    emit(sceneLoadedChanged(getSceneLoaded()));
     emit(sceneSetupFinished());
 }
 
@@ -335,5 +354,5 @@ void Application::onPlayButtonPressed()
 
 void Application::onPlayingChanged(bool isPlaying)
 {
-    emit onScenePlayingChanged(isPlaying);
+    emit scenePlayingChanged(isPlaying);
 }

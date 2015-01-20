@@ -29,6 +29,7 @@ void PlanningPlugin::onSceneStarted(const PluginInterface& interface, Scene& sce
 void PlanningPlugin::onSceneEnded(const PluginInterface& interface, Scene& scene)
 {
     Q_UNUSED(interface);
+    Q_UNUSED(scene);
 }
 
 void PlanningPlugin::update(const PluginInterface& interface, Scene& scene, float deltaTime)

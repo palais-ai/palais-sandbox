@@ -10,7 +10,8 @@ void SceneModel::declareQML()
 }
 
 SceneModel::SceneModel(const QString& name) :
-    mName(name)
+    mName(name),
+    mActorSelected(false)
 {
 }
 
@@ -32,6 +33,11 @@ QHash<int, QByteArray> SceneModel::roleNames() const
 void SceneModel::requestCurrentActors()
 {
     emit requestEmitCurrentActors();
+}
+
+bool SceneModel::getActorSelected() const
+{
+    return mActorSelected;
 }
 
 Qt::ItemFlags SceneModel::flags(const QModelIndex &index) const
@@ -120,10 +126,12 @@ void SceneModel::onActorChangedSelection(const QString& actorName, bool selected
     int i = indexForActorName(actorName);
     if(i != -1)
     {
+        mActorSelected = selected;
         mActors[i].setSelected(selected);
         QVector<int> roles;
         roles += ModelRoleIsSelected;
         emit dataChanged(createIndex(i,i), createIndex(i,i), roles);
+        emit actorSelectedChanged(selected);
     }
     else
     {

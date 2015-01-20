@@ -65,12 +65,15 @@ Rectangle {
         anchors.topMargin: verticalMargin
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - horizontalMargin*2
+        visible: typeNameForObject(value) !== "object"
 
         model: {
             if(value.hasOwnProperty("getTextualRepresentation")) {
                 return value.getTextualRepresentation();
             } else if(value instanceof Array) {
                 return value;
+            } else if(typeNameForObject(value) === "object") {
+                return [];
             } else {
                 return [value];
             }

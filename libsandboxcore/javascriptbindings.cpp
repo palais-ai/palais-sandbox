@@ -508,6 +508,7 @@ void Vector3_register_prototype(QScriptEngine& engine)
     obj.setProperty("multiply", engine.newFunction(Vector3_prototype_multiply));
     obj.setProperty("normalize", engine.newFunction(Vector3_prototype_normalize));
     obj.setProperty("distanceTo", engine.newFunction(Vector3_prototype_distance));
+    obj.setProperty("equals", engine.newFunction(Vector3_prototype_equals));
 
     engine.setDefaultPrototype(qMetaTypeId<Ogre::Vector3>(), obj);
     engine.setDefaultPrototype(qMetaTypeId<Ogre::Vector3*>(), obj);
@@ -684,7 +685,7 @@ QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engin
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: \
+                                   "Vector3.prototype.add: \
                                     this object is not a Ogre::Vector3");
     }
 
@@ -694,7 +695,7 @@ QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engin
         if (!v2)
         {
             return context->throwError(QScriptContext::TypeError,
-                                       "Vector3.prototype.toString: \
+                                       "Vector3.prototype.add: \
                                         Argument #0 object is not a Ogre::Vector3");
         }
 
@@ -714,7 +715,7 @@ QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: \
+                                   "Vector3.prototype.subtract: \
                                     this object is not a Ogre::Vector3");
     }
 
@@ -724,7 +725,7 @@ QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *
         if (!v2)
         {
             return context->throwError(QScriptContext::TypeError,
-                                       "Vector3.prototype.toString: \
+                                       "Vector3.prototype.subtract: \
                                         Argument #0 object is not a Ogre::Vector3");
         }
 
@@ -744,7 +745,7 @@ QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: \
+                                   "Vector3.prototype.multiply: \
                                     this object is not a Ogre::Vector3");
     }
 
@@ -761,7 +762,7 @@ QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *
         if (!v2)
         {
             return context->throwError(QScriptContext::TypeError,
-                                       "Vector3.prototype.toString:\
+                                       "Vector3.prototype.multiply:\
                                         Argument #0 object is not a Ogre::Vector3 or a number");
         }
 
@@ -781,7 +782,7 @@ QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine 
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: \
+                                   "Vector3.prototype.normalize: \
                                     this object is not a Ogre::Vector3");
     }
 
@@ -799,7 +800,7 @@ QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
-                                   "Vector3.prototype.toString: \
+                                   "Vector3.prototype.distance: \
                                     this object is not a Ogre::Vector3");
     }
 
@@ -809,11 +810,39 @@ QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *
         if (!v2)
         {
             return context->throwError(QScriptContext::TypeError,
-                                       "Vector3.prototype.toString:\
+                                       "Vector3.prototype.distance:\
                                         Argument #0 object is not a Ogre::Vector3");
         }
 
         return v->distance(*v2);
+    }
+
+    return engine->undefinedValue();
+}
+
+QScriptValue Vector3_prototype_equals(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Vector3.prototype.equals: \
+                                    this object is not a Ogre::Vector3");
+    }
+
+    if (context->argumentCount() == 1)
+    {
+        Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
+        if (!v2)
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Vector3.prototype.equals:\
+                                        Argument #0 object is not a Ogre::Vector3");
+        }
+
+        return v->distance(*v2) < 0.001f;
     }
 
     return engine->undefinedValue();

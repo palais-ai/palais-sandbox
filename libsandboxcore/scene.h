@@ -3,6 +3,7 @@
 
 #include "ogrehelper.h"
 #include "knowledgemodel.h"
+#include "scenedynamics.h"
 
 #include <QVector>
 #include <QScriptEngine>
@@ -108,6 +109,7 @@ private:
 
     QString mName, mSceneFile, mLogicFile;
     OgreEngine* mEngine;
+    SceneDynamics mDynamics;
     QString mSceneManagerName;
     Ogre::SceneNode* mRoot;
     Ogre::RaySceneQuery* mRayQuery;

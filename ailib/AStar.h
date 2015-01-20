@@ -52,13 +52,22 @@ private:
     mutable std::vector<AStarNode> mNodeInfo;
 public:
     typedef typename GRAPH::node_type node_type;
+    typedef typename GRAPH::edge_type edge_type;
     typedef std::vector<const node_type*> path_type;
     typedef std::vector<Connection> connections_type;
     typedef real_type(*Heuristic)(const node_type&,
                                   const node_type&);
+    typedef bool(*Comparator)(const node_type&,
+                              const node_type&);
 
-    static real_type zeroHeuristic(const node_type&,
-                            const node_type&)
+    FORCE_INLINE static bool equalsComparator(const node_type& lv,
+                                              const node_type& rv)
+    {
+        return lv == rv;
+    }
+
+    FORCE_INLINE static real_type zeroHeuristic(const node_type&,
+                                                const node_type&)
     {
         return 0;
     }
@@ -71,9 +80,18 @@ public:
         ;
     }
 
+    FORCE_INLINE path_type findPath(const node_type* const start,
+                                    const node_type& goal,
+                                    Comparator comparator = &equalsComparator,
+                                    connections_type* /* out */ connections = NULL) const
+    {
+        return findPath(start, goal, &zeroHeuristic, comparator, connections);
+    }
+
     path_type findPath(const node_type* const start,
                        const node_type& goal,
                        Heuristic heuristic = &zeroHeuristic,
+                       Comparator comparator = &equalsComparator,
                        connections_type* /* out */ connections = NULL) const
     {
         assert(start);
@@ -111,7 +129,7 @@ public:
             assert(lowestCostIdx < mGraph.getNumNodes());
 
             const node_type* lowestCost = mGraph.getNode(lowestCostIdx);
-            if(UNLIKELY(*lowestCost == goal))
+            if(UNLIKELY(comparator(*lowestCost, goal)))
             {
                 // We found a valid short path.
                 // It's guaranteed to be the shortest, if our heuristic is underestimating.
@@ -125,9 +143,9 @@ public:
             // a better cost value.
             open.pop();
 
-            const Edge* const end = mGraph.getSuccessorsEnd(lowestCostIdx);
-            const Edge* const begin = mGraph.getSuccessorsBegin(lowestCostIdx);
-            for(const Edge* it = begin; it != end; ++it)
+            const edge_type* const end = mGraph.getSuccessorsEnd(lowestCostIdx);
+            const edge_type* const begin = mGraph.getSuccessorsBegin(lowestCostIdx);
+            for(const edge_type* it = begin; it != end; ++it)
             {
                 const size_t targetIdx = it->targetIndex;
                 assert(targetIdx < mGraph.getNumNodes());
@@ -169,6 +187,7 @@ public:
 
                 targetNode->parent = lowestCostNode;
                 targetNode->connection = it - begin;
+                assert(targetNode->connection < mGraph.getNumEdges(lowestCostIdx));
                 targetNode->currentCost = targetCost;
             }
         }
@@ -207,6 +226,11 @@ private:
         }
 
         retVal.push_back(start);
+
+        if(connections)
+        {
+            *connections = connections_type(connections->rbegin(), connections->rend());
+        }
 
         // Reverse the path so it is in order from __start__ to __goal__
         return path_type(retVal.rbegin(), retVal.rend());

@@ -39,6 +39,9 @@ public:
 
     // Thread-safe
     Q_INVOKABLE void reloadProject();
+
+    // Thread-safe
+    Q_INVOKABLE void unselectActor();
 signals:
     void startSceneLoad(const QString& sceneFile,
                         const QString& logicFile);
@@ -55,6 +58,7 @@ signals:
                               bool selected);
     void signalSetSimulationSpeed(float speedFactor);
     void signalReloadProject();
+    void signalUnselectActor();
 public slots:
     void onSetSimulationSpeed(float speedFactor);
     void onReloadProject();
@@ -67,6 +71,9 @@ public slots:
     void onSelectActorAtClickpoint(float mouseX,
                                    float mouseY);
     void onFocusSelectedActor();
+    void onSaveRenderView(const QUrl& url);
+    void onUnselectActor();
+    void onActorRemoved(const QString& actorName);
 private:
     static std::string sCurrentResourceGroupName;
     void loadResources(const QStringList& paths);

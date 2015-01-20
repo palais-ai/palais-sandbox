@@ -32,6 +32,7 @@ public:
     Q_INVOKABLE void lookAt(const Ogre::Vector3& target);
     Q_INVOKABLE void show();
     Q_INVOKABLE void hide();
+    Q_INVOKABLE void setCastShadows(bool hasShadows);
     Q_INVOKABLE QString toString() const;
 
     void setVisible(bool visible);

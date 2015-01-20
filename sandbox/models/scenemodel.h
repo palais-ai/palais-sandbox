@@ -10,6 +10,7 @@ class SceneModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
+    Q_PROPERTY(bool actorSelected READ getActorSelected NOTIFY actorSelectedChanged)
 public:
     enum ModelRole
     {
@@ -24,6 +25,7 @@ public:
 
     const QString& getName() const;
     void requestCurrentActors();
+    bool getActorSelected() const;
 
     // List Model impl
     virtual QHash<int, QByteArray> roleNames() const;
@@ -39,6 +41,7 @@ signals:
     void requestEmitCurrentActors();
     void requestVisiblitiyChange(const QString& actorName, bool visible);
     void requestSelectionChange(const QString& actorName, bool selected);
+    void actorSelectedChanged(bool selected);
 public slots:
     void onActorAdded(const QString& actorName);
     void onActorRemoved(const QString& actorName);
@@ -49,6 +52,7 @@ private:
 
     QVector<ActorModel> mActors;
     QString mName;
+    bool mActorSelected;
 };
 
 #endif // SCENEMODEL_H

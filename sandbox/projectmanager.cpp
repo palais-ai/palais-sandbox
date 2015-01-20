@@ -19,6 +19,7 @@
 
 #include "../libqmlogre/ogreengine.h"
 #include "../libqmlogre/cameranodeobject.h"
+#include "../libqmlogre/ogreitem.h"
 
 std::string ProjectManager::sCurrentResourceGroupName = "CurrentScene";
 
@@ -35,6 +36,8 @@ ProjectManager::ProjectManager(OgreEngine* engine) :
             this, &ProjectManager::onReloadProject);
     connect(this, &ProjectManager::signalSetSimulationSpeed,
             this, &ProjectManager::onSetSimulationSpeed);
+    connect(this, &ProjectManager::signalUnselectActor,
+            this, &ProjectManager::onUnselectActor);
 }
 
 ProjectManager::~ProjectManager()
@@ -60,8 +63,11 @@ void ProjectManager::initializeSceneManager()
     }
 
     mgr = root.createSceneManager(Ogre::ST_GENERIC, Application::sSceneManagerName);
-    mgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+    mgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
     mgr->setAmbientLight(Ogre::ColourValue(1, 1, 1));
+    mgr->setShadowCasterRenderBackFaces(false);
+    mgr->setCameraRelativeRendering(true);
+    mgr->setShowDebugShadows(true);
 
     // This fixes some issues with ray casting when using shallow terrain.
     Ogre::AxisAlignedBox box;
@@ -88,6 +94,33 @@ void ProjectManager::onFocusSelectedActor()
     cameraNode->focus(mSelectedActor->getSceneNode());
 }
 
+void ProjectManager::onSaveRenderView(const QUrl& url)
+{
+    QString itemName("ogreItem");
+    QQuickWindow* window = mScenarioManager.getOgreEngine()->getQQuickWindow();
+    OgreItem* item = window->findChild<OgreItem*>(itemName);
+
+    if(!item)
+    {
+        qFatal("Couldn't find ogre item with name (objectName=%s).",
+               itemName.toLocal8Bit().constData());
+    }
+
+    QImage img = item->saveCurrentImage();
+
+    if(img.isNull())
+    {
+        qWarning("The screenshot couldn't be allocated. Out of memory.");
+        return;
+    }
+
+    QString path = url.toLocalFile();
+    if(!img.save(path + ".png", "PNG", 100))
+    {
+        qWarning("Failed to save current scene screenshot to %s", path.toLocal8Bit().constData());
+    }
+}
+
 void ProjectManager::setSimulationSpeed(float speedFactor)
 {
     // Queue signal to call on the engine thread.
@@ -98,6 +131,30 @@ void ProjectManager::reloadProject()
 {
     // Queue signal to call on the engine thread.
     emit signalReloadProject();
+}
+
+void ProjectManager::unselectActor()
+{
+    // Queue signal to call on the engine thread.
+    emit signalUnselectActor();
+}
+
+void ProjectManager::onUnselectActor()
+{
+    if(mSelectedActor)
+    {
+        emit onActorChangeSelected(mSelectedActor->getName(), false);
+    }
+}
+
+void ProjectManager::onActorRemoved(const QString& actorName)
+{
+    if(mSelectedActor && mSelectedActor->getName() == actorName)
+    {
+        Scene* current = mScenarioManager.getCurrentScene();
+        emit inspectorSelectionChanged(current->getName(), current);
+        mSelectedActor = NULL;
+    }
 }
 
 void ProjectManager::onTimePassed(const QTime& time)
@@ -133,14 +190,8 @@ void ProjectManager::onSelectActorAtClickpoint(float mouseX,
 
     if(hitActor)
     {
-        qDebug() << "Clicked " << hitActor->getName();
-
         onActorChangeSelected(hitActor->getName(),
                               !hitActor->getSceneNode()->getShowBoundingBox());
-    }
-    else
-    {
-        qDebug() << "No hit.";
     }
 }
 

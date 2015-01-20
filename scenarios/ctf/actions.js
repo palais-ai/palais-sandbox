@@ -7,17 +7,26 @@ function Action() {
 	this.perform = function(actor) {}
 }
 
-function MoveToAction(goal) {
+function MoveToFlagAction(goal) {
 	this.precondition = function(state) {
-
+		return true
 	}
 	this.postcondition = function(state) {
+		var ownGoal = state["team_color"] === "red" ? flag_red : flag_green;
+		var otherGoal = state["team_color"] === "red" ? flag_green : flag_red;
 
+		if(goal.equals(ownGoal.position) && state["has_flag"] === true) {
+			state["has_flag"] = false
+			state["made_points"] = true
+		} else if(goal.equals(otherGoal.position)) {
+			state["has_flag"] = true
+		}
+		return state;
 	}
 	this.cost = function(state) {
-
+		return 0
 	}
-	this.perform = function(state) {
-
+	this.perform = function(actor) {
+		print(goal)
 	}
 }
