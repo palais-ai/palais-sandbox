@@ -24,10 +24,7 @@
         <file>ConsoleTableCell.qml</file>
         <file>InspectorAreaTable.qml</file>
     </qresource>
-    <qresource prefix="/images">
-        <file>sandbox-bg.jpg</file>
-        <file>controls-bg.jpg</file>
-    </qresource>
+    <qresource prefix="/images"/>
     <qresource prefix="/fonts">
         <file>open-sans/OpenSans-Bold.ttf</file>
         <file>open-sans/OpenSans-BoldItalic.ttf</file>

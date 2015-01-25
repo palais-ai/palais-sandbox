@@ -82,6 +82,9 @@ macx {
 
     FrameworkFiles.path = Contents/Frameworks
 
+    LicenseFiles.path = Contents/Licenses
+    LicenseFiles.files += $$files($$PWD/licenses/*)
+
     ConfigFiles.files += config/resources.cfg
     ConfigFiles.path = Contents/MacOS
 
@@ -99,7 +102,7 @@ macx {
     MediaFiles.files += $$files(media/*)
     MediaFiles.path = Contents/MacOS/Resources
 
-    QMAKE_BUNDLE_DATA += FrameworkFiles ConfigFiles PluginFiles MediaFiles
+    QMAKE_BUNDLE_DATA += FrameworkFiles ConfigFiles PluginFiles MediaFiles LicenseFiles
 } else:unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += OGRE
@@ -150,6 +153,9 @@ macx {
         Config.path = $$DESTDIR
         Config.files += config/resources.cfg
         Config.files += config/$$M_BUILD_DIR/plugins.cfg
+
+        LicenseFiles.path = $$DESTDIR/Licenses
+        LicenseFiles.files += $$PWD/licenses/*
 
         INSTALLS += package Resources Config
     }
