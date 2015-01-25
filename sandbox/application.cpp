@@ -44,7 +44,7 @@ static void messageHandlerFun(QtMsgType type,
             level = ConsoleModel::LogLevelDebug;
             break;
         case QtWarningMsg:
-        level = ConsoleModel::LogLevelWarning;
+            level = ConsoleModel::LogLevelWarning;
             break;
         case QtCriticalMsg:
             level = ConsoleModel::LogLevelError;
@@ -158,6 +158,10 @@ void Application::initializeOgre()
     mOgreEngine->startEngine();
 
     Ogre::LogManager::getSingleton().getDefaultLog()->addListener(mLogHandler.data());
+
+    Ogre::MaterialManager& matMgr = Ogre::MaterialManager::getSingleton();
+    matMgr.setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
+    matMgr.setDefaultAnisotropy(16);
 
     mRoot = mOgreEngine->getRoot();
     mOgreEngine->setupResources();

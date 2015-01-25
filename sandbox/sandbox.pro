@@ -1,7 +1,7 @@
 CONFIG += qt
 QT += qml quick script
 TEMPLATE = app
-TARGET = sandbox
+TARGET = Palais
 
 #CONFIG += c++11
 
@@ -14,6 +14,8 @@ DEFINES -= QJSONRPC_BUILD
 DEFINES += QJSONRPC_SHARED
 
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
+
+ICON = $$PWD/intermediary/Icon.icns
 
 SOURCES += main.cpp \
     application.cpp \
@@ -67,8 +69,16 @@ macx {
 
     message(Packaging Ogre libraries in $$OGREDIR)
     message(Packaging bullet libraries in $$BULLETDIR)
+    message(Packaging Qt libraries in $$[QT_INSTALL_LIBS])
 
     FrameworkFiles.files += $$OGREDIR/lib/release/Ogre.framework
+
+    MY_BUNDLE_DIR = $$OUT_PWD/$$basename(TARGET).app
+    message($$MY_BUNDLE_DIR is the bundle dir)
+    message($$PWD/resources is the qml dir)
+
+    QMAKE_POST_LINK = macdeployqt $$MY_BUNDLE_DIR -qmldir=$$PWD/resources
+
     FrameworkFiles.path = Contents/Frameworks
 
     ConfigFiles.files += config/resources.cfg

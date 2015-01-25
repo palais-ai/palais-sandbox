@@ -135,7 +135,7 @@ QImage OgreNode::renderToImage()
     const uint32_t w = m_renderTarget->getWidth();
     const uint32_t h = m_renderTarget->getHeight();
 
-    QImage retVal(w, h, QImage::Format_RGB888);
+    QImage retVal(w, h, QImage::Format_RGBA8888);
 
     if(retVal.isNull())
     {
@@ -147,7 +147,7 @@ QImage OgreNode::renderToImage()
     const Ogre::PixelBox encodeDest = Ogre::PixelBox(w,
                                                      h,
                                                      1,
-                                                     Ogre::PF_B8G8R8,
+                                                     Ogre::PF_A8B8G8R8,
                                                      retVal.bits());
 
     // Do the copy, NOTE: Differs from the slides (other ogre version?)
