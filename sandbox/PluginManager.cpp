@@ -16,7 +16,9 @@ PluginManager::~PluginManager()
 void PluginManager::loadPlugins()
 {
     QDir pluginsDir(QCoreApplication::applicationDirPath());
+#if defined(Q_OS_MAC)
     pluginsDir.cdUp();
+#endif
     pluginsDir.cd("Plugins");
 
     foreach (QString fileName, pluginsDir.entryList(QDir::Files))

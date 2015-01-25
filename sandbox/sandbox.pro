@@ -115,17 +115,17 @@ macx {
         message(Putting libraries in $$DESTDIR)
         message(QDIRs are in $$[QT_INSTALL_LIBS])
 
-        package.path = $$DESTDIR/Plugins
-        plugins.files += $$OUT_PWD/../plugin_pathfinding/$$M_BUILD_DIR/libplugin_pathfinding.dll
-        plugins.files += $$OUT_PWD/../plugin_planning/$$M_BUILD_DIR/libplugin_planning.dll
-        package.CONFIG = no_check_exist
+        plugins.path = $$DESTDIR/Plugins
+        plugins.files += $$OUT_PWD/../plugin_pathfinding/$$M_BUILD_DIR/plugin_pathfinding.dll
+        plugins.files += $$OUT_PWD/../plugin_planning/$$M_BUILD_DIR/plugin_planning.dll
+        plugins.CONFIG = no_check_exist
 
         package.path = $$DESTDIR
-        package.files += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR/libqmlogre1.dll
-        package.files += $$OUT_PWD/../libsandboxcore/$$M_BUILD_DIR/libsandboxcore1.dll
+        package.files += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR/qmlogre.dll
+        package.files += $$OUT_PWD/../libsandboxcore/$$M_BUILD_DIR/sandboxcore.dll
 
         OGRE_LIBS_SUFFIX =
-        CONFIG(release, debug|release) {
+        CONFIG(debug, debug|release) {
             OGRE_LIBS_SUFFIX = _d
         }
 
@@ -133,7 +133,7 @@ macx {
         OGRE_LIBS += RenderSystem_GL$$OGRE_LIBS_SUFFIX
         OGRE_LIBS += Plugin_OctreeSceneManager$$OGRE_LIBS_SUFFIX
 
-        for(the_lib, OGRE_LIBS):package.files += $$OGREDIR/$$M_BUILD_DIR/bin/$${the_lib}.dll
+        for(the_lib, OGRE_LIBS):package.files += $$OGREDIR/bin/$$M_BUILD_DIR/$${the_lib}.dll
         package.CONFIG = no_check_exist
 
         MY_BUNDLE_DIR = $$DESTDIR/$$basename(TARGET).exe
@@ -151,7 +151,7 @@ macx {
         Config.files += config/resources.cfg
         Config.files += config/$$M_BUILD_DIR/plugins.cfg
 
-        INSTALLS += package Resources Config
+        INSTALLS += package plugins Resources Config
     }
 }
 
