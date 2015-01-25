@@ -38,6 +38,12 @@ HEADERS +=\
 include(../linkOgreSDK.pri)
 include(../linkBulletSDK.pri)
 
+CONFIG(release, debug|release) {
+    M_BUILD_DIR = release
+} else {
+    M_BUILD_DIR = debug
+}
+
 INCLUDEPATH += ../sandbox/
 
 win32 {

@@ -1,6 +1,7 @@
 #ifndef JAVASCRIPTBINDINGS_H
 #define JAVASCRIPTBINDINGS_H
 
+#include "libsandboxcore_global.h"
 #include <QScriptValue>
 #include <QList>
 #include <QTimer>
@@ -66,14 +67,14 @@ private:
 
 namespace JavaScriptBindings
 {
-void addBindings(QScriptEngine& engine, Scene* scene);
-void addActorBinding(Actor* actor, QScriptEngine& engine);
-void removeActorBinding(Actor* actor, QScriptEngine& engine);
-QString cleanIdentifier(const QString& input);
-void checkScriptEngineException(QScriptEngine& engine, const QString& context);
+void DLL_EXPORT addBindings(QScriptEngine& engine, Scene* scene);
+void DLL_EXPORT addActorBinding(Actor* actor, QScriptEngine& engine);
+void DLL_EXPORT removeActorBinding(Actor* actor, QScriptEngine& engine);
+QString DLL_EXPORT cleanIdentifier(const QString& input);
+void DLL_EXPORT checkScriptEngineException(QScriptEngine& engine, const QString& context);
 
-void timers_register(QScriptEngine& engine);
-void timers_update(float deltaTime); //< To be called by the active scene
+void DLL_EXPORT timers_register(QScriptEngine& engine);
+void DLL_EXPORT timers_update(float deltaTime); //< To be called by the active scene
 QScriptValue script_addTimer_private(QScriptContext *context, QScriptEngine *engine, bool oneShot);
 QScriptValue script_removeTimer_private(QScriptContext *context, QScriptEngine *engine);
 

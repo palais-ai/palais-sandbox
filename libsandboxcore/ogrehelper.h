@@ -1,6 +1,7 @@
 #ifndef OGREHELPER_H
 #define OGREHELPER_H
 
+#include "libsandboxcore_global.h"
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 
@@ -11,11 +12,11 @@ namespace Ogre
 
 namespace OgreHelper
 {
-const Ogre::MeshPtr optimizeMesh(const Ogre::MeshPtr mesh);
+const Ogre::MeshPtr DLL_EXPORT optimizeMesh(const Ogre::MeshPtr mesh);
 
 // CREDITS: Public domain license, from
 // http://www.ogre3d.org/tikiwiki/tiki-index.php?page=RetrieveVertexData
-void getMeshInformation(const Ogre::MeshPtr mesh,
+void DLL_EXPORT getMeshInformation(const Ogre::MeshPtr mesh,
                         size_t &vertex_count,
                         Ogre::Vector3* &vertices,
                         size_t &index_count,

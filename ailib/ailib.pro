@@ -6,8 +6,8 @@
 
 QT       -= core gui
 
-TARGET = smastar
-TEMPLATE = lib
+TARGET = ailib
+#TEMPLATE = lib
 
 DEFINES += SMASTAR_LIBRARY
 

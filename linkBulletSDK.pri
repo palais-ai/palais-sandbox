@@ -5,5 +5,11 @@ isEmpty(BULLETDIR) {
     message(Using bullet libraries in $$BULLETDIR)
 
     INCLUDEPATH += $$BULLETDIR/src
-    LIBS += -L$$BULLETDIR/src/BulletCollision -L$$BULLETDIR/src/BulletDynamics -L$$BULLETDIR/src/LinearMath -lBulletCollision -lBulletDynamics -lLinearMath
+
+    macx {
+        BULLET_BUILD_DIR = $$BULLETDIR/src
+    } else:win32 {
+        BULLET_BUILD_DIR = $$BULLETDIR/lib
+    }
+    LIBS += -L$$BULLET_BUILD_DIR -L$$BULLET_BUILD_DIR/BulletCollision -L$$BULLET_BUILD_DIR/BulletDynamics -L$$BULLET_BUILD_DIR/LinearMath -lBulletCollision -lBulletDynamics -lLinearMath
 }

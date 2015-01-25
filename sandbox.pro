@@ -1,6 +1,5 @@
 TEMPLATE = subdirs
-SUBDIRS = ailib \
-    libqmlogre \
+SUBDIRS = libqmlogre \
     libdotsceneloader \
     libmeshmagick \
     libsandboxcore \

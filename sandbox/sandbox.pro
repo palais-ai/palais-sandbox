@@ -16,6 +16,7 @@ DEFINES += QJSONRPC_SHARED
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
 
 ICON = $$PWD/intermediary/Icon.icns
+RC_FILE = $$PWD/intermediary/Palais.rc
 
 SOURCES += main.cpp \
     application.cpp \
@@ -114,18 +115,32 @@ macx {
         message(Putting libraries in $$DESTDIR)
         message(QDIRs are in $$[QT_INSTALL_LIBS])
 
+        package.path = $$DESTDIR/Plugins
+        plugins.files += $$OUT_PWD/../plugin_pathfinding/$$M_BUILD_DIR/libplugin_pathfinding.dll
+        plugins.files += $$OUT_PWD/../plugin_planning/$$M_BUILD_DIR/libplugin_planning.dll
+        package.CONFIG = no_check_exist
+
         package.path = $$DESTDIR
         package.files += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR/libqmlogre1.dll
         package.files += $$OUT_PWD/../libsandboxcore/$$M_BUILD_DIR/libsandboxcore1.dll
-        package.files += $$OUT_PWD/../plugin_pathfinding/$$M_BUILD_DIR/libplugin_pathfinding.dll
-        package.files += $$OUT_PWD/../plugin_planning/$$M_BUILD_DIR/libplugin_planning.dll
-        package.files += $$OGREDIR/bin/release/opt/*.dll $$OGREDIR/bin/release/*.dll
-        package.files += $$OGREDIR/bin/debug/opt/*.dll $$OGREDIR/bin/debug/*.dll
-        package.files += $$BULLETDIR/src/BulletCollision/*.dll
-        package.files += $$BULLETDIR/src/BulletDynamics/*.dll
-        package.files += $$BULLETDIR/src/LinearMath/*.dll
-        package.files += $$[QT_INSTALL_LIBS]/../bin/*.dll
+
+        OGRE_LIBS_SUFFIX =
+        CONFIG(release, debug|release) {
+            OGRE_LIBS_SUFFIX = _d
+        }
+
+        OGRE_LIBS += OgreMain$$OGRE_LIBS_SUFFIX
+        OGRE_LIBS += RenderSystem_GL$$OGRE_LIBS_SUFFIX
+        OGRE_LIBS += Plugin_OctreeSceneManager$$OGRE_LIBS_SUFFIX
+
+        for(the_lib, OGRE_LIBS):package.files += $$OGREDIR/$$M_BUILD_DIR/bin/$${the_lib}.dll
         package.CONFIG = no_check_exist
+
+        MY_BUNDLE_DIR = $$DESTDIR/$$basename(TARGET).exe
+        message($$MY_BUNDLE_DIR is the bundle dir)
+        message($$PWD/resources is the qml dir)
+
+        QMAKE_POST_LINK = $$[QT_INSTALL_LIBS]/../bin/windeployqt $$MY_BUNDLE_DIR --qmldir=$$PWD/resources --release --compiler-runtime
 
         # Copy all resources to build folder
         Resources.path = $$DESTDIR/Resources
