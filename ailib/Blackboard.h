@@ -5,8 +5,9 @@
 
 #include "ai_global.h"
 #include "Any.h"
-
 #include <map>
+
+BEGIN_NS_AILIB
 
 // A generic class to store knowledge by unique keys.
 template <typename KEY>
@@ -34,5 +35,7 @@ public:
 private:
     std::map<KEY, ailib::hold_any> mKnowledge;
 };
+
+END_NS_AILIB
 
 #endif // BLACKBOARD_H

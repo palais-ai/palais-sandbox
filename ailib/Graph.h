@@ -15,13 +15,7 @@ class Connection
 {
 public:
     static Connection makeConnection(uint16_t fromNode,
-                                     uint16_t edgeIndex)
-    {
-        Connection retVal;
-        retVal.fromNode = fromNode;
-        retVal.edgeIndex = edgeIndex;
-        return retVal;
-    }
+                                     uint16_t edgeIndex);
 
     uint16_t fromNode;
     uint16_t edgeIndex;
@@ -34,14 +28,7 @@ public:
 
     static Edge makeEdge(uint16_t targetIndex,
                          real_type cost,
-                         user_type* userData = NULL)
-    {
-        UNUSED(userData);
-        Edge retVal;
-        retVal.cost = cost;
-        retVal.targetIndex = targetIndex;
-        return retVal;
-    }
+                         user_type* userData = NULL);
 
     real_type cost;
     uint16_t targetIndex;

@@ -42,7 +42,7 @@ class DLL_EXPORT OgreNode : public QObject,
 public:
     // The fboCreationDelay is used to throttle the framebuffer recreation rate
     // when this QQuickItem's size is changed continuously.
-    OgreNode(float fboCreationDelay = 1.f);
+    OgreNode(float fboCreationDelay = 1.f); // In seconds
     ~OgreNode();
 
     void setSize(const QSize &size);

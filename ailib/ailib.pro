@@ -7,11 +7,16 @@
 QT       -= core gui
 
 TARGET = ailib
-#TEMPLATE = lib
+TEMPLATE = lib
+CONFIG += staticlib
 
 DEFINES += SMASTAR_LIBRARY
 
-SOURCES +=
+SOURCES += \
+    Scheduler.cpp \
+    Task.cpp \
+    Graph.cpp \
+    BehaviorTree.cpp
 
 HEADERS +=\
     ai_global.h \
@@ -20,7 +25,10 @@ HEADERS +=\
     Graph.h \
     Any.h \
     Blackboard.h \
-    GOAP.h
+    GOAP.h \
+    BehaviorTree.h \
+    Scheduler.h \
+    Task.h
 
 unix {
     target.path = /usr/lib

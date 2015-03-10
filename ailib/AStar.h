@@ -60,12 +60,17 @@ public:
     typedef bool(*Comparator)(const node_type&,
                               const node_type&);
 
+    typedef std::priority_queue<AStarNode*,
+                                std::vector<AStarNode*>,
+                                NodeComparator> OpenList;
+
     FORCE_INLINE static bool equalsComparator(const node_type& lv,
                                               const node_type& rv)
     {
         return lv == rv;
     }
 
+    // Using the zeroHeuristic makes A* check all possible paths.
     FORCE_INLINE static real_type zeroHeuristic(const node_type&,
                                                 const node_type&)
     {
@@ -101,9 +106,7 @@ public:
         // and this path query.
         mNodeInfo.reserve(mGraph.getNumNodes());
 
-        std::priority_queue<AStarNode*,
-                            std::vector<AStarNode*>,
-                            NodeComparator> open;
+        OpenList open;
 
         // Zero-initialize the bookkeeping information
         std::memset(&mNodeInfo[0],
@@ -116,6 +119,7 @@ public:
         const size_t startIdx = start - firstNode;
         assert(startIdx < mGraph.getNumNodes());
 
+        // Add the start node to the open list.
         AStarNode* startNode = &mNodeInfo[startIdx];
         startNode->estTotalCost = heuristic(*start, goal);
         startNode->state = AStarNode::NodeStateOpen;
@@ -143,53 +147,8 @@ public:
             // a better cost value.
             open.pop();
 
-            const edge_type* const end = mGraph.getSuccessorsEnd(lowestCostIdx);
-            const edge_type* const begin = mGraph.getSuccessorsBegin(lowestCostIdx);
-            for(const edge_type* it = begin; it != end; ++it)
-            {
-                const size_t targetIdx = it->targetIndex;
-                assert(targetIdx < mGraph.getNumNodes());
-
-                real_type targetCost = lowestCostNode->currentCost + it->cost;
-                real_type heuristicValue = 0.;
-
-                AStarNode* targetNode = &mNodeInfo[targetIdx];
-
-                if(targetNode->state == AStarNode::NodeStateUnvisited)
-                {
-                    const node_type* target = mGraph.getNode(targetIdx);
-
-                    // We have to calculate the heuristic for unvisited nodes.
-                    heuristicValue = heuristic(*target, goal);
-
-                    targetNode->estTotalCost = targetCost + heuristicValue;
-                    targetNode->state = AStarNode::NodeStateOpen;
-                    open.push(targetNode);
-                }
-                else
-                {
-                    if(LIKELY(targetNode->currentCost <= targetCost))
-                    {
-                        // Continue if this node doesn't offer improvement
-                        continue;
-                    }
-
-                    // Reuse the heuristic value
-                    heuristicValue = targetNode->estTotalCost - targetNode->currentCost;
-
-                    targetNode->estTotalCost = targetCost + heuristicValue;
-                    if(targetNode->state != AStarNode::NodeStateOpen)
-                    {
-                        targetNode->state = AStarNode::NodeStateOpen;
-                        open.push(targetNode);
-                    }
-                }
-
-                targetNode->parent = lowestCostNode;
-                targetNode->connection = it - begin;
-                assert(targetNode->connection < mGraph.getNumEdges(lowestCostIdx));
-                targetNode->currentCost = targetCost;
-            }
+            // Expand all child nodes of the current node.
+            expand(lowestCost, lowestCostIdx, open);
         }
 
         // No solution found. Return an empty path.
@@ -197,9 +156,62 @@ public:
     }
 
 private:
+    void expand(const node_type* node,
+                const size_t index,
+                OpenList& open)
+    {
+        const edge_type* const end = mGraph.getSuccessorsEnd(index);
+        const edge_type* const begin = mGraph.getSuccessorsBegin(index);
+        for(const edge_type* it = begin; it != end; ++it)
+        {
+            const size_t targetIdx = it->targetIndex;
+            assert(targetIdx < mGraph.getNumNodes());
+
+            real_type targetCost = node->currentCost + it->cost;
+            real_type heuristicValue = 0.;
+
+            AStarNode* targetNode = &mNodeInfo[targetIdx];
+
+            if(targetNode->state == AStarNode::NodeStateUnvisited)
+            {
+                const node_type* target = mGraph.getNode(targetIdx);
+
+                // We have to calculate the heuristic for unvisited nodes.
+                heuristicValue = heuristic(*target, goal);
+
+                targetNode->estTotalCost = targetCost + heuristicValue;
+                targetNode->state = AStarNode::NodeStateOpen;
+                open.push(targetNode);
+            }
+            else
+            {
+                if(LIKELY(targetNode->currentCost <= targetCost))
+                {
+                    // Continue if this node doesn't offer improvement
+                    continue;
+                }
+
+                // Reuse the heuristic value
+                heuristicValue = targetNode->estTotalCost - targetNode->currentCost;
+
+                targetNode->estTotalCost = targetCost + heuristicValue;
+                if(targetNode->state != AStarNode::NodeStateOpen)
+                {
+                    targetNode->state = AStarNode::NodeStateOpen;
+                    open.push(targetNode);
+                }
+            }
+
+            targetNode->parent = node;
+            targetNode->connection = it - begin;
+            assert(targetNode->connection < mGraph.getNumEdges(lowestCostIdx));
+            targetNode->currentCost = targetCost;
+        }
+    }
+
     path_type buildPath(const AStarNode* fromNode,
                         const size_t startIdx,
-                        connections_type* connections) const
+                        connections_type* /* out */ connections) const
     {
         const AStarNode* const firstNodeInfo = &mNodeInfo[0];
         const AStarNode* const startNode = &mNodeInfo[startIdx];
@@ -221,7 +233,8 @@ private:
             {
                 const size_t parentIdx = currentNode - firstNodeInfo;
                 assert(parentIdx < mGraph.getNumNodes());
-                connections->push_back(Connection::makeConnection(parentIdx, currentNode->connection));
+                connections->push_back(Connection::makeConnection(parentIdx,
+                                                                  currentNode->connection));
             }
         }
 

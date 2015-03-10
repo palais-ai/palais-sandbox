@@ -6,7 +6,7 @@
 void SceneModel::declareQML()
 {
     qmlRegisterType<SceneModel>("SceneModel", 1, 0,
-                                  "SceneModel");
+                                "SceneModel");
 }
 
 SceneModel::SceneModel(const QString& name) :

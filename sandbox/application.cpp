@@ -154,7 +154,6 @@ void Application::initializeOgre()
 
     // Start up Ogre.
     mOgreEngine = new OgreEngine(window);
-
     mOgreEngine->startEngine();
 
     Ogre::LogManager::getSingleton().getDefaultLog()->addListener(mLogHandler.data());

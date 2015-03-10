@@ -16,8 +16,8 @@ public:
 
     virtual ~Action() {}
 
-    virtual bool isPreconditionFulfilled(const state_type& state) const = 0;
-    virtual void applyPostcondition(state_type& state) const = 0;
+    virtual bool  isPreconditionFulfilled(const state_type& state) const = 0;
+    virtual void  applyPostcondition(state_type& state) const = 0;
     virtual float getCost(const state_type& state) const = 0;
 };
 
