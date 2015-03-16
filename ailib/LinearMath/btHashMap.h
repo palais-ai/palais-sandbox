@@ -1,6 +1,7 @@
 /*
  *  03/16/2015 Patrick Schwab : Adapted to support iterating over keys.
- * /
+ *
+ */
 
 /*
 Bullet Continuous Collision Detection and Physics Library

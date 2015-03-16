@@ -8,6 +8,21 @@
 
 BEGIN_NS_AILIB
 
+template<class T> struct remove_reference
+{
+    typedef T type;
+};
+
+template<class T> struct remove_reference<T&>
+{
+    typedef T type;
+};
+
+template<class T> struct remove_reference<T&&>
+{
+    typedef T type;
+};
+
 namespace detail
 {
 //
@@ -101,7 +116,7 @@ BEGIN_NS_AILIB
 
 namespace detail
 {
-// CREDITS: Based on boost::local_bool (bool.hpp and bool_fwd.hpp)
+// CREDITS: Based on boost::ailib::detail::bool_ (bool.hpp and bool_fwd.hpp)
 // ORIGINAL LICENSE:
 //
 // Copyright Aleksey Gurtovoy 2000-2004
@@ -145,7 +160,6 @@ typedef bool_<false> false_;
 */
 
     typedef ailib::detail::sp_typeinfo local_typeinfo;
-    typedef ailib::detail::bool_ local_bool;
     typedef ailib::detail::true_ local_true;
     typedef ailib::detail::false_ local_false;
 
@@ -184,8 +198,6 @@ typedef bool_<false> false_;
             std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&, void* const*);
             bool (*equals)(void* const*, void* const*);
         };
-
-        typedef ailib::detail::fxn_ptr_table local_fxn_ptr_table;
 
         // static functions for small value-types
         template <typename Small>
@@ -291,7 +303,7 @@ typedef bool_<false> false_;
         template <typename T>
         struct get_table
         {
-            typedef local_bool<(sizeof(T) <= sizeof(void*))> is_small;
+            typedef ailib::detail::bool_<(sizeof(T) <= sizeof(void*))> is_small;
 
             template <typename Char>
             static fxn_ptr_table<Char>* get()
@@ -311,10 +323,14 @@ typedef bool_<false> false_;
             }
         };
 
-        typedef ailib::detail::get_table local_get_table;
-
         ///////////////////////////////////////////////////////////////////////
-        struct empty {};
+        struct empty {
+            inline bool operator==(const empty& other) const
+            {
+                UNUSED(other);
+                return true;
+            }
+        };
 
         typedef ailib::detail::empty local_empty;
 
@@ -352,22 +368,22 @@ typedef bool_<false> false_;
         // constructors
         template <typename T>
         explicit basic_hold_any(T const& x) :
-            table(local_get_table<T>::template get<Char>()), object(0)
+            table(ailib::detail::get_table<T>::template get<Char>()), object(0)
         {
-            if (local_get_table<T>::is_small::value)
+            if (ailib::detail::get_table<T>::is_small::value)
                 new (&object) T(x);
             else
                 object = new T(x);
         }
 
         basic_hold_any()
-          : table(local_get_table<local_empty>::template get<Char>()),
+          : table(ailib::detail::get_table<detail::local_empty>::template get<Char>()),
             object(0)
         {
         }
 
         basic_hold_any(basic_hold_any const& x)
-          : table(local_get_table<local_empty>::template get<Char>()),
+          : table(ailib::detail::get_table<detail::local_empty>::template get<Char>()),
             object(0)
         {
             assign(x);
@@ -400,12 +416,12 @@ typedef bool_<false> false_;
         basic_hold_any& assign(T const& x)
         {
             // are we copying between the same type?
-            local_fxn_ptr_table<Char>* x_table =
-                local_get_table<T>::template get<Char>();
+            ailib::detail::fxn_ptr_table<Char>* x_table =
+                ailib::detail::get_table<T>::template get<Char>();
             if (table == x_table) {
             // if so, we can avoid deallocating and re-use memory
                 table->destruct(&object);    // first destruct the old content
-                if (local_get_table<T>::is_small::value) {
+                if (ailib::detail::get_table<T>::is_small::value) {
                     // create copy on-top of object pointer itself
                     new (&object) T(x);
                 }
@@ -415,7 +431,7 @@ typedef bool_<false> false_;
                 }
             }
             else {
-                if (local_get_table<T>::is_small::value) {
+                if (ailib::detail::get_table<T>::is_small::value) {
                     // create copy on-top of object pointer itself
                     table->destruct(&object); // first destruct the old content
                     new (&object) T(x);
@@ -455,7 +471,7 @@ typedef bool_<false> false_;
             if (type() != AI_SP_TYPEID(T))
               throw bad_any_cast(type(), AI_SP_TYPEID(T));
 
-            return local_get_table<T>::is_small::value ?
+            return ailib::detail::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
                 *reinterpret_cast<T const*>(object);
         }
@@ -466,7 +482,7 @@ typedef bool_<false> false_;
 
         bool empty() const
         {
-            return table == local_get_table<local_empty>::template get<Char>();
+            return table == ailib::detail::get_table<detail::local_empty>::template get<Char>();
         }
 
         void reset()
@@ -474,7 +490,7 @@ typedef bool_<false> false_;
             if (!empty())
             {
                 table->static_delete(&object);
-                table = local_get_table<local_empty>::template get<Char>();
+                table = ailib::detail::get_table<detail::local_empty>::template get<Char>();
                 object = 0;
             }
         }
@@ -498,14 +514,14 @@ typedef bool_<false> false_;
         }
 
         template <typename Char_>
-        friend inline bool
+        inline bool
         operator==(basic_hold_any<Char_> const& other) const
         {
             return type() == other.type() && table->equals(&object, &other.object);
         }
 
         template <typename Char_>
-        friend inline bool
+        inline bool
         operator!=(basic_hold_any<Char_> const& other) const
         {
             return !(*this == other);
@@ -518,7 +534,7 @@ typedef bool_<false> false_;
     public: // types (public so any_cast can be non-friend)
 #endif
         // fields
-        local_fxn_ptr_table<Char>* table;
+        ailib::detail::fxn_ptr_table<Char>* table;
         void* object;
     };
 
@@ -527,7 +543,7 @@ typedef bool_<false> false_;
     inline T* any_cast (basic_hold_any<Char>* operand)
     {
         if (operand && operand->type() == AI_SP_TYPEID(T)) {
-            return local_get_table<T>::is_small::value ?
+            return ailib::detail::get_table<T>::is_small::value ?
                 reinterpret_cast<T*>(&operand->object) :
                 reinterpret_cast<T*>(operand->object);
         }

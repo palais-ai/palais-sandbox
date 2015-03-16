@@ -30,7 +30,7 @@ public:
     template <typename T>
     FORCE_INLINE void set(const KEY& key, const T& value)
     {
-        mKnowledge.insert(key, value);
+        mKnowledge.insert(key, ailib::hold_any(value));
     }
 
     FORCE_INLINE void remove(const KEY& key)
@@ -69,7 +69,14 @@ public:
 
         for(int i = 0; i < mKnowledge.size(); ++i)
         {
-            if(*other.mKnowledge.find(mKnowledge.getKeyAtIndex(i)) !=
+            const ailib::hold_any* value = other.mKnowledge.find(mKnowledge.getKeyAtIndex(i));
+
+            if(value == NULL)
+            {
+                return false;
+            }
+
+            if(*value !=
                *mKnowledge.getAtIndex(i))
             {
                 return false;
@@ -84,15 +91,16 @@ private:
 };
 
 // Adapter class to enable the use of Blackboards as keys in btHashMap.
+template <typename KEY>
 class HashBlackboard
 {
 private:
-    Blackboard*  mBlackboard;
+    Blackboard<KEY>*  mBlackboard;
     unsigned int mHash;
 public:
-    HashBlackboard(Blackboard* board) :
+    HashBlackboard(Blackboard<KEY>* board) :
         mBlackboard(board),
-        mHash(blackboard->getHashCode())
+        mHash(board->getHashCode())
     {
         ;
     }
