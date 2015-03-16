@@ -6,7 +6,7 @@ Connection Connection::makeConnection(uint16_t fromNode,
                                       uint16_t edgeIndex)
 {
     Connection retVal;
-    retVal.fromNode = fromNode;
+    retVal.fromNode  = fromNode;
     retVal.edgeIndex = edgeIndex;
     return retVal;
 }
@@ -16,6 +16,7 @@ Edge Edge::makeEdge(uint16_t targetIndex,
                     Edge::user_type* userData)
 {
     UNUSED(userData);
+
     Edge retVal;
     retVal.cost = cost;
     retVal.targetIndex = targetIndex;

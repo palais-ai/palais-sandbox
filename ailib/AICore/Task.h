@@ -4,6 +4,7 @@
 #pragma once
 
 #include "ai_global.h"
+#include "HighResolutionTime.h"
 
 BEGIN_NS_AILIB
 
@@ -15,19 +16,19 @@ public:
         StatusUnknown = 0,
         StatusDone,
         StatusRunning,
-        StatusInterrupted,
-        StatusTerminated
+        StatusWaiting
     };
 
     Task();
     virtual ~Task();
     virtual void run() = 0;
 
-    void interrupt();
-    bool shouldYield() const;
     Status getStatus() const;
     void setStatus(Status status);
+    void addRuntime(const HighResolutionTime::Timestamp& runtime);
+    HighResolutionTime::Timestamp getRuntime() const;
 private:
+    uint16_t mRuntime; // in microseconds
     Status mStatus;
 };
 

@@ -10,6 +10,9 @@ BEGIN_NS_AILIB
 
 namespace detail
 {
+//
+// 03/16/2015 Patrick Schwab: Added support for comparison operators (operator==, operator!=).
+//
 // CREDITS: Based on: boost::detail::sp_typeinfo
 // ORIGINAL LICENSE:
 //
@@ -90,7 +93,6 @@ template<class T> struct sp_typeid_< T const volatile >: sp_typeid_< T >
 END_NS_AILIB
 
 #include <stdexcept>
-#include <typeinfo>
 #include <algorithm>
 #include <iosfwd>
 #include <cassert>
@@ -180,6 +182,7 @@ typedef bool_<false> false_;
             void (*move)(void* const*, void**);
             std::basic_istream<Char>& (*stream_in)(std::basic_istream<Char>&, void**);
             std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&, void* const*);
+            bool (*equals)(void* const*, void* const*);
         };
 
         typedef ailib::detail::fxn_ptr_table local_fxn_ptr_table;
@@ -228,6 +231,10 @@ typedef bool_<false> false_;
                     o << *reinterpret_cast<T const*>(obj);
                     return o;
                 }
+                static bool equals(void* const* lv, void* const* rv)
+                {
+                    return *reinterpret_cast<T const*>(lv) == *reinterpret_cast<T const*>(rv);
+                }
             };
         };
 
@@ -274,6 +281,10 @@ typedef bool_<false> false_;
                     o << **reinterpret_cast<T* const*>(obj);
                     return o;
                 }
+                static bool equals(void* const* lv, void* const* rv)
+                {
+                    return **reinterpret_cast<T* const*>(lv) == **reinterpret_cast<T* const*>(rv);
+                }
             };
         };
 
@@ -293,7 +304,8 @@ typedef bool_<false> false_;
                     fxns<is_small>::template type<T, Char>::clone,
                     fxns<is_small>::template type<T, Char>::move,
                     fxns<is_small>::template type<T, Char>::stream_in,
-                    fxns<is_small>::template type<T, Char>::stream_out
+                    fxns<is_small>::template type<T, Char>::stream_out,
+                    fxns<is_small>::template type<T, Char>::equals
                 };
                 return &static_table;
             }
@@ -483,6 +495,20 @@ typedef bool_<false> false_;
         operator<< (std::basic_ostream<Char_>& o, basic_hold_any<Char_> const& obj)
         {
             return obj.table->stream_out(o, &obj.object);
+        }
+
+        template <typename Char_>
+        friend inline bool
+        operator==(basic_hold_any<Char_> const& other) const
+        {
+            return type() == other.type() && table->equals(&object, &other.object);
+        }
+
+        template <typename Char_>
+        friend inline bool
+        operator!=(basic_hold_any<Char_> const& other) const
+        {
+            return !(*this == other);
         }
 
     private: // types

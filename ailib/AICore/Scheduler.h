@@ -12,11 +12,13 @@ BEGIN_NS_AILIB
 class Scheduler : public Task
 {
 public:
+    typedef std::vector<Task*> TaskList;
+
     void enqueue(Task* task);
     void dequeue(Task* task);
     virtual void run();
 private:
-    std::vector<Task*> mTasks;
+    TaskList mTasks;
 };
 
 END_NS_AILIB

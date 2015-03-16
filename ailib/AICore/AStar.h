@@ -48,7 +48,7 @@ private:
 
     const GRAPH& mGraph;
 
-    // Mutable, because it's a cache
+    // Mutable, because it's an intermediary cache
     mutable std::vector<AStarNode> mNodeInfo;
 public:
     typedef typename GRAPH::node_type node_type;
@@ -70,7 +70,7 @@ public:
         return lv == rv;
     }
 
-    // Using the zeroHeuristic makes A* check all possible paths.
+    // Using the zeroHeuristic results in A* simply processing all possible paths.
     FORCE_INLINE static real_type zeroHeuristic(const node_type&,
                                                 const node_type&)
     {

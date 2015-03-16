@@ -47,6 +47,7 @@ public:
         recursiveBuildGraph(startIdx, maxDepth, 0);
         return startIdx;
     }
+
 private:
     void recursiveBuildGraph(size_t currentIdx,
                              uint32_t maxDepth,

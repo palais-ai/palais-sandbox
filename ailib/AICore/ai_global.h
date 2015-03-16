@@ -44,7 +44,7 @@
     #define UNLIKELY(x) (x)
 #endif
 
-#define UNUSED(x) (void)(x);
+#define UNUSED(x__) (void)( (x__) );
 
 /*
 Based on boost's STATIC_ASSERT.
