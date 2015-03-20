@@ -1,7 +1,6 @@
 // CREDITS: Adapted from http://ogre3d.org/tikiwiki/Debug+Drawing+Utility+Class
 
 #include "DebugDrawer.h"
- 
 #include <OgreSceneManager.h>
 #include <OgreRenderQueue.h>
 #include <OgreManualObject.h>

@@ -2,7 +2,6 @@
 #define PROJECTMANAGER_H
 
 #include "scenemanager.h"
-
 #include <QObject>
 #include <QUrl>
 
@@ -20,7 +19,7 @@ class SceneManager;
 class ProjectManager : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool playing READ isPlaying NOTIFY onPlayingChanged)
+    Q_PROPERTY(bool playing READ isPlaying NOTIFY playingChanged)
 public:
     explicit ProjectManager(OgreEngine* engine);
     ~ProjectManager();
@@ -50,7 +49,7 @@ signals:
     void beforeSceneLoad(const QString& name,
                          const QString& sceneFile,
                          const QString& logicFile);
-    void onPlayingChanged(bool isPlaying);
+    void playingChanged(bool isPlaying);
     void inspectorSelectionChanged(const QString& name,
                                    const KnowledgeModel* knowledge);
     void timePassed(const QTime& time);
@@ -59,6 +58,7 @@ signals:
     void signalSetSimulationSpeed(float speedFactor);
     void signalReloadProject();
     void signalUnselectActor();
+    void oneSecondTimeout();
 public slots:
     void onSetSimulationSpeed(float speedFactor);
     void onReloadProject();
@@ -74,6 +74,8 @@ public slots:
     void onSaveRenderView(const QUrl& url);
     void onUnselectActor();
     void onActorRemoved(const QString& actorName);
+protected:
+    void timerEvent(QTimerEvent *);
 private:
     static std::string sCurrentResourceGroupName;
     void loadResources(const QStringList& paths);

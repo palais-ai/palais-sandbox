@@ -4,7 +4,6 @@
 #pragma once
 
 #include "ai_global.h"
-#include <functional>
 
 BEGIN_NS_AILIB
 

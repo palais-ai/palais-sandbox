@@ -1,5 +1,4 @@
 #include "scenemodel.h"
-
 #include <QtQml>
 #include <stdint.h>
 

@@ -1,5 +1,4 @@
 #include "PluginManager.h"
-
 #include <QPluginLoader>
 #include <QGuiApplication>
 #include <QDir>

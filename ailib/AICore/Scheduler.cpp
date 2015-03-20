@@ -4,86 +4,91 @@
 #include <algorithm>
 #include <queue>
 #include <cassert>
+#include <iostream>
+#include <typeinfo>
 
 BEGIN_NS_AILIB
 
-class TaskComparator
-{
-public:
-    FORCE_INLINE bool operator() (const Task* lv, const Task* rv) const
-    {
-        // Greather than ('>') because priority_queue orders from highest to lowest.
-        // We require the opposite.
-        return lv->getRuntime() > rv->getRuntime();
-    }
-};
+#define PRINT_STATES 0
 
 void Scheduler::enqueue(Task* task)
 {
-    // Tasks that haven't been run yet are always inserted at the list's end.
-    if(task->getRuntime() == 0)
+    assert(task);
+
+#if PRINT_STATES
+    std::cout << "Adding " << typeid(*task).name() << "." << std::endl;
+#endif
+
+    if(task->getStatus() == StatusWaiting)
     {
-        // New tasks are automatically set to run.
-        task->setStatus(StatusRunning);
-        mTasks.push_back(task);
+        mWaiting.insert(task);
     }
-    // Tasks with runtimes > 0 must be inserted at their sorted position in the queue.
     else
     {
-        TaskComparator cmp;
-        TaskList::iterator it = std::lower_bound(mTasks.begin(),
-                                                 mTasks.end(),
-                                                 task,
-                                                 cmp);
-
-        mTasks.insert(it, task);
+        task->setStatus(StatusRunning);
+        mTasks.insert(task);
     }
+    task->setListener(this);
 }
 
 void Scheduler::dequeue(Task* task)
 {
-    if(task == mTasks.back())
+    assert(task);
+
+#if PRINT_STATES
+    std::cout << "Removing " << typeid(*task).name() << "." << std::endl;
+#endif
+    const Status status = task->getStatus();
+    if(status == StatusWaiting)
     {
-        mTasks.pop_back();
+        removeWaiting(task);
+    }
+    else if(status == StatusRunning)
+    {
+        removeRunning(task);
     }
     else
     {
-        TaskComparator cmp;
-        TaskList::iterator it = std::lower_bound(mTasks.begin(),
-                                                 mTasks.end(),
-                                                 task,
-                                                 cmp);
-
-        if(it != mTasks.end() && !(cmp(task, *it)))
-        {
-            assert(*it == task);
-            mTasks.erase(it);
-        }
-        else
-        {
-            puts("Task couldnt be dequeued because its not currently queued.");
-        }
+        puts("Only waiting or running tasks may be removed.");
     }
 }
 
-void Scheduler::run()
+#if PRINT_STATES
+static void printTasks(const Scheduler::TaskList& tasks)
 {
+    std::cout << "Vector(" << tasks.size() << ") [ ";
+    for(Scheduler::TaskList::const_iterator it = tasks.begin(); it != tasks.end(); ++it)
+    {
+        std::cout << typeid(*(*it)).name() << ",";
+    }
+    std::cout << " ]" << std::endl;
+}
+#endif
+
+void Scheduler::update(HighResolutionTime::Timestamp maxRuntime, float dt)
+{
+    UNUSED(dt);
+
     using namespace HighResolutionTime;
 
-    //const Timestamp maxRuntime = milliseconds(5);
     Timestamp currentRuntime = 0;
 
-    while(!mTasks.empty() /* && currentRuntime <= maxRuntime */)
+    while(!mTasks.empty() && currentRuntime <= maxRuntime)
     {
         Timestamp start = now();
 
         // Take tasks from the end (lowest runtime to date).
-        Task* current = mTasks.back();
+        Task* current = *mTasks.begin();
+#if PRINT_STATES
+        std::cout << "Running " << typeid(*current).name() << "." << std::endl;
+#endif
 
         switch(current->getStatus())
         {
             case StatusRunning:
             {
+                dequeue(current);
+
                 // Execute the current task.
                 current->run();
 
@@ -91,19 +96,23 @@ void Scheduler::run()
                 currentRuntime += duration;
 
                 // Add the granted computation time to the tasks runtime if it isn't done yet.
-                if(current->getStatus() == StatusRunning)
+                if(current->getStatus() == StatusRunning ||
+                   current->getStatus() == StatusWaiting)
                 {
                     // Re-insert it at the appropiate position in the task queue
-                    dequeue(current);
                     current->addRuntime(duration);
                     enqueue(current);
                 }
+
+#if PRINT_STATES
+                printTasks(mTasks);
+                printTasks(mWaiting);
+#endif
             }
             break;
         case StatusWaiting:
             break;
-        case StatusDone:
-        case StatusUnknown:
+        case StatusDormant:
         default:
             // Remove finished and unknwon status tasks.
             // The queue should only contain running and waiting tasks.
@@ -111,6 +120,50 @@ void Scheduler::run()
             break;
         }
     }
+}
+
+void Scheduler::onStatusChanged(Task* task, Status from)
+{
+    const Status to = task->getStatus();
+    if(to == StatusRunning &&
+       from == StatusWaiting)
+    {
+        removeWaiting(task);
+        enqueue(task);
+    }
+    else if(to == StatusWaiting &&
+            from != StatusRunning)
+    {
+        enqueue(task);
+    }
+    else if(from == StatusWaiting)
+    {
+        removeWaiting(task);
+    }
+    else if(from == StatusRunning)
+    {
+        removeRunning(task);
+    }
+}
+
+void Scheduler::removeWaiting(Task* task)
+{
+    if(mWaiting.erase(task) != 1)
+    {
+        printf("Couldnt find task to erase. %lu\n", mWaiting.size());
+    }
+
+    task->setListener(NULL);
+}
+
+void Scheduler::removeRunning(Task* task)
+{
+    if(mTasks.erase(task) != 1)
+    {
+        printf("Couldnt find task to erase.  %lu\n", mTasks.size());
+    }
+
+    task->setListener(NULL);
 }
 
 END_NS_AILIB

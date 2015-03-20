@@ -97,6 +97,7 @@ macx {
     PluginFiles.files += $$OUT_PWD/../libsandboxcore/libsandboxcore.1.dylib
     PluginFiles.files += $$OUT_PWD/../plugin_pathfinding/libplugin_pathfinding.dylib
     PluginFiles.files += $$OUT_PWD/../plugin_planning/libplugin_planning.dylib
+    PluginFiles.files += $$OUT_PWD/../plugin_behaviortree/libplugin_behaviortree.dylib
     PluginFiles.path = Contents/Plugins
 
     MediaFiles.files += $$files(media/*)
@@ -121,6 +122,7 @@ macx {
         plugins.path = $$DESTDIR/Plugins
         plugins.files += $$OUT_PWD/../plugin_pathfinding/$$M_BUILD_DIR/plugin_pathfinding.dll
         plugins.files += $$OUT_PWD/../plugin_planning/$$M_BUILD_DIR/plugin_planning.dll
+        plugins.files += $$OUT_PWD/../plugin_behaviortree/$$M_BUILD_DIR/plugin_behaviortree.dll
         plugins.CONFIG = no_check_exist
 
         package.path = $$DESTDIR

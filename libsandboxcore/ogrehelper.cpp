@@ -1,14 +1,11 @@
 #include "ogrehelper.h"
-
 #include <QDebug>
-
 #include <OgreLogManager.h>
 #include <OgreEntity.h>
 #include <OgreSceneNode.h>
 #include <OgreMesh.h>
 #include <OgreSubMesh.h>
 #include <OgreMovableObject.h>
-
 #include <MmOptimiseTool.h>
 #include <MmOgreEnvironment.h>
 

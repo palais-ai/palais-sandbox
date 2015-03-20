@@ -9,12 +9,24 @@
 
 BEGIN_NS_AILIB
 
+template <typename KEY>
+class BlackboardListener
+{
+public:
+    virtual void onValueChanged(const KEY& key, const ailib::hold_any& value) = 0;
+};
+
 // A generic class to store knowledge by unique keys.
 template <typename KEY>
 class Blackboard
 {
 public:
     typedef KEY key_type;
+
+    void setListener(BlackboardListener<KEY>* listener)
+    {
+        mListener = listener;
+    }
 
     template <typename T>
     FORCE_INLINE T get(const KEY& key) const
@@ -30,7 +42,13 @@ public:
     template <typename T>
     FORCE_INLINE void set(const KEY& key, const T& value)
     {
-        mKnowledge.insert(key, ailib::hold_any(value));
+        ailib::hold_any newVal(value);
+        mKnowledge.insert(key, newVal);
+
+        if(mListener)
+        {
+            mListener->onValueChanged(key, newVal);
+        }
     }
 
     FORCE_INLINE void remove(const KEY& key)
@@ -55,7 +73,7 @@ public:
         }
     }
 
-    int size() const
+    FORCE_INLINE int size() const
     {
         return mKnowledge.size();
     }
@@ -69,15 +87,11 @@ public:
 
         for(int i = 0; i < mKnowledge.size(); ++i)
         {
-            const ailib::hold_any* value = other.mKnowledge.find(mKnowledge.getKeyAtIndex(i));
+            const KEY& key = mKnowledge.getKeyAtIndex(i);
+            const ailib::hold_any* value = other.mKnowledge.find(key);
 
-            if(value == NULL)
-            {
-                return false;
-            }
-
-            if(*value !=
-               *mKnowledge.getAtIndex(i))
+            if(value == NULL ||
+               *value != *mKnowledge.getAtIndex(i))
             {
                 return false;
             }
@@ -88,6 +102,7 @@ public:
 
 private:
     btHashMap<KEY, ailib::hold_any> mKnowledge;
+    BlackboardListener<KEY>* mListener;
 };
 
 // Adapter class to enable the use of Blackboards as keys in btHashMap.

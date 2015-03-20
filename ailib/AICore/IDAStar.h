@@ -5,7 +5,6 @@
 
 #include "ai_global.h"
 #include "graph.h"
-
 #include <limits>
 
 BEGIN_NS_AILIB

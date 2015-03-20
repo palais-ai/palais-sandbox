@@ -73,7 +73,7 @@ Rectangle {
 
             Connections {
                 target: ConsoleModel
-                onOnFinishedMessage: timer.restart()
+                onFinishedMessage: timer.restart()
             }
         }
     }

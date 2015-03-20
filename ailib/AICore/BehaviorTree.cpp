@@ -1,10 +1,16 @@
 #include "BehaviorTree.h"
 #include <cassert>
+#include <cstring>
 
 BEGIN_NS_AILIB
 
+void BehaviorListener::onReset(Behavior* behavior)
+{
+    UNUSED(behavior);
+}
+
 Behavior::Behavior() :
-    mListener(0)
+    mListener(NULL)
 {
     ;
 }
@@ -21,26 +27,32 @@ void Behavior::setListener(BehaviorListener* listener)
 
 void Behavior::terminate()
 {
-    ;
+    setStatus(StatusTerminated);
 }
 
 void Behavior::notifySuccess()
 {
-    setStatus(StatusDone);
-
     if(mListener)
     {
         mListener->onSuccess(this);
     }
+    setStatus(StatusDormant);
 }
 
 void Behavior::notifyFailure()
 {
-    setStatus(StatusDone);
-
     if(mListener)
     {
         mListener->onFailure(this);
+    }
+    setStatus(StatusDormant);
+}
+
+void Behavior::notifyReset()
+{
+    if(mListener)
+    {
+        mListener->onReset(this);
     }
 }
 
@@ -59,6 +71,15 @@ Composite::Composite(Scheduler& scheduler,
 const Composite::BehaviorList& Composite::getChildren() const
 {
     return mChildren;
+}
+
+uint32_t Composite::indexOf(const Behavior* child) const
+{
+    BehaviorList::const_iterator it = std::find(getChildren().begin(),
+                                                getChildren().end(),
+                                                child);
+    assert(it != getChildren().end());
+    return it - getChildren().begin();
 }
 
 SequentialComposite::SequentialComposite(Scheduler& scheduler,
@@ -86,24 +107,47 @@ void SequentialComposite::run()
 
 void SequentialComposite::terminate()
 {
-    if(getStatus() == StatusWaiting)
-    {
-        getChildren()[mCurrentBehavior]->terminate();
-        mScheduler.dequeue(getChildren()[mCurrentBehavior]);
-    }
+    terminateFromIndex(0);
+    Behavior::terminate();
+}
+
+void SequentialComposite::onReset(Behavior* behavior)
+{
+    const uint32_t idx = indexOf(behavior);
+    assert(idx < mCurrentBehavior);
+
+    // Terminate all behaviors following this one.
+    terminateFromIndex(idx+1);
+    notifyReset();
+}
+
+bool SequentialComposite::indexIsCurrent(uint32_t idx) const
+{
+    return idx == mCurrentBehavior;
 }
 
 bool SequentialComposite::currentIsLastBehavior() const
 {
     // Ensure no overflow for signed / unsigned comparison.
     assert(getChildren().size() <= std::numeric_limits<int32_t>::max());
-
     return mCurrentBehavior + 1 == static_cast<int32_t>(getChildren().size());
 }
 
 void SequentialComposite::scheduleNextBehavior()
 {
     mScheduler.enqueue(getChildren()[++mCurrentBehavior]);
+}
+
+void SequentialComposite::terminateFromIndex(uint32_t idx)
+{
+    assert(idx <= mCurrentBehavior);
+    // Terminate all behaviors following (including) __idx__.
+    for(uint32_t i = idx; i <= mCurrentBehavior; ++i)
+    {
+        getChildren()[i]->terminate();
+    }
+
+    mCurrentBehavior = idx == 0 ? 0 : idx - 1;
 }
 
 Selector::Selector(Scheduler& scheduler,
@@ -115,14 +159,21 @@ Selector::Selector(Scheduler& scheduler,
 
 void Selector::onSuccess(Behavior* behavior)
 {
-    UNUSED(behavior);
-
+    const uint32_t idx = indexOf(behavior);
+    if(!indexIsCurrent(idx))
+    {
+        terminateFromIndex(idx+1);
+    }
     notifySuccess();
 }
 
 void Selector::onFailure(Behavior* behavior)
 {
-    UNUSED(behavior);
+    const uint32_t idx = indexOf(behavior);
+    if(!indexIsCurrent(idx))
+    {
+        terminateFromIndex(idx+1);
+    }
 
     // The successful behavior was the last one in the sequence.
     if(currentIsLastBehavior())
@@ -145,7 +196,11 @@ Sequence::Sequence(Scheduler& scheduler,
 
 void Sequence::onSuccess(Behavior* behavior)
 {
-    UNUSED(behavior);
+    const uint32_t idx = indexOf(behavior);
+    if(!indexIsCurrent(idx))
+    {
+        terminateFromIndex(idx+1);
+    }
 
     if(currentIsLastBehavior())
     {
@@ -159,17 +214,21 @@ void Sequence::onSuccess(Behavior* behavior)
 
 void Sequence::onFailure(Behavior* behavior)
 {
-    UNUSED(behavior);
-
+    const uint32_t idx = indexOf(behavior);
+    if(!indexIsCurrent(idx))
+    {
+        terminateFromIndex(idx+1);
+    }
     notifyFailure();
 }
 
 Parallel::Parallel(Scheduler& scheduler,
                    const Composite::BehaviorList& children) :
-    Composite(scheduler, children),
-    mSuccessCount(0)
+    Composite(scheduler, children)
 {
-    ;
+    // The return code state array limits the maximum number of children for parallel tasks.
+    assert(children.size() <= sMaxChildCount);
+    resetCodes();
 }
 
 void Parallel::run()
@@ -193,44 +252,110 @@ void Parallel::run()
 
 void Parallel::terminate()
 {
-    if(getStatus() == StatusWaiting)
+    resetCodes();
+
+    // Terminate all child behaviors.
+    for(std::vector<Behavior*>::const_iterator it = getChildren().begin();
+        it != getChildren().end(); ++it)
     {
-        // Unschedule all the child behaviors at once.
-        for(std::vector<Behavior*>::const_iterator it = getChildren().begin();
-            it != getChildren().end(); ++it)
-        {
-            (*it)->terminate();
-            mScheduler.dequeue(*it);
-        }
+        (*it)->terminate();
     }
+
+    Behavior::terminate();
 }
 
 void Parallel::onSuccess(Behavior* behavior)
 {
-    UNUSED(behavior);
+    // Set the corresponding flags for the behavior.
+    const uint32_t idx = indexOf(behavior);
+    ReturnCode before = mCodes[idx];
+    mCodes[idx] = ReturnCodeSuccess;
 
-    if(++mSuccessCount == getChildren().size())
+    if(allChildrenSucceeded())
     {
         // Signal successful execution only after all children have succeeded.
         notifySuccess();
+    }
+    else if(before == ReturnCodeFailure && !anyChildrenFailed())
+    {
+        // This behavior previously failed the parallel node.
+        // Schedule the parallel node to run again to restart all terminated nodes and
+        // tell the parent node that this node has an uncertain state (again).
+        setStatus(StatusRunning);
+        notifyReset();
     }
 }
 
 void Parallel::onFailure(Behavior* behavior)
 {
-    // End all other remaining parallel tasks.
-    for(std::vector<Behavior*>::const_iterator it = getChildren().begin();
-        it != getChildren().end(); ++it)
+    // Clear the corresponding flags for the behavior.
+    const uint32_t idx = indexOf(behavior);
+    const bool wasFailed = anyChildrenFailed();
+    mCodes[idx] = ReturnCodeFailure;
+
+    if(!wasFailed)
     {
-        if(*it != behavior)
+        // End all remaining, active parallel tasks.
+        for(std::vector<Behavior*>::const_iterator it = getChildren().begin();
+            it != getChildren().end(); ++it)
         {
-            (*it)->terminate();
-            mScheduler.dequeue(*it);
+            if((*it)->getStatus() == StatusRunning ||
+               (*it)->getStatus() == StatusWaiting)
+            {
+                (*it)->terminate();
+            }
+        }
+
+        // Signal the failure of this node to the parent node.
+        notifyFailure();
+    }
+}
+
+void Parallel::onReset(Behavior* behavior)
+{
+    // Clear the corresponding flags for the behavior.
+    const uint32_t idx = indexOf(behavior);
+    const bool wasSuccess = allChildrenSucceeded();
+    const ReturnCode before = mCodes[idx];
+    mCodes[idx] = ReturnCodeNone;
+
+    // Notify the parent node that this node has an uncertain state if
+    // the __behavior__ was determining this node's return state.
+    if((before == ReturnCodeSuccess && wasSuccess) ||
+       (before == ReturnCodeFailure && !anyChildrenFailed()))
+    {
+        setStatus(StatusWaiting);
+        notifyReset();
+    }
+}
+
+void Parallel::resetCodes()
+{
+    std::memset(mCodes, ReturnCodeNone, sizeof(ReturnCode)*getChildren().size());
+}
+
+bool Parallel::allChildrenSucceeded() const
+{
+    for(uint32_t i = 0; i < getChildren().size(); ++i)
+    {
+        if(mCodes[i] != ReturnCodeSuccess)
+        {
+            return false;
         }
     }
+    return true;
+}
 
-    // Signal the failure of this node to the parent node.
-    notifyFailure();
+bool Parallel::anyChildrenFailed() const
+{
+    for(uint32_t i = 0; i < getChildren().size(); ++i)
+    {
+        if(mCodes[i] == ReturnCodeFailure)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 Decorator::Decorator(Scheduler& scheduler, Behavior* child) :
@@ -238,9 +363,41 @@ Decorator::Decorator(Scheduler& scheduler, Behavior* child) :
     mChild(child)
 {
     UNUSED(mScheduler);
-
     assert(mChild);
     mChild->setListener(this);
+}
+
+void Decorator::terminate()
+{
+    mChild->terminate();
+    Behavior::terminate();
+}
+
+
+void Decorator::onSuccess(Behavior* behavior)
+{
+    notifySuccess();
+}
+
+void Decorator::onFailure(Behavior* behavior)
+{
+    notifyFailure();
+}
+
+void Decorator::onReset(Behavior* behavior)
+{
+    UNUSED(behavior);
+    notifyReset();
+}
+
+const Behavior* Decorator::getChild() const
+{
+    return mChild;
+}
+
+void Decorator::scheduleBehavior()
+{
+    mScheduler.enqueue(mChild);
 }
 
 END_NS_AILIB

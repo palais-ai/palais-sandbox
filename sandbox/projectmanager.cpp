@@ -2,7 +2,6 @@
 #include "scene.h"
 #include "actor.h"
 #include "application.h"
-
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -12,11 +11,9 @@
 #include <QDir>
 #include <QThread>
 #include <QFileInfo>
-
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
 #include <OgreCamera.h>
-
 #include "../libqmlogre/ogreengine.h"
 #include "../libqmlogre/cameranodeobject.h"
 #include "../libqmlogre/ogreitem.h"
@@ -38,6 +35,8 @@ ProjectManager::ProjectManager(OgreEngine* engine) :
             this, &ProjectManager::onSetSimulationSpeed);
     connect(this, &ProjectManager::signalUnselectActor,
             this, &ProjectManager::onUnselectActor);
+
+    startTimer(1000);
 }
 
 ProjectManager::~ProjectManager()
@@ -157,6 +156,11 @@ void ProjectManager::onActorRemoved(const QString& actorName)
     }
 }
 
+void ProjectManager::timerEvent(QTimerEvent *)
+{
+    emit oneSecondTimeout();
+}
+
 void ProjectManager::onTimePassed(const QTime& time)
 {
     emit timePassed(time);
@@ -256,14 +260,14 @@ void ProjectManager::play()
 {
     mScenarioManager.start();
 
-    emit onPlayingChanged(isPlaying());
+    emit playingChanged(isPlaying());
 }
 
 void ProjectManager::pause()
 {
     mScenarioManager.pause();
 
-    emit onPlayingChanged(isPlaying());
+    emit playingChanged(isPlaying());
 }
 
 void ProjectManager::onSetSimulationSpeed(float speedFactor)

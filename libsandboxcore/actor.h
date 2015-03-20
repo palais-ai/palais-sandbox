@@ -2,7 +2,6 @@
 #define ACTOR_H
 
 #include "knowledgemodel.h"
-
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 

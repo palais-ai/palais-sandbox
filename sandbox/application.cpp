@@ -7,9 +7,7 @@
 #include "models/scenemodel.h"
 #include "utility/timedlogger.h"
 #include "utility/loghandler.h"
-
 #include <cassert>
-
 #include <QCoreApplication>
 #include <QtQml/QQmlContext>
 #include <QtGui/QGuiApplication>
@@ -18,10 +16,8 @@
 #include <QTime>
 #include <QDebug>
 #include <QThread>
-
 #include "../libqmlogre/ogreitem.h"
 #include "../libqmlogre/ogreengine.h"
-
 #include <Ogre.h>
 
 Q_DECLARE_METATYPE(ConsoleModel::LogLevel)
@@ -132,6 +128,9 @@ int Application::onApplicationStarted(int argc, char **argv)
     connect(window, &QQuickWindow::frameSwapped,
             this, &Application::initializeOgre, Qt::DirectConnection);
 
+    connect(window, &QQuickWindow::frameSwapped,
+            mConsoleModel.data(), &ConsoleModel::onFrameSwapped);
+
     connect(this, &Application::ogreInitialized,
             this, &Application::onOgreIsReady, Qt::DirectConnection);
 
@@ -175,10 +174,13 @@ void Application::initializeOgre()
     QObject::connect(mProjectManager, &ProjectManager::timePassed,
                      mConsoleModel.data(), &ConsoleModel::onTimePassed);
 
+    QObject::connect(mProjectManager, &ProjectManager::oneSecondTimeout,
+                     mConsoleModel.data(), &ConsoleModel::onFPSTimeout);
+
     QObject::connect(this, &Application::sceneSetupFinished,
                      mProjectManager, &ProjectManager::onSceneSetupFinished);
 
-    QObject::connect(mProjectManager, &ProjectManager::onPlayingChanged,
+    QObject::connect(mProjectManager, &ProjectManager::playingChanged,
                      this, &Application::onPlayingChanged);
 
     QObject::connect(this, &Application::selectActorAtClickpoint,

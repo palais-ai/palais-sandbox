@@ -5,11 +5,9 @@
 #pragma once
  
 #include "libsandboxcore_global.h"
-
 #include <OgreVector3.h>
 #include <OgreColourValue.h>
 #include <OgreString.h>
-
 #include <map>
 #include <list>
 #include <stdint.h>

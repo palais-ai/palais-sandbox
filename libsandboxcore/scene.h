@@ -4,11 +4,9 @@
 #include "ogrehelper.h"
 #include "knowledgemodel.h"
 #include "scenedynamics.h"
-
 #include <QVector>
 #include <QScriptEngine>
 #include <QMap>
-
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 #include <OgreFrameListener.h>

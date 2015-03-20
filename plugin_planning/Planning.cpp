@@ -29,7 +29,7 @@ void Planner_register_prototype(QScriptEngine& engine)
 {
     const int typeId = qRegisterMetaType<Planner*>("Planner*");
 
-    QScriptValue prototype = engine.newQObject((Planner*)0);
+    QScriptValue prototype = engine.newQObject(new Planner());
     prototype.setProperty("addAction", engine.newFunction(planning_add_action));
     engine.setDefaultPrototype(typeId, prototype);
 

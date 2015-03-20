@@ -4,16 +4,12 @@
 #include "javascriptbindings.h"
 #include "application.h"
 #include "PluginManager.h"
-
 #include <exception>
-
 #include <QScopedPointer>
 #include <QtGlobal>
-
 #include <OgreSceneManager.h>
 #include <OgreString.h>
 #include <OgreSceneNode.h>
-
 #include "../libqmlogre/ogreengine.h"
 #include "../libdotsceneloader/DotSceneLoader.h"
 

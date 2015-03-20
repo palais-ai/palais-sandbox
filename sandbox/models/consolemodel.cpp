@@ -16,8 +16,10 @@ void ConsoleModel::declareQML()
 
 ConsoleModel::ConsoleModel() :
     mPassedTime(0,0,0,0),
+    mFrameCount(0),
     mIsLogging(false)
 {
+    ;
 }
 
 void ConsoleModel::onMessageReceived(LogLevel level, const QString& msg)
@@ -31,16 +33,32 @@ void ConsoleModel::onMessageReceived(LogLevel level, const QString& msg)
     }
 }
 
+void ConsoleModel::onFrameSwapped()
+{
+    ++mFrameCount;
+}
+
+void ConsoleModel::onFPSTimeout()
+{
+    emit frameCounterStringChanged(getFrameCounterString());
+    mFrameCount = 0;
+}
+
 void ConsoleModel::onTimePassed(const QTime& passedTime)
 {
     mPassedTime = mPassedTime.addMSecs(passedTime.msec());
 
-    emit onPassedTimeStringChanged(getPassedTimeString());
+    emit passedTimeStringChanged(getPassedTimeString());
 }
 
 QString ConsoleModel::getPassedTimeString() const
 {
     return mPassedTime.toString("mm:ss.zzz");
+}
+
+QString ConsoleModel::getFrameCounterString() const
+{
+    return QString("%1 fps").arg(mFrameCount);
 }
 
 void ConsoleModel::clear()
@@ -59,7 +77,7 @@ void ConsoleModel::log(const QString& message, LogLevel level)
     mLog += LogEntry(message, level);
     endInsertRows();
 
-    emit onFinishedMessage();
+    emit finishedMessage();
 }
 
 QHash<int, QByteArray> ConsoleModel::roleNames() const

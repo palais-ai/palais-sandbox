@@ -5,7 +5,6 @@
 
 #include <QObject>
 #include <QVector>
-
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 

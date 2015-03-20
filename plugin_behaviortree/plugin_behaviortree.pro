@@ -7,7 +7,7 @@
 QT += core script
 QT -= gui
 
-TARGET = plugin_pathfinding
+TARGET = plugin_behaviortree
 TEMPLATE = lib
 CONFIG += plugin
 
@@ -18,17 +18,16 @@ MOC_DIR = ./.moc
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
 
 SOURCES += \
-    pathfinding.cpp \
-    PathfindingPlugin.cpp
+    Behavior.cpp \
+    BehaviorPlugin.cpp
 
 HEADERS += \
-    pathfinding.h \
-    PathfindingPlugin.h
+    Behavior.h \
+    BehaviorPlugin.h
 
 include(../linkOgreSDK.pri)
 
 INCLUDEPATH += ../sandbox/
-INCLUDEPATH += ../ailib/
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libsandboxcore/release/ -lsandboxcore
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libsandboxcore/debug/ -lsandboxcore

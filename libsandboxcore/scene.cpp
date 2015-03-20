@@ -2,16 +2,12 @@
 #include "actor.h"
 #include "javascriptbindings.h"
 #include "DebugDrawer.h"
-
 #include "../libqmlogre/cameranodeobject.h"
 #include "../libqmlogre/ogreengine.h"
-
 #include <cassert>
-
 #include <QDebug>
 #include <QVector>
 #include <QQuickWindow>
-
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>

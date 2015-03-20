@@ -42,6 +42,19 @@ Rectangle {
     NativeText {
         anchors.top: parent.top
         anchors.topMargin: 4
+        anchors.right: timeText.left
+        anchors.leftMargin: 8
+        text: ConsoleModel.fpsString + " |"
+        font.family: openSans.name
+        font.pointSize: 12
+        font.weight: Font.Light
+        color: colors.lightGray
+    }
+
+    NativeText {
+        id: timeText
+        anchors.top: parent.top
+        anchors.topMargin: 4
         anchors.right: parent.right
         anchors.rightMargin: 8
         text: ConsoleModel.passedTimeString

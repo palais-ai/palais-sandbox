@@ -5,7 +5,6 @@
 
 #include "ai_global.h"
 #include "graph.h"
-
 #include <cstring>
 #include <cassert>
 #include <algorithm>
@@ -148,7 +147,7 @@ public:
             open.pop();
 
             // Expand all child nodes of the current node.
-            expand(lowestCost, lowestCostIdx, open);
+            expand(lowestCostNode, goal, heuristic, lowestCostIdx, open);
         }
 
         // No solution found. Return an empty path.
@@ -156,9 +155,11 @@ public:
     }
 
 private:
-    void expand(const node_type* node,
+    void expand(AStarNode* node,
+                const node_type& goal,
+                Heuristic heuristic,
                 const size_t index,
-                OpenList& open)
+                OpenList& open) const
     {
         const edge_type* const end = mGraph.getSuccessorsEnd(index);
         const edge_type* const begin = mGraph.getSuccessorsBegin(index);
@@ -204,7 +205,7 @@ private:
 
             targetNode->parent = node;
             targetNode->connection = it - begin;
-            assert(targetNode->connection < mGraph.getNumEdges(lowestCostIdx));
+            assert(targetNode->connection < mGraph.getNumEdges(index));
             targetNode->currentCost = targetCost;
         }
     }

@@ -2,7 +2,6 @@
 #define KNOWLEDGEMODEL_H
 
 #include "libsandboxcore_global.h"
-
 #include <QObject>
 #include <QVariant>
 

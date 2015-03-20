@@ -6,6 +6,7 @@
 #include "ai_global.h"
 #include "Scheduler.h"
 #include <vector>
+#include <bitset>
 
 BEGIN_NS_AILIB
 
@@ -16,6 +17,7 @@ class BehaviorListener
 public:
     virtual void onSuccess(Behavior* behavior) = 0;
     virtual void onFailure(Behavior* behavior) = 0;
+    virtual void onReset(Behavior* behavior);
 };
 
 class Behavior : public Task
@@ -32,6 +34,7 @@ public:
 protected:
     void notifySuccess();
     void notifyFailure();
+    void notifyReset();
 private:
     BehaviorListener* mListener;
 };
@@ -47,6 +50,8 @@ public:
 private:
     BehaviorList mChildren;
 protected:
+    uint32_t indexOf(const Behavior* child) const;
+
     Scheduler& mScheduler;
 };
 
@@ -58,9 +63,12 @@ public:
 
     virtual void run();
     virtual void terminate();
+    virtual void onReset(Behavior* behavior);
 protected:
+    bool indexIsCurrent(uint32_t idx) const;
     bool currentIsLastBehavior() const;
     void scheduleNextBehavior();
+    void terminateFromIndex(uint32_t idx);
 private:
     uint16_t mCurrentBehavior;
 };
@@ -95,14 +103,35 @@ public:
     virtual void terminate();
     virtual void onSuccess(Behavior* behavior);
     virtual void onFailure(Behavior* behavior);
+    virtual void onReset(Behavior* behavior);
 private:
-    uint16_t mSuccessCount;
+    void resetCodes();
+    bool allChildrenSucceeded() const;
+    bool anyChildrenFailed() const;
+
+    enum ReturnCode
+    {
+        ReturnCodeNone = 0,
+        ReturnCodeSuccess,
+        ReturnCodeFailure
+    };
+    static const int32_t sMaxChildCount = 8;
+    ReturnCode mCodes[sMaxChildCount];
 };
 
 class Decorator : public Behavior, public BehaviorListener
 {
 public:
     Decorator(Scheduler& scheduler, Behavior* child);
+
+    virtual void terminate();
+    virtual void onSuccess(Behavior* behavior);
+    virtual void onFailure(Behavior* behavior);
+    virtual void onReset(Behavior* behavior);
+
+    const Behavior* getChild() const;
+protected:
+    void scheduleBehavior();
 private:
     Scheduler& mScheduler;
     Behavior* const mChild;

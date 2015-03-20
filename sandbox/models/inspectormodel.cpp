@@ -1,9 +1,7 @@
 #include "inspectormodel.h"
 #include "utility/MetatypeDeclarations.h"
-
 #include <QtQml>
 #include <QSharedPointer>
-
 #include "OgreStringConverter.h"
 
 void OgreVector3Model::declareQML()

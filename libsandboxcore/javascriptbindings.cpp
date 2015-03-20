@@ -2,7 +2,6 @@
 #include "scene.h"
 #include "actor.h"
 #include "utility/MetatypeDeclarations.h"
-
 #include <QScriptEngine>
 #include <QTextStream>
 #include <QDebug>
@@ -13,7 +12,6 @@
 #include <QDir>
 #include <QUrl>
 #include <QScriptContextInfo>
-
 #include <OgreQuaternion.h>
 #include <OgreVector3.h>
 

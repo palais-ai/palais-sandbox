@@ -4,9 +4,7 @@
 #pragma once
 
 #include <stdint.h>
-
 #include <QScriptEngine>
-
 #include "actor.h"
 #include "scene.h"
 

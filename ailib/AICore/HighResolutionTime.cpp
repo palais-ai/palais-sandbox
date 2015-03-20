@@ -8,12 +8,12 @@ namespace HighResolutionTime {
 
     Timestamp milliseconds(double t)
     {
-        return Timestamp(t * 1e6);
+        return Timestamp(t * 1e3);
     }
 
     Timestamp seconds(double t)
     {
-        return Timestamp(t * 1e9);
+        return Timestamp(t * 1e6);
     }
 
     Timestamp now()

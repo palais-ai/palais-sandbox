@@ -4,7 +4,6 @@
 #pragma once
 
 #include "ai_global.h"
-
 #include <stdint.h>
 #include <vector>
 #include <cassert>

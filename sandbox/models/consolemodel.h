@@ -10,7 +10,9 @@ class ConsoleModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString passedTimeString READ getPassedTimeString
-                                        NOTIFY onPassedTimeStringChanged)
+                                        NOTIFY passedTimeStringChanged)
+    Q_PROPERTY(QString fpsString READ getFrameCounterString
+                                 NOTIFY frameCounterStringChanged)
 public:
     enum ModelRole
     {
@@ -32,6 +34,8 @@ public:
     ConsoleModel();
 
     QString getPassedTimeString() const;
+    QString getFrameCounterString() const;
+
     void log(const QString& message, LogLevel level = LogLevelDebug);
 
     // List Model impl
@@ -41,12 +45,15 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual int rowCount(const QModelIndex &parent) const;
 signals:
-    void onPassedTimeStringChanged(QString passedTime);
-    void onFinishedMessage();
+    void passedTimeStringChanged(QString passedTime);
+    void finishedMessage();
+    void frameCounterStringChanged(QString string);
 public slots:
     void clear();
     void onTimePassed(const QTime& passedTime);
     void onMessageReceived(LogLevel level, const QString& msg);
+    void onFrameSwapped();
+    void onFPSTimeout();
 private:
     struct LogEntry
     {
@@ -58,6 +65,7 @@ private:
 
     QTime mPassedTime;
     QList<LogEntry> mLog;
+    uint32_t mFrameCount;
     bool mIsLogging;
 };
 

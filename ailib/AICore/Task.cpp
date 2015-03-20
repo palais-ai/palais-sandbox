@@ -4,7 +4,7 @@ BEGIN_NS_AILIB
 
 Task::Task() :
     mRuntime(0),
-    mStatus(StatusUnknown)
+    mStatus(StatusDormant)
 {
     ;
 }
@@ -14,14 +14,25 @@ Task::~Task()
     ;
 }
 
-Task::Status Task::getStatus() const
+void Task::setListener(TaskListener* listener)
+{
+    mListener = listener;
+}
+
+Status Task::getStatus() const
 {
     return mStatus;
 }
 
-void Task::setStatus(Task::Status status)
+void Task::setStatus(Status status)
 {
+    Status before = mStatus;
     mStatus = status;
+
+    if(mListener && status != before)
+    {
+        mListener->onStatusChanged(this, before);
+    }
 }
 
 void Task::addRuntime(const HighResolutionTime::Timestamp& runtime)

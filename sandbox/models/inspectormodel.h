@@ -2,10 +2,8 @@
 #define INSPECTORMODEL_H
 
 #include "knowledgemodel.h"
-
 #include <QAbstractListModel>
 #include <QVector>
-
 #include <OgreVector3.h>
 
 class TextualModel : public QObject

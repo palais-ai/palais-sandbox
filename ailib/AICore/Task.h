@@ -8,26 +8,36 @@
 
 BEGIN_NS_AILIB
 
+class Task;
+
+enum Status
+{
+    StatusDormant = 0,
+    StatusRunning,
+    StatusWaiting,
+    StatusTerminated
+};
+
+class TaskListener
+{
+public:
+    virtual void onStatusChanged(Task* task, Status from) = 0;
+};
+
 class Task
 {
 public:
-    enum Status
-    {
-        StatusUnknown = 0,
-        StatusDone,
-        StatusRunning,
-        StatusWaiting
-    };
-
     Task();
     virtual ~Task();
     virtual void run() = 0;
 
+    void setListener(TaskListener* listener);
     Status getStatus() const;
     void setStatus(Status status);
     void addRuntime(const HighResolutionTime::Timestamp& runtime);
     HighResolutionTime::Timestamp getRuntime() const;
 private:
+    TaskListener* mListener;
     uint16_t mRuntime; // in microseconds
     Status mStatus;
 };

@@ -2,9 +2,7 @@
 #define LOGHANDLER_H
 
 #include "../models/consolemodel.h"
-
 #include <QObject>
-
 #include <OgreLog.h>
 
 class LogHandler : public QObject,
