@@ -2,19 +2,12 @@
 #define PLANNING_H
 
 #include <QObject>
+#include <QScriptValue>
+#include <QScriptEngine>
 #include "BehaviorTree.h"
 #include "Blackboard.h"
 
 using namespace ailib;
-
-class BehaviorTree : public QObject
-{
-    Q_OBJECT
-public:
-    Q_INVOKABLE void setRoot(Behavior* behavior);
-private:
-    Behavior* mRoot;
-};
 
 class BlackboardDecorator : public Decorator, public BlackboardListener<btHashString>
 {
@@ -22,40 +15,16 @@ public:
     BlackboardDecorator(Scheduler& scheduler,
                         Behavior* child,
                         QString observedValue,
-                        Blackboard<btHashString>& blackboard) :
-        Decorator(scheduler, child),
-        mObservedValue(observedValue),
-        mBlackboard(blackboard)
-    {
-        ;
-    }
+                        const Blackboard<btHashString>& blackboard);
 
-    virtual void onValueChanged(const btHashString& key, const ailib::hold_any& value)
-    {
-        if(key.equals(mObservedValue))
-        {
-            setStatus(StatusRunning);
-        }
-    }
-
-    virtual void run()
-    {
-        if(mBlackboard.get<bool>(mObservedValue))
-        {
-            scheduleBehavior();
-            setStatus(StatusWaiting);
-        }
-        else
-        {
-            notifyFailure();
-        }
-    }
-
+    virtual void onValueChanged(const btHashString& key, const hold_any& value);
+    virtual void run();
 private:
     QString mObservedValue;
-    Blackboard<btHashString>& mBlackboard;
+    const Blackboard<btHashString>& mBlackboard;
 };
 
-
+void Sequence_register_prototype(QScriptEngine& engine);
+QScriptValue Sequence_prototype_ctor(QScriptContext *context, QScriptEngine *engine);
 
 #endif // PLANNING_H

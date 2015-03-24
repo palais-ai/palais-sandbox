@@ -9,7 +9,6 @@ QT -= core gui
 TARGET = LinearMath
 TEMPLATE = lib
 CONFIG += staticlib
-CONFIG += c++11
 
 SOURCES += $$files(*.cpp)
 

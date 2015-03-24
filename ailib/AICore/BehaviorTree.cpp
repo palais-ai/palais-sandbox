@@ -1,6 +1,9 @@
 #include "BehaviorTree.h"
+#include <stdint.h>
 #include <cassert>
 #include <cstring>
+#include <limits>
+#include <algorithm>
 
 BEGIN_NS_AILIB
 
@@ -129,7 +132,7 @@ bool SequentialComposite::indexIsCurrent(uint32_t idx) const
 bool SequentialComposite::currentIsLastBehavior() const
 {
     // Ensure no overflow for signed / unsigned comparison.
-    assert(getChildren().size() <= std::numeric_limits<int32_t>::max());
+    assert(getChildren().size() <= static_cast<size_t>(std::numeric_limits<int32_t>::max()));
     return mCurrentBehavior + 1 == static_cast<int32_t>(getChildren().size());
 }
 
@@ -373,14 +376,15 @@ void Decorator::terminate()
     Behavior::terminate();
 }
 
-
 void Decorator::onSuccess(Behavior* behavior)
 {
+    UNUSED(behavior);
     notifySuccess();
 }
 
 void Decorator::onFailure(Behavior* behavior)
 {
+    UNUSED(behavior);
     notifyFailure();
 }
 

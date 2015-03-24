@@ -21,6 +21,26 @@
 #include <OgrePolygon.h>
 #include <OgreStringConverter.h>
 
+class GoalReachedCallback
+{
+public:
+    GoalReachedCallback(const QScriptValue& fun) :
+        mCallback(fun)
+    {
+        assert(fun.isFunction());
+    }
+
+    void onGoalReached(Actor& actor)
+    {
+        mCallback.call(QScriptValue(), QScriptValueList() <<
+                                        mCallback.engine()->toScriptValue(&actor));
+    }
+
+private:
+    QScriptValue mCallback;
+};
+Q_DECLARE_METATYPE(GoalReachedCallback*)
+
 static ailib::real_type euclideanHeuristic(const Pathfinding::NavigationGraph::node_type& n1,
                                            const Pathfinding::NavigationGraph::node_type& n2)
 {
@@ -76,7 +96,16 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
             {
                 actor.removeKnowledge("movement_target");
                 actor.disableAnimation("my_animation");
-                qDebug("Reached goal.");
+
+                if(actor.hasKnowledge("goal_reached_callback"))
+                {
+                    GoalReachedCallback* cb = actor.getKnowledge("goal_reached_callback")
+                                                    .value<GoalReachedCallback*>();
+
+                    cb->onGoalReached(actor);
+                    actor.removeKnowledge("goal_reached_callback");
+                    delete cb;
+                }
             }
         }
 
@@ -338,7 +367,9 @@ void Pathfinding::visualizeNavGraph(DebugDrawer* drawer) const
     qDebug() << "Navigation mesh loaded with " << mGraph.getNumNodes() << " nodes.";
 }
 
-void Pathfinding::moveActor(Actor* actor, const Ogre::Vector3& target)
+void Pathfinding::moveActor(Actor* actor,
+                            const Ogre::Vector3& target,
+                            QScriptValue onFinishedCallback)
 {
     bool isAlreadyThere;
     ailib::AStar<Pathfinding::NavigationGraph>::path_type path;
@@ -373,4 +404,23 @@ void Pathfinding::moveActor(Actor* actor, const Ogre::Vector3& target)
 
     actor->setKnowledge("current_path", QVariant::fromValue(qpath));
     actor->setKnowledge("movement_target", QVariant::fromValue(qpath.first()));
+
+    if(!onFinishedCallback.isUndefined())
+    {
+        GoalReachedCallback* cb = new GoalReachedCallback(onFinishedCallback);
+        connect(actor, &QObject::destroyed,
+                this, &Pathfinding::onActorDestroyed);
+        actor->setKnowledge("goal_reached_callback", QVariant::fromValue(cb));
+    }
+}
+
+void Pathfinding::onActorDestroyed(QObject* actorObject)
+{
+    Actor& actor = *static_cast<Actor*>(actorObject);
+    if(actor.hasKnowledge("goal_reached_callback"))
+    {
+        GoalReachedCallback* cb = actor.getKnowledge("goal_reached_callback")
+                                        .value<GoalReachedCallback*>();
+        delete cb;
+    }
 }

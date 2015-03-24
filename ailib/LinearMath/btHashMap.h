@@ -1,5 +1,5 @@
 /*
- *  03/16/2015 Patrick Schwab : Adapted to support iterating over keys.
+ *  03/16/2015 PS : Adapted to support iterating over keys.
  *
  */
 
@@ -410,7 +410,11 @@ protected:
 		return find(key);
 	}
 
-	const Value*	find(const Key& key) const
+    const Value* operator[](const Key& key) const {
+        return find(key);
+    }
+
+    const Value* find(const Key& key) const
 	{
 		int index = findIndex(key);
 		if (index == BT_HASH_NULL)

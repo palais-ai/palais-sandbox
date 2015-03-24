@@ -9,7 +9,6 @@ QT       -= core gui
 TARGET = ailib
 TEMPLATE = lib
 CONFIG += staticlib
-CONFIG += c++11
 
 DEFINES += SMASTAR_LIBRARY
 
@@ -19,6 +18,14 @@ SOURCES += \
     Graph.cpp \
     BehaviorTree.cpp \
     HighResolutionTime.cpp
+
+win32 {
+    SOURCES += platform/win32/win32_time.cpp
+} else:macx {
+    SOURCES += platform/mac/mac_time.cpp
+} else:unix {
+    SOURCES += platform/posix/posix_time.cpp
+}
 
 HEADERS +=\
     ai_global.h \

@@ -11,6 +11,15 @@ BEGIN_NS_AILIB
 
 #define PRINT_STATES 0
 
+void Scheduler::clear()
+{
+    while(!mTasks.empty())
+    {
+        Task* current = *mTasks.begin();
+        current->setStatus(StatusDormant);
+    }
+}
+
 void Scheduler::enqueue(Task* task)
 {
     assert(task);

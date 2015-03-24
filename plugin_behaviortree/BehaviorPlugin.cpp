@@ -1,6 +1,5 @@
 #include "BehaviorPlugin.h"
 #include "Behavior.h"
-
 #include <OgreSceneManager.h>
 
 using namespace ailib;
@@ -24,19 +23,19 @@ void BehaviorPlugin::onSceneStarted(const PluginInterface& interface, Scene& sce
 {
     Q_UNUSED(interface);
     QScriptEngine& engine = scene.getScriptEngine();
-
-    //Planner_register_prototype(engine);
 }
 
 void BehaviorPlugin::onSceneEnded(const PluginInterface& interface, Scene& scene)
 {
     Q_UNUSED(interface);
     Q_UNUSED(scene);
+
+    mScheduler.clear();
 }
 
 void BehaviorPlugin::update(const PluginInterface& interface, Scene& scene, float deltaTime)
 {
     Q_UNUSED(interface);
 
-    //mAIWorld.update(HighResolutionTime::milliseconds(8), deltaTime);
+    mScheduler.update(HighResolutionTime::milliseconds(8), deltaTime);
 }

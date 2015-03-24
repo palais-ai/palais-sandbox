@@ -6,7 +6,6 @@
 #include "ai_global.h"
 #include "Scheduler.h"
 #include <vector>
-#include <bitset>
 
 BEGIN_NS_AILIB
 
@@ -15,6 +14,7 @@ class Behavior;
 class BehaviorListener
 {
 public:
+    virtual ~BehaviorListener() {}
     virtual void onSuccess(Behavior* behavior) = 0;
     virtual void onFailure(Behavior* behavior) = 0;
     virtual void onReset(Behavior* behavior);

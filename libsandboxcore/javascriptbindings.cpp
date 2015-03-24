@@ -1,6 +1,5 @@
 #include "javascriptbindings.h"
 #include "scene.h"
-#include "actor.h"
 #include "utility/MetatypeDeclarations.h"
 #include <QScriptEngine>
 #include <QTextStream>
@@ -15,7 +14,6 @@
 #include <OgreQuaternion.h>
 #include <OgreVector3.h>
 
-Q_DECLARE_METATYPE(Actor*)
 Q_DECLARE_METATYPE(RaycastResult)
 Q_DECLARE_METATYPE(RaycastResult*)
 
@@ -195,7 +193,7 @@ static bool loadScript(QScriptEngine *engine, const QString& filename)
     // Set context to parent context
     // See http://www.qtcentre.org/threads/20432-Can-I-include-a-script-from-script
     QScriptContext *context = engine->currentContext();
-    QScriptContext *parent= context->parentContext();
+    QScriptContext *parent = context->parentContext();
 
     if(parent != 0)
     {

@@ -23,6 +23,10 @@ class Blackboard
 public:
     typedef KEY key_type;
 
+    Blackboard() :
+        mListener(NULL)
+    {}
+
     void setListener(BlackboardListener<KEY>* listener)
     {
         mListener = listener;
@@ -40,7 +44,7 @@ public:
     }
 
     template <typename T>
-    FORCE_INLINE void set(const KEY& key, const T& value)
+    void set(const KEY& key, const T& value)
     {
         ailib::hold_any newVal(value);
         mKnowledge.insert(key, newVal);

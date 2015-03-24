@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "PluginInterface.h"
-//#include "Scheduler.h"
+#include "Scheduler.h"
 
 class BehaviorPlugin : public QObject, public Plugin
 {
@@ -20,7 +20,7 @@ public:
     virtual void update(const PluginInterface& interface, Scene& scene, float deltaTime);
 
 private:
-    //ailib::Scheduler mAIWorld;
+    ailib::Scheduler mScheduler;
 };
 
 #endif // AILIBPLUGIN_H

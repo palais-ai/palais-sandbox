@@ -29,7 +29,7 @@ void Planner_register_prototype(QScriptEngine& engine)
 {
     const int typeId = qRegisterMetaType<Planner*>("Planner*");
 
-    QScriptValue prototype = engine.newQObject(new Planner());
+    QScriptValue prototype = engine.newQObject((Planner*)0);
     prototype.setProperty("addAction", engine.newFunction(planning_add_action));
     engine.setDefaultPrototype(typeId, prototype);
 
@@ -270,7 +270,9 @@ void Planner::makePlan(Actor* actor,
         {
             qDebug() << it->edgeIndex;
             qDebug() << graph.getNumEdges(it->fromNode);
-            static_cast<ScriptAction*>((graph.getSuccessorsBegin(it->fromNode) + it->edgeIndex)->userData)->perform(actor);
+            static_cast<ScriptAction*>((graph.getSuccessorsBegin(it->fromNode) +
+                                        it->edgeIndex)->userData)
+                                      ->perform(actor);
         }
     }
 }
@@ -284,7 +286,6 @@ void Planner::update(Scene& scene, float deltaTime)
 void Planning::onDestroyed(QObject* obj)
 {
     int idx = sPlanners.indexOf(static_cast<Planner*>(obj));
-
     if(idx != -1)
     {
         sPlanners.remove(idx);

@@ -21,6 +21,7 @@ enum Status
 class TaskListener
 {
 public:
+    virtual ~TaskListener() {}
     virtual void onStatusChanged(Task* task, Status from) = 0;
 };
 
@@ -29,6 +30,7 @@ class Task
 public:
     Task();
     virtual ~Task();
+
     virtual void run() = 0;
 
     void setListener(TaskListener* listener);

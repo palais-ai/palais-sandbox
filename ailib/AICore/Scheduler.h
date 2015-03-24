@@ -28,6 +28,7 @@ class Scheduler : private TaskListener
 public:
     typedef std::set<Task*, TaskComparator> TaskList;
 
+    void clear();
     void enqueue(Task* task);
     void dequeue(Task* task);
     void update(HighResolutionTime::Timestamp maxRuntime, float dt);

@@ -3,6 +3,7 @@
 BEGIN_NS_AILIB
 
 Task::Task() :
+    mListener(0),
     mRuntime(0),
     mStatus(StatusDormant)
 {
@@ -27,11 +28,14 @@ Status Task::getStatus() const
 void Task::setStatus(Status status)
 {
     Status before = mStatus;
-    mStatus = status;
-
-    if(mListener && status != before)
+    if(status != before)
     {
-        mListener->onStatusChanged(this, before);
+        mStatus = status;
+
+        if(mListener)
+        {
+            mListener->onStatusChanged(this, before);
+        }
     }
 }
 

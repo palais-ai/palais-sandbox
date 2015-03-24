@@ -4,7 +4,7 @@
 #include "AStar.h"
 
 #include <QObject>
-
+#include <QScriptValue>>
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 
@@ -50,13 +50,17 @@ public:
 
     void initNavGraphFromOgreNode(Ogre::SceneNode* node);
     void visualizeNavGraph(DebugDrawer* drawer) const;
-    Q_INVOKABLE void moveActor(Actor* actor, const Ogre::Vector3& target);
+    Q_INVOKABLE void moveActor(Actor* actor,
+                               const Ogre::Vector3& target,
+                               QScriptValue onFinishedCallback =  QScriptValue::UndefinedValue);
 
     ailib::AStar<NavigationGraph>::path_type planPath(const Ogre::Vector3& from,
                                                       const Ogre::Vector3& to,
                                                       bool* isAlreadyThere = NULL);
 
     const NavigationGraph::node_type* getNavNodeClosestToPoint(const Ogre::Vector3& point);
+private slots:
+    void onActorDestroyed(QObject* actor);
 private:
     NavigationGraph mGraph;
 };

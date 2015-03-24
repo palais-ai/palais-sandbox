@@ -42,7 +42,7 @@ public:
     size_t buildGraph(const state_type& startState, const state_type& endState, uint32_t maxDepth)
     {
         UNUSED(endState);
-        mGraph = graph_type(); //< Clear before build
+        mGraph = graph_type(); //< Clear before build.
         size_t startIdx = mGraph.addNode(startState);
         recursiveBuildGraph(startIdx, maxDepth, 0);
         return startIdx;

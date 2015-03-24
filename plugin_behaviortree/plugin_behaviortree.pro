@@ -49,3 +49,16 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../aili
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../ailib/AICore/release/ailib.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../ailib/AICore/debug/ailib.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../ailib/AICore/libailib.a
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ailib/LinearMath/release/ -lLinearMath
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ailib/LinearMath/debug/ -lLinearMath
+else:unix: LIBS += -L$$OUT_PWD/../ailib/LinearMath/ -lLinearMath
+
+INCLUDEPATH += $$PWD/../ailib/LinearMath
+DEPENDPATH += $$PWD/../ailib/LinearMath
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../ailib/LinearMath/release/libLinearMath.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../ailib/LinearMath/debug/libLinearMath.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../ailib/LinearMath/release/LinearMath.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../ailib/LinearMath/debug/LinearMath.lib
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../ailib/LinearMath/libLinearMath.a

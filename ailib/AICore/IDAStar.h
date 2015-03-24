@@ -91,6 +91,7 @@ private:
         {
             real_type tmp = std::numeric_limits<real_type>::max();
             DepthSearchResult res = depthSearch(mGraph.getNode(it->targetIndex),
+                                                goal,
                                                 currentCost + it->cost,
                                                 currentEstimate,
                                                 heuristic,

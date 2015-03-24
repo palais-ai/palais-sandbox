@@ -25,7 +25,7 @@ template<class T> struct remove_reference<T&&>
 namespace detail
 {
 //
-// 03/16/2015 Patrick Schwab: Added support for comparison operators (operator==, operator!=).
+// 03/16/2015 PS: Added support for comparison operators (operator==, operator!=).
 //
 // CREDITS: Based on: boost::detail::sp_typeinfo
 // ORIGINAL LICENSE:
@@ -162,7 +162,7 @@ typedef bool_<false> false_;
     typedef ailib::detail::true_ local_true;
     typedef ailib::detail::false_ local_false;
 
-    class bad_any_cast : public std::bad_cast
+    class bad_any_cast : public std::exception
     {
     public:
         bad_any_cast(local_typeinfo const& src,

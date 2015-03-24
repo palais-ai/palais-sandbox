@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 SUBDIRS = LinearMath \
-        AICore \
-        Tests
+          AICore \
+          Tests
 
 CONFIG += ordered
