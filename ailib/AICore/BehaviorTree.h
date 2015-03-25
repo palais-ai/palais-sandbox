@@ -5,6 +5,7 @@
 
 #include "ai_global.h"
 #include "Scheduler.h"
+#include "Blackboard.h"
 #include <vector>
 
 BEGIN_NS_AILIB
