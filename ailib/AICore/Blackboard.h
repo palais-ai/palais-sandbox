@@ -6,6 +6,7 @@
 #include "ai_global.h"
 #include "Any.h"
 #include "btHashMap.h"
+#include <map>
 
 BEGIN_NS_AILIB
 
@@ -16,20 +17,36 @@ public:
     virtual void onValueChanged(const KEY& key, const ailib::hold_any& value) = 0;
 };
 
+
+typedef uint32_t Handle;
+const static Handle INVALID_HANDLE = 0;
+
 // A generic class to store knowledge by unique keys.
 template <typename KEY>
 class Blackboard
 {
+    typedef std::map<Handle, BlackboardListener<KEY>* > BlackboardListeners;
 public:
     typedef KEY key_type;
 
     Blackboard() :
-        mListener(NULL)
-    {}
-
-    void setListener(BlackboardListener<KEY>* listener)
+        mCount(INVALID_HANDLE)
     {
-        mListener = listener;
+        ;
+    }
+
+    // INVALID_HANLDE (= 0) is never returned.
+    Handle addListener(BlackboardListener<KEY>* listener)
+    {
+        AI_ASSERT(listener, "Tried to add NULL listener.");
+        mListeners.insert(std::make_pair(++mCount, listener));
+        return mCount;
+    }
+
+    void removeListener(Handle id)
+    {
+        size_t numRemoved = mListeners.erase(id);
+        AI_ASSERT(numRemoved == 1, "Tried to remove non-existant listener.");
     }
 
     template <typename T>
@@ -49,9 +66,10 @@ public:
         ailib::hold_any newVal(value);
         mKnowledge.insert(key, newVal);
 
-        if(mListener)
+        for(typename BlackboardListeners::iterator it = mListeners.begin();
+            it != mListeners.end(); ++it)
         {
-            mListener->onValueChanged(key, newVal);
+            it->second->onValueChanged(key, newVal);
         }
     }
 
@@ -106,7 +124,8 @@ public:
 
 private:
     btHashMap<KEY, ailib::hold_any> mKnowledge;
-    BlackboardListener<KEY>* mListener;
+    BlackboardListeners mListeners;
+    uint32_t mCount;
 };
 
 // Adapter class to enable the use of Blackboards as keys in btHashMap.

@@ -4,7 +4,7 @@
 #include "AStar.h"
 
 #include <QObject>
-#include <QScriptValue>>
+#include <QScriptValue>
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 

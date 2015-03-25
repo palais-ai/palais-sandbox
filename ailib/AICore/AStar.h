@@ -98,7 +98,7 @@ public:
                        Comparator comparator = &equalsComparator,
                        connections_type* /* out */ connections = NULL) const
     {
-        assert(start);
+        AI_ASSERT(start, "Supplied a NULL start node.");
 
         // Make sure there is enough space in the node cache to handle all nodes.
         // This is necessary if the graph has changed its size in between construction
@@ -116,7 +116,8 @@ public:
         const AStarNode* const firstNodeInfo = &mNodeInfo[0];
 
         const size_t startIdx = start - firstNode;
-        assert(startIdx < mGraph.getNumNodes());
+        AI_ASSERT(startIdx < mGraph.getNumNodes(),
+                  "The nodes are not in continguous memory.");
 
         // Add the start node to the open list.
         AStarNode* startNode = &mNodeInfo[startIdx];
@@ -129,7 +130,8 @@ public:
             AStarNode* lowestCostNode = open.top();
 
             const size_t lowestCostIdx = lowestCostNode - firstNodeInfo;
-            assert(lowestCostIdx < mGraph.getNumNodes());
+            AI_ASSERT(lowestCostIdx < mGraph.getNumNodes(),
+                   "The nodes are not in continguous memory.");
 
             const node_type* lowestCost = mGraph.getNode(lowestCostIdx);
             if(UNLIKELY(comparator(*lowestCost, goal)))
@@ -205,7 +207,8 @@ private:
 
             targetNode->parent = node;
             targetNode->connection = it - begin;
-            assert(targetNode->connection < mGraph.getNumEdges(index));
+            AI_ASSERT(targetNode->connection < mGraph.getNumEdges(index),
+                      "The nodes are not in continguous memory.");
             targetNode->currentCost = targetCost;
         }
     }
@@ -224,7 +227,8 @@ private:
         while(currentNode != startNode)
         {
             const size_t currentIdx = currentNode - firstNodeInfo;
-            assert(currentIdx < mGraph.getNumNodes());
+            AI_ASSERT(currentIdx < mGraph.getNumNodes(),
+                      "The nodes are not in continguous memory.");
 
             const node_type* current = mGraph.getNode(currentIdx);
             retVal.push_back(current);
@@ -233,7 +237,8 @@ private:
             if(connections)
             {
                 const size_t parentIdx = currentNode - firstNodeInfo;
-                assert(parentIdx < mGraph.getNumNodes());
+                AI_ASSERT(parentIdx < mGraph.getNumNodes(),
+                          "The nodes are not in continguous memory.");
                 connections->push_back(Connection::makeConnection(parentIdx,
                                                                   currentNode->connection));
             }

@@ -46,6 +46,10 @@
 
 #define UNUSED(x__) (void)( (x__) );
 
+#include <cassert>
+
+#define AI_ASSERT(x__, text__) assert((x__) && (text__))
+
 /*
 Based on boost's STATIC_ASSERT.
 

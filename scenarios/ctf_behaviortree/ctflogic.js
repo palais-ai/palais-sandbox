@@ -1,5 +1,10 @@
 require("global.js")
-require("actions.js")
+
+function shoot(actor, target) {
+	print(actor.name + " shot " + target.name + ". Bang.");
+}
+
+require("behaviors.js")
 
 Navmesh.hide()
 
@@ -22,24 +27,7 @@ function spawnFighter(startPos, teamColor, index) {
 	actor.lookAt(lookAtPos);
 	actor.setKnowledge("team_color", teamColor);
 	actor.setKnowledge("position", actor.position);
-	var otherFlag = teamColor == "red" ? flag_green.position : flag_red.position;
-	var ownFlag = teamColor == "red" ? flag_red.position : flag_green.position;
-
-	var planner = new Planner();
-	var moveToOwnFlagAction = new MoveToFlagAction(ownFlag);
-	var moveToOtherFlagAction = new MoveToFlagAction(otherFlag);
-	planner.addAction(moveToOwnFlagAction.precondition,
-				      moveToOwnFlagAction.postcondition,
-				      moveToOwnFlagAction.cost,
-				      moveToOwnFlagAction.perform);
-
-	planner.addAction(moveToOtherFlagAction.precondition,
-				      moveToOtherFlagAction.postcondition,
-				      moveToOtherFlagAction.cost,
-				      moveToOtherFlagAction.perform);
-
-	planner.makePlan(actor, {"made_points" : true});
-	pathfinding.moveActor(actor, teamColor == "red" ? flag_green.position : flag_red.position);
+	Scheduler.enqueue(constructBehaviorTreeForActor(actor));
 }
 
 function spawnTeam(teamSize, startPos) {
@@ -73,9 +61,5 @@ function onStart() {
 }
 
 function update(deltaTime) {
-	;
-}
-
-function shoot(actor, target) {
 	;
 }

@@ -31,7 +31,7 @@ public:
     // __terminate__ should be called by parent nodes that
     // forcefully remove this behavior from the scheduler.
     virtual void terminate();
-protected:
+
     void notifySuccess();
     void notifyFailure();
     void notifyReset();
@@ -132,6 +132,7 @@ public:
     const Behavior* getChild() const;
 protected:
     void scheduleBehavior();
+    void terminateChild();
 private:
     Scheduler& mScheduler;
     Behavior* const mChild;

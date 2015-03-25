@@ -1,9 +1,10 @@
-#ifndef AILIBPLUGIN_H
-#define AILIBPLUGIN_H
+#ifndef BEHAVIORPLUGIN_H
+#define BEHAVIORPLUGIN_H
 
 #include <QObject>
 #include "PluginInterface.h"
 #include "Scheduler.h"
+#include "BehaviorPrototypes.h"
 
 class BehaviorPlugin : public QObject, public Plugin
 {
@@ -21,6 +22,7 @@ public:
 
 private:
     ailib::Scheduler mScheduler;
+    SchedulerPrototype mSchedulerWrapper;
 };
 
-#endif // AILIBPLUGIN_H
+#endif // BEHAVIORPLUGIN_H

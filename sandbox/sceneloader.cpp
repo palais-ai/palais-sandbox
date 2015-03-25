@@ -107,5 +107,7 @@ void SceneLoader::loadSceneLogic(Scene* scene,
 
     engine.evaluate(QScriptProgram(QString(ba), logicFile));
 
-    JavaScriptBindings::checkScriptEngineException(engine, "Script evaluation");
+    JavaScriptBindings::checkScriptEngineException(engine,
+                                                   QString("Script evaluation (%1)").arg(logicFile)
+                                                   );
 }

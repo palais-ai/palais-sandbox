@@ -11,6 +11,8 @@ TARGET = plugin_behaviortree
 TEMPLATE = lib
 CONFIG += plugin
 
+# QMAKE_CXXFLAGS += -save-temps
+
 UI_DIR = ./.ui
 OBJECTS_DIR = ./.obj
 MOC_DIR = ./.moc
@@ -19,11 +21,13 @@ QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
 
 SOURCES += \
     Behavior.cpp \
-    BehaviorPlugin.cpp
+    BehaviorPlugin.cpp \
+    BehaviorPrototypes.cpp
 
 HEADERS += \
     Behavior.h \
-    BehaviorPlugin.h
+    BehaviorPlugin.h \
+    BehaviorPrototypes.h
 
 include(../linkOgreSDK.pri)
 

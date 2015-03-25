@@ -372,7 +372,7 @@ Decorator::Decorator(Scheduler& scheduler, Behavior* child) :
 
 void Decorator::terminate()
 {
-    mChild->terminate();
+    terminateChild();
     Behavior::terminate();
 }
 
@@ -402,6 +402,11 @@ const Behavior* Decorator::getChild() const
 void Decorator::scheduleBehavior()
 {
     mScheduler.enqueue(mChild);
+}
+
+void Decorator::terminateChild()
+{
+    mChild->terminate();
 }
 
 END_NS_AILIB

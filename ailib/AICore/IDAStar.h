@@ -31,8 +31,8 @@ public:
                        Heuristic heuristic,
                        uint32_t maxDepth) const
     {
-        assert(start);
-        assert(goal);
+        AI_ASSERT(start, "Supplied a NULL start node.");
+        AI_ASSERT(goal, "Supplied a NULL goal node.");
 
         real_type estimate = heuristic(*start, *goal);
 
@@ -83,7 +83,8 @@ private:
 
         const node_type* const firstNode = mGraph.getNodesBegin();
         const size_t nodeIdx = node - firstNode;
-        assert(nodeIdx < mGraph.getNumNodes());
+        AI_ASSERT(nodeIdx < mGraph.getNumNodes(),
+                  "The nodes are not in continguous memory.");
 
         real_type min = std::numeric_limits<real_type>::max();
         const Edge* const end = mGraph.getSuccessorsEnd(nodeIdx);
