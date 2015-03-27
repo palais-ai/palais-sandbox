@@ -243,7 +243,7 @@ Planner::findPlan(const QVariantMap& startState,
 void Planner::makePlan(Actor* actor,
                        const planner_state_type& endState)
 {
-    QVariantMap knowledge = actor->getKnowledge();
+    const QVariantMap& knowledge = actor->getKnowledge();
 
     bool isAlreadyThere;
     ailib::AStar<planner_type::graph_type>::connections_type connections;

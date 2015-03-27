@@ -6,7 +6,6 @@
 #include "ai_global.h"
 #include "graph.h"
 #include <cstring>
-#include <cassert>
 #include <algorithm>
 #include <queue>
 
@@ -168,7 +167,8 @@ private:
         for(const edge_type* it = begin; it != end; ++it)
         {
             const size_t targetIdx = it->targetIndex;
-            assert(targetIdx < mGraph.getNumNodes());
+            AI_ASSERT(targetIdx < mGraph.getNumNodes(),
+                      "The nodes are not in continguous memory.");
 
             real_type targetCost = node->currentCost + it->cost;
             real_type heuristicValue = 0.;

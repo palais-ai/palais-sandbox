@@ -26,13 +26,14 @@ private:
 class BehaviorPrototype : public QObject, public QScriptable
 {
     Q_OBJECT
-    Q_PROPERTY(QVariantMap blackboard READ getBlackboard)
+    Q_PROPERTY(const QVariantMap* userData READ getUserData)
 public:
     explicit BehaviorPrototype(QObject* parent = NULL);
 
-    QVariantMap getBlackboard() const;
-
+    Q_INVOKABLE void setUserData(QVariantMap* data);
+    Q_INVOKABLE const QVariantMap* getUserData() const;
     Q_INVOKABLE void setStatus(Status status);
+    Q_INVOKABLE Status getStatus() const;
     Q_INVOKABLE void notifySuccess();
     Q_INVOKABLE void notifyFailure();
     Q_INVOKABLE void notifyReset();

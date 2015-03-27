@@ -1,6 +1,7 @@
 #include "BehaviorPrototypes.h"
 #include <QScriptEngine>
 #include <QDebug>
+#include "javascriptbindings.h"
 
 using namespace ailib;
 
@@ -18,8 +19,9 @@ void ScriptBehavior::run()
     QScriptValue runVal = mScript.property("run");
     if(runVal.isFunction())
     {
-        // FIXME: Add exception check.
         runVal.call();
+        JavaScriptBindings::checkScriptEngineException(*runVal.engine(),
+                                                       "ScriptBehavior.run");
     }
     else
     {
@@ -33,8 +35,9 @@ void ScriptBehavior::terminate()
     QScriptValue terminateVal = mScript.property("terminate");
     if(terminateVal.isFunction())
     {
-        // FIXME: Add exception check.
         terminateVal.call();
+        JavaScriptBindings::checkScriptEngineException(*terminateVal.engine(),
+                                                       "ScriptBehavior.terminate");
     }
     else
     {
@@ -44,38 +47,65 @@ void ScriptBehavior::terminate()
     Behavior::terminate();
 }
 
+FORCE_INLINE static Behavior* extractBehavior(const QScriptValue& value)
+{
+    return qscriptvalue_cast<QSharedPointer<Behavior> >(value.data()).data();
+}
+
 BehaviorPrototype::BehaviorPrototype(QObject* parent) :
     QObject(parent)
 {
     ;
 }
 
-QVariantMap BehaviorPrototype::getBlackboard() const
+void BehaviorPrototype::setUserData(QVariantMap* data)
 {
-    return QVariantMap();
+    Behavior* behavior = extractBehavior(thisObject());
+    behavior->setUserData(hold_any(data));
+}
+
+const QVariantMap* BehaviorPrototype::getUserData() const
+{
+    Behavior* behavior = extractBehavior(thisObject());
+
+    try
+    {
+        return any_cast<QVariantMap*>(behavior->getUserData());
+    }
+    catch(const bad_any_cast& ex)
+    {
+        UNUSED(ex);
+        return NULL;
+    }
 }
 
 void BehaviorPrototype::setStatus(Status status)
 {
-    Behavior* behavior = qscriptvalue_cast<QSharedPointer<Behavior> >(thisObject().data()).data();
+    Behavior* behavior = extractBehavior(thisObject());
     behavior->setStatus(status);
+}
+
+Status BehaviorPrototype::getStatus() const
+{
+    Behavior* behavior = extractBehavior(thisObject());
+    return behavior->getStatus();
 }
 
 void BehaviorPrototype::notifySuccess()
 {
-    Behavior* behavior = qscriptvalue_cast<QSharedPointer<Behavior> >(thisObject().data()).data();
+    Behavior* behavior = extractBehavior(thisObject());
     behavior->notifySuccess();
 }
 
 void BehaviorPrototype::notifyFailure()
 {
-    Behavior* behavior = qscriptvalue_cast<QSharedPointer<Behavior> >(thisObject().data()).data();
+    Behavior* behavior = extractBehavior(thisObject());
     behavior->notifyFailure();
 }
 
 void BehaviorPrototype::notifyReset()
 {
-    Behavior* behavior = qscriptvalue_cast<QSharedPointer<Behavior> >(thisObject().data()).data();
+    Behavior* behavior = extractBehavior(thisObject());
     behavior->notifyReset();
 }
 
@@ -88,13 +118,13 @@ SchedulerPrototype::SchedulerPrototype(QObject* parent) :
 void SchedulerPrototype::enqueue(QScriptValue behaviorValue)
 {
     Scheduler* sched = qscriptvalue_cast<Scheduler*>(thisObject());
-    Behavior* behavior = qscriptvalue_cast<QSharedPointer<Behavior> >(behaviorValue.data()).data();
+    Behavior* behavior = extractBehavior(behaviorValue);
     sched->enqueue(behavior);
 }
 
 void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
 {
     Scheduler* sched = qscriptvalue_cast<Scheduler*>(thisObject());
-    Behavior* behavior = qscriptvalue_cast<QSharedPointer<Behavior> >(behaviorValue.data()).data();
+    Behavior* behavior = extractBehavior(behaviorValue);
     sched->dequeue(behavior);
 }

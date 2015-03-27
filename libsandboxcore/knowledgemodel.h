@@ -8,11 +8,11 @@
 class DLL_EXPORT KnowledgeModel : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QVariantMap knowledge READ getKnowledge)
+    Q_PROPERTY(const QVariantMap& knowledge READ getKnowledge)
 public:
     KnowledgeModel();
 
-    QVariantMap getKnowledge() const;
+    const QVariantMap& getKnowledge() const;
     Q_INVOKABLE bool hasKnowledge(const QString& key) const;
     Q_INVOKABLE QVariant getKnowledge(const QString& key) const;
     Q_INVOKABLE void setKnowledge(const QString& key, const QVariant& value);

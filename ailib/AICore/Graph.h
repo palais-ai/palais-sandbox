@@ -6,7 +6,6 @@
 #include "ai_global.h"
 #include <stdint.h>
 #include <vector>
-#include <cassert>
 
 BEGIN_NS_AILIB
 
@@ -79,7 +78,8 @@ public:
 
     FORCE_INLINE void addEdge(const edge_type& edge)
     {
-        assert(mNumEdges <= MAX_EDGES);
+        AI_ASSERT(mNumEdges <= MAX_EDGES,
+                  "This node can only have __MAX_EDGES__ edges.");
 
         mEdges[mNumEdges++] = edge;
     }

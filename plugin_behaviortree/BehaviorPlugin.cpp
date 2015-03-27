@@ -14,6 +14,7 @@ BehaviorPlugin::BehaviorPlugin(QObject *parent) :
 void BehaviorPlugin::onLoad(const PluginInterface& interface)
 {
     Q_UNUSED(interface);
+    qRegisterMetaType<Status>("Status");
 }
 
 void BehaviorPlugin::onUnload(const PluginInterface& interface)

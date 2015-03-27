@@ -3,7 +3,6 @@
 #include "HighResolutionTime.h"
 #include <algorithm>
 #include <queue>
-#include <cassert>
 #include <iostream>
 #include <typeinfo>
 
@@ -22,7 +21,7 @@ void Scheduler::clear()
 
 void Scheduler::enqueue(Task* task)
 {
-    assert(task);
+    AI_ASSERT(task, "Enqueued tasks may not be NULL.");
 
 #if PRINT_STATES
     std::cout << "Adding " << typeid(*task).name() << "." << std::endl;
@@ -42,7 +41,7 @@ void Scheduler::enqueue(Task* task)
 
 void Scheduler::dequeue(Task* task)
 {
-    assert(task);
+    AI_ASSERT(task, "Dequeued tasks may not be NULL.");
 
 #if PRINT_STATES
     std::cout << "Removing " << typeid(*task).name() << "." << std::endl;

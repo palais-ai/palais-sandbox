@@ -1,13 +1,13 @@
 require("global.js")
 
-function getOwnFlag(blackboard)
+function getOwnFlag(userData)
 {
-	return blackboard["team_color"] === "red" ? flag_red : flag_green;
+	return userData["team_color"] === "red" ? flag_red : flag_green;
 }
 
-function getOpponentFlag(blackboard)
+function getOpponentFlag(userData)
 {
-	return blackboard["team_color"] === "green" ? flag_red : flag_green;
+	return userData["team_color"] === "green" ? flag_red : flag_green;
 }
 
 function MoveTo(goal)
@@ -20,28 +20,28 @@ MoveTo.prototype =
 {
 	run: function()
 	{
-		pathfinding.moveActor(this.blackboard["self"], this.goal, this.notifySuccess);
-		setStatus(Behavior.StatusWaiting);
+		print('moving');
+		pathfinding.moveActor(this.userData["self"], this.goal, this.notifySuccess);
+		setStatus(StatusWaiting);
 	}
 }
-
 extend(Behavior, MoveTo)
 
-function HasFlag(child)
+function HasFlag(child, actor)
 {
-	BlackboardDecorator.call(this, child, "has_flag");
+	BlackboardDecorator.call(this, child, actor, "has_flag");
 }
 extend(BlackboardDecorator, HasFlag)
 
-function TeamHasFlag(child)
+function TeamHasFlag(child, actor)
 {
-	BlackboardDecorator.call(this, child, "team_has_flag");
+	BlackboardDecorator.call(this, child, actor, "team_has_flag");
 }
 extend(BlackboardDecorator, TeamHasFlag)
 
-function EnemyInRange(child)
+function EnemyInRange(child, actor)
 {
-	BlackboardDecorator.call(this, child, "enemy_in_range");
+	BlackboardDecorator.call(this, child, actor, "enemy_in_range");
 }
 extend(BlackboardDecorator, EnemyInRange)
 
@@ -54,12 +54,12 @@ Shoot.prototype =
 {
 	onShootResult: function()
 	{
-		setStatus(Behavior.StatusRunning);
+		setStatus(StatusRunning);
 	},
 	run: function()
 	{
-		//shoot(blackboard["self"], blackboard["nearest_enemy"], onShootResult)
-		setStatus(Behavior.StatusWaiting);
+		//shoot(userData["self"], userData["nearest_enemy"], onShootResult)
+		setStatus(StatusWaiting);
 		// We don't need to notify the parent of success or failure here,
 		// because the decorator will prevent any further shooting by resetting the tree
 		// once no more targets are available.
@@ -76,22 +76,22 @@ GuardCarrier.prototype =
 {
 	runAgain: function()
 	{
-		setStatus(Behavior.StatusRunning);
+		setStatus(StatusRunning);
 	},
 	run: function()
 	{
-		var carrier = blackboard["flag_carrier"];
-		var self    = blackboard["self"];
+		var carrier = userData["flag_carrier"];
+		var self    = userData["self"];
 
 		if(self.position.distanceTo(carrier.position) > 0.1)
 		{
-			pathfinding.moveActor(this.blackboard["self"], this.goal, this.runAgain);
+			pathfinding.moveActor(this.userData["self"], this.goal, this.runAgain);
 		}
 		else
 		{
 			setTimeout(500, this.runAgain);
 		}
-		setStatus(Behavior.StatusWaiting);
+		setStatus(StatusWaiting);
 		// As was the case above, the decorator will cancel this behavior once it is no longer feasible.
 	}
 }
@@ -99,9 +99,12 @@ extend(Behavior, GuardCarrier)
 
 function constructBehaviorTreeForActor(actor)
 {
-	var root = new Sequence(new HasFlag(new MoveTo(getOwnFlag(actor.knowledge).position)), 
-					        new EnemyInRange(new Shoot()), 
-					       	new TeamHasFlag(new GuardCarrier()), 
+	var root = new Sequence(new HasFlag(new MoveTo(getOwnFlag(actor.knowledge).position), actor), 
+					        new EnemyInRange(new Shoot(), actor), 
+					       	new TeamHasFlag(new GuardCarrier(), actor), 
 					       	new MoveTo(getOpponentFlag(actor.knowledge).position));
+
+	actor.setKnowledge("self", actor);
+	root.setUserData(actor.knowledge);
 	return root;
 }

@@ -10,20 +10,24 @@
 
 using namespace ailib;
 
-class BlackboardDecorator : public Decorator, public BlackboardListener<btHashString>
+class Actor;
+
+class BlackboardDecorator : public QObject, public Decorator
 {
+    Q_OBJECT
 public:
     BlackboardDecorator(Scheduler& scheduler,
                         Behavior* child,
+                        Actor* actor,
                         QString observedValue);
 
-    virtual void onValueChanged(const btHashString& key, const hold_any& value);
     virtual void run();
     virtual void terminate();
+public slots:
+    void onKnowledgeChanged(const QString& key, const QVariant& knowledge);
 private:
+    Actor* mActor;
     QString mObservedValue;
-    Blackboard<btHashString> mBlackboard;
-    uint32_t mListenerHandle;
 };
 
 void behavior_tree_register_prototypes(QScriptEngine& engine);

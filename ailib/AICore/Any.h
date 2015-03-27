@@ -25,6 +25,7 @@ template<class T> struct remove_reference<T&&>
 namespace detail
 {
 //
+// 03/26/2015 PS: Removed streaming operator support.
 // 03/16/2015 PS: Added support for comparison operators (operator==, operator!=).
 //
 // CREDITS: Based on: boost::detail::sp_typeinfo
@@ -109,7 +110,6 @@ END_NS_AILIB
 #include <stdexcept>
 #include <algorithm>
 #include <iosfwd>
-#include <cassert>
 
 BEGIN_NS_AILIB
 
@@ -193,8 +193,6 @@ typedef bool_<false> false_;
             void (*destruct)(void**);
             void (*clone)(void* const*, void**);
             void (*move)(void* const*, void**);
-            std::basic_istream<Char>& (*stream_in)(std::basic_istream<Char>&, void**);
-            std::basic_ostream<Char>& (*stream_out)(std::basic_ostream<Char>&, void* const*);
             bool (*equals)(void* const*, void* const*);
         };
 
@@ -229,18 +227,6 @@ typedef bool_<false> false_;
                     reinterpret_cast<T*>(dest)->~T();
                     *reinterpret_cast<T*>(dest) =
                         *reinterpret_cast<T const*>(src);
-                }
-                static std::basic_istream<Char>&
-                stream_in (std::basic_istream<Char>& i, void** obj)
-                {
-                    i >> *reinterpret_cast<T*>(obj);
-                    return i;
-                }
-                static std::basic_ostream<Char>&
-                stream_out(std::basic_ostream<Char>& o, void* const* obj)
-                {
-                    o << *reinterpret_cast<T const*>(obj);
-                    return o;
                 }
                 static bool equals(void* const* lv, void* const* rv)
                 {
@@ -280,18 +266,6 @@ typedef bool_<false> false_;
                     **reinterpret_cast<T**>(dest) =
                         **reinterpret_cast<T* const*>(src);
                 }
-                static std::basic_istream<Char>&
-                stream_in(std::basic_istream<Char>& i, void** obj)
-                {
-                    i >> **reinterpret_cast<T**>(obj);
-                    return i;
-                }
-                static std::basic_ostream<Char>&
-                stream_out(std::basic_ostream<Char>& o, void* const* obj)
-                {
-                    o << **reinterpret_cast<T* const*>(obj);
-                    return o;
-                }
                 static bool equals(void* const* lv, void* const* rv)
                 {
                     return **reinterpret_cast<T* const*>(lv) == **reinterpret_cast<T* const*>(rv);
@@ -314,8 +288,6 @@ typedef bool_<false> false_;
                     fxns<is_small>::template type<T, Char>::destruct,
                     fxns<is_small>::template type<T, Char>::clone,
                     fxns<is_small>::template type<T, Char>::move,
-                    fxns<is_small>::template type<T, Char>::stream_in,
-                    fxns<is_small>::template type<T, Char>::stream_out,
                     fxns<is_small>::template type<T, Char>::equals
                 };
                 return &static_table;
@@ -332,31 +304,6 @@ typedef bool_<false> false_;
         };
 
         typedef ailib::detail::empty local_empty;
-
-        template <typename Char>
-        inline std::basic_istream<Char>&
-        operator>> (std::basic_istream<Char>& i, empty&)
-        {
-            // If this assertion fires you tried to insert from a std istream
-            // into an empty hold_any instance. This simply can't work, because
-            // there is no way to figure out what type to extract from the
-            // stream.
-            // The only way to make this work is to assign an arbitrary
-            // value of the required type to the hold_any instance you want to
-            // stream to. This assignment has to be executed before the actual
-            // call to the operator>>().
-            assert(false &&
-                "Tried to insert from a std istream into an empty "
-                "hold_any instance");
-            return i;
-        }
-
-        template <typename Char>
-        inline std::basic_ostream<Char>&
-        operator<< (std::basic_ostream<Char>& o, empty const&)
-        {
-            return o;
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -492,24 +439,6 @@ typedef bool_<false> false_;
                 table = ailib::detail::get_table<detail::local_empty>::template get<Char>();
                 object = 0;
             }
-        }
-
-    // these functions have been added in the assumption that the embedded
-    // type has a corresponding operator defined, which is completely safe
-    // because spirit::hold_any is used only in contexts where these operators
-    // do exist
-        template <typename Char_>
-        friend inline std::basic_istream<Char_>&
-        operator>> (std::basic_istream<Char_>& i, basic_hold_any<Char_>& obj)
-        {
-            return obj.table->stream_in(i, &obj.object);
-        }
-
-        template <typename Char_>
-        friend inline std::basic_ostream<Char_>&
-        operator<< (std::basic_ostream<Char_>& o, basic_hold_any<Char_> const& obj)
-        {
-            return obj.table->stream_out(o, &obj.object);
         }
 
         template <typename Char_>

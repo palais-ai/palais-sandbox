@@ -378,7 +378,8 @@ Actor* Scene::addActor(Ogre::SceneNode* node)
     connect(newActor, &Actor::visibilityChanged,
             this, &Scene::onActorVisibilityChanged);
 
-    mDynamics.addPhysicsBody(newActor->getSceneNode());
+    // FIXME: Integrate physics properly.
+    //mDynamics.addPhysicsBody(newActor->getSceneNode());
     JavaScriptBindings::addActorBinding(newActor, mLogicScript);
 
     emit actorAdded(name);

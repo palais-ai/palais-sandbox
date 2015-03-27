@@ -5,7 +5,7 @@
 
 #include "ai_global.h"
 #include "Scheduler.h"
-#include "Blackboard.h"
+#include "Any.h"
 #include <vector>
 
 BEGIN_NS_AILIB
@@ -36,8 +36,12 @@ public:
     void notifySuccess();
     void notifyFailure();
     void notifyReset();
+
+    virtual void setUserData(const hold_any& data);
+    hold_any& getUserData();
 private:
     BehaviorListener* mListener;
+    hold_any mUserData;
 };
 
 class Composite : public Behavior, public BehaviorListener
@@ -48,6 +52,7 @@ public:
     Composite(Scheduler& scheduler, const BehaviorList& children);
 
     const BehaviorList& getChildren() const;
+    virtual void setUserData(const hold_any& data);
 private:
     BehaviorList mChildren;
 protected:
@@ -129,6 +134,7 @@ public:
     virtual void onSuccess(Behavior* behavior);
     virtual void onFailure(Behavior* behavior);
     virtual void onReset(Behavior* behavior);
+    virtual void setUserData(const hold_any &data);
 
     const Behavior* getChild() const;
 protected:

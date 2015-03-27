@@ -10,34 +10,23 @@ Q_DECLARE_METATYPE(Scheduler*)
 
 BlackboardDecorator::BlackboardDecorator(Scheduler& scheduler,
                                          Behavior* child,
+                                         Actor* actor,
                                          QString observedValue) :
     Decorator(scheduler, child),
-    mObservedValue(observedValue),
-    mListenerHandle(0)
+    mActor(actor),
+    mObservedValue(observedValue)
 {
-    ;
-}
-
-void BlackboardDecorator::onValueChanged(const btHashString& key, const ailib::hold_any& value)
-{
-    UNUSED(value);
-
-    if(getStatus() == StatusWaiting)
-    {
-        terminateChild();
-    }
-
-    if(key.equals(mObservedValue.toLocal8Bit().constData()))
-    {
-        run();
-    }
+    AI_ASSERT(actor, "Actor mustn't be NULL.");
 }
 
 void BlackboardDecorator::run()
 {
-    mListenerHandle = mBlackboard.addListener(this);
+    connect(mActor, &KnowledgeModel::knowledgeChanged,
+            this, &BlackboardDecorator::onKnowledgeChanged);
 
-    if(mBlackboard.get<bool>(mObservedValue.toLocal8Bit().constData()))
+    QVariantMap& state = *any_cast<QVariantMap*>(getUserData());
+    QVariantMap::iterator it = state.find(mObservedValue);
+    if(it != state.end() && it.value().toBool())
     {
         scheduleBehavior();
         setStatus(StatusWaiting);
@@ -50,7 +39,22 @@ void BlackboardDecorator::run()
 
 void BlackboardDecorator::terminate()
 {
-    mBlackboard.removeListener(mListenerHandle);
+    disconnect(mActor, &KnowledgeModel::knowledgeChanged,
+               this, &BlackboardDecorator::onKnowledgeChanged);
+}
+
+void BlackboardDecorator::onKnowledgeChanged(const QString& key, const QVariant& knowledge)
+{
+    UNUSED(knowledge);
+    if(getStatus() == StatusWaiting)
+    {
+        terminateChild();
+    }
+
+    if(key == mObservedValue)
+    {
+        run();
+    }
 }
 
 void behavior_tree_register_prototypes(QScriptEngine& engine)
@@ -58,23 +62,38 @@ void behavior_tree_register_prototypes(QScriptEngine& engine)
     Behavior_register_prototype(engine);
 }
 
+static void registerConstructorAndPrototype(QScriptEngine& engine,
+                                            const QString& name,
+                                            QScriptEngine::FunctionSignature constructorFun,
+                                            const QScriptValue& prototype)
+{
+    QScriptValue ctor = prototype.engine()->newFunction(constructorFun);
+    ctor.setPrototype(prototype);
+    prototype.engine()->globalObject().setProperty(name, ctor);
+}
+
 void Behavior_register_prototype(QScriptEngine& engine)
 {
     const int typeId = qRegisterMetaType<Behavior*>("Behavior*");
 
-    BehaviorPrototype bp;
-    engine.setDefaultPrototype(typeId, engine.newQObject(&bp));
+    static BehaviorPrototype bp;
+    QScriptValue prototype = engine.newQObject(&bp);
+    engine.setDefaultPrototype(typeId, prototype);
 
-    engine.globalObject().setProperty("Behavior",
-                                      engine.newFunction(Behavior_prototype_ctor));
-    engine.globalObject().setProperty("Sequence",
-                                      engine.newFunction(composite_prototype_ctor<Sequence>));
-    engine.globalObject().setProperty("Selector",
-                                      engine.newFunction(composite_prototype_ctor<Selector>));
-    engine.globalObject().setProperty("Parallel",
-                                      engine.newFunction(composite_prototype_ctor<Parallel>));
-    engine.globalObject().setProperty("BlackboardDecorator",
-                                      engine.newFunction(BlackboardDecorator_prototype_ctor));
+    QMap<QString, QScriptEngine::FunctionSignature> ctors;
+    ctors["Behavior"] = Behavior_prototype_ctor;
+    ctors["Sequence"] = composite_prototype_ctor<Sequence>;
+    ctors["Selector"] = composite_prototype_ctor<Selector>;
+    ctors["Parallel"] = composite_prototype_ctor<Parallel>;
+    ctors["BlackboardDecorator"] = BlackboardDecorator_prototype_ctor;
+
+    for(QMap<QString, QScriptEngine::FunctionSignature>::iterator it = ctors.begin();
+        it != ctors.end(); ++it)
+    {
+        QScriptValue ctor = engine.newFunction(it.value());
+        ctor.setProperty("prototype", prototype);
+        engine.globalObject().setProperty(it.key(), ctor);
+    }
 }
 
 QScriptValue Behavior_prototype_ctor(QScriptContext *context, QScriptEngine *engine)
@@ -96,9 +115,11 @@ QScriptValue construct_shared_behavior(QScriptContext* context,
 
 QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScriptEngine *engine)
 {
+    static const int numArgsExpected = 3;
     Behavior* child = NULL;
+    Actor*    actor = NULL;
     QString observedName;
-    if(context->argumentCount() >= 2)
+    if(context->argumentCount() >= numArgsExpected)
     {
         {
             QScriptValue originalArg = context->argument(0);
@@ -116,9 +137,19 @@ QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScript
 
         {
             QScriptValue arg = context->argument(1);
+            actor = qscriptvalue_cast<Actor*>(arg);
+            if(!actor)
+            {
+                QString msg("BlackboardDecorator.prototype.ctor: Argument 2 must be an Actor.");
+                return context->throwError(QScriptContext::TypeError, msg);
+            }
+        }
+
+        {
+            QScriptValue arg = context->argument(2);
             if(!arg.isString())
             {
-                QString msg("BlackboardDecorator.prototype.ctor: Argument 2 must be a string.");
+                QString msg("BlackboardDecorator.prototype.ctor: Argument 3 must be a string.");
                 return context->throwError(QScriptContext::TypeError, msg);
             }
             observedName = arg.toString();
@@ -126,16 +157,19 @@ QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScript
     }
     else
     {
-        QString msg("BlackboardDecorator.prototype.ctor: You must supply at least 2 arguments.");
+        QString msg;
+        msg = QString("BlackboardDecorator.prototype.ctor: You must supply at least %1 arguments.")
+                      .arg(numArgsExpected);
         return context->throwError(QScriptContext::TypeError,
                                    msg);
     }
 
     Scheduler* scheduler = qscriptvalue_cast<Scheduler*>(engine->globalObject()
                                                                .property("Scheduler"));
-    AI_ASSERT(scheduler, "A Scheduler must be exist in the global object.");
+    AI_ASSERT(scheduler, "A Scheduler must exist in the global object.");
 
     return construct_shared_behavior(context, engine, new BlackboardDecorator(*scheduler,
                                                                               child,
+                                                                              actor,
                                                                               observedName));
 }

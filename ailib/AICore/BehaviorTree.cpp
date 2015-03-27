@@ -1,6 +1,5 @@
 #include "BehaviorTree.h"
 #include <stdint.h>
-#include <cassert>
 #include <cstring>
 #include <limits>
 #include <algorithm>
@@ -59,6 +58,16 @@ void Behavior::notifyReset()
     }
 }
 
+void Behavior::setUserData(const hold_any& data)
+{
+    mUserData = data;
+}
+
+hold_any& Behavior::getUserData()
+{
+    return mUserData;
+}
+
 Composite::Composite(Scheduler& scheduler,
                      const Composite::BehaviorList& children) :
     mChildren(children),
@@ -67,6 +76,7 @@ Composite::Composite(Scheduler& scheduler,
     for(Composite::BehaviorList::iterator it = mChildren.begin();
         it != mChildren.end(); ++it)
     {
+        // Composites listen to their children's result codes
         (*it)->setListener(this);
     }
 }
@@ -76,12 +86,24 @@ const Composite::BehaviorList& Composite::getChildren() const
     return mChildren;
 }
 
+void Composite::setUserData(const hold_any& data)
+{
+    Behavior::setUserData(data);
+    for(Composite::BehaviorList::iterator it = mChildren.begin();
+        it != mChildren.end(); ++it)
+    {
+        // Pass on tge data to all child nodes.
+        (*it)->setUserData(getUserData());
+    }
+}
+
 uint32_t Composite::indexOf(const Behavior* child) const
 {
     BehaviorList::const_iterator it = std::find(getChildren().begin(),
                                                 getChildren().end(),
                                                 child);
-    assert(it != getChildren().end());
+    AI_ASSERT(it != getChildren().end(),
+              "Tried to obtain index of inexistant child.");
     return it - getChildren().begin();
 }
 
@@ -117,7 +139,8 @@ void SequentialComposite::terminate()
 void SequentialComposite::onReset(Behavior* behavior)
 {
     const uint32_t idx = indexOf(behavior);
-    assert(idx < mCurrentBehavior);
+    AI_ASSERT(idx < mCurrentBehavior,
+              "A behavior running after the current behavior should not be reseting this node.");
 
     // Terminate all behaviors following this one.
     terminateFromIndex(idx+1);
@@ -131,8 +154,8 @@ bool SequentialComposite::indexIsCurrent(uint32_t idx) const
 
 bool SequentialComposite::currentIsLastBehavior() const
 {
-    // Ensure no overflow for signed / unsigned comparison.
-    assert(getChildren().size() <= static_cast<size_t>(std::numeric_limits<int32_t>::max()));
+    AI_ASSERT(getChildren().size() <= static_cast<size_t>(std::numeric_limits<int32_t>::max()),
+              "This node parents too many children for the counter variable - integer overflow.");
     return mCurrentBehavior + 1 == static_cast<int32_t>(getChildren().size());
 }
 
@@ -143,7 +166,8 @@ void SequentialComposite::scheduleNextBehavior()
 
 void SequentialComposite::terminateFromIndex(uint32_t idx)
 {
-    assert(idx <= mCurrentBehavior);
+    AI_ASSERT(idx <= mCurrentBehavior,
+              "A behavior running after the current behavior should not be terminating.");
     // Terminate all behaviors following (including) __idx__.
     for(uint32_t i = idx; i <= mCurrentBehavior; ++i)
     {
@@ -230,7 +254,8 @@ Parallel::Parallel(Scheduler& scheduler,
     Composite(scheduler, children)
 {
     // The return code state array limits the maximum number of children for parallel tasks.
-    assert(children.size() <= sMaxChildCount);
+    AI_ASSERT(children.size() <= sMaxChildCount,
+              "A parallel node can't run more than __sMaxChildCount__ parallel tasks.");
     resetCodes();
 }
 
@@ -366,7 +391,7 @@ Decorator::Decorator(Scheduler& scheduler, Behavior* child) :
     mChild(child)
 {
     UNUSED(mScheduler);
-    assert(mChild);
+    AI_ASSERT(mChild, "Child mustn't be NULL.");
     mChild->setListener(this);
 }
 
@@ -392,6 +417,12 @@ void Decorator::onReset(Behavior* behavior)
 {
     UNUSED(behavior);
     notifyReset();
+}
+
+void Decorator::setUserData(const hold_any &data)
+{
+    Behavior::setUserData(data);
+    mChild->setUserData(data);
 }
 
 const Behavior* Decorator::getChild() const
