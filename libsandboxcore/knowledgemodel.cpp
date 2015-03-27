@@ -37,6 +37,11 @@ void KnowledgeModel::setKnowledge(const QString& key, const QVariant& value)
     }
 }
 
+QVariantMap* KnowledgeModel::getKnowledgePtr()
+{
+    return &mKnowledge;
+}
+
 const QVariantMap& KnowledgeModel::getKnowledge() const
 {
     return mKnowledge;

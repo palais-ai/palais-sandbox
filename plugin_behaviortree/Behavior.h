@@ -31,6 +31,7 @@ private:
 };
 
 void behavior_tree_register_prototypes(QScriptEngine& engine);
+void Status_register(QScriptEngine& engine);
 void Behavior_register_prototype(QScriptEngine& engine);
 
 QScriptValue Behavior_prototype_ctor(QScriptContext *context, QScriptEngine *engine);

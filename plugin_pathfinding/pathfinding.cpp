@@ -95,7 +95,6 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
             else
             {
                 actor.removeKnowledge("movement_target");
-                actor.disableAnimation("my_animation");
 
                 if(actor.hasKnowledge("goal_reached_callback"))
                 {

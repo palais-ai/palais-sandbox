@@ -57,6 +57,7 @@ void Scheduler::dequeue(Task* task)
     }
     else
     {
+        // FIXME: This should be an ASSERT.
         puts("Only waiting or running tasks may be removed.");
     }
 }
@@ -91,42 +92,30 @@ void Scheduler::update(HighResolutionTime::Timestamp maxRuntime, float dt)
         std::cout << "Running " << typeid(*current).name() << "." << std::endl;
 #endif
 
-        switch(current->getStatus())
+        AI_ASSERT(current->getStatus() == StatusRunning,
+                  "All tasks in the task queue must be running.");
+
+        dequeue(current);
+
+        // Execute the current task.
+        current->run();
+
+        Timestamp duration = now() - start;
+        currentRuntime += duration;
+
+        // Add the granted computation time to the tasks runtime if it isn't done yet.
+        if(current->getStatus() == StatusRunning ||
+           current->getStatus() == StatusWaiting)
         {
-            case StatusRunning:
-            {
-                dequeue(current);
-
-                // Execute the current task.
-                current->run();
-
-                Timestamp duration = now() - start;
-                currentRuntime += duration;
-
-                // Add the granted computation time to the tasks runtime if it isn't done yet.
-                if(current->getStatus() == StatusRunning ||
-                   current->getStatus() == StatusWaiting)
-                {
-                    // Re-insert it at the appropiate position in the task queue
-                    current->addRuntime(duration);
-                    enqueue(current);
-                }
+            // Re-insert it at the appropiate position in the task queue
+            current->addRuntime(duration);
+            enqueue(current);
+        }
 
 #if PRINT_STATES
-                printTasks(mTasks);
-                printTasks(mWaiting);
+        printTasks(mTasks);
+        printTasks(mWaiting);
 #endif
-            }
-            break;
-        case StatusWaiting:
-            break;
-        case StatusDormant:
-        default:
-            // Remove finished and unknwon status tasks.
-            // The queue should only contain running and waiting tasks.
-            dequeue(current);
-            break;
-        }
     }
 }
 

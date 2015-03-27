@@ -59,17 +59,32 @@ void BlackboardDecorator::onKnowledgeChanged(const QString& key, const QVariant&
 
 void behavior_tree_register_prototypes(QScriptEngine& engine)
 {
+    Status_register(engine);
     Behavior_register_prototype(engine);
 }
 
-static void registerConstructorAndPrototype(QScriptEngine& engine,
-                                            const QString& name,
-                                            QScriptEngine::FunctionSignature constructorFun,
-                                            const QScriptValue& prototype)
+void Status_register(QScriptEngine& engine)
 {
-    QScriptValue ctor = prototype.engine()->newFunction(constructorFun);
-    ctor.setPrototype(prototype);
-    prototype.engine()->globalObject().setProperty(name, ctor);
+    QScriptValue obj = engine.newObject();
+
+    QScriptValue::PropertyFlags flags = QScriptValue::Undeletable | QScriptValue::ReadOnly;
+
+    obj.setProperty("Waiting",
+                    engine.toScriptValue((uint32_t)StatusDormant),
+                    flags);
+    obj.setProperty("Running",
+                    engine.toScriptValue((uint32_t)StatusRunning),
+                    flags);
+    obj.setProperty("Waiting",
+                    engine.toScriptValue((uint32_t)StatusWaiting),
+                    flags);
+    obj.setProperty("Terminated",
+                    engine.toScriptValue((uint32_t)StatusTerminated),
+                    flags);
+
+    engine.globalObject().setProperty("Status",
+                                      obj,
+                                      flags);
 }
 
 void Behavior_register_prototype(QScriptEngine& engine)
@@ -106,9 +121,6 @@ QScriptValue construct_shared_behavior(QScriptContext* context,
                                        Behavior* ptr)
 {
     context->thisObject().setData(engine->toScriptValue(QSharedPointer<Behavior>(ptr)));
-
-    AI_ASSERT(qscriptvalue_cast<QSharedPointer<Behavior>* >(context->thisObject().data()),
-              "Data wasnt set.");
 
     return engine->undefinedValue();
 }

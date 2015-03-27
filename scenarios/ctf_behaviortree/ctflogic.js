@@ -13,7 +13,6 @@ function spawnFighter(startPos, teamColor, index) {
 	var actor = scene.instantiate("player_team_" + teamColor + "_" + index,
 								  "Soldier2" + teamColor, 
 								  startPos);
-	actor.enableAnimation("my_animation");
 	actor.setScale(0.2);
 
 	var lookAtPos = actor.position
@@ -43,8 +42,8 @@ function spawnTeam(teamSize, startPos) {
 var timer;
 function onStart() {
 	var teamSize = 5;
-	spawnTeam(teamSize, flag_red.position)
-	spawnTeam(teamSize, flag_green.position)
+	spawnTeam(1, flag_red.position)
+	//spawnTeam(teamSize, flag_green.position)
 
 	print(Cube_000.position)
 	cubePosition = Cube_059.position

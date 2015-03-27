@@ -120,7 +120,7 @@ void ScriptTimer::timeout()
 {
     if(mFunction.isFunction())
     {
-        mFunction.call(QScriptValue());
+        mFunction.call();
     }
     else
     {

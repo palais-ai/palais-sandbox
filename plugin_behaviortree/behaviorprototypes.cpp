@@ -7,6 +7,7 @@ using namespace ailib;
 
 Q_DECLARE_METATYPE(QSharedPointer<Behavior>)
 Q_DECLARE_METATYPE(Scheduler*)
+Q_DECLARE_METATYPE(QVariantMap*)
 
 ScriptBehavior::ScriptBehavior(const QScriptValue& obj) :
     mScript(obj)
@@ -19,7 +20,7 @@ void ScriptBehavior::run()
     QScriptValue runVal = mScript.property("run");
     if(runVal.isFunction())
     {
-        runVal.call();
+        runVal.call(mScript);
         JavaScriptBindings::checkScriptEngineException(*runVal.engine(),
                                                        "ScriptBehavior.run");
     }
@@ -35,7 +36,7 @@ void ScriptBehavior::terminate()
     QScriptValue terminateVal = mScript.property("terminate");
     if(terminateVal.isFunction())
     {
-        terminateVal.call();
+        terminateVal.call(mScript);
         JavaScriptBindings::checkScriptEngineException(*terminateVal.engine(),
                                                        "ScriptBehavior.terminate");
     }
@@ -64,18 +65,36 @@ void BehaviorPrototype::setUserData(QVariantMap* data)
     behavior->setUserData(hold_any(data));
 }
 
-const QVariantMap* BehaviorPrototype::getUserData() const
+QVariantMap BehaviorPrototype::getUserData() const
 {
     Behavior* behavior = extractBehavior(thisObject());
 
-    try
+    if(behavior->getUserData().empty())
     {
-        return any_cast<QVariantMap*>(behavior->getUserData());
+        return QVariantMap();
     }
-    catch(const bad_any_cast& ex)
+
+    QVariantMap* ptr = any_cast<QVariantMap*>(behavior->getUserData());
+
+    if(!ptr)
     {
-        UNUSED(ex);
-        return NULL;
+        return QVariantMap();
+    }
+    else
+    {
+        return *ptr;
+    }
+}
+
+void BehaviorPrototype::setStatus(int status)
+{
+    if(status >= StatusDormant && status <= StatusTerminated)
+    {
+        setStatus((Status)status);
+    }
+    else
+    {
+        qWarning("Called Behavior.setStatus with invalid value.");
     }
 }
 

@@ -15,6 +15,7 @@ void BehaviorPlugin::onLoad(const PluginInterface& interface)
 {
     Q_UNUSED(interface);
     qRegisterMetaType<Status>("Status");
+    qRegisterMetaType<QVariantMap*>("QVariantMap*");
 }
 
 void BehaviorPlugin::onUnload(const PluginInterface& interface)
