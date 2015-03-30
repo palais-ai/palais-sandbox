@@ -3,8 +3,10 @@
 
 #include <QObject>
 #include <QScriptValue>
+#include <QVector>
 #include <QScriptEngine>
 #include <QSharedPointer>
+#include <QDebug>
 #include "BehaviorTree.h"
 #include "Blackboard.h"
 
@@ -43,25 +45,39 @@ template <typename T>
 QScriptValue composite_prototype_ctor(QScriptContext *context, QScriptEngine *engine)
 {
     Composite::BehaviorList children;
+    QScriptValueList sharedBehaviors;
     for(int i = 0; i < context->argumentCount(); ++i)
     {
-        QScriptValue arg = context->argument(i).data();
-        QSharedPointer<Behavior>* behavior = qscriptvalue_cast<QSharedPointer<Behavior>* >(arg);
+        QScriptValue arg = context->argument(i);
+        QSharedPointer<Behavior>* behavior =
+                qscriptvalue_cast<QSharedPointer<Behavior>* >(arg.property("__behavior"));
 
         if(!behavior)
         {
             return context->throwError(QScriptContext::TypeError,
-                                       "Composite.prototype.ctor: Arguments must be behaviors.");
+                                       "Composite.prototype.ctor: Arguments must be behaviors. Did you forget to call the Behaviors constructor for one of your user-defined behaviors?");
         }
-
+        sharedBehaviors.append(arg);
         children.push_back(behavior->data());
     }
     Scheduler* scheduler = qscriptvalue_cast<Scheduler*>(engine->globalObject()
                                                                .property("Scheduler"));
-    AI_ASSERT(scheduler, "A Scheduler must be exist in the global object.");
+    AI_ASSERT(scheduler, "A Scheduler must exist in the global object.");
 
-    return construct_shared_behavior(context, engine, new T(*scheduler, children));
+    construct_shared_behavior(context, engine, new T(*scheduler, children));
+
+    QScriptValue array = engine->newArray();
+    foreach(QScriptValue behavior, sharedBehaviors)
+    {
+        array.property("push").call(array, QScriptValueList() << behavior);
+    }
+
+    // We need to keep a reference within the scripting system
+    // to prevent garbage collection.
+    context->thisObject().setProperty("children", array);
+    return engine->undefinedValue();
 }
+
 QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScriptEngine *engine);
 
 #endif // BEHAVIOR_H

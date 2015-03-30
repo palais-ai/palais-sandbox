@@ -11,6 +11,8 @@ BEGIN_NS_AILIB
 namespace HighResolutionTime {
     typedef int64_t Timestamp; // in microseconds
 
+    double milliseconds(Timestamp t);
+    double seconds(Timestamp t);
     Timestamp milliseconds(double t);
     Timestamp seconds(double t);
     Timestamp now();

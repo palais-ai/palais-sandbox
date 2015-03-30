@@ -85,6 +85,11 @@ QScriptValue script_setInterval(QScriptContext *context, QScriptEngine *engine);
 QScriptValue script_clearTimeout(QScriptContext *context, QScriptEngine *engine);
 QScriptValue script_clearInterval(QScriptContext *context, QScriptEngine *engine);
 
+void QVariantMapPtr_register_prototype(QScriptEngine& engine);
+
+void RangeQueryResult_register_prototype(QScriptEngine& engine);
+QScriptValue RangeQueryResultt_prototype_actors(QScriptContext *context, QScriptEngine *engine);
+
 void RaycastResult_register_prototype(QScriptEngine& engine);
 QScriptValue RaycastResult_prototype_distance(QScriptContext *context, QScriptEngine *engine);
 QScriptValue RaycastResult_prototype_actor(QScriptContext *context, QScriptEngine *engine);

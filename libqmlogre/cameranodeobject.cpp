@@ -54,8 +54,8 @@ void CameraHandler::onCreateCameraWithCurrentSceneManager()
     instanceName.sprintf("camera_%d", sCameraCounter++);
 
     Ogre::Camera *camera = sceneManager->createCamera(instanceName.toLatin1().data());
-    camera->setNearClipDistance(2);
-    camera->setFarClipDistance(750);
+    camera->setNearClipDistance(0.1);
+    camera->setFarClipDistance(1000);
     camera->setAspectRatio(1);
 
     mCamera = camera;

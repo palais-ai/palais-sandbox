@@ -19,7 +19,7 @@ Behavior::Behavior() :
 
 Behavior::~Behavior()
 {
-    ;
+    fprintf(stderr, "Behavior dtor [%lu]\n", mObjectId);
 }
 
 void Behavior::setListener(BehaviorListener* listener)
@@ -78,6 +78,16 @@ Composite::Composite(Scheduler& scheduler,
     {
         // Composites listen to their children's result codes
         (*it)->setListener(this);
+    }
+}
+
+Composite::~Composite()
+{
+    for(Composite::BehaviorList::iterator it = mChildren.begin();
+        it != mChildren.end(); ++it)
+    {
+        // Composites listen to their children's result codes
+        (*it)->setListener(NULL);
     }
 }
 
@@ -393,6 +403,11 @@ Decorator::Decorator(Scheduler& scheduler, Behavior* child) :
     UNUSED(mScheduler);
     AI_ASSERT(mChild, "Child mustn't be NULL.");
     mChild->setListener(this);
+}
+
+Decorator::~Decorator()
+{
+    mChild->setListener(NULL);
 }
 
 void Decorator::terminate()

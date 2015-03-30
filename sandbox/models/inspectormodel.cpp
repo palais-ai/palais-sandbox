@@ -2,6 +2,7 @@
 #include "utility/MetatypeDeclarations.h"
 #include <QtQml>
 #include <QSharedPointer>
+#include <QDebug>
 #include "OgreStringConverter.h"
 
 void OgreVector3Model::declareQML()
@@ -132,8 +133,11 @@ void InspectorModel::setModel(const QString& name,
 
 void InspectorModel::onKnowledgeAdded(const QString& key, const QVariant& value)
 {
-    int index = mKnowledge.size();
-    beginInsertRows(QModelIndex(), index, index);
+    QVariantMap tmp = mKnowledge;
+    tmp[key] = value;
+    const int i = tmp.keys().indexOf(key);
+
+    beginInsertRows(QModelIndex(), i, i);
     mKnowledge[key] = value;
     endInsertRows();
 }
@@ -141,7 +145,7 @@ void InspectorModel::onKnowledgeAdded(const QString& key, const QVariant& value)
 void InspectorModel::onKnowledgeChanged(const QString& key, const QVariant& value)
 {
     QList<QString> keys = mKnowledge.keys();
-    int i = keys.indexOf(key);
+    const int i = keys.indexOf(key);
 
     mKnowledge[key] = value;
 
@@ -151,10 +155,11 @@ void InspectorModel::onKnowledgeChanged(const QString& key, const QVariant& valu
 void InspectorModel::onKnowledgeRemoved(const QString& key)
 {
     QList<QString> keys = mKnowledge.keys();
-    int index = keys.indexOf(key);
+    const int i = keys.indexOf(key);
 
-    beginRemoveRows(QModelIndex(), index, index);
-    mKnowledge.remove(key);
+    beginRemoveRows(QModelIndex(), i, i);
+    const int numRemoved = mKnowledge.remove(key);
+    assert(numRemoved == 1);
     endRemoveRows();
 }
 

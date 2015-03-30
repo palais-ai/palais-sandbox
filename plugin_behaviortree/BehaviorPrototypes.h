@@ -8,6 +8,7 @@
 #include <QScriptValue>
 #include <QVariant>
 #include <QScriptable>
+#include <QHash>
 
 using namespace ailib;
 
@@ -48,6 +49,8 @@ public:
 
     Q_INVOKABLE void enqueue(QScriptValue behaviorValue);
     Q_INVOKABLE void dequeue(QScriptValue behaviorValue);
+private:
+    QHash<qint64, QScriptValue> mActiveBehaviors;
 };
 
 #endif // BEHAVIOR_P_H

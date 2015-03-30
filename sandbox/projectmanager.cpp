@@ -300,8 +300,7 @@ void ProjectManager::onOpenProject(const QUrl url)
 
     if(error.error != QJsonParseError::NoError)
     {
-        QString errorMsg = QString("Failed to parse the project file at %0,\
-                                    because it isn't a JSON document.")
+        QString errorMsg = QString("Failed to parse the project file at %0, because it isn't a JSON document.")
                                     .arg(url.toLocalFile());
         emit(sceneLoadFailed(errorMsg));
         return;
@@ -318,8 +317,7 @@ void ProjectManager::onOpenProject(const QUrl url)
     }
     else
     {
-        emit(sceneLoadFailed(QString("Failed to load the project file at %0,\
-                                      because it is missing the mandatory property %1.")
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.")
                              .arg(url.toLocalFile())
                              .arg(visualPropertyName)));
         return;
@@ -338,8 +336,7 @@ void ProjectManager::onOpenProject(const QUrl url)
     }
     else
     {
-        emit(sceneLoadFailed(QString("Failed to load the project file at %0,\
-                                      because it is missing the mandatory property %1.")
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.")
                              .arg(url.toLocalFile())
                              .arg(logicPropertyName)));
         return;
@@ -353,8 +350,7 @@ void ProjectManager::onOpenProject(const QUrl url)
     }
     else
     {
-        emit(sceneLoadFailed(QString("Failed to load the project file at %0,\
-                                      because it is missing the mandatory property %1.")
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.")
                              .arg(url.toLocalFile())
                              .arg(namePropertyName)));
         return;

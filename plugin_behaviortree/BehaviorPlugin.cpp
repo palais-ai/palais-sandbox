@@ -7,8 +7,10 @@ using namespace ailib;
 Q_DECLARE_METATYPE(Scheduler*)
 
 BehaviorPlugin::BehaviorPlugin(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    mCurrentEngine(NULL)
 {
+    ;
 }
 
 void BehaviorPlugin::onLoad(const PluginInterface& interface)
@@ -27,6 +29,7 @@ void BehaviorPlugin::onSceneStarted(const PluginInterface& interface, Scene& sce
 {
     Q_UNUSED(interface);
     QScriptEngine& engine = scene.getScriptEngine();
+    mCurrentEngine = &engine;
 
     engine.setDefaultPrototype(qMetaTypeId<Scheduler*>(), engine.newQObject(&mSchedulerWrapper));
     engine.globalObject().setProperty("Scheduler",
@@ -40,11 +43,18 @@ void BehaviorPlugin::onSceneEnded(const PluginInterface& interface, Scene& scene
     Q_UNUSED(interface);
     Q_UNUSED(scene);
     mScheduler.clear();
+    mCurrentEngine = NULL;
 }
 
 void BehaviorPlugin::update(const PluginInterface& interface, Scene& scene, float deltaTime)
 {
     Q_UNUSED(interface);
     Q_UNUSED(scene);
-    mScheduler.update(HighResolutionTime::milliseconds(8), deltaTime);
+    HighResolutionTime::Timestamp timeInMs =
+            HighResolutionTime::milliseconds(mScheduler.update(HighResolutionTime::milliseconds(8.f),
+                                                               deltaTime));
+    if(timeInMs > 0)
+    {
+        qDebug() << "Excessive frametime: " << timeInMs;
+    }
 }

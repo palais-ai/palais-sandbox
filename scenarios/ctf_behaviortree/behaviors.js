@@ -1,13 +1,14 @@
 require("global.js")
+require("ctf_game.js")
 
-function getOwnFlag(userData)
+function getOwnFlag(color)
 {
-	return userData["team_color"] === "red" ? flag_red : flag_green;
+	return color === "red" ? flag_red : flag_green;
 }
 
-function getOpponentFlag(userData)
+function getOpponentFlag(color)
 {
-	return userData["team_color"] === "green" ? flag_red : flag_green;
+	return color === "red" ? flag_green : flag_red;
 }
 
 function PlayAnimation(animationName)
@@ -30,7 +31,7 @@ PlayAnimation.prototype =
 }
 extend(Behavior, PlayAnimation);
 
-// The MoveTo behavior invokes the pathfinding module to move an actor to a __goal__.
+// The __MoveTo__ behavior invokes the pathfinding module to move an actor to a __goal__.
 function MoveTo(goal)
 {
 	this.goal = goal;
@@ -42,7 +43,7 @@ MoveTo.prototype =
 	run: function()
 	{
 		var context = this;
-		pathfinding.moveActor(this.userData["self"], this.goal, function() {
+		Pathfinding.moveActor(this.userData["self"], this.goal, function() {
 			context.notifySuccess();
 		});
 		this.setStatus(Status.Waiting);
@@ -50,7 +51,7 @@ MoveTo.prototype =
 }
 extend(Behavior, MoveTo);
 
-// The WalkTo behavior plays the walking animation while moving to a location (using the MoveTo behavior).
+// The __WalkTo__ behavior plays the walking animation while moving to a location (using the __MoveTo__ behavior).
 function WalkTo(goal)
 {
 	Parallel.call(this, new MoveTo(goal), new PlayAnimation("my_animation"));
@@ -132,17 +133,41 @@ GuardCarrier.prototype =
 }
 extend(Behavior, GuardCarrier);
 
+function MonitorTask(actor)
+{
+	this.actor = actor;
+	setInterval(250, function() {
+		var checkDistance = function(actor, flag) {
+			return actor.position.distanceTo(flag.position) < 0.1;
+		};
+
+		var flag = actor.getKnowledge("has_flag") == true ? getOwnFlag(actor.getKnowledge("team_color")) : getOpponentFlag(actor.getKnowledge("team_color"));
+		if(checkDistance(actor, flag))
+		{
+			actor.setKnowledge("has_flag", !actor.getKnowledge("has_flag"));
+		}
+	})
+}
+
+for(var prop in Array.prototype)
+{
+	print(prop)
+}
+
+var monitored = [];
 function constructBehaviorTreeForActor(actor)
 {
-	var root = new Selector(new HasFlag(new WalkTo(getOwnFlag(actor.knowledge).position), actor), 
+	var color = actor.getKnowledge("team_color");
+	var root = new Selector(new HasFlag(new WalkTo(getOwnFlag(color).position), actor), 
 					        new EnemyInRange(new Shoot(), actor), 
 					       	new TeamHasFlag(new GuardCarrier(), actor),
-					       	new WalkTo(getOpponentFlag(actor.knowledge).position));
+					       	new WalkTo(getOpponentFlag(color).position)); // FIXME: behavior might end prematurely here..
 
 	actor.setKnowledge("self", actor);
 	actor.setKnowledge("has_flag", false);
 	actor.setKnowledge("team_has_flag", false);
 	actor.setKnowledge("enemy_in_range", false);
 	root.setUserData(actor.knowledge);
+	monitored += new MonitorTask(actor);
 	return root;
 }

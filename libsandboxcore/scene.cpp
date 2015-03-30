@@ -31,6 +31,7 @@ Scene::Scene(const QString& name,
     mSceneManagerName(sceneManagerName),
     mRoot(root),
     mRayQuery(getOgreSceneManager()->createRayQuery(Ogre::Ray())),
+    mSphereQuery(getOgreSceneManager()->createSphereQuery(Ogre::Sphere())),
     mIsSetup(false)
 {
     if(!mEngine)
@@ -40,7 +41,6 @@ Scene::Scene(const QString& name,
 
     // This object must reside in the same thread as the ogre engine.
     assert(thread() == mEngine->thread());
-
     getActors(mRoot);
     Ogre::Root::getSingleton().addFrameListener(this);
 }
@@ -192,6 +192,42 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin,
     }
 
     mRayQuery->clearResults();
+    return retVal;
+}
+
+RangeQueryResult Scene::rangeQuery(const Ogre::Vector3& origin, float distance)
+{
+    mSphereQuery->setSphere(Ogre::Sphere(origin, distance));
+    mSphereQuery->setQueryTypeMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
+    Ogre::SceneQueryResultMovableList& result = mSphereQuery->execute().movables;
+
+    RangeQueryResult retVal;
+    for(Ogre::SceneQueryResultMovableList::iterator it = result.begin();
+        it != result.end(); ++it)
+    {
+        Ogre::MovableObject* obj = *it;
+        Ogre::SceneNode* node = obj->getParentSceneNode();
+
+        if(!node)
+        {
+            qWarning("No parent node attached to movable object %s in sphere query.",
+                     obj->getName().c_str());
+            return retVal;
+        }
+
+        Actor* actor = getActorForNode(node);
+
+        if(!actor)
+        {
+            qWarning("No actor found for scene node %s in sphere query.",
+                     node->getName().c_str());
+            return retVal;
+        }
+
+        retVal.actors += actor;
+    }
+
+    mSphereQuery->clearResults();
     return retVal;
 }
 
@@ -395,14 +431,11 @@ void Scene::getActors(Ogre::SceneNode* root)
     }
 
     Ogre::SceneNode::ChildNodeIterator children = root->getChildIterator();
-
     while (children.hasMoreElements())
     {
         Ogre::SceneNode* child = static_cast<Ogre::SceneNode*>(children.getNext());
-
         // Recursively add children
         getActors(child);
-
         addActor(child);
     }
 }
@@ -419,7 +452,7 @@ void Scene::setup()
     }
     else
     {
-        qWarning("No onStart handler defined in script.");
+        qWarning("No __onStart__ handler defined in script.");
     }
 }
 
@@ -434,6 +467,8 @@ void Scene::update(float time)
     mDynamics.update(time);
 
     float deltaTimeInSeconds = time / 1000.f;
+
+    // Call into the scripts __update__ function.
     QScriptValue fun = mLogicScript.globalObject().property("update");
     if(fun.isFunction())
     {
@@ -443,11 +478,13 @@ void Scene::update(float time)
     }
     else
     {
-        qWarning("No update handler defined in script.");
+        qWarning("No __update__ handler defined in script.");
     }
 
+    // Update timers.
     JavaScriptBindings::timers_update(deltaTimeInSeconds);
 
+    // Update all actors.
     for(QMap<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
     {
         it.value()->update(deltaTimeInSeconds);

@@ -43,7 +43,7 @@ void PathfindingPlugin::onSceneStarted(const PluginInterface& interface, Scene& 
     }
 
     QScriptEngine& engine = scene.getScriptEngine();
-    engine.globalObject().setProperty("pathfinding", engine.newQObject(&mPathfinding));
+    engine.globalObject().setProperty("Pathfinding", engine.newQObject(&mPathfinding));
 }
 
 void PathfindingPlugin::onSceneEnded(const PluginInterface& interface, Scene& scene)

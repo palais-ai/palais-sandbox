@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 
     //p.terminate();
     //aiWorld.enqueue(&p);
-    aiWorld.update(HighResolutionTime::seconds(5000), 0);
+    aiWorld.update(HighResolutionTime::seconds(5000.f), 0);
 
     return EXIT_SUCCESS;
 }

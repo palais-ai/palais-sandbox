@@ -1,8 +1,10 @@
 #include "Behavior.h"
 #include "scene.h"
 #include "actor.h"
-
 #include "BehaviorPrototypes.h"
+#include <QDebug>
+
+#define PRINT_DEBUG 0
 
 Q_DECLARE_METATYPE(QSharedPointer<Behavior>)
 Q_DECLARE_METATYPE(QSharedPointer<Behavior>*)
@@ -21,8 +23,14 @@ BlackboardDecorator::BlackboardDecorator(Scheduler& scheduler,
 
 void BlackboardDecorator::run()
 {
-    connect(mActor, &KnowledgeModel::knowledgeChanged,
-            this, &BlackboardDecorator::onKnowledgeChanged);
+    if(getStatus() != StatusWaiting)
+    {
+#if PRINT_DEBUG
+        qDebug() << "Registering [" << mObservedValue << "]";
+#endif
+        connect(mActor, &KnowledgeModel::knowledgeChanged,
+                this, &BlackboardDecorator::onKnowledgeChanged);
+    }
 
     QVariantMap& state = *any_cast<QVariantMap*>(getUserData());
     QVariantMap::iterator it = state.find(mObservedValue);
@@ -39,6 +47,9 @@ void BlackboardDecorator::run()
 
 void BlackboardDecorator::terminate()
 {
+#if PRINT_DEBUG
+    qDebug() << "Unregistering [" << mObservedValue << "]";
+#endif
     disconnect(mActor, &KnowledgeModel::knowledgeChanged,
                this, &BlackboardDecorator::onKnowledgeChanged);
 }
@@ -46,13 +57,16 @@ void BlackboardDecorator::terminate()
 void BlackboardDecorator::onKnowledgeChanged(const QString& key, const QVariant& knowledge)
 {
     UNUSED(knowledge);
-    if(getStatus() == StatusWaiting)
-    {
-        terminateChild();
-    }
-
     if(key == mObservedValue)
     {
+#if PRINT_DEBUG
+        qDebug() << "Key [" << key << "] changed to " << knowledge;
+#endif
+        if(getStatus() == StatusWaiting)
+        {
+            terminateChild();
+        }
+
         run();
     }
 }
@@ -90,6 +104,7 @@ void Status_register(QScriptEngine& engine)
 void Behavior_register_prototype(QScriptEngine& engine)
 {
     const int typeId = qRegisterMetaType<Behavior*>("Behavior*");
+    qScriptRegisterSequenceMetaType<QVector< QSharedPointer<Behavior> > >(&engine);
 
     static BehaviorPrototype bp;
     QScriptValue prototype = engine.newQObject(&bp);
@@ -120,7 +135,10 @@ QScriptValue construct_shared_behavior(QScriptContext* context,
                                        QScriptEngine* engine,
                                        Behavior* ptr)
 {
-    context->thisObject().setData(engine->toScriptValue(QSharedPointer<Behavior>(ptr)));
+    context->thisObject().setProperty("__behavior",
+                                      engine->toScriptValue(QSharedPointer<Behavior>(ptr)));
+
+    ptr->mObjectId = context->thisObject().objectId();
 
     return engine->undefinedValue();
 }
@@ -128,6 +146,7 @@ QScriptValue construct_shared_behavior(QScriptContext* context,
 QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScriptEngine *engine)
 {
     static const int numArgsExpected = 3;
+    QSharedPointer<Behavior> behaviorPtr;
     Behavior* child = NULL;
     Actor*    actor = NULL;
     QString observedName;
@@ -135,7 +154,7 @@ QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScript
     {
         {
             QScriptValue originalArg = context->argument(0);
-            QScriptValue arg = originalArg.data();
+            QScriptValue arg = originalArg.property("__behavior");
             QSharedPointer<Behavior>* ptr = qscriptvalue_cast<QSharedPointer<Behavior>* >(arg);
 
             if(!ptr)
@@ -143,7 +162,7 @@ QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScript
                 QString msg("BlackboardDecorator.prototype.ctor: Argument 1 must be a behavior.");
                 return context->throwError(QScriptContext::TypeError, msg);
             }
-
+            behaviorPtr = *ptr;
             child = ptr->data();
         }
 
@@ -180,8 +199,16 @@ QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScript
                                                                .property("Scheduler"));
     AI_ASSERT(scheduler, "A Scheduler must exist in the global object.");
 
-    return construct_shared_behavior(context, engine, new BlackboardDecorator(*scheduler,
-                                                                              child,
-                                                                              actor,
-                                                                              observedName));
+    construct_shared_behavior(context,
+                              engine,
+                              new BlackboardDecorator(*scheduler,
+                                                      child,
+                                                      actor,
+                                                      observedName));
+
+    QScriptValue array = engine->newArray();
+    array.property("push").call(array, QScriptValueList() << context->argument(0));
+    // Increase the internal ref count of the child node.
+    context->thisObject().setProperty("children", array);
+    return engine->undefinedValue();
 }

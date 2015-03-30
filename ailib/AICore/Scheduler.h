@@ -23,22 +23,37 @@ public:
     }
 };
 
+class SchedulerListener
+{
+public:
+    virtual ~SchedulerListener() {}
+    virtual void   onTaskAdded(Task* task) = 0;
+    virtual void onTaskRemoved(Task* task) = 0;
+};
+
 class Scheduler : private TaskListener
 {
 public:
     typedef std::set<Task*, TaskComparator> TaskList;
 
+    Scheduler();
+
+    void setListener(SchedulerListener* listener);
     void clear();
     void enqueue(Task* task);
     void dequeue(Task* task);
-    void update(HighResolutionTime::Timestamp maxRuntime, float dt);
+
+    // @returns Number of microseconds spent computing during this call.
+    HighResolutionTime::Timestamp update(HighResolutionTime::Timestamp maxRuntime, float dt);
     virtual void onStatusChanged(Task* task, Status from);
 private:
     void removeWaiting(Task* task);
     void removeRunning(Task* task);
+    void removeFrom(TaskList& list, Task* task);
 
     TaskList mTasks;
     TaskList mWaiting;
+    SchedulerListener* mListener;
 };
 
 END_NS_AILIB

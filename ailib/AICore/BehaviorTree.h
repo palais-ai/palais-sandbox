@@ -39,6 +39,9 @@ public:
 
     virtual void setUserData(const hold_any& data);
     hold_any& getUserData();
+
+
+    uint64_t mObjectId;
 private:
     BehaviorListener* mListener;
     hold_any mUserData;
@@ -50,6 +53,7 @@ public:
     typedef std::vector<Behavior*> BehaviorList;
 
     Composite(Scheduler& scheduler, const BehaviorList& children);
+    ~Composite();
 
     const BehaviorList& getChildren() const;
     virtual void setUserData(const hold_any& data);
@@ -129,6 +133,7 @@ class Decorator : public Behavior, public BehaviorListener
 {
 public:
     Decorator(Scheduler& scheduler, Behavior* child);
+    ~Decorator();
 
     virtual void terminate();
     virtual void onSuccess(Behavior* behavior);

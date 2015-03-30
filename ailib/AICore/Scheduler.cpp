@@ -10,6 +10,17 @@ BEGIN_NS_AILIB
 
 #define PRINT_STATES 0
 
+Scheduler::Scheduler() :
+    mListener(NULL)
+{
+
+}
+
+void Scheduler::setListener(SchedulerListener* listener)
+{
+    mListener = listener;
+}
+
 void Scheduler::clear()
 {
     while(!mTasks.empty())
@@ -37,12 +48,16 @@ void Scheduler::enqueue(Task* task)
         mTasks.insert(task);
     }
     task->setListener(this);
+
+    if(mListener)
+    {
+        mListener->onTaskAdded(task);
+    }
 }
 
 void Scheduler::dequeue(Task* task)
 {
     AI_ASSERT(task, "Dequeued tasks may not be NULL.");
-
 #if PRINT_STATES
     std::cout << "Removing " << typeid(*task).name() << "." << std::endl;
 #endif
@@ -57,8 +72,7 @@ void Scheduler::dequeue(Task* task)
     }
     else
     {
-        // FIXME: This should be an ASSERT.
-        puts("Only waiting or running tasks may be removed.");
+        AI_ASSERT(false, "Only waiting or running tasks may be removed.");
     }
 }
 
@@ -74,14 +88,12 @@ static void printTasks(const Scheduler::TaskList& tasks)
 }
 #endif
 
-void Scheduler::update(HighResolutionTime::Timestamp maxRuntime, float dt)
+HighResolutionTime::Timestamp Scheduler::update(HighResolutionTime::Timestamp maxRuntime, float dt)
 {
     UNUSED(dt);
-
     using namespace HighResolutionTime;
 
     Timestamp currentRuntime = 0;
-
     while(!mTasks.empty() && currentRuntime <= maxRuntime)
     {
         Timestamp start = now();
@@ -117,6 +129,8 @@ void Scheduler::update(HighResolutionTime::Timestamp maxRuntime, float dt)
         printTasks(mWaiting);
 #endif
     }
+
+    return currentRuntime;
 }
 
 void Scheduler::onStatusChanged(Task* task, Status from)
@@ -145,22 +159,26 @@ void Scheduler::onStatusChanged(Task* task, Status from)
 
 void Scheduler::removeWaiting(Task* task)
 {
-    if(mWaiting.erase(task) != 1)
-    {
-        printf("Couldnt find task to erase. %lu\n", mWaiting.size());
-    }
-
-    task->setListener(NULL);
+    removeFrom(mWaiting, task);
 }
 
 void Scheduler::removeRunning(Task* task)
 {
-    if(mTasks.erase(task) != 1)
-    {
-        printf("Couldnt find task to erase.  %lu\n", mTasks.size());
-    }
+    removeFrom(mTasks, task);
+}
 
+void Scheduler::removeFrom(TaskList& list, Task* task)
+{
+    if(list.erase(task) != 1)
+    {
+        puts("Couldn't find task to erase.");
+    }
     task->setListener(NULL);
+
+    if(mListener)
+    {
+        mListener->onTaskRemoved(task);
+    }
 }
 
 END_NS_AILIB

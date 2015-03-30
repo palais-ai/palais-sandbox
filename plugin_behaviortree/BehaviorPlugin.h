@@ -19,10 +19,10 @@ public:
     virtual void onSceneStarted(const PluginInterface& interface, Scene& scene);
     virtual void onSceneEnded(const PluginInterface& interface, Scene& scene);
     virtual void update(const PluginInterface& interface, Scene& scene, float deltaTime);
-
 private:
     ailib::Scheduler mScheduler;
     SchedulerPrototype mSchedulerWrapper;
+    QScriptEngine* mCurrentEngine;
 };
 
 #endif // BEHAVIORPLUGIN_H

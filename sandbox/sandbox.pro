@@ -1,4 +1,4 @@
-CONFIG += qt
+CONFIG += qt debug
 QT += qml quick script
 TEMPLATE = app
 TARGET = Palais
@@ -44,7 +44,8 @@ HEADERS += \
     models/scenemodel.h \
     PluginInterface.h \
     utility/MetatypeDeclarations.h \
-    PluginManager.h
+    PluginManager.h \
+    sandboxsettings.h
 
 OTHER_FILES += \
     config/resources.cfg
@@ -78,7 +79,7 @@ macx {
     message($$MY_BUNDLE_DIR is the bundle dir)
     message($$PWD/resources is the qml dir)
 
-    QMAKE_POST_LINK = macdeployqt $$MY_BUNDLE_DIR -qmldir=$$PWD/resources
+    #QMAKE_POST_LINK = macdeployqt $$MY_BUNDLE_DIR -qmldir=$$PWD/resources
 
     FrameworkFiles.path = Contents/Frameworks
 

@@ -29,6 +29,12 @@ public:
     float distance;
 };
 
+class DLL_EXPORT RangeQueryResult
+{
+public:
+    QObjectList actors;
+};
+
 class DLL_EXPORT Scene : public KnowledgeModel,
                          public Ogre::FrameListener
 {
@@ -36,12 +42,6 @@ class DLL_EXPORT Scene : public KnowledgeModel,
     Q_PROPERTY(QString name READ getName)
     Q_PROPERTY(QObjectList actors READ getActorsArray)
 public:
-    enum ModelRole
-    {
-        ModelRoleName = Qt::UserRole + 1,
-        ModelRoleIndex
-    };
-
     Scene(const QString& name,
           const QString& sceneFile,
           const QString& logicFile,
@@ -74,6 +74,8 @@ public:
     // Reports the first hit actor in the scene.
     Q_INVOKABLE RaycastResult raycast(const Ogre::Vector3& origin,
                                       const Ogre::Vector3& direction);
+
+    Q_INVOKABLE RangeQueryResult rangeQuery(const Ogre::Vector3& origin, float distance);
 
     void setup();
     void update(float time);
@@ -111,6 +113,7 @@ private:
     QString mSceneManagerName;
     Ogre::SceneNode* mRoot;
     Ogre::RaySceneQuery* mRayQuery;
+    Ogre::SphereSceneQuery* mSphereQuery;
     QScriptEngine mLogicScript;
     QMap<QString, Actor*> mActors;
     QVector<DebugDrawer*> mDrawers;

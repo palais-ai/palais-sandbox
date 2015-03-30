@@ -50,7 +50,13 @@ void ScriptBehavior::terminate()
 
 FORCE_INLINE static Behavior* extractBehavior(const QScriptValue& value)
 {
-    return qscriptvalue_cast<QSharedPointer<Behavior> >(value.data()).data();
+    AI_ASSERT(value.property("__behavior").isValid(),
+              "Script behaviors need to have their data object set. Did you forget to call the constructor?");
+    QSharedPointer<Behavior> ptr =
+                qscriptvalue_cast<QSharedPointer<Behavior> >(value.property("__behavior"));
+    AI_ASSERT(!ptr.isNull(),
+              "Script behaviors need to have their data object set. Did you forget to call the constructor?");
+    return ptr.data();
 }
 
 BehaviorPrototype::BehaviorPrototype(QObject* parent) :
@@ -136,13 +142,21 @@ SchedulerPrototype::SchedulerPrototype(QObject* parent) :
 
 void SchedulerPrototype::enqueue(QScriptValue behaviorValue)
 {
+    // Prevent garbage collection of the executed behavior by keeping a reference.
+    mActiveBehaviors[behaviorValue.objectId()] = behaviorValue;
+
     Scheduler* sched = qscriptvalue_cast<Scheduler*>(thisObject());
     Behavior* behavior = extractBehavior(behaviorValue);
     sched->enqueue(behavior);
+
+    engine()->collectGarbage();
 }
 
 void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
 {
+    // Remove reference so that the behavior can be garbage collected by the script engine.
+    mActiveBehaviors.remove(behaviorValue.objectId());
+
     Scheduler* sched = qscriptvalue_cast<Scheduler*>(thisObject());
     Behavior* behavior = extractBehavior(behaviorValue);
     sched->dequeue(behavior);

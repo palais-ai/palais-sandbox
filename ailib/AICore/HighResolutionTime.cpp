@@ -3,6 +3,15 @@
 BEGIN_NS_AILIB
 
 namespace HighResolutionTime {
+    double milliseconds(Timestamp t)
+    {
+        return Timestamp(t / 1e3);
+    }
+
+    double seconds(Timestamp t)
+    {
+        return Timestamp(t / 1e6);
+    }
 
     Timestamp milliseconds(double t)
     {

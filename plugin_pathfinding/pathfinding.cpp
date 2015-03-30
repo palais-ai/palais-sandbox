@@ -101,6 +101,7 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
                     GoalReachedCallback* cb = actor.getKnowledge("goal_reached_callback")
                                                     .value<GoalReachedCallback*>();
 
+                    // FIXME: This crashes (sometimes).
                     cb->onGoalReached(actor);
                     actor.removeKnowledge("goal_reached_callback");
                     delete cb;
@@ -401,8 +402,20 @@ void Pathfinding::moveActor(Actor* actor,
         qpath += (*it)->getCentroid();
     }
 
+    // Add the move from the navigation mesh node to the actual goal aswell.
+    qpath += target;
+
     actor->setKnowledge("current_path", QVariant::fromValue(qpath));
     actor->setKnowledge("movement_target", QVariant::fromValue(qpath.first()));
+
+    // Residual from another pathfinding call, that was interrupted before reaching the goal.
+    if(actor->hasKnowledge("goal_reached_callback"))
+    {
+        GoalReachedCallback* cb = actor->getKnowledge("goal_reached_callback")
+                                        .value<GoalReachedCallback*>();
+        actor->removeKnowledge("goal_reached_callback");
+        delete cb;
+    }
 
     if(!onFinishedCallback.isUndefined())
     {
@@ -415,10 +428,19 @@ void Pathfinding::moveActor(Actor* actor,
 
 void Pathfinding::onActorDestroyed(QObject* actorObject)
 {
-    Actor& actor = *static_cast<Actor*>(actorObject);
-    if(actor.hasKnowledge("goal_reached_callback"))
+    Actor* actor = qobject_cast<Actor*>(actorObject);
+
+    // FIXME: Somehow actors get corrupted in this callback.
+    return;
+    if(!actor)
     {
-        GoalReachedCallback* cb = actor.getKnowledge("goal_reached_callback")
+        qWarning("Destroyed object (unexpectedly) wasn't an Actor.");
+        return;
+    }
+
+    if(actor->hasKnowledge("goal_reached_callback"))
+    {
+        GoalReachedCallback* cb = actor->getKnowledge("goal_reached_callback")
                                         .value<GoalReachedCallback*>();
         delete cb;
     }

@@ -16,6 +16,9 @@
 
 Q_DECLARE_METATYPE(RaycastResult)
 Q_DECLARE_METATYPE(RaycastResult*)
+Q_DECLARE_METATYPE(RangeQueryResult)
+Q_DECLARE_METATYPE(RangeQueryResult*)
+Q_DECLARE_METATYPE(QVariantMap*)
 
 int ScriptTimer::newTimer(int interval,
                           bool oneShot,
@@ -170,10 +173,11 @@ void addBindings(QScriptEngine& engine, Scene* scene)
 
     QScriptValue sceneVal = engine.newQObject(scene);
 
-    engine.globalObject().setProperty("scene", sceneVal);
+    engine.globalObject().setProperty("Scene", sceneVal);
     engine.globalObject().setProperty("require", engine.newFunction(script_require));
 
     Vector3_register_prototype(engine);
+    RangeQueryResult_register_prototype(engine);
     RaycastResult_register_prototype(engine);
 }
 
@@ -402,6 +406,43 @@ QScriptValue script_clearTimeout(QScriptContext *context, QScriptEngine *engine)
 QScriptValue script_clearInterval(QScriptContext *context, QScriptEngine *engine)
 {
     return script_removeTimer_private(context, engine);
+}
+
+//class VariantMapPrototype : public QScriptable, public QObject
+// FIXME: Add dynamic wrapper for qvariantmap* - using QScriptClass maybe?
+void QVariantMapPtr_register_prototype(QScriptEngine& engine)
+{
+    QScriptValue obj = engine.newObject();
+
+    ;
+
+    engine.setDefaultPrototype(qMetaTypeId<QVariantMap*>(), obj);
+}
+
+void RangeQueryResult_register_prototype(QScriptEngine& engine)
+{
+    QScriptValue obj = engine.newObject();
+
+    obj.setProperty("actors", engine.newFunction(RangeQueryResultt_prototype_actors),
+                    QScriptValue::PropertyGetter | QScriptValue::ReadOnly);
+
+    engine.setDefaultPrototype(qMetaTypeId<RangeQueryResult>(), obj);
+    engine.setDefaultPrototype(qMetaTypeId<RangeQueryResult*>(), obj);
+}
+
+QScriptValue RangeQueryResultt_prototype_actors(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    RangeQueryResult* res = qscriptvalue_cast<RangeQueryResult*>(context->thisObject());
+
+    if (!res)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "RangeQueryResult.prototype.actors: \
+                                    this object is not a RangeQueryResult");
+    }
+
+    return engine->toScriptValue(res->actors);
 }
 
 void RaycastResult_register_prototype(QScriptEngine& engine)
