@@ -11,7 +11,6 @@
 #define OGREITEM_H
 
 #include "qmlogre_global.h"
-
 #include <QtQuick/QQuickItem>
 
 class OgreEngine;

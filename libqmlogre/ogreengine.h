@@ -11,11 +11,9 @@
 #define OGREENGINEITEM_H
 
 #include "qmlogre_global.h"
-
 #include <QObject>
 #include <QQuickWindow>
 #include <QOpenGLContext>
-
 #include <OgreString.h>
 
 namespace Ogre

@@ -18,11 +18,11 @@ MOC_DIR = ./.moc
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
 
 SOURCES += \
-    pathfinding.cpp \
+    Pathfinding.cpp \
     PathfindingPlugin.cpp
 
 HEADERS += \
-    pathfinding.h \
+    Pathfinding.h \
     PathfindingPlugin.h
 
 include(../linkOgreSDK.pri)

@@ -39,9 +39,6 @@ public:
 
     virtual void setUserData(const hold_any& data);
     hold_any& getUserData();
-
-
-    uint64_t mObjectId;
 private:
     BehaviorListener* mListener;
     hold_any mUserData;

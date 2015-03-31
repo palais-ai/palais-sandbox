@@ -1,9 +1,9 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "ogrehelper.h"
-#include "knowledgemodel.h"
-#include "scenedynamics.h"
+#include "OgreHelper.h"
+#include "KnowledgeModel.h"
+#include "SceneDynamics.h"
 #include <QVector>
 #include <QScriptEngine>
 #include <QMap>
@@ -32,7 +32,7 @@ public:
 class DLL_EXPORT RangeQueryResult
 {
 public:
-    QObjectList actors;
+    QList<Actor*> actors;
 };
 
 class DLL_EXPORT Scene : public KnowledgeModel,
@@ -70,6 +70,8 @@ public:
 
     Q_INVOKABLE void destroy(Actor* actor);
     Q_INVOKABLE void setCameraFocus(Actor* actor);
+    // Attaches the actors scene node to the root scene node.
+    Q_INVOKABLE void attach(Actor* actor);
 
     // Reports the first hit actor in the scene.
     Q_INVOKABLE RaycastResult raycast(const Ogre::Vector3& origin,
@@ -95,6 +97,7 @@ public:
 signals:
     void actorAdded(const QString& actorName);
     void actorRemoved(const QString& actorName);
+    void actorRemovedObject(Actor* actor);
     void actorChangedVisibility(const QString& actorName, bool visible);
 public slots:
     void onRequestEmitCurrentActors();

@@ -1,6 +1,7 @@
-#include "javascriptbindings.h"
-#include "scene.h"
+#include "JavascriptBindings.h"
+#include "Scene.h"
 #include "utility/MetatypeDeclarations.h"
+#include "ScriptTimer.h"
 #include <QScriptEngine>
 #include <QTextStream>
 #include <QDebug>
@@ -19,131 +20,6 @@ Q_DECLARE_METATYPE(RaycastResult*)
 Q_DECLARE_METATYPE(RangeQueryResult)
 Q_DECLARE_METATYPE(RangeQueryResult*)
 Q_DECLARE_METATYPE(QVariantMap*)
-
-int ScriptTimer::newTimer(int interval,
-                          bool oneShot,
-                          QScriptEngine& engine,
-                          const QScriptValue& function)
-{
-    if(function.isFunction())
-    {
-        sScriptTimers.append(new ScriptTimer(interval, oneShot, engine, function));
-        return  sScriptTimers.last()->getHandle();
-    }
-    else
-    {
-        qWarning("The second parameter to setTimeout/setInterval must be a function.");
-        return -1;
-    }
-}
-
-bool ScriptTimer::removeTimer(int handle)
-{
-    QMutableListIterator<ScriptTimer*> i(sScriptTimers);
-    while (i.hasNext())
-    {
-        ScriptTimer* timer = i.next();
-        if (timer->getHandle() == handle)
-        {
-            delete timer;
-            i.remove();
-            return true;
-        }
-    }
-    return false;
-}
-
-void ScriptTimer::onEngineDestroyed(QObject* engine)
-{
-    int removedCount = 0;
-
-    QMutableListIterator<ScriptTimer*> i(sScriptTimers);
-    while (i.hasNext())
-    {
-        ScriptTimer* timer = i.next();
-        // Remove all timers registered with that engine.
-        if (&timer->getEngine() == engine)
-        {
-            delete timer;
-            i.remove();
-            removedCount++;
-        }
-    }
-
-    qDebug() << "Removed " << removedCount << " timers on script destruction.";
-}
-
-int ScriptTimer::getHandle() const
-{
-    return mHandle;
-}
-
-QScriptEngine& ScriptTimer::getEngine()
-{
-    return mEngine;
-}
-
-void ScriptTimer::update(float deltaTime)
-{
-    mTimeLeft -= deltaTime;
-
-    if(mTimeLeft < 0)
-    {
-        timeout();
-
-        if(mIsOneShot)
-        {
-            if(!sScriptTimers.removeOne(this))
-            {
-                qWarning("Failed to remove single shot timer with id %d.", mHandle);
-            }
-        }
-        else
-        {
-            mTimeLeft = mInitialTime;
-        }
-    }
-}
-
-ScriptTimer::ScriptTimer(int interval,
-                         bool oneShot,
-                         QScriptEngine& engine,
-                         const QScriptValue& function) :
-    mTimeLeft(interval / 1000.f),
-    mInitialTime(mTimeLeft),
-    mIsOneShot(oneShot),
-    mEngine(engine),
-    mFunction(function),
-    mHandle(ScriptTimer::gHandleCounter++)
-{
-    ;
-}
-
-void ScriptTimer::timeout()
-{
-    if(mFunction.isFunction())
-    {
-        mFunction.call();
-    }
-    else
-    {
-        qWarning("The second parameter to setTimeout/setInterval must be a function.");
-    }
-
-    JavaScriptBindings::checkScriptEngineException(mEngine, "script timer's timeout");
-}
-
-
-void ScriptTimer::updateAll(float deltaTime)
-{
-    foreach(ScriptTimer* timer, ScriptTimer::sScriptTimers)
-    {
-        timer->update(deltaTime);
-    }
-}
-
-int ScriptTimer::gHandleCounter = 0;
-QList<ScriptTimer*> ScriptTimer::sScriptTimers;
 
 namespace JavaScriptBindings
 {
@@ -423,14 +299,14 @@ void RangeQueryResult_register_prototype(QScriptEngine& engine)
 {
     QScriptValue obj = engine.newObject();
 
-    obj.setProperty("actors", engine.newFunction(RangeQueryResultt_prototype_actors),
+    obj.setProperty("actors", engine.newFunction(RangeQueryResult_prototype_actors),
                     QScriptValue::PropertyGetter | QScriptValue::ReadOnly);
 
     engine.setDefaultPrototype(qMetaTypeId<RangeQueryResult>(), obj);
     engine.setDefaultPrototype(qMetaTypeId<RangeQueryResult*>(), obj);
 }
 
-QScriptValue RangeQueryResultt_prototype_actors(QScriptContext *context, QScriptEngine *engine)
+QScriptValue RangeQueryResult_prototype_actors(QScriptContext *context, QScriptEngine *engine)
 {
     // Cast to a pointer to be able to modify the underlying C++ value
     RangeQueryResult* res = qscriptvalue_cast<RangeQueryResult*>(context->thisObject());
@@ -442,7 +318,13 @@ QScriptValue RangeQueryResultt_prototype_actors(QScriptContext *context, QScript
                                     this object is not a RangeQueryResult");
     }
 
-    return engine->toScriptValue(res->actors);
+    QScriptValue retVal = engine->newArray(res->actors.size());
+    quint32 i = 0;
+    foreach(Actor* actor, res->actors)
+    {
+        retVal.setProperty(i++, engine->toScriptValue(actor));
+    }
+    return retVal;
 }
 
 void RaycastResult_register_prototype(QScriptEngine& engine)
@@ -455,7 +337,6 @@ void RaycastResult_register_prototype(QScriptEngine& engine)
                     QScriptValue::PropertyGetter | QScriptValue::ReadOnly);
     obj.setProperty("hasHit", engine.newFunction(RaycastResult_prototype_hasHit),
                     QScriptValue::PropertyGetter | QScriptValue::ReadOnly);
-
     obj.setProperty("toString",
                     engine.evaluate("(function() {return 'RaycastResult @value ( \
                                      hasHit: ' + this.hasHit + ', distance: ' \
@@ -543,6 +424,7 @@ void Vector3_register_prototype(QScriptEngine& engine)
     obj.setProperty("add", engine.newFunction(Vector3_prototype_add));
     obj.setProperty("subtract", engine.newFunction(Vector3_prototype_subtract));
     obj.setProperty("multiply", engine.newFunction(Vector3_prototype_multiply));
+    obj.setProperty("divide", engine.newFunction(Vector3_prototype_divide));
     obj.setProperty("normalize", engine.newFunction(Vector3_prototype_normalize));
     obj.setProperty("distanceTo", engine.newFunction(Vector3_prototype_distance));
     obj.setProperty("equals", engine.newFunction(Vector3_prototype_equals));
@@ -811,6 +693,43 @@ QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *
     return engine->undefinedValue();
 }
 
+QScriptValue Vector3_prototype_divide(QScriptContext *context, QScriptEngine *engine)
+{
+    // Cast to a pointer to be able to modify the underlying C++ value
+    Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Vector3.prototype.divide: \
+                                    this object is not a Ogre::Vector3");
+    }
+
+    if (context->argumentCount() == 1)
+    {
+        if(context->argument(0).isNumber())
+        {
+            *v /= context->argument(0).toNumber();
+
+            return engine->toScriptValue(v);
+        }
+
+        Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
+        if (!v2)
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Vector3.prototype.divide:\
+                                        Argument #0 object is not a Ogre::Vector3 or a number");
+        }
+
+        *v /= *v2;
+
+        return engine->toScriptValue(v);
+    }
+
+    return engine->undefinedValue();
+}
+
 QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine *engine)
 {
     // Cast to a pointer to be able to modify the underlying C++ value
@@ -908,18 +827,9 @@ void removeActorBinding(Actor* actor, QScriptEngine& engine)
     }
 
     QString name = cleanIdentifier(actor->getName());
-    qDebug() << "Removing actor " << name << " from the scripting system.";
-
-    QScriptValue value = engine.globalObject().property(name);
-    if(value.toVariant().userType() != qMetaTypeId<Actor*>())
-    {
-        qDebug() << "The actor "
-                 << actor->getName()
-                 << " you tried to remove from the scripting environment wasn't properly added."
-                 << " The deletion is performed anyway.";
-    }
-
-    engine.globalObject().setProperty(name, engine.undefinedValue());
+    qDebug() << "Removing actor " << name << " / " << actor->getName() << "from the scripting system.";
+    engine.globalObject().setProperty(name, QScriptValue());
+    qDebug() << "Removed actor " << name << " from the scripting system.";
 }
 
 QString cleanIdentifier(const QString &input)

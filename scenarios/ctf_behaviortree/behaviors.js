@@ -1,14 +1,19 @@
 require("global.js")
 require("ctf_game.js")
 
-function getOwnFlag(color)
+var global = this;
+function getOwnFlagPos(color)
 {
-	return color === "red" ? flag_red : flag_green;
+	var red   = Scene.getKnowledge("goal_red");
+	var green = Scene.getKnowledge("goal_green");
+	return color === "red"   ? red : green;
 }
 
-function getOpponentFlag(color)
+function getOpponentFlagPos(color)
 {
-	return color === "red" ? flag_green : flag_red;
+	var red   = Scene.getKnowledge("goal_red");
+	var green = Scene.getKnowledge("goal_green");
+	return color === "red" ? green : red;
 }
 
 function PlayAnimation(animationName)
@@ -20,13 +25,21 @@ function PlayAnimation(animationName)
 PlayAnimation.prototype =
 {
 	run: function() {
+		this.actorRemoved = false;
+		var context = this;
 		var actor = this.userData["self"];
-		actor.enableAnimation("my_animation");
+		actor.removedFromScene.connect(function() {
+			context.actorRemoved = true;
+		})
+		actor.enableAnimation(this.animationName);
 		this.setStatus(Status.Waiting);
 	},
 	terminate: function() {
-		var actor = this.userData["self"];
-		actor.disableAnimation("my_animation");
+		if(this.actorRemoved)
+		{
+			var actor = this.userData["self"];
+			actor.disableAnimation(this.animationName);
+		}
 	}
 }
 extend(Behavior, PlayAnimation);
@@ -47,6 +60,11 @@ MoveTo.prototype =
 			context.notifySuccess();
 		});
 		this.setStatus(Status.Waiting);
+	},
+	terminate: function()
+	{
+		print("cancel move");
+		Pathfinding.cancelMove(this.userData["self"]);
 	}
 }
 extend(Behavior, MoveTo);
@@ -79,6 +97,7 @@ extend(BlackboardDecorator, EnemyInRange);
 
 function Shoot()
 {
+	this.fireRate = 5000;
 	Behavior.call(this);
 }
 
@@ -87,16 +106,36 @@ Shoot.prototype =
 	run: function()
 	{
 		var context = this;
-		/*shoot(userData["self"], 
-				userData["nearest_enemy"], 
-				function()
-				{
-					context.setStatus(StatusRunning);
-				})*/
-		setStatus(Status.Waiting);
+
+		if(typeof(this.userData["nearest_enemy"]) === "undefined")
+		{
+			// The actor we were shooting has been removed. (=killed)
+			this.notifySuccess();
+		}
+		else
+		{
+			shoot(this.userData["self"], 
+				  this.userData["nearest_enemy"]);
+
+			this.handle = setTimeout(this.fireRate, function() {
+				// Shoot again when possible.
+				context.setStatus(Status.Running);
+				delete context.handle;
+			})
+
+			this.setStatus(Status.Waiting);
+		}
 		// We don't need to notify the parent of success or failure here,
 		// because the decorator will prevent any further shooting by resetting the tree
 		// once no more targets are available.
+	},
+	terminate: function() 
+	{
+		print("terminating SHOOT :: " + this.handle)
+		if(typeof(this.handle) !== "undefined")
+		{
+			clearTimeout(this.handle);
+		}
 	}
 }
 extend(Behavior, Shoot);
@@ -110,7 +149,7 @@ GuardCarrier.prototype =
 {
 	run: function()
 	{
-		var carrier = userData["flag_carrier"];
+		var carrier = getFlagOwner(this.userData["team_color"]);
 		var self    = userData["self"];
 
 		if(self.position.distanceTo(carrier.position) > 0.1)
@@ -136,38 +175,81 @@ extend(Behavior, GuardCarrier);
 function MonitorTask(actor)
 {
 	this.actor = actor;
-	setInterval(250, function() {
-		var checkDistance = function(actor, flag) {
-			return actor.position.distanceTo(flag.position) < 0.1;
+	this.hasFlagHandle = setInterval(250, function() {
+		if(actor.getKnowledge("team_has_flag") === true)
+		{
+			return;
+		}
+
+		var checkDistance = function(actor, flagPos) {
+			return actor.position.distanceTo(flagPos) < 0.1;
 		};
 
-		var flag = actor.getKnowledge("has_flag") == true ? getOwnFlag(actor.getKnowledge("team_color")) : getOpponentFlag(actor.getKnowledge("team_color"));
-		if(checkDistance(actor, flag))
+		var ownFlagPos = getOwnFlagPos(actor.getKnowledge("team_color"));
+		var opponentFlagPos = getOpponentFlagPos(actor.getKnowledge("team_color"));
+		var flagPos = actor.getKnowledge("has_flag") == true ? ownFlagPos : opponentFlagPos;
+		if(checkDistance(actor, flagPos))
 		{
-			actor.setKnowledge("has_flag", !actor.getKnowledge("has_flag"));
+			if(flagPos.equals(opponentFlagPos))
+			{
+				capture(actor)
+			}
+			else
+			{
+				score(actor)
+			}
 		}
+	})
+
+	var removalFun = function(actor) {
+
+		print("removed nearest_enemy " + actor.name)
+		actor.setKnowledge("enemy_in_range", false)
+		actor.removeKnowledge("nearest_enemy");
+	}
+	this.rangeHandle = setInterval(1000, function() {
+		var result = Scene.rangeQuery(actor.position, 2).actors
+		for(var i = 0; i < result.length; ++i)
+		{
+			var other = result[i]
+			if(other.hasKnowledge("team_color") &&
+			   other.getKnowledge("team_color") !== actor.getKnowledge("team_color"))
+			{
+				actor.setKnowledge("enemy_in_range", true)
+
+				if(actor.hasKnowledge("nearest_enemy"))
+				{
+					var old = actor.getKnowledge("nearest_enemy")
+					old.removedFromScene.disconnect(removalFun)
+				}
+
+				actor.setKnowledge("nearest_enemy", other)
+				other.removedFromScene.connect(removalFun)
+				return
+			}
+		}
+		actor.setKnowledge("enemy_in_range", false)
 	})
 }
 
-for(var prop in Array.prototype)
-{
-	print(prop)
-}
-
-var monitored = [];
 function constructBehaviorTreeForActor(actor)
 {
 	var color = actor.getKnowledge("team_color");
-	var root = new Selector(new HasFlag(new WalkTo(getOwnFlag(color).position), actor), 
+	var root = new Selector(new HasFlag(new WalkTo(getOwnFlagPos(color)), actor), 
 					        new EnemyInRange(new Shoot(), actor), 
 					       	new TeamHasFlag(new GuardCarrier(), actor),
-					       	new WalkTo(getOpponentFlag(color).position)); // FIXME: behavior might end prematurely here..
+					       	new WalkTo(getOpponentFlagPos(color))); // FIXME: behavior might end prematurely here..
 
 	actor.setKnowledge("self", actor);
 	actor.setKnowledge("has_flag", false);
 	actor.setKnowledge("team_has_flag", false);
 	actor.setKnowledge("enemy_in_range", false);
+	var monitorTask = new MonitorTask(actor);
+	actor.monitorTask = monitorTask;
+	actor.removedFromScene.connect(function(actor) {
+		clearInterval(monitorTask.hasFlagHandle)
+		clearInterval(monitorTask.rangeHandle)
+	});
 	root.setUserData(actor.knowledge);
-	monitored += new MonitorTask(actor);
 	return root;
 }

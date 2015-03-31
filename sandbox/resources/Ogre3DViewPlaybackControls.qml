@@ -34,7 +34,7 @@ RowLayout {
         Slider {
             id: speedSlider
             minimumValue: 0.1
-            maximumValue: 5
+            maximumValue: 10
             stepSize: 0.1
             value: 1
             opacity: 1

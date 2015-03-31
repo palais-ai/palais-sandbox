@@ -1,33 +1,10 @@
 require("global.js")
-
-function shoot(actor, target) {
-	print(actor.name + " shot " + target.name + ". Bang.");
-}
-
 require("behaviors.js")
 
 Navmesh.hide()
 
-function printAll(b)
-{
-	if(b.children)
-	{
-		print(b.children.length)
-		for(var child in b.children)
-		{
-			printAll(child)
-		}
-	}
-	else
-	{
-		for(var prop in b)
-		{
-			print(prop);
-		}
-	}
-}
-
 var numCalls = 1;
+var defaultHealth = 10;
 function spawnFighter(startPos, teamColor, index) {
 	var actor = Scene.instantiate("player_team_" + teamColor + "_" + index,
 								  "Soldier2" + teamColor, 
@@ -45,12 +22,20 @@ function spawnFighter(startPos, teamColor, index) {
 	actor.lookAt(lookAtPos);
 	actor.setKnowledge("team_color", teamColor);
 	actor.setKnowledge("position", actor.position);
+	actor.setKnowledge("health", defaultHealth);
 
 	var root = constructBehaviorTreeForActor(actor);
-	print("root:");
-	printAll(root);
-
+	actor.setKnowledge("behavior_tree", root);
 	Scheduler.enqueue(root);
+	actor.removedFromScene.connect(function() {
+		print("DEQUEUEING")
+		Scheduler.dequeue(root);
+	});
+
+	var teamKey = "team_" + teamColor;
+	var before = Scene.getKnowledge(teamKey);
+	// Add actor to the team list.
+	Scene.setKnowledge(teamKey, before.push(actor));
 }
 
 function spawnTeam(teamSize, startPos) {
@@ -64,21 +49,14 @@ function spawnTeam(teamSize, startPos) {
 
 var timer;
 function onStart() {
-	var teamSize = 25;
+	var teamSize = 1;
+	Scene.setKnowledge("team_red", []);
+	Scene.setKnowledge("team_green", []);
 	spawnTeam(teamSize, flag_red.position)
 	spawnTeam(teamSize, flag_green.position)
 
-	print(Cube_000.position)
-	cubePosition = Cube_059.position
-
-	// Test values for the knowledge inspector.
-	Scene.setKnowledge("bool", true);
-	Scene.setKnowledge("int", 1);
-	Scene.setKnowledge("float", 2.1);
-	Scene.setKnowledge("floatarr", [2.0, 2.0, 2.0]);
-	Scene.setKnowledge("string", "hi");
-	Scene.setKnowledge("vec3", new Vector3(3,3,3));
-	Scene.setKnowledge("vec3array", [new Vector3(3,3,3), new Vector3(3,3,3)]);
+	Scene.setKnowledge("goal_red", flag_red.position);
+	Scene.setKnowledge("goal_green", flag_green.position);
 
 	Plane.setCastShadows(false)
 }

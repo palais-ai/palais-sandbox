@@ -11,7 +11,6 @@
 #include "ogrenode.h"
 #include "ogreengine.h"
 #include "cameranodeobject.h"
-
 #include <OgreCamera.h>
 
 OgreItem::OgreItem(QQuickItem *parent)

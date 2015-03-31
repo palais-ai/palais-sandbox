@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "PluginInterface.h"
-#include "pathfinding.h"
+#include "Pathfinding.h"
 
 class PathfindingPlugin : public QObject, public Plugin
 {

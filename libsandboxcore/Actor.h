@@ -1,7 +1,7 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
-#include "knowledgemodel.h"
+#include "KnowledgeModel.h"
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
 
@@ -33,6 +33,7 @@ public:
     Q_INVOKABLE void hide();
     Q_INVOKABLE void setCastShadows(bool hasShadows);
     Q_INVOKABLE QString toString() const;
+    Q_INVOKABLE void attach(Actor* other);
 
     void setVisible(bool visible);
 
@@ -47,6 +48,7 @@ public:
     Ogre::SceneNode* getSceneNode();
 signals:
     void visibilityChanged(Actor* self, bool visible);
+    void removedFromScene(Actor* self);
 private:
     Ogre::SceneNode* mNode;
 };

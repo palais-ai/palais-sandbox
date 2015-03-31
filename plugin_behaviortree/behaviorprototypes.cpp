@@ -1,7 +1,7 @@
 #include "BehaviorPrototypes.h"
 #include <QScriptEngine>
 #include <QDebug>
-#include "javascriptbindings.h"
+#include "Bindings/JavascriptBindings.h"
 
 using namespace ailib;
 
@@ -33,6 +33,7 @@ void ScriptBehavior::run()
 
 void ScriptBehavior::terminate()
 {
+    qDebug() << "TERMINATING SCRIPT";
     QScriptValue terminateVal = mScript.property("terminate");
     if(terminateVal.isFunction())
     {
@@ -148,8 +149,6 @@ void SchedulerPrototype::enqueue(QScriptValue behaviorValue)
     Scheduler* sched = qscriptvalue_cast<Scheduler*>(thisObject());
     Behavior* behavior = extractBehavior(behaviorValue);
     sched->enqueue(behavior);
-
-    engine()->collectGarbage();
 }
 
 void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
@@ -157,7 +156,8 @@ void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
     // Remove reference so that the behavior can be garbage collected by the script engine.
     mActiveBehaviors.remove(behaviorValue.objectId());
 
-    Scheduler* sched = qscriptvalue_cast<Scheduler*>(thisObject());
     Behavior* behavior = extractBehavior(behaviorValue);
-    sched->dequeue(behavior);
+    // Cascade terminate the behaviors from the root.
+    // This removes all references from the scheduler.
+    behavior->terminate();
 }

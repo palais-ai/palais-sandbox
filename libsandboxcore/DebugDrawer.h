@@ -1,7 +1,7 @@
 #ifndef DEBUGDRAWER_H
 #define DEBUGDRAWER_H
 
-// CREDITS: Adapted from http://ogre3d.org/tikiwiki/Debug+Drawing+Utility+Class
+// CREDITS (Public Domain): Adapted from http://ogre3d.org/tikiwiki/Debug+Drawing+Utility+Class
 #pragma once
  
 #include "libsandboxcore_global.h"

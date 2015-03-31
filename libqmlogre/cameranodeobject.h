@@ -11,10 +11,8 @@
 #define CAMERANODEOBJECT_H
 
 #include "qmlogre_global.h"
-
 #include <QObject>
 #include <QScopedPointer>
-
 #include <OgreVector3.h>
 
 namespace Ogre

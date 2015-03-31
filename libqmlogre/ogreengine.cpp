@@ -10,12 +10,9 @@
 #include "ogreengine.h"
 #include "ogreitem.h"
 #include "cameranodeobject.h"
-
 #include <exception>
-
 #include <Ogre.h>
 #include <OgreAnimation.h>
-
 #include <QDebug>
 #include <QOpenGLFunctions>
 #include <QDir>

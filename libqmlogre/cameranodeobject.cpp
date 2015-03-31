@@ -8,17 +8,14 @@
  */
 
 #include "cameranodeobject.h"
-
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>
 #include <OgreNode.h>
 #include <OgreCamera.h>
 #include <OgreAxisAlignedBox.h>
 #include <OgreStringConverter.h>
-
 #include <QDebug>
 #include <QThread>
-
 #include <cmath>
 
 extern QThread* g_engineThread;

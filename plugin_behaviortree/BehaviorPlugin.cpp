@@ -33,7 +33,8 @@ void BehaviorPlugin::onSceneStarted(const PluginInterface& interface, Scene& sce
 
     engine.setDefaultPrototype(qMetaTypeId<Scheduler*>(), engine.newQObject(&mSchedulerWrapper));
     engine.globalObject().setProperty("Scheduler",
-                                      engine.toScriptValue(&mScheduler));
+                                      engine.toScriptValue(&mScheduler),
+                                      QScriptValue::Undeletable | QScriptValue::ReadOnly);
 
     behavior_tree_register_prototypes(engine);
 }
@@ -55,6 +56,6 @@ void BehaviorPlugin::update(const PluginInterface& interface, Scene& scene, floa
                                                                deltaTime));
     if(timeInMs > 0)
     {
-        qDebug() << "Excessive frametime: " << timeInMs;
+        //qDebug() << "Excessive frametime: " << timeInMs;
     }
 }

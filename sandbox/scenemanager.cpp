@@ -1,9 +1,9 @@
 #include "scenemanager.h"
 #include "sceneloader.h"
-#include "scene.h"
+#include "Scene.h"
 #include "application.h"
 #include "utility/timedlogger.h"
-#include "javascriptbindings.h"
+#include "Bindings/JavascriptBindings.h"
 #include "../libqmlogre/ogreengine.h"
 #include <QtGlobal>
 #include <QTimerEvent>
@@ -12,7 +12,7 @@
 #include <OgreSceneManager.h>
 
 const float SceneManager::sMinimumSpeedFactor = 0.1f; // In times the normal speed
-const float SceneManager::sMaximumSpeedFactor = 5.f;  // In times the normal speed
+const float SceneManager::sMaximumSpeedFactor = 10.f;  // In times the normal speed
 const float SceneManager::sMaximumTickRate    = 100.f; // In ticks Per Second
 const float SceneManager::sAITickRate         = 100.f; // In ticks Per Second
 

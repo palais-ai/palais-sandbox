@@ -7,7 +7,7 @@
 #include <QVector>
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
-#include "actor.h"
+#include "Actor.h"
 
 Q_DECLARE_METATYPE(Actor*)
 Q_DECLARE_METATYPE(Ogre::Vector3)

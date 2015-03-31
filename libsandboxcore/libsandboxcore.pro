@@ -17,23 +17,25 @@ macx:QMAKE_LFLAGS_SONAME = -Wl,-install_name,@executable_path/../Plugins/
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
 
 SOURCES += \
-    actor.cpp \
-    javascriptbindings.cpp \
-    knowledgemodel.cpp \
-    ogrehelper.cpp \
-    scene.cpp \
+    Actor.cpp \
+    Bindings/JavascriptBindings.cpp \
+    KnowledgeModel.cpp \
+    OgreHelper.cpp \
+    Scene.cpp \
     DebugDrawer.cpp \
-    scenedynamics.cpp
+    SceneDynamics.cpp \
+    Bindings/ScriptTimer.cpp
 
 HEADERS +=\
     libsandboxcore_global.h \
-    actor.h \
-    javascriptbindings.h \
-    knowledgemodel.h \
-    ogrehelper.h \
-    scene.h \
+    Bindings/JavascriptBindings.h \
+    KnowledgeModel.h \
+    OgreHelper.h \
+    Scene.h \
     DebugDrawer.h \
-    scenedynamics.h
+    SceneDynamics.h \
+    Bindings/ScriptTimer.h \
+    Actor.h
 
 include(../linkOgreSDK.pri)
 include(../linkBulletSDK.pri)

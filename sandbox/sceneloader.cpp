@@ -1,7 +1,7 @@
 #include "sceneloader.h"
-#include "scene.h"
-#include "actor.h"
-#include "javascriptbindings.h"
+#include "Scene.h"
+#include "Actor.h"
+#include "Bindings/JavascriptBindings.h"
 #include "application.h"
 #include "PluginManager.h"
 #include <exception>

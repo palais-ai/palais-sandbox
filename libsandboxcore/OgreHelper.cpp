@@ -1,4 +1,4 @@
-#include "ogrehelper.h"
+#include "OgreHelper.h"
 #include <QDebug>
 #include <OgreLogManager.h>
 #include <OgreEntity.h>
@@ -38,7 +38,7 @@ const Ogre::MeshPtr optimizeMesh(const Ogre::MeshPtr mesh)
     return mesh;
 }
 
-// CREDITS: Public domain license, from http://www.ogre3d.org/tikiwiki/tiki-index.php?page=RetrieveVertexData
+// CREDITS (Public Domain): From http://www.ogre3d.org/tikiwiki/tiki-index.php?page=RetrieveVertexData
 void getMeshInformation(const Ogre::MeshPtr mesh,
                         size_t &vertex_count,
                         Ogre::Vector3* &vertices,

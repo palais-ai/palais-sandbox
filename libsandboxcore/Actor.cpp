@@ -1,4 +1,4 @@
-#include "actor.h"
+#include "Actor.h"
 #include <cassert>
 #include <QDebug>
 #include <QVector>
@@ -177,4 +177,10 @@ QString Actor::getName() const
 QString Actor::toString() const
 {
     return "Actor (name: \"" + getName() + "\")";
+}
+
+void Actor::attach(Actor* other)
+{
+    other->getSceneNode()->getParent()->removeChild(other->getSceneNode());
+    mNode->addChild(other->getSceneNode());
 }

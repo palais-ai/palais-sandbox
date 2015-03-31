@@ -1,16 +1,14 @@
-#include "pathfinding.h"
-#include "ogrehelper.h"
+#include "Pathfinding.h"
+#include "OgreHelper.h"
 #include "DebugDrawer.h"
 #include "utility/MetatypeDeclarations.h"
-#include "actor.h"
-#include "scene.h"
-
+#include "Actor.h"
+#include "Scene.h"
 #include <QScopedArrayPointer>
 #include <QHash>
 #include <QVector>
 #include <QSet>
 #include <QDebug>
-
 #include <OgreLogManager.h>
 #include <OgreEntity.h>
 #include <OgreSceneNode.h>
@@ -95,17 +93,7 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
             else
             {
                 actor.removeKnowledge("movement_target");
-
-                if(actor.hasKnowledge("goal_reached_callback"))
-                {
-                    GoalReachedCallback* cb = actor.getKnowledge("goal_reached_callback")
-                                                    .value<GoalReachedCallback*>();
-
-                    // FIXME: This crashes (sometimes).
-                    cb->onGoalReached(actor);
-                    actor.removeKnowledge("goal_reached_callback");
-                    delete cb;
-                }
+                removeCallback(&actor);
             }
         }
 
@@ -409,39 +397,39 @@ void Pathfinding::moveActor(Actor* actor,
     actor->setKnowledge("movement_target", QVariant::fromValue(qpath.first()));
 
     // Residual from another pathfinding call, that was interrupted before reaching the goal.
-    if(actor->hasKnowledge("goal_reached_callback"))
-    {
-        GoalReachedCallback* cb = actor->getKnowledge("goal_reached_callback")
-                                        .value<GoalReachedCallback*>();
-        actor->removeKnowledge("goal_reached_callback");
-        delete cb;
-    }
+    removeCallback(actor);
 
     if(!onFinishedCallback.isUndefined())
     {
+        connect(actor, &Actor::removedFromScene,
+                this, &Pathfinding::onActorRemoved);
         GoalReachedCallback* cb = new GoalReachedCallback(onFinishedCallback);
-        connect(actor, &QObject::destroyed,
-                this, &Pathfinding::onActorDestroyed);
         actor->setKnowledge("goal_reached_callback", QVariant::fromValue(cb));
     }
 }
 
-void Pathfinding::onActorDestroyed(QObject* actorObject)
+void Pathfinding::cancelMove(Actor* actor)
 {
-    Actor* actor = qobject_cast<Actor*>(actorObject);
+    actor->removeKnowledge("current_path");
+    actor->removeKnowledge("movement_target");
+    actor->removeKnowledge("goal_reached_callback");
+}
 
-    // FIXME: Somehow actors get corrupted in this callback.
-    return;
-    if(!actor)
-    {
-        qWarning("Destroyed object (unexpectedly) wasn't an Actor.");
-        return;
-    }
+void Pathfinding::onActorRemoved(Actor* actor)
+{
+    removeCallback(actor);
+}
 
+void Pathfinding::removeCallback(Actor* actor)
+{
     if(actor->hasKnowledge("goal_reached_callback"))
     {
+        disconnect(actor, &Actor::removedFromScene,
+                   this, &Pathfinding::onActorRemoved);
+
         GoalReachedCallback* cb = actor->getKnowledge("goal_reached_callback")
                                         .value<GoalReachedCallback*>();
+        actor->removeKnowledge("goal_reached_callback");
         delete cb;
     }
 }

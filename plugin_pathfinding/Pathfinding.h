@@ -54,14 +54,17 @@ public:
                                const Ogre::Vector3& target,
                                QScriptValue onFinishedCallback =  QScriptValue::UndefinedValue);
 
+    Q_INVOKABLE void cancelMove(Actor* actor);
+
     ailib::AStar<NavigationGraph>::path_type planPath(const Ogre::Vector3& from,
                                                       const Ogre::Vector3& to,
                                                       bool* isAlreadyThere = NULL);
 
     const NavigationGraph::node_type* getNavNodeClosestToPoint(const Ogre::Vector3& point);
 private slots:
-    void onActorDestroyed(QObject* actor);
+    void onActorRemoved(Actor* actor);
 private:
+    void removeCallback(Actor* actor);
     NavigationGraph mGraph;
 };
 

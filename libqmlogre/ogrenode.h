@@ -11,9 +11,7 @@
 #define OGRENODE_H
 
 #include "qmlogre_global.h"
-
 #include "ogreengine.h"
-
 #include <QObject>
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGTextureMaterial>

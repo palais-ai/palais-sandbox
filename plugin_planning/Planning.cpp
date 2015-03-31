@@ -1,6 +1,6 @@
 #include "Planning.h"
-#include "scene.h"
-#include "actor.h"
+#include "Scene.h"
+#include "Actor.h"
 
 #include <QScriptEngine>
 #include <QDebug>

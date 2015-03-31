@@ -1,6 +1,6 @@
 #include "projectmanager.h"
-#include "scene.h"
-#include "actor.h"
+#include "Scene.h"
+#include "Actor.h"
 #include "application.h"
 #include <QJsonDocument>
 #include <QJsonObject>

@@ -23,7 +23,7 @@ BlackboardDecorator::BlackboardDecorator(Scheduler& scheduler,
 
 void BlackboardDecorator::run()
 {
-    if(getStatus() != StatusWaiting)
+    if(getStatus() == StatusRunning)
     {
 #if PRINT_DEBUG
         qDebug() << "Registering [" << mObservedValue << "]";
@@ -37,6 +37,12 @@ void BlackboardDecorator::run()
     if(it != state.end() && it.value().toBool())
     {
         scheduleBehavior();
+
+        if(getStatus() != StatusRunning)
+        {
+            notifyReset();
+        }
+
         setStatus(StatusWaiting);
     }
     else
@@ -52,6 +58,7 @@ void BlackboardDecorator::terminate()
 #endif
     disconnect(mActor, &KnowledgeModel::knowledgeChanged,
                this, &BlackboardDecorator::onKnowledgeChanged);
+    Decorator::terminate();
 }
 
 void BlackboardDecorator::onKnowledgeChanged(const QString& key, const QVariant& knowledge)
@@ -117,12 +124,13 @@ void Behavior_register_prototype(QScriptEngine& engine)
     ctors["Parallel"] = composite_prototype_ctor<Parallel>;
     ctors["BlackboardDecorator"] = BlackboardDecorator_prototype_ctor;
 
+    QScriptValue::PropertyFlags flags = QScriptValue::Undeletable | QScriptValue::ReadOnly;
     for(QMap<QString, QScriptEngine::FunctionSignature>::iterator it = ctors.begin();
         it != ctors.end(); ++it)
     {
         QScriptValue ctor = engine.newFunction(it.value());
         ctor.setProperty("prototype", prototype);
-        engine.globalObject().setProperty(it.key(), ctor);
+        engine.globalObject().setProperty(it.key(), ctor, flags);
     }
 }
 
@@ -136,9 +144,8 @@ QScriptValue construct_shared_behavior(QScriptContext* context,
                                        Behavior* ptr)
 {
     context->thisObject().setProperty("__behavior",
-                                      engine->toScriptValue(QSharedPointer<Behavior>(ptr)));
-
-    ptr->mObjectId = context->thisObject().objectId();
+                                      engine->toScriptValue(QSharedPointer<Behavior>(ptr)),
+                                      QScriptValue::Undeletable | QScriptValue::ReadOnly);
 
     return engine->undefinedValue();
 }
@@ -209,6 +216,8 @@ QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScript
     QScriptValue array = engine->newArray();
     array.property("push").call(array, QScriptValueList() << context->argument(0));
     // Increase the internal ref count of the child node.
-    context->thisObject().setProperty("children", array);
+    context->thisObject().setProperty("children",
+                                      array,
+                                      QScriptValue::Undeletable | QScriptValue::ReadOnly);
     return engine->undefinedValue();
 }

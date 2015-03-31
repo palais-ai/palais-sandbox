@@ -10,16 +10,12 @@
 #include <RenderSystems/GL/OgreGLTexture.h>
 #include <RenderSystems/GL/OgreGLFrameBufferObject.h>
 #include <RenderSystems/GL/OgreGLFBORenderTexture.h>
-
 #include "ogrenode.h"
-
 #include <sstream>
 #include <cfloat>
-
 #include <Ogre.h>
 #include <OgreString.h>
 #include <OgreRenderTarget.h>
-
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QSurfaceFormat>

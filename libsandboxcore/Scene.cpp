@@ -1,6 +1,6 @@
-#include "scene.h"
-#include "actor.h"
-#include "javascriptbindings.h"
+#include "Scene.h"
+#include "Actor.h"
+#include "Bindings/JavascriptBindings.h"
 #include "DebugDrawer.h"
 #include "../libqmlogre/cameranodeobject.h"
 #include "../libqmlogre/ogreengine.h"
@@ -115,6 +115,12 @@ void Scene::setCameraFocus(Actor* actor)
     }
 
     camera->focus(actor->getSceneNode());
+}
+
+void Scene::attach(Actor* actor)
+{
+    actor->getSceneNode()->getParent()->removeChild(actor->getSceneNode());
+    getOgreSceneManager()->getRootSceneNode()->addChild(actor->getSceneNode());
 }
 
 bool Scene::frameStarted(const Ogre::FrameEvent& evt)
@@ -345,8 +351,13 @@ void Scene::destroy(Actor* actor)
 
     JavaScriptBindings::removeActorBinding(actor, mLogicScript);
 
-    mActors.remove(actor->getName());
+    int numRemoved = mActors.remove(actor->getName());
+    qDebug() << "[" << actor->getName() << "] : Num. Removed: " << numRemoved;
+    assert(numRemoved == 1);
     emit actorRemoved(actor->getName());
+    emit actorRemovedObject(actor);
+    emit actor->removedFromScene(actor);
+    delete actor;
 }
 
 Actor* Scene::getActor(unsigned int index)

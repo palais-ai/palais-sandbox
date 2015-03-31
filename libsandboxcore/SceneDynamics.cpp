@@ -1,5 +1,5 @@
-#include "scenedynamics.h"
-#include "ogrehelper.h"
+#include "SceneDynamics.h"
+#include "OgreHelper.h"
 #include <QScopedArrayPointer>
 #include <btBulletDynamicsCommon.h>
 #include <BulletCollision/CollisionShapes/btShapeHull.h>

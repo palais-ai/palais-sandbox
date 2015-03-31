@@ -1,4 +1,4 @@
-#include "knowledgemodel.h"
+#include "KnowledgeModel.h"
 
 KnowledgeModel::KnowledgeModel()
 {
@@ -11,28 +11,35 @@ bool KnowledgeModel::hasKnowledge(const QString &key) const
 
 QVariant KnowledgeModel::getKnowledge(const QString& key) const
 {
-    const QVariant& retVal = mKnowledge[key];
-
-    return retVal;
+    return mKnowledge[key];
 }
 
 void KnowledgeModel::removeKnowledge(const QString& key)
 {
-    mKnowledge.remove(key);
-    emit knowledgeRemoved(key);
+    int numRemoved = mKnowledge.remove(key);
+
+    if(numRemoved != 0)
+    {
+        emit knowledgeRemoved(key);
+    }
 }
 
 void KnowledgeModel::setKnowledge(const QString& key, const QVariant& value)
 {
-    const bool isEdited = mKnowledge.contains(key);
-    mKnowledge[key] = value;
+    QVariantMap::iterator it = mKnowledge.find(key);
+    const bool isEdited = it != mKnowledge.end();
 
     if(isEdited)
     {
-        emit knowledgeChanged(key, value);
+        if(value != it.value())
+        {
+            mKnowledge.insert(it, key, value);
+            emit knowledgeChanged(key, value);
+        }
     }
     else
     {
+        mKnowledge.insert(key, value);
         emit knowledgeAdded(key, value);
     }
 }

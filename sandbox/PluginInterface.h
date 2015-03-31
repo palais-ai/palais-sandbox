@@ -5,8 +5,8 @@
 
 #include <stdint.h>
 #include <QScriptEngine>
-#include "actor.h"
-#include "scene.h"
+#include "Actor.h"
+#include "Scene.h"
 
 class PluginInterface
 {

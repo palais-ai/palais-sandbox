@@ -19,7 +19,7 @@ Behavior::Behavior() :
 
 Behavior::~Behavior()
 {
-    fprintf(stderr, "Behavior dtor [%lu]\n", mObjectId);
+    ;
 }
 
 void Behavior::setListener(BehaviorListener* listener)
