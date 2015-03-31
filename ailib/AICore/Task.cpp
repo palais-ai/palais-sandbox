@@ -51,6 +51,11 @@ void Task::addRuntime(const HighResolutionTime::Timestamp& runtime)
     mRuntime += runtime;
 }
 
+void Task::resetRuntime()
+{
+    mRuntime = 0;
+}
+
 HighResolutionTime::Timestamp Task::getRuntime() const
 {
     return mRuntime;

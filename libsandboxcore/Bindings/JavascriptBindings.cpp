@@ -23,6 +23,7 @@ Q_DECLARE_METATYPE(QVariantMap*)
 
 namespace JavaScriptBindings
 {
+static QScopedPointer<ScriptTimerFactory> gTimerFactory(new ScriptTimerFactory);
 
 static void installModuleSystem(QScriptEngine& engine, Scene* scene)
 {
@@ -160,7 +161,8 @@ QScriptValue script_require(QScriptContext *context, QScriptEngine *engine)
 
 void timers_register(QScriptEngine& engine)
 {
-    QObject::connect(&engine, &QScriptEngine::destroyed, &ScriptTimer::onEngineDestroyed);
+    QObject::connect(&engine, &QScriptEngine::destroyed,
+                     gTimerFactory.data(), &ScriptTimerFactory::onEngineDestroyed);
 
     engine.globalObject().setProperty("setTimeout",
                                       engine.newFunction(script_setTimeout));
@@ -174,7 +176,7 @@ void timers_register(QScriptEngine& engine)
 
 void timers_update(float deltaTime)
 {
-    ScriptTimer::updateAll(deltaTime);
+    gTimerFactory->updateTimers(deltaTime);
 }
 
 void checkScriptEngineException(QScriptEngine& engine, const QString& context)
@@ -219,7 +221,7 @@ QScriptValue script_addTimer_private(QScriptContext *context, QScriptEngine *eng
             {
                 QScriptValue function = context->argument(1).toObject();
 
-                return ScriptTimer::newTimer(interval, oneShot, *engine, function);
+                return gTimerFactory->newTimer(interval, oneShot, function);
             }
             else
             {
@@ -249,17 +251,23 @@ QScriptValue script_removeTimer_private(QScriptContext *context, QScriptEngine *
         {
             int handle = context->argument(0).toInteger();
 
-            return ScriptTimer::removeTimer(handle);
+            bool didRemove = gTimerFactory->removeTimer(handle);
+
+            if(!didRemove)
+            {
+                qWarning() << "clearTimeout / clearInterval : Failed to remove timer by handle [ " << handle << " ].";
+            }
+            return didRemove;
         }
         else
         {
-            qWarning() << "The removeTimeout function requires an integer as its first argument.";
+            qWarning() << "clearTimeout / clearInterval : This function requires an integer as its first argument.";
             return engine->undefinedValue();
         }
     }
     else
     {
-        qWarning() << "The removeTimeout function requires 1 argument.";
+        qWarning() << "clearTimeout / clearInterval : This function requires 1 argument.";
         return engine->undefinedValue();
     }
 }
@@ -826,13 +834,14 @@ void removeActorBinding(Actor* actor, QScriptEngine& engine)
         return;
     }
 
+    qDebug() << "Name before " << actor->getName();
     QString name = cleanIdentifier(actor->getName());
     qDebug() << "Removing actor " << name << " / " << actor->getName() << "from the scripting system.";
     engine.globalObject().setProperty(name, QScriptValue());
     qDebug() << "Removed actor " << name << " from the scripting system.";
 }
 
-QString cleanIdentifier(const QString &input)
+QString cleanIdentifier(const QString& input)
 {
     QString output = input;
     for(int i = 0; i < input.size(); ++i)

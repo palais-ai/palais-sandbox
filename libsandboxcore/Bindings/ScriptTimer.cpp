@@ -2,19 +2,22 @@
 #include "JavascriptBindings.h"
 #include <qDebug>
 
-qint32 ScriptTimer::sHandleCounter = 0;
-QHash<qint32, ScriptTimer*> ScriptTimer::sScriptTimers;
+ScriptTimerFactory::ScriptTimerFactory(QObject* parent) :
+    QObject(parent),
+    mHandleCounter(0)
+{
 
-qint32 ScriptTimer::newTimer(int interval,
-                             bool oneShot,
-                             QScriptEngine& engine,
-                             const QScriptValue& function)
+}
+
+qint32 ScriptTimerFactory::newTimer(int interval,
+                                    bool oneShot,
+                                    const QScriptValue& function)
 {
     if(function.isFunction())
     {
-        ScriptTimer* timer = new ScriptTimer(interval, oneShot, engine, function);
-        sScriptTimers.insert(timer->getHandle(), timer);
-        return  timer->getHandle();
+        ScriptTimer* timer = new ScriptTimer(interval, oneShot, function);
+        mScriptTimers.insert(mHandleCounter, timer);
+        return mHandleCounter++;
     }
     else
     {
@@ -23,14 +26,16 @@ qint32 ScriptTimer::newTimer(int interval,
     }
 }
 
-bool ScriptTimer::removeTimer(qint32 handle)
+bool ScriptTimerFactory::removeTimer(qint32 handle)
 {
-    QHash<qint32, ScriptTimer*>::iterator it = sScriptTimers.find(handle);
+    QHash<qint32, ScriptTimer*>::iterator it = mScriptTimers.find(handle);
 
-    if(it != sScriptTimers.end())
+    if(it != mScriptTimers.end())
     {
-        delete it.value();
-        sScriptTimers.remove(handle);
+        ScriptTimer* timer = it.value();
+        mScriptTimers.remove(handle);
+        // DeleteLater is necessary here, because a timer may be removed while it is running.
+        timer->deleteLater();
         return true;
     }
     else
@@ -39,59 +44,31 @@ bool ScriptTimer::removeTimer(qint32 handle)
     }
 }
 
-void ScriptTimer::updateAll(float deltaTime)
+void ScriptTimerFactory::updateTimers(float deltaTime)
 {
-    foreach(ScriptTimer* timer, ScriptTimer::sScriptTimers)
+    QMutableHashIterator<qint32, ScriptTimer*> it(mScriptTimers);
+    while(it.hasNext())
     {
-        timer->update(deltaTime);
-    }
-}
-
-void ScriptTimer::update(float deltaTime)
-{
-    mTimeLeft -= deltaTime;
-
-    if(mTimeLeft < 0)
-    {
-        timeout();
-
-        if(mIsOneShot)
+        ScriptTimer* timer  = it.next().value();
+        if(timer->update(deltaTime))
         {
-            if(sScriptTimers.remove(mHandle) != 1)
-            {
-                qWarning("Failed to remove single shot timer with id %d.", mHandle);
-            }
-        }
-        else
-        {
-            mTimeLeft = mInitialTime;
+            it.remove();
+            delete timer;
         }
     }
 }
 
-
-qint32 ScriptTimer::getHandle() const
-{
-    return mHandle;
-}
-
-QScriptEngine& ScriptTimer::getEngine()
-{
-    return mEngine;
-}
-
-void ScriptTimer::onEngineDestroyed(QObject* engine)
+void ScriptTimerFactory::onEngineDestroyed(QObject* engine)
 {
     int removedCount = 0;
 
-    QMutableHashIterator<qint32, ScriptTimer*> i(sScriptTimers);
+    QMutableHashIterator<qint32, ScriptTimer*> i(mScriptTimers);
     while (i.hasNext())
     {
-        QHash<qint32, ScriptTimer*>::iterator it = i.next();
-        ScriptTimer* timer = it.value();
+        ScriptTimer* timer = i.next().value();
 
         // Remove all timers registered with that engine.
-        if (&timer->getEngine() == engine)
+        if (timer->getEngine() == engine)
         {
             delete timer;
             i.remove();
@@ -102,31 +79,46 @@ void ScriptTimer::onEngineDestroyed(QObject* engine)
     qDebug() << "Removed " << removedCount << " timers on script destruction.";
 }
 
+
+bool ScriptTimer::update(float deltaTime)
+{
+    mTimeLeft -= deltaTime;
+
+    if(mTimeLeft < 0)
+    {
+        timeout();
+
+        if(mIsOneShot)
+        {
+            return true;
+        }
+        else
+        {
+            mTimeLeft = mInitialTime;
+        }
+    }
+    return false;
+}
+
+QScriptEngine* ScriptTimer::getEngine()
+{
+    return mFunction.engine();
+}
+
 ScriptTimer::ScriptTimer(int interval,
                          bool oneShot,
-                         QScriptEngine& engine,
                          const QScriptValue& function) :
     mTimeLeft(interval / 1000.f),
     mInitialTime(mTimeLeft),
     mIsOneShot(oneShot),
-    mEngine(engine),
-    mFunction(function),
-    mHandle(ScriptTimer::sHandleCounter++)
+    mFunction(function)
 {
     ;
 }
 
 void ScriptTimer::timeout()
 {
-    if(mFunction.isFunction())
-    {
-        mFunction.call();
-    }
-    else
-    {
-        qWarning("ScriptTimer.timeout: The second parameter to setTimeout/setInterval must be a function.");
-    }
-
-    JavaScriptBindings::checkScriptEngineException(mEngine, "script timer's timeout");
+    mFunction.call();
+    JavaScriptBindings::checkScriptEngineException(*getEngine(), "script timer's timeout");
 }
 

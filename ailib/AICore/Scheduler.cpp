@@ -45,6 +45,7 @@ void Scheduler::enqueue(Task* task)
     else
     {
         task->setStatus(StatusRunning);
+        task->resetRuntime();
         mTasks.insert(task);
     }
     task->setListener(this);
@@ -154,6 +155,10 @@ void Scheduler::onStatusChanged(Task* task, Status from)
     else if(from == StatusRunning)
     {
         removeRunning(task);
+    }
+    else if(to == StatusTerminated)
+    {
+        task->setListener(NULL);
     }
 }
 

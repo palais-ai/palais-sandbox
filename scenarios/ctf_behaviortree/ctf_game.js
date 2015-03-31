@@ -1,7 +1,10 @@
 function shoot(actor, target)
 {
-    print(actor.name + " shot " + target.name + ". Bang.");
-    var newHealth = target.getKnowledge("health") - 1;
+    var health    = target.getKnowledge("health");
+    var newHealth = health - 1;
+
+    print(actor.name + " shot " + target.name + ". Bang. [" + health + " -> " + newHealth + "]");
+
     if(newHealth <= 0)
     {
         Scene.destroy(target);
@@ -81,4 +84,6 @@ function score(actor)
     Scene.attach(flag);
     flag.scale = flag.scale.multiply(actor.scale);
     flag.position = Scene.getKnowledge(flagPosKey);
+
+    Scene.destroy(actor);
 }

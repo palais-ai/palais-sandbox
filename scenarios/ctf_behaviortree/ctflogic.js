@@ -28,7 +28,6 @@ function spawnFighter(startPos, teamColor, index) {
 	actor.setKnowledge("behavior_tree", root);
 	Scheduler.enqueue(root);
 	actor.removedFromScene.connect(function() {
-		print("DEQUEUEING")
 		Scheduler.dequeue(root);
 	});
 

@@ -171,7 +171,7 @@ void Actor::toggleHighlight(bool highlighted)
 
 QString Actor::getName() const
 {
-    return mNode->getName().c_str();
+    return QString::fromStdString(mNode->getName());
 }
 
 QString Actor::toString() const

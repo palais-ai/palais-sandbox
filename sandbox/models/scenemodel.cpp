@@ -89,6 +89,7 @@ void SceneModel::onActorAdded(const QString& actorName)
 
 void SceneModel::onActorRemoved(const QString& actorName)
 {
+    qDebug("Removed actor from model %s", actorName.toStdString().c_str());
     int i = indexForActorName(actorName);
     if(i != -1)
     {

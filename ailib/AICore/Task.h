@@ -37,6 +37,7 @@ public:
     Status getStatus() const;
     void setStatus(Status status);
     void addRuntime(const HighResolutionTime::Timestamp& runtime);
+    void resetRuntime();
     HighResolutionTime::Timestamp getRuntime() const;
 private:
     TaskListener* mListener;

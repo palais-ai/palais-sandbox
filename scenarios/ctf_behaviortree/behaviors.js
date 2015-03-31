@@ -25,13 +25,17 @@ function PlayAnimation(animationName)
 PlayAnimation.prototype =
 {
 	run: function() {
+		print('running PlayAnimation');
 		this.actorRemoved = false;
 		var context = this;
 		var actor = this.userData["self"];
+		print(actor.name)
+		print("play animation for " + actor.name)
+		actor.enableAnimation(this.animationName);
 		actor.removedFromScene.connect(function() {
+			print('setting removal flag')
 			context.actorRemoved = true;
 		})
-		actor.enableAnimation(this.animationName);
 		this.setStatus(Status.Waiting);
 	},
 	terminate: function() {
@@ -55,6 +59,7 @@ MoveTo.prototype =
 {
 	run: function()
 	{
+		print('running MoveTo');
 		var context = this;
 		Pathfinding.moveActor(this.userData["self"], this.goal, function() {
 			context.notifySuccess();
@@ -105,7 +110,10 @@ Shoot.prototype =
 {
 	run: function()
 	{
+		print('running Shoot');
 		var context = this;
+
+		print(this.userData["self"].name + ' shooting.');
 
 		if(typeof(this.userData["nearest_enemy"]) === "undefined")
 		{
@@ -149,6 +157,7 @@ GuardCarrier.prototype =
 {
 	run: function()
 	{
+		print('running GuardCarrier');
 		var carrier = getFlagOwner(this.userData["team_color"]);
 		var self    = userData["self"];
 
@@ -176,6 +185,7 @@ function MonitorTask(actor)
 {
 	this.actor = actor;
 	this.hasFlagHandle = setInterval(250, function() {
+		print("has flag handle")
 		if(actor.getKnowledge("team_has_flag") === true)
 		{
 			return;
@@ -202,12 +212,12 @@ function MonitorTask(actor)
 	})
 
 	var removalFun = function(actor) {
-
-		print("removed nearest_enemy " + actor.name)
+		print("removing nearest_enemy")
 		actor.setKnowledge("enemy_in_range", false)
 		actor.removeKnowledge("nearest_enemy");
 	}
 	this.rangeHandle = setInterval(1000, function() {
+		print("range handle")
 		var result = Scene.rangeQuery(actor.position, 2).actors
 		for(var i = 0; i < result.length; ++i)
 		{
@@ -238,7 +248,7 @@ function constructBehaviorTreeForActor(actor)
 	var root = new Selector(new HasFlag(new WalkTo(getOwnFlagPos(color)), actor), 
 					        new EnemyInRange(new Shoot(), actor), 
 					       	new TeamHasFlag(new GuardCarrier(), actor),
-					       	new WalkTo(getOpponentFlagPos(color))); // FIXME: behavior might end prematurely here..
+					       	new WalkTo(getOpponentFlagPos(color)));
 
 	actor.setKnowledge("self", actor);
 	actor.setKnowledge("has_flag", false);
@@ -246,7 +256,8 @@ function constructBehaviorTreeForActor(actor)
 	actor.setKnowledge("enemy_in_range", false);
 	var monitorTask = new MonitorTask(actor);
 	actor.monitorTask = monitorTask;
-	actor.removedFromScene.connect(function(actor) {
+	actor.removedFromScene.connect(function() {
+		print('removing timers');
 		clearInterval(monitorTask.hasFlagHandle)
 		clearInterval(monitorTask.rangeHandle)
 	});

@@ -346,17 +346,20 @@ void Scene::destroy(Actor* actor)
         return;
     }
 
-    destroyAllAttachedMovableObjects(actor->getSceneNode());
-    actor->getSceneNode()->getCreator()->destroySceneNode(actor->getSceneNode());
-
-    JavaScriptBindings::removeActorBinding(actor, mLogicScript);
-
     int numRemoved = mActors.remove(actor->getName());
     qDebug() << "[" << actor->getName() << "] : Num. Removed: " << numRemoved;
     assert(numRemoved == 1);
+
     emit actorRemoved(actor->getName());
     emit actorRemovedObject(actor);
     emit actor->removedFromScene(actor);
+
+    JavaScriptBindings::removeActorBinding(actor, mLogicScript);
+
+    // Destroy the actor's scene node last. Since it contains data used by the Actor* instance.
+    destroyAllAttachedMovableObjects(actor->getSceneNode());
+    actor->getSceneNode()->getCreator()->destroySceneNode(actor->getSceneNode());
+
     delete actor;
 }
 

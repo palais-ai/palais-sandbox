@@ -5,6 +5,27 @@
 #include <QScriptEngine>
 #include <QHash>
 
+class ScriptTimer;
+
+class ScriptTimerFactory : public QObject
+{
+    Q_OBJECT
+public:
+    explicit ScriptTimerFactory(QObject* parent = NULL);
+
+    qint32 newTimer(int interval,
+                    bool oneShot,
+                    const QScriptValue& function);
+    bool removeTimer(qint32 handle);
+
+    void updateTimers(float deltaTime);
+public slots:
+    void onEngineDestroyed(QObject* engine);
+private:
+    QHash<qint32, ScriptTimer*> mScriptTimers;
+    qint32 mHandleCounter;
+};
+
 /**
  * @brief The ScriptTimer class
  *
@@ -19,38 +40,22 @@ class ScriptTimer : public QObject
     Q_OBJECT
 
 public:
-    static qint32 newTimer(int interval,
-                           bool oneShot,
-                           QScriptEngine& engine,
-                           const QScriptValue& function);
-    static bool removeTimer(qint32 handle);
-
-    // Updates all active timers. Call this regularily.
-    static void updateAll(float deltaTime);
-
-    void update(float deltaTime);
-
-    qint32 getHandle() const;
-    QScriptEngine& getEngine();
+    bool update(float deltaTime);
+    QScriptEngine* getEngine();
 public slots:
-    static void onEngineDestroyed(QObject* engine);
     void timeout();
 private:
-    static QHash<qint32, ScriptTimer*> sScriptTimers;
-    static qint32 sHandleCounter;
-
-    // Timers may only be instantiated by the factory methods above.
+    // Timers may only be instantiated by the ScriptTimerFactory above.
     ScriptTimer(int interval,
                 bool oneShot,
-                QScriptEngine& engine,
                 const QScriptValue& function);
 
     float mTimeLeft;
     const float mInitialTime;
     const bool mIsOneShot;
-    QScriptEngine& mEngine;
     QScriptValue mFunction;
-    qint32 mHandle;
+
+    friend class ScriptTimerFactory;
 };
 
 #endif // SCRIPTTIMER_H

@@ -2,6 +2,7 @@
 #include <QScriptEngine>
 #include <QDebug>
 #include "Bindings/JavascriptBindings.h"
+#include "Actor.h"
 
 using namespace ailib;
 
@@ -17,6 +18,13 @@ ScriptBehavior::ScriptBehavior(const QScriptValue& obj) :
 
 void ScriptBehavior::run()
 {
+    qDebug() << mScript.objectId();
+    QScriptValue bb = mScript.property("userData");
+    Actor* actor = qscriptvalue_cast<Actor*>(bb.property("self"));
+
+    assert(actor);
+    qDebug() << "Running for actor " << actor->getName();
+
     QScriptValue runVal = mScript.property("run");
     if(runVal.isFunction())
     {
@@ -143,6 +151,12 @@ SchedulerPrototype::SchedulerPrototype(QObject* parent) :
 
 void SchedulerPrototype::enqueue(QScriptValue behaviorValue)
 {
+    if(mActiveBehaviors.contains(behaviorValue.objectId()))
+    {
+        qWarning() << "Scheduler.enqueue: Can't schedule the same behavior twice.";
+        return;
+    }
+
     // Prevent garbage collection of the executed behavior by keeping a reference.
     mActiveBehaviors[behaviorValue.objectId()] = behaviorValue;
 
@@ -151,13 +165,41 @@ void SchedulerPrototype::enqueue(QScriptValue behaviorValue)
     sched->enqueue(behavior);
 }
 
+static void checkTerminatedChildren(QScriptValue behaviorValue)
+{
+    QScriptValue children = behaviorValue.property("children");
+
+    if(children.isArray())
+    {
+        const int len = children.property("length").toInt32();
+        for(int i = 0; i < len; ++i)
+        {
+            QScriptValue child = children.property(i);
+            checkTerminatedChildren(child);
+        }
+    }
+
+    Behavior* behavior = extractBehavior(behaviorValue);
+    assert(behavior->getStatus() == StatusTerminated);
+}
+
 void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
 {
-    // Remove reference so that the behavior can be garbage collected by the script engine.
-    mActiveBehaviors.remove(behaviorValue.objectId());
+    if(!mActiveBehaviors.contains(behaviorValue.objectId()))
+    {
+        qWarning() << "Scheduler.dequeue: Can't dequeue behavior that hasn't been enqueued before.";
+        return;
+    }
 
     Behavior* behavior = extractBehavior(behaviorValue);
     // Cascade terminate the behaviors from the root.
     // This removes all references from the scheduler.
     behavior->terminate();
+
+    checkTerminatedChildren(behaviorValue);
+
+    // Remove reference so that the behavior can be garbage collected by the script engine.
+    int numRemoved = mActiveBehaviors.remove(behaviorValue.objectId());
+    assert(numRemoved == 1);
+    behaviorValue.engine()->collectGarbage();
 }
