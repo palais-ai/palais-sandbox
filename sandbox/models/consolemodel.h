@@ -5,6 +5,7 @@
 #include <QTime>
 #include <QList>
 #include <QtQml>
+#include <stdint.h>
 
 class ConsoleModel : public QAbstractListModel
 {

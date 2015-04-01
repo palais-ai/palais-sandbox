@@ -3,6 +3,10 @@
 
 #pragma once
 
+#ifdef _MSC_VER
+    #define __func__ __FUNCTION__
+#endif
+
 #if defined _WIN32 || defined __CYGWIN__
   #ifdef SMASTAR_LIBRARY
     #ifdef defined(__GNUC__) || defined(__clang__)

@@ -1,6 +1,6 @@
 #include "JavascriptBindings.h"
-#include "Scene.h"
-#include "utility/MetatypeDeclarations.h"
+#include "../Actor.h"
+#include "../Scene.h"
 #include "ScriptTimer.h"
 #include <QScriptEngine>
 #include <QTextStream>
@@ -14,6 +14,14 @@
 #include <QScriptContextInfo>
 #include <OgreQuaternion.h>
 #include <OgreVector3.h>
+
+Q_DECLARE_METATYPE(Actor*)
+Q_DECLARE_METATYPE(Ogre::Vector3)
+Q_DECLARE_METATYPE(Ogre::Vector3*)
+Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
+Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
+Q_DECLARE_METATYPE(Ogre::Quaternion)
+Q_DECLARE_METATYPE(Ogre::Quaternion*)
 
 Q_DECLARE_METATYPE(RaycastResult)
 Q_DECLARE_METATYPE(RaycastResult*)
