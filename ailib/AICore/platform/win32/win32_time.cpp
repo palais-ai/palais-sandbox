@@ -1,4 +1,4 @@
-#include "HighResolutionTime.h"
+#include "../../HighResolutionTime.h"
 #include <windows.h>
 
 BEGIN_NS_AILIB
@@ -6,7 +6,7 @@ BEGIN_NS_AILIB
 namespace HighResolutionTime {
     static LARGE_INTEGER initQPC()
     {
-        LARGE_INTEGER retVal = 0;
+        LARGE_INTEGER retVal;
         QueryPerformanceFrequency(&retVal);
         return retVal;
     }
@@ -15,11 +15,11 @@ namespace HighResolutionTime {
 
     Timestamp now()
     {
-        Timestamp retVal;
-        QueryPerformanceCounter(static_cast<LARGE_INTEGER*>(&retVal));
-        retVal.QuadPart *= 1.f / nanoseconds(1); // multiply first to prevent precision-loss
+        LARGE_INTEGER retVal;
+        QueryPerformanceCounter(&retVal);
+        retVal.QuadPart *= 1000000000; // multiply first to prevent precision-loss
         retVal.QuadPart /= sFrequency.QuadPart;
-        return retVal;
+        return retVal.QuadPart;
     }
 }
 

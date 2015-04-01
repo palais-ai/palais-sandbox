@@ -1,7 +1,7 @@
 #ifndef JAVASCRIPTBINDINGS_H
 #define JAVASCRIPTBINDINGS_H
 
-#include "libsandboxcore_global.h"
+#include "../libsandboxcore_global.h"
 #include <QScriptValue>
 #include <QList>
 #include <QTimer>

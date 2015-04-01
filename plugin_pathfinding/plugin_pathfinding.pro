@@ -27,6 +27,17 @@ HEADERS += \
 
 include(../linkOgreSDK.pri)
 
+CONFIG(release, debug|release) {
+    M_BUILD_DIR = release
+} else {
+    M_BUILD_DIR = debug
+}
+
+win32 {
+    QMAKE_LIBDIR += $$OUT_PWD/../ailib/AICore/$$M_BUILD_DIR
+    QMAKE_LIBDIR += $$OUT_PWD/../ailib/LinearMath/$$M_BUILD_DIR
+}
+
 INCLUDEPATH += ../sandbox/
 INCLUDEPATH += ../ailib/
 

@@ -33,6 +33,17 @@ include(../linkOgreSDK.pri)
 
 INCLUDEPATH += ../sandbox/
 
+CONFIG(release, debug|release) {
+    M_BUILD_DIR = release
+} else {
+    M_BUILD_DIR = debug
+}
+
+win32 {
+    QMAKE_LIBDIR += $$OUT_PWD/../ailib/AICore/$$M_BUILD_DIR
+    QMAKE_LIBDIR += $$OUT_PWD/../ailib/LinearMath/$$M_BUILD_DIR
+}
+
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libsandboxcore/release/ -lsandboxcore
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libsandboxcore/debug/ -lsandboxcore
 else:unix: LIBS += -L$$OUT_PWD/../libsandboxcore/ -lsandboxcore
