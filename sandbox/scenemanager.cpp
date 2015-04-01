@@ -37,6 +37,7 @@ void SceneManager::unloadCurrentScene()
 {
     if(mCurrentScene)
     {
+        mCurrentScene->teardown();
         mPluginManager.sceneEnded(*mCurrentScene);
         delete mCurrentScene;
         mCurrentScene = NULL;

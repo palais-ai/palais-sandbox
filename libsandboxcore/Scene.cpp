@@ -492,17 +492,29 @@ void Scene::getActors(Ogre::SceneNode* root)
 
 void Scene::setup()
 {
-    QScriptValue fun = mLogicScript.globalObject().property("onStart");
-
+    QScriptValue fun = mLogicScript.globalObject().property("onSetup");
     if(fun.isFunction())
     {
         fun.call();
-
-        JavaScriptBindings::checkScriptEngineException(mLogicScript, "onStart");
+        JavaScriptBindings::checkScriptEngineException(mLogicScript, "onSetup");
     }
     else
     {
-        qWarning("No __onStart__ handler defined in script.");
+        // No __onStart__ handler defined in script. This is not an error. (optional)
+    }
+}
+
+void Scene::teardown()
+{
+    QScriptValue fun = mLogicScript.globalObject().property("onTeardown");
+    if(fun.isFunction())
+    {
+        fun.call();
+        JavaScriptBindings::checkScriptEngineException(mLogicScript, "onTeardown");
+    }
+    else
+    {
+        // No __onTeardown__ handler defined in script. This is not an error. (optional)
     }
 }
 
@@ -521,12 +533,11 @@ void Scene::update(float time)
     if(fun.isFunction())
     {
         fun.call(QScriptValue(), QScriptValueList() << deltaTimeInSeconds);
-
         JavaScriptBindings::checkScriptEngineException(mLogicScript, "update");
     }
     else
     {
-        qWarning("No __update__ handler defined in script.");
+        // No __update__ handler defined in script. This is not an error. (optional)
     }
 
     // Update timers.
@@ -536,25 +547,6 @@ void Scene::update(float time)
     for(QMap<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
     {
         it.value()->update(deltaTimeInSeconds);
-    }
-}
-
-void Scene::performAction(const QString& actionName,
-                          const QVariant& params)
-{
-    QScriptValue fun = mLogicScript.globalObject().property(actionName);
-    if(fun.isFunction())
-    {
-        QScriptValueList list;
-        if(params.isValid())
-        {
-                list << mLogicScript.newVariant(params);
-        }
-
-        fun.call(QScriptValue(), list);
-
-        JavaScriptBindings::checkScriptEngineException(mLogicScript,
-                                                       "performAction( " + actionName + " )");
     }
 }
 

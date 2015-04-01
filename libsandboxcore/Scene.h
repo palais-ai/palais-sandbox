@@ -79,8 +79,8 @@ public:
     Q_INVOKABLE RangeQueryResult rangeQuery(const Ogre::Vector3& origin, float distance);
 
     void setup();
+    void teardown();
     void update(float time);
-    void performAction(const QString& actionName, const QVariant& params = QVariant());
 
     QScriptEngine& getScriptEngine();
     const QString& getName() const;

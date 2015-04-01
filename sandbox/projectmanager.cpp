@@ -294,6 +294,7 @@ void ProjectManager::onSetSimulationSpeed(float speedFactor)
     mScenarioManager.setSimulationSpeed(speedFactor);
 }
 
+// FIXME: Move the parsing code to a separate class
 void ProjectManager::onOpenProject(const QUrl url)
 {
     assert(QThread::currentThread() == thread());

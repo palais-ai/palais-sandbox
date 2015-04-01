@@ -47,7 +47,7 @@ function spawnTeam(teamSize, startPos) {
 }
 
 var timer;
-function onStart() {
+function onSetup() {
 	var teamSize = 5;
 	Scene.setKnowledge("team_red", []);
 	Scene.setKnowledge("team_green", []);
