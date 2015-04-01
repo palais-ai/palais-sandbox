@@ -2,18 +2,24 @@ import QtQuick 2.0
 import QtQuick.Layouts 1.1
 
 Rectangle {
-    height: childrenRect.height + separator.anchors.topMargin
+    height: 26
     color: colors.darkGray
+
+    ListSeparator {
+        anchors.top: parent.top
+        handleColor: colors.black95
+        handleSize: 1
+    }
 
     Row {
         id: row
-        anchors.top: parent.top
-        anchors.topMargin: 4
+        anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.leftMargin: 8
         spacing: 12
 
         NativeText {
+            anchors.verticalCenter: parent.verticalCenter
             id: consoleText
             text: ApplicationWrapper.sceneLoaded ? "Console" : "No Scene Is Loaded Yet."
             font.family: openSans.name
@@ -24,16 +30,19 @@ Rectangle {
         }
 
         FAIconButton {
+            anchors.verticalCenter: parent.verticalCenter
             unicode: "\uf014"
             onPressed: ConsoleModel.clear()
         }
 
         FAIconButton {
+            anchors.verticalCenter: parent.verticalCenter
             unicode: "\uf0de"
             onPressed: consoleListView.positionViewAtBeginning()
         }
 
         FAIconButton {
+            anchors.verticalCenter: parent.verticalCenter
             unicode: "\uf0dd"
             onPressed: consoleListView.positionViewAtEnd()
         }
@@ -66,8 +75,7 @@ Rectangle {
 
     ListSeparator {
         id: separator
-        anchors.top: row.bottom
-        anchors.topMargin: 4
+        anchors.bottom: parent.bottom
         handleColor: colors.black95
         handleSize: 1
     }

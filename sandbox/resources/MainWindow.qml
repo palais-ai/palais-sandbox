@@ -138,27 +138,17 @@ ApplicationWindow {
             }
         }
 
-        SplitView {
+        Column {
             id: centerArea
             height: parent.height
             width: parent.width - controlArea.width - inspectorArea.width
             anchors.left: controlArea.right
             anchors.top: parent.top
-            orientation: Qt.Vertical
-
-            handleDelegate: ListSeparator {
-                handleSize: 1
-                handleColor: colors.black95
-            }
-
-            onResizingChanged: {
-                consoleArea.state = ''
-            }
 
             Loader {
                 id: mainLoader
-                Layout.minimumHeight: 400
-                Layout.fillHeight: true
+                height: parent.height - consoleArea.height
+                width: parent.width
                 focus: true
                 source: "loading.qml"
             }
@@ -166,15 +156,8 @@ ApplicationWindow {
             ConsoleArea {
                 id: consoleArea
                 z: mainLoader.z - 1
-                Layout.minimumHeight: 150
-
-                /**
-                Behavior on height {
-                    NumberAnimation {
-                        id: consoleHeightAnimation
-                        duration: 120
-                    }
-                }*/
+                height: 200
+                width: parent.width
 
                 states: State {
                     name: "HIDDEN"
