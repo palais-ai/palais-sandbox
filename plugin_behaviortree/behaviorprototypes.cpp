@@ -18,12 +18,19 @@ ScriptBehavior::ScriptBehavior(const QScriptValue& obj) :
 
 void ScriptBehavior::run()
 {
-    qDebug() << mScript.objectId();
-    QScriptValue bb = mScript.property("userData");
-    Actor* actor = qscriptvalue_cast<Actor*>(bb.property("self"));
+    QScriptValue tag = mScript.property("tag");
+    qDebug() << "running for tag : " << tag.toString();
 
-    assert(actor);
-    qDebug() << "Running for actor " << actor->getName();
+    QScriptValue userData = mScript.property("userData");
+    QVariantMap* map = qscriptvalue_cast<QVariantMap*>(userData);
+    if(map)
+    {
+        qDebug() << "map";
+    }
+    else
+    {
+        qDebug() << "no map";
+    }
 
     QScriptValue runVal = mScript.property("run");
     if(runVal.isFunction())
@@ -59,12 +66,17 @@ void ScriptBehavior::terminate()
 
 FORCE_INLINE static Behavior* extractBehavior(const QScriptValue& value)
 {
-    AI_ASSERT(value.property("__behavior").isValid(),
-              "Script behaviors need to have their data object set. Did you forget to call the constructor?");
+    QScriptValue prop = value.property("__behavior");
+
+    if(!prop.isValid())
+    {
+        qWarning("Script behavior didnt have their internal data set. Did you forget to call the 'Behavior'' constructor?");
+        return NULL;
+    }
+
     QSharedPointer<Behavior> ptr =
-                qscriptvalue_cast<QSharedPointer<Behavior> >(value.property("__behavior"));
-    AI_ASSERT(!ptr.isNull(),
-              "Script behaviors need to have their data object set. Did you forget to call the constructor?");
+                qscriptvalue_cast<QSharedPointer<Behavior> >(prop);
+
     return ptr.data();
 }
 

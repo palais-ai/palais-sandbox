@@ -1,9 +1,12 @@
 #include "ScriptTimer.h"
 #include "JavascriptBindings.h"
 #include <qDebug>
+#include <cassert>
 
 ScriptTimerFactory::ScriptTimerFactory(QObject* parent) :
     QObject(parent),
+    mCurrentTimer(NULL),
+    mCurrentIsRemoved(false),
     mHandleCounter(0)
 {
 
@@ -16,8 +19,10 @@ qint32 ScriptTimerFactory::newTimer(int interval,
     if(function.isFunction())
     {
         ScriptTimer* timer = new ScriptTimer(interval, oneShot, function);
-        mScriptTimers.insert(mHandleCounter, timer);
-        return mHandleCounter++;
+        qint32 nextId = mHandleCounter;
+        mHandleCounter++;
+        mScriptTimers.insert(nextId, timer);
+        return nextId;
     }
     else
     {
@@ -29,13 +34,20 @@ qint32 ScriptTimerFactory::newTimer(int interval,
 bool ScriptTimerFactory::removeTimer(qint32 handle)
 {
     QHash<qint32, ScriptTimer*>::iterator it = mScriptTimers.find(handle);
-
     if(it != mScriptTimers.end())
     {
         ScriptTimer* timer = it.value();
-        mScriptTimers.remove(handle);
-        // DeleteLater is necessary here, because a timer may be removed while it is running.
-        timer->deleteLater();
+        if(timer != mCurrentTimer)
+        {
+            int numRemoved = mScriptTimers.remove(handle);
+            assert(numRemoved == 1);
+            delete timer;
+        }
+        else
+        {
+            // Delay deletion of the currently running timer until it is done.
+            mCurrentIsRemoved = true;
+        }
         return true;
     }
     else
@@ -46,16 +58,26 @@ bool ScriptTimerFactory::removeTimer(qint32 handle)
 
 void ScriptTimerFactory::updateTimers(float deltaTime)
 {
-    QMutableHashIterator<qint32, ScriptTimer*> it(mScriptTimers);
-    while(it.hasNext())
+    // We can't use an ordinary iterator here,
+    // because removeTimer could be called by timeout functions.
+    QList<qint32> keys = mScriptTimers.keys();
+    foreach(qint32 key, keys)
     {
-        ScriptTimer* timer  = it.next().value();
-        if(timer->update(deltaTime))
+        // Check on every iteration whether this key was removed by a previous timer.
+        QHash<qint32, ScriptTimer*>::iterator it = mScriptTimers.find(key);
+        if(it != mScriptTimers.end())
         {
-            it.remove();
-            delete timer;
+            mCurrentTimer = it.value();
+            if(mCurrentTimer->update(deltaTime) ||
+               mCurrentIsRemoved)
+            {
+                mScriptTimers.remove(key);
+                delete mCurrentTimer;
+                mCurrentIsRemoved = false;
+            }
         }
     }
+    mCurrentTimer = NULL;
 }
 
 void ScriptTimerFactory::onEngineDestroyed(QObject* engine)

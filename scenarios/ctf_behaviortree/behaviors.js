@@ -185,7 +185,6 @@ function MonitorTask(actor)
 {
 	this.actor = actor;
 	this.hasFlagHandle = setInterval(250, function() {
-		print("has flag handle")
 		if(actor.getKnowledge("team_has_flag") === true)
 		{
 			return;
@@ -217,7 +216,6 @@ function MonitorTask(actor)
 		actor.removeKnowledge("nearest_enemy");
 	}
 	this.rangeHandle = setInterval(1000, function() {
-		print("range handle")
 		var result = Scene.rangeQuery(actor.position, 2).actors
 		for(var i = 0; i < result.length; ++i)
 		{
@@ -242,14 +240,26 @@ function MonitorTask(actor)
 	})
 }
 
+function addTag(root, actor)
+{
+	if(root.children)
+	{
+		for(var i = 0; i < root.children.length; ++i)
+		{
+			addTag(root.children[i], actor);
+		}
+	}
+	root.tag = actor.name;
+}
+
 function constructBehaviorTreeForActor(actor)
 {
 	var color = actor.getKnowledge("team_color");
 	var root = new Selector(new HasFlag(new WalkTo(getOwnFlagPos(color)), actor), 
 					        new EnemyInRange(new Shoot(), actor), 
-					       	new TeamHasFlag(new GuardCarrier(), actor),
+					       	//new TeamHasFlag(new GuardCarrier(), actor),
 					       	new WalkTo(getOpponentFlagPos(color)));
-
+	addTag(root, actor);
 	actor.setKnowledge("self", actor);
 	actor.setKnowledge("has_flag", false);
 	actor.setKnowledge("team_has_flag", false);

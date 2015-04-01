@@ -8,7 +8,7 @@
 
 BEGIN_NS_AILIB
 
-#define PRINT_STATES 0
+#define PRINT_STATES 1
 
 Scheduler::Scheduler() :
     mListener(NULL)

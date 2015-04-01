@@ -23,6 +23,8 @@ public slots:
     void onEngineDestroyed(QObject* engine);
 private:
     QHash<qint32, ScriptTimer*> mScriptTimers;
+    ScriptTimer* mCurrentTimer;
+    bool mCurrentIsRemoved;
     qint32 mHandleCounter;
 };
 

@@ -4,7 +4,7 @@ require("behaviors.js")
 Navmesh.hide()
 
 var numCalls = 1;
-var defaultHealth = 10;
+var defaultHealth = 2;
 function spawnFighter(startPos, teamColor, index) {
 	var actor = Scene.instantiate("player_team_" + teamColor + "_" + index,
 								  "Soldier2" + teamColor, 
@@ -28,6 +28,7 @@ function spawnFighter(startPos, teamColor, index) {
 	actor.setKnowledge("behavior_tree", root);
 	Scheduler.enqueue(root);
 	actor.removedFromScene.connect(function() {
+		print("dequeueing for actor " + actor.name);
 		Scheduler.dequeue(root);
 	});
 
