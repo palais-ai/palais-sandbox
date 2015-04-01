@@ -255,6 +255,8 @@ RangeQueryResult Scene::rangeQuery(const Ogre::Vector3& origin, float distance)
 }
 
 // CREDITS: http://www.ogre3d.org/forums/viewtopic.php?f=2&t=53647&start=0
+// FIXME: This would delete an attached __Actor__ aswell..
+//        -> Prevent deletion of attached actors and move them to the root scene node instead.
 void Scene::destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
 {
    if ( !i_pSceneNode )

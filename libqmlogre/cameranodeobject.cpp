@@ -58,6 +58,7 @@ void CameraHandler::onCreateCameraWithCurrentSceneManager()
     mCamera = camera;
     mNode = sceneManager->getRootSceneNode()->createChildSceneNode();
     mNode->attachObject(camera);
+    mCamera->setPosition(0,0,0);
 
     fitToContain(sceneManager->getRootSceneNode());
 
@@ -115,6 +116,8 @@ void CameraHandler::fitToContain(Ogre::SceneNode* node)
         return;
     }
 
+    Ogre::Vector3 previousPosition = mCamera->getPosition();
+
     mCamera->setAutoTracking(true, node);
     mCamera->setFixedYawAxis(true);
     mCamera->setPosition(node->_getDerivedPosition());
@@ -161,9 +164,17 @@ void CameraHandler::fitToContain(Ogre::SceneNode* node)
     }
 
     // Reset zoom level
-    mCamera->moveRelative(Ogre::Vector3(0, 0, mInitialDistance));
+    if(fabs(previousPosition.length()) <= 0.001) // Initial case
+    {
+        mCamera->moveRelative(Ogre::Vector3(0, 0, mInitialDistance));
+    }
+    else // Re-focus case
+    {
+        mCamera->setPosition(previousPosition);
+    }
 
     emit zoomChanged(1);
+    emit focusNodeChanged(node);
 }
 
 float CameraHandler::getDistanceToAutoTrackingTarget() const
@@ -176,6 +187,7 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
     QObject(parent),
     mZoom(0),
     mNode(0),
+    mFocusNode(0),
     mCamera(0),
     mHandler(new CameraHandler)
 {
@@ -257,6 +269,11 @@ Ogre::SceneNode* CameraNodeObject::sceneNode() const
     return mNode;
 }
 
+Ogre::SceneNode* CameraNodeObject::focusedNode() const
+{
+    return mFocusNode;
+}
+
 Ogre::Camera* CameraNodeObject::camera() const
 {
     return mCamera;
@@ -285,6 +302,11 @@ qreal CameraNodeObject::getZoom() const
 void CameraNodeObject::onZoomChanged(qreal zoom)
 {
     mZoom = zoom;
+}
+
+void CameraNodeObject::onFocusNodeChanged(Ogre::SceneNode* focusNode)
+{
+    mFocusNode = focusNode;
 }
 
 void CameraNodeObject::onSetupChanged(Ogre::Camera* camera, Ogre::SceneNode* sceneNode)

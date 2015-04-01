@@ -31,6 +31,7 @@ public:
     qreal getZoom() const;
 signals:
     void zoomChanged(qreal zoomLevel);
+    void focusNodeChanged(Ogre::SceneNode* node);
     void setupChanged(Ogre::Camera* camera, Ogre::SceneNode* node);
 public slots:
     void onCreateCameraWithCurrentSceneManager();
@@ -57,6 +58,7 @@ public:
     void createCameraWithCurrentSceneManager();
 
     Ogre::SceneNode* sceneNode() const;
+    Ogre::SceneNode* focusedNode() const;
     Ogre::Camera* camera() const;
 
     // Thread-safe
@@ -74,10 +76,12 @@ signals:
     void requestFocusSceneNode(Ogre::SceneNode* node);
 public slots:
     void onZoomChanged(qreal zoom);
+    void onFocusNodeChanged(Ogre::SceneNode* focusNode);
     void onSetupChanged(Ogre::Camera* camera, Ogre::SceneNode* sceneNode);
 private:
     qreal mZoom;
     Ogre::SceneNode* mNode;
+    Ogre::SceneNode* mFocusNode;
     Ogre::Camera* mCamera;
     QScopedPointer<CameraHandler> mHandler;
 };
