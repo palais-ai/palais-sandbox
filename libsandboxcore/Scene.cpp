@@ -14,9 +14,15 @@
 #include <OgreMeshManager.h>
 #include <OgreEntity.h>
 #include <OgreAnimationState.h>
-#include <OgreRay.h>
 #include <OgreSceneQuery.h>
 #include <OgreStringConverter.h>
+
+#define VERBOSE_LOGGING false
+#define IF_VERBOSE(x__) do \
+{\
+    if(VERBOSE_LOGGING) {\
+    (x__);}\
+} while(false);
 
 Scene::Scene(const QString& name,
              const QString& sceneFile,
@@ -43,6 +49,11 @@ Scene::Scene(const QString& name,
     assert(thread() == mEngine->thread());
     getActors(mRoot);
     Ogre::Root::getSingleton().addFrameListener(this);
+
+    // Connect destroyLater to run from queue.
+    connect(this, &Scene::actorDestroyLater,
+            this, &Scene::onDestroyLater,
+            Qt::QueuedConnection);
 }
 
 Scene::~Scene()
@@ -60,6 +71,12 @@ Scene::~Scene()
     {
         getOgreSceneManager()->destroyQuery(mRayQuery);
         mRayQuery = NULL;
+    }
+
+    if(mSphereQuery)
+    {
+        getOgreSceneManager()->destroyQuery(mRayQuery);
+        mSphereQuery = NULL;
     }
 
     for(QMap<QString, Actor*>::iterator it = mActors.begin(); it != mActors.end(); ++it)
@@ -217,7 +234,7 @@ RangeQueryResult Scene::rangeQuery(const Ogre::Vector3& origin, float distance)
         if(!node)
         {
             qWarning("No parent node attached to movable object %s in sphere query.",
-                     obj->getName().c_str());
+                      obj->getName().c_str());
             return retVal;
         }
 
@@ -238,7 +255,7 @@ RangeQueryResult Scene::rangeQuery(const Ogre::Vector3& origin, float distance)
 }
 
 // CREDITS: http://www.ogre3d.org/forums/viewtopic.php?f=2&t=53647&start=0
-void Scene::destroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode )
+void Scene::destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
 {
    if ( !i_pSceneNode )
    {
@@ -273,7 +290,7 @@ void Scene::toggleHighlight(bool highlighted, int index)
     }
     else
     {
-        qWarning("Tried to access actor index beyond bounds idx=%d.", index);
+        qWarning("Tried to access actor index beyond bounds idx = [ %d ].", index);
     }
 }
 
@@ -304,7 +321,7 @@ Actor* Scene::instantiate(const QString& name,
     Ogre::SceneManager* scnMgr = getOgreSceneManager();
 
     Ogre::String meshFile = meshName.toStdString() + ".mesh";
-    qDebug() << "Loading mesh at " << QString::fromStdString(meshFile);
+    IF_VERBOSE(qDebug() << "Loading mesh at " << QString::fromStdString(meshFile));
 
     try
     {
@@ -347,7 +364,7 @@ void Scene::destroy(Actor* actor)
     }
 
     int numRemoved = mActors.remove(actor->getName());
-    qDebug() << "[" << actor->getName() << "] : Num. Removed: " << numRemoved;
+    IF_VERBOSE(qDebug() << "[" << actor->getName() << "] : Num. Removed: " << numRemoved);
     assert(numRemoved == 1);
 
     emit actorRemoved(actor->getName());
@@ -363,9 +380,24 @@ void Scene::destroy(Actor* actor)
     delete actor;
 }
 
-Actor* Scene::getActor(unsigned int index)
+void Scene::destroyLater(Actor* actor)
+{
+    emit actorDestroyLater(actor);
+}
+
+bool Scene::hasActor(const QString& actorName) const
+{
+    return mActors.contains(actorName);
+}
+
+Actor* Scene::getActorByIndex(unsigned int index)
 {
     return mActors.values()[index];
+}
+
+Actor* Scene::getActorByName(const QString& actorName)
+{
+    return getActor(actorName);
 }
 
 Actor* Scene::getActor(const QString& actorName)
@@ -399,6 +431,11 @@ void Scene::onActorVisibilityChanged(Actor* actor, bool visible)
     emit actorChangedVisibility(actor->getName(), visible);
 }
 
+void Scene::onDestroyLater(Actor* actor)
+{
+    destroy(actor);
+}
+
 QObjectList Scene::getActorsArray() const
 {
     QObjectList list;
@@ -428,12 +465,9 @@ Actor* Scene::addActor(Ogre::SceneNode* node)
     connect(newActor, &Actor::visibilityChanged,
             this, &Scene::onActorVisibilityChanged);
 
-    // FIXME: Integrate physics properly.
-    //mDynamics.addPhysicsBody(newActor->getSceneNode());
     JavaScriptBindings::addActorBinding(newActor, mLogicScript);
 
     emit actorAdded(name);
-
     return mActors[name];
 }
 
@@ -477,8 +511,6 @@ void Scene::update(float time)
         setup();
         mIsSetup = true;
     }
-
-    mDynamics.update(time);
 
     float deltaTimeInSeconds = time / 1000.f;
 

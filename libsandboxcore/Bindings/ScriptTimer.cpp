@@ -9,7 +9,7 @@ ScriptTimerFactory::ScriptTimerFactory(QObject* parent) :
     mCurrentIsRemoved(false),
     mHandleCounter(0)
 {
-
+    ;
 }
 
 qint32 ScriptTimerFactory::newTimer(int interval,
@@ -21,7 +21,7 @@ qint32 ScriptTimerFactory::newTimer(int interval,
         ScriptTimer* timer = new ScriptTimer(interval, oneShot, function);
         qint32 nextId = mHandleCounter;
         mHandleCounter++;
-        mScriptTimers.insert(nextId, timer);
+        mScriptTimers.insert(nextId, QSharedPointer<ScriptTimer>(timer));
         return nextId;
     }
     else
@@ -33,15 +33,14 @@ qint32 ScriptTimerFactory::newTimer(int interval,
 
 bool ScriptTimerFactory::removeTimer(qint32 handle)
 {
-    QHash<qint32, ScriptTimer*>::iterator it = mScriptTimers.find(handle);
+    QHash<qint32, QSharedPointer<ScriptTimer> >::iterator it = mScriptTimers.find(handle);
     if(it != mScriptTimers.end())
     {
-        ScriptTimer* timer = it.value();
-        if(timer != mCurrentTimer)
+        QSharedPointer<ScriptTimer> timer = it.value();
+        if(timer.data() != mCurrentTimer.data())
         {
-            int numRemoved = mScriptTimers.remove(handle);
+            const int numRemoved = mScriptTimers.remove(handle);
             assert(numRemoved == 1);
-            delete timer;
         }
         else
         {
@@ -59,12 +58,12 @@ bool ScriptTimerFactory::removeTimer(qint32 handle)
 void ScriptTimerFactory::updateTimers(float deltaTime)
 {
     // We can't use an ordinary iterator here,
-    // because removeTimer could be called by timeout functions.
+    // because __removeTimer__ could be called in timer updates.
     QList<qint32> keys = mScriptTimers.keys();
     foreach(qint32 key, keys)
     {
         // Check on every iteration whether this key was removed by a previous timer.
-        QHash<qint32, ScriptTimer*>::iterator it = mScriptTimers.find(key);
+        QHash<qint32, QSharedPointer<ScriptTimer> >::iterator it = mScriptTimers.find(key);
         if(it != mScriptTimers.end())
         {
             mCurrentTimer = it.value();
@@ -72,35 +71,12 @@ void ScriptTimerFactory::updateTimers(float deltaTime)
                mCurrentIsRemoved)
             {
                 mScriptTimers.remove(key);
-                delete mCurrentTimer;
                 mCurrentIsRemoved = false;
             }
         }
     }
-    mCurrentTimer = NULL;
+    mCurrentTimer.reset();
 }
-
-void ScriptTimerFactory::onEngineDestroyed(QObject* engine)
-{
-    int removedCount = 0;
-
-    QMutableHashIterator<qint32, ScriptTimer*> i(mScriptTimers);
-    while (i.hasNext())
-    {
-        ScriptTimer* timer = i.next().value();
-
-        // Remove all timers registered with that engine.
-        if (timer->getEngine() == engine)
-        {
-            delete timer;
-            i.remove();
-            removedCount++;
-        }
-    }
-
-    qDebug() << "Removed " << removedCount << " timers on script destruction.";
-}
-
 
 bool ScriptTimer::update(float deltaTime)
 {
@@ -140,7 +116,14 @@ ScriptTimer::ScriptTimer(int interval,
 
 void ScriptTimer::timeout()
 {
-    mFunction.call();
+    if(mFunction.isFunction())
+     {
+         mFunction.call();
+     }
+     else
+     {
+         qWarning("ScriptTimer.timeout: The second parameter to setTimeout/setInterval must be a function.");
+     }
     JavaScriptBindings::checkScriptEngineException(*getEngine(), "script timer's timeout");
 }
 

@@ -31,7 +31,7 @@ Q_DECLARE_METATYPE(QVariantMap*)
 
 namespace JavaScriptBindings
 {
-static QScopedPointer<ScriptTimerFactory> gTimerFactory(new ScriptTimerFactory);
+static QScopedPointer<ScriptTimerFactory> gTimerFactory;
 
 static void installModuleSystem(QScriptEngine& engine, Scene* scene)
 {
@@ -169,8 +169,7 @@ QScriptValue script_require(QScriptContext *context, QScriptEngine *engine)
 
 void timers_register(QScriptEngine& engine)
 {
-    QObject::connect(&engine, &QScriptEngine::destroyed,
-                     gTimerFactory.data(), &ScriptTimerFactory::onEngineDestroyed);
+    gTimerFactory.reset(new ScriptTimerFactory);
 
     engine.globalObject().setProperty("setTimeout",
                                       engine.newFunction(script_setTimeout));
@@ -842,11 +841,10 @@ void removeActorBinding(Actor* actor, QScriptEngine& engine)
         return;
     }
 
-    qDebug() << "Name before " << actor->getName();
     QString name = cleanIdentifier(actor->getName());
-    qDebug() << "Removing actor " << name << " / " << actor->getName() << "from the scripting system.";
+
+    // Remove its object from the scripting system.
     engine.globalObject().setProperty(name, QScriptValue());
-    qDebug() << "Removed actor " << name << " from the scripting system.";
 }
 
 QString cleanIdentifier(const QString& input)

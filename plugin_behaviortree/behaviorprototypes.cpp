@@ -18,20 +18,6 @@ ScriptBehavior::ScriptBehavior(const QScriptValue& obj) :
 
 void ScriptBehavior::run()
 {
-    QScriptValue tag = mScript.property("tag");
-    qDebug() << "running for tag : " << tag.toString();
-
-    QScriptValue userData = mScript.property("userData");
-    QVariantMap* map = qscriptvalue_cast<QVariantMap*>(userData);
-    if(map)
-    {
-        qDebug() << "map";
-    }
-    else
-    {
-        qDebug() << "no map";
-    }
-
     QScriptValue runVal = mScript.property("run");
     if(runVal.isFunction())
     {
@@ -48,7 +34,6 @@ void ScriptBehavior::run()
 
 void ScriptBehavior::terminate()
 {
-    qDebug() << "TERMINATING SCRIPT";
     QScriptValue terminateVal = mScript.property("terminate");
     if(terminateVal.isFunction())
     {
@@ -70,7 +55,7 @@ FORCE_INLINE static Behavior* extractBehavior(const QScriptValue& value)
 
     if(!prop.isValid())
     {
-        qWarning("Script behavior didnt have their internal data set. Did you forget to call the 'Behavior'' constructor?");
+        qWarning("Script behavior didnt have their internal data set. Did you forget to call the 'Behavior' constructor?");
         return NULL;
     }
 
@@ -105,6 +90,7 @@ QVariantMap BehaviorPrototype::getUserData() const
 
     if(!ptr)
     {
+        qWarning() << "Behavior.userData: Failed to convert userData to Object. Type mismatch.";
         return QVariantMap();
     }
     else
@@ -204,6 +190,7 @@ void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
     }
 
     Behavior* behavior = extractBehavior(behaviorValue);
+
     // Cascade terminate the behaviors from the root.
     // This removes all references from the scheduler.
     behavior->terminate();

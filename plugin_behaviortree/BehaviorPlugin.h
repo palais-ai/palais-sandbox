@@ -21,7 +21,6 @@ public:
     virtual void update(const PluginInterface& interface, Scene& scene, float deltaTime);
 private:
     ailib::Scheduler mScheduler;
-    SchedulerPrototype mSchedulerWrapper;
     QScriptEngine* mCurrentEngine;
 };
 

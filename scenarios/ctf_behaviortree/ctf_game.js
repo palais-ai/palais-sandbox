@@ -1,13 +1,33 @@
+var bulletCount = 0;
 function shoot(actor, target)
 {
     var health    = target.getKnowledge("health");
     var newHealth = health - 1;
 
-    print(actor.name + " shot " + target.name + ". Bang. [" + health + " -> " + newHealth + "]");
+    //print(actor.name + " shot " + target.name + ". Bang. [" + health + " -> " + newHealth + "]");
+
+    //var direction = target.position.subtract(actor.position).normalize();
+    //var shotDist = Scene.raycast(actor.position, direction).distance;
+    var shotHeight = 0.5;
+    var position = actor.position;
+    position.y += shotHeight;
+    var bullet = Scene.instantiate("bullet_" + bulletCount, "bullet", position);
+    bulletCount++;
+    //var impactPoint = actor.position.add(direction.multiply(shotDist));
+    var impactPoint = target.position;
+    impactPoint.y += shotHeight;
+    bullet.setScale(0.1);
+    bullet.setKnowledge("movement_target", impactPoint);
+    bullet.knowledgeRemoved.connect(function(key) {
+        if(key === "movement_target")
+        {
+            Scene.destroyLater(bullet);
+        }
+    })
 
     if(newHealth <= 0)
     {
-        Scene.destroy(target);
+        Scene.destroy(target)
     }
     else
     {
@@ -85,5 +105,5 @@ function score(actor)
     flag.scale = flag.scale.multiply(actor.scale);
     flag.position = Scene.getKnowledge(flagPosKey);
 
-    Scene.destroy(actor);
+    //Scene.destroy(actor);
 }

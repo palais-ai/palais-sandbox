@@ -3,7 +3,6 @@
 
 #include "OgreHelper.h"
 #include "KnowledgeModel.h"
-#include "SceneDynamics.h"
 #include <QVector>
 #include <QScriptEngine>
 #include <QMap>
@@ -18,7 +17,6 @@ class DebugDrawer;
 namespace Ogre
 {
 class SceneNode;
-class RaySceneQuery;
 class SceneManager;
 }
 
@@ -69,6 +67,7 @@ public:
                                    const Ogre::Vector3& scale = Ogre::Vector3(1,1,1));
 
     Q_INVOKABLE void destroy(Actor* actor);
+    Q_INVOKABLE void destroyLater(Actor* actor);
     Q_INVOKABLE void setCameraFocus(Actor* actor);
     // Attaches the actors scene node to the root scene node.
     Q_INVOKABLE void attach(Actor* actor);
@@ -88,7 +87,9 @@ public:
 
     Actor* addActor(Ogre::SceneNode* node);
     const QMap<QString, Actor*>& getActors() const;
-    Q_INVOKABLE Actor* getActor(unsigned int index);
+    Q_INVOKABLE bool hasActor(const QString& actorName) const;
+    Q_INVOKABLE Actor* getActorByIndex(unsigned int index);
+    Q_INVOKABLE Actor* getActorByName(const QString& actorName);
     Actor* getActor(const QString& actorName);
     Q_INVOKABLE QObjectList getActorsArray() const;
 
@@ -99,11 +100,14 @@ signals:
     void actorRemoved(const QString& actorName);
     void actorRemovedObject(Actor* actor);
     void actorChangedVisibility(const QString& actorName, bool visible);
+    void actorDestroyLater(Actor* actor);
 public slots:
     void onRequestEmitCurrentActors();
     void onActorChangeVisible(const QString& actorName,
                               bool visible);
     void onActorVisibilityChanged(Actor* actor, bool visible);
+private slots:
+    void onDestroyLater(Actor* actor);
 private:
     void getActors(Ogre::SceneNode* root);
     Actor* getActorForNode(Ogre::SceneNode* node) const;
@@ -112,7 +116,6 @@ private:
 
     QString mName, mSceneFile, mLogicFile;
     OgreEngine* mEngine;
-    SceneDynamics mDynamics;
     QString mSceneManagerName;
     Ogre::SceneNode* mRoot;
     Ogre::RaySceneQuery* mRayQuery;

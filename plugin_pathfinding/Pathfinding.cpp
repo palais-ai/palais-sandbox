@@ -1,6 +1,7 @@
 #include "Pathfinding.h"
 #include "OgreHelper.h"
 #include "DebugDrawer.h"
+#include "Bindings/JavascriptBindings.h"
 #include "utility/MetatypeDeclarations.h"
 #include "Actor.h"
 #include "Scene.h"
@@ -19,25 +20,7 @@
 #include <OgrePolygon.h>
 #include <OgreStringConverter.h>
 
-class GoalReachedCallback
-{
-public:
-    GoalReachedCallback(const QScriptValue& fun) :
-        mCallback(fun)
-    {
-        assert(fun.isFunction());
-    }
-
-    void onGoalReached(Actor& actor)
-    {
-        mCallback.call(QScriptValue(), QScriptValueList() <<
-                                        mCallback.engine()->toScriptValue(&actor));
-    }
-
-private:
-    QScriptValue mCallback;
-};
-Q_DECLARE_METATYPE(GoalReachedCallback*)
+Q_DECLARE_METATYPE(QScriptValue)
 
 static ailib::real_type euclideanHeuristic(const Pathfinding::NavigationGraph::node_type& n1,
                                            const Pathfinding::NavigationGraph::node_type& n2)
@@ -92,8 +75,25 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
             }
             else
             {
-                actor.removeKnowledge("movement_target");
+                if(actor.hasKnowledge("goal_reached_callback"))
+                {
+                    QVariant variant = actor.getKnowledge("goal_reached_callback");
+                    QScriptValue val = variant.value<QScriptValue>();
+                    if(val.isFunction() && val.engine())
+                    {
+                        val.call();
+                        JavaScriptBindings::checkScriptEngineException(*val.engine(),
+                                                                       "Pathfinding.GoalReachedCallback");
+                    }
+                    else
+                    {
+                        qWarning("[PATHFINDING] 'goal_reached_callback' should be a function.");
+                    }
+                }
+
                 removeCallback(&actor);
+                actor.removeKnowledge("movement_target");
+                return;
             }
         }
 
@@ -225,7 +225,7 @@ Pathfinding::planPath(const Ogre::Vector3& from,
     const NavigationGraph::node_type* start = getNavNodeClosestToPoint(from);
     if(!start)
     {
-        qWarning() << "Target position "
+        qWarning() << "[PATHFINDING] Target position "
                    << Ogre::StringConverter::toString(from).c_str()
                    << " is not covered by the navmesh. No valid path could be calculated.";
         return ailib::AStar<NavigationGraph>::path_type();
@@ -234,7 +234,7 @@ Pathfinding::planPath(const Ogre::Vector3& from,
     const NavigationGraph::node_type* goal = getNavNodeClosestToPoint(to);
     if(!goal)
     {
-        qWarning() << "Target position "
+        qWarning() << "[PATHFINDING] Target position "
                    << Ogre::StringConverter::toString(to).c_str()
                    << " is not covered by the navmesh. No valid path could be calculated.";
         return ailib::AStar<NavigationGraph>::path_type();
@@ -267,7 +267,7 @@ Pathfinding::initNavGraphFromOgreNode(Ogre::SceneNode* node)
 
         if(!mesh.get())
         {
-            qWarning() << "Optimized mesh ptr was null. Returning empty nav graph.";
+            qWarning() << "[PATHFINDING] Optimized mesh ptr was null. Returning empty nav graph.";
             mGraph = graph;
             return;
         }
@@ -325,7 +325,7 @@ Pathfinding::initNavGraphFromOgreNode(Ogre::SceneNode* node)
     }
     else
     {
-        qWarning() << "No meshes were attached to the navmesh scene node. "
+        qWarning() << "[PATHFINDING] No meshes were attached to the navmesh scene node. "
                    << "Returning an empty navgraph.";
     }
 
@@ -352,7 +352,7 @@ void Pathfinding::visualizeNavGraph(DebugDrawer* drawer) const
         }
     }
 
-    qDebug() << "Navigation mesh loaded with " << mGraph.getNumNodes() << " nodes.";
+    qDebug() << "[PATHFINDING] Navigation mesh loaded with " << mGraph.getNumNodes() << " nodes.";
 }
 
 void Pathfinding::moveActor(Actor* actor,
@@ -365,11 +365,9 @@ void Pathfinding::moveActor(Actor* actor,
                                  target,
                                  &isAlreadyThere);
 
-    qDebug() << "Path size is " << path.size() << "hops.";
-
     if(path.empty())
     {
-        qWarning() << "Could not find a path for actor [ "
+        qWarning() << "[PATHFINDING] Could not find a path for actor [ "
                    << actor->getName() << " ] to reach "
                    << Ogre::StringConverter::toString(target).c_str();
         return;
@@ -377,7 +375,7 @@ void Pathfinding::moveActor(Actor* actor,
 
     if(isAlreadyThere)
     {
-        qDebug() << "Target triangle has already been reached.";
+        qDebug() << "[PATHFINDING] Target triangle has already been reached.";
         actor->setKnowledge("movement_target", QVariant::fromValue(target));
         return;
     }
@@ -403,8 +401,7 @@ void Pathfinding::moveActor(Actor* actor,
     {
         connect(actor, &Actor::removedFromScene,
                 this, &Pathfinding::onActorRemoved);
-        GoalReachedCallback* cb = new GoalReachedCallback(onFinishedCallback);
-        actor->setKnowledge("goal_reached_callback", QVariant::fromValue(cb));
+        actor->setKnowledge("goal_reached_callback", QVariant::fromValue(onFinishedCallback));
     }
 }
 
@@ -426,10 +423,6 @@ void Pathfinding::removeCallback(Actor* actor)
     {
         disconnect(actor, &Actor::removedFromScene,
                    this, &Pathfinding::onActorRemoved);
-
-        GoalReachedCallback* cb = actor->getKnowledge("goal_reached_callback")
-                                        .value<GoalReachedCallback*>();
         actor->removeKnowledge("goal_reached_callback");
-        delete cb;
     }
 }

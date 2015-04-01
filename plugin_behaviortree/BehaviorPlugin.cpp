@@ -31,7 +31,9 @@ void BehaviorPlugin::onSceneStarted(const PluginInterface& interface, Scene& sce
     QScriptEngine& engine = scene.getScriptEngine();
     mCurrentEngine = &engine;
 
-    engine.setDefaultPrototype(qMetaTypeId<Scheduler*>(), engine.newQObject(&mSchedulerWrapper));
+    engine.setDefaultPrototype(qMetaTypeId<Scheduler*>(),
+                               engine.newQObject(new SchedulerPrototype,
+                                                 QScriptEngine::ScriptOwnership));
     engine.globalObject().setProperty("Scheduler",
                                       engine.toScriptValue(&mScheduler),
                                       QScriptValue::Undeletable | QScriptValue::ReadOnly);

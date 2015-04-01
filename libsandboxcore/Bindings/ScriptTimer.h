@@ -19,11 +19,9 @@ public:
     bool removeTimer(qint32 handle);
 
     void updateTimers(float deltaTime);
-public slots:
-    void onEngineDestroyed(QObject* engine);
 private:
-    QHash<qint32, ScriptTimer*> mScriptTimers;
-    ScriptTimer* mCurrentTimer;
+    QHash<qint32, QSharedPointer<ScriptTimer> > mScriptTimers;
+    QSharedPointer<ScriptTimer> mCurrentTimer;
     bool mCurrentIsRemoved;
     qint32 mHandleCounter;
 };

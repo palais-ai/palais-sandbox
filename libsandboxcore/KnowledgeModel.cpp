@@ -28,7 +28,6 @@ void KnowledgeModel::setKnowledge(const QString& key, const QVariant& value)
 {
     QVariantMap::iterator it = mKnowledge.find(key);
     const bool isEdited = it != mKnowledge.end();
-
     if(isEdited)
     {
         if(value != it.value())

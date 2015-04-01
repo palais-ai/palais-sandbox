@@ -25,15 +25,11 @@ function PlayAnimation(animationName)
 PlayAnimation.prototype =
 {
 	run: function() {
-		print('running PlayAnimation');
 		this.actorRemoved = false;
 		var context = this;
 		var actor = this.userData["self"];
-		print(actor.name)
-		print("play animation for " + actor.name)
 		actor.enableAnimation(this.animationName);
 		actor.removedFromScene.connect(function() {
-			print('setting removal flag')
 			context.actorRemoved = true;
 		})
 		this.setStatus(Status.Waiting);
@@ -59,7 +55,6 @@ MoveTo.prototype =
 {
 	run: function()
 	{
-		print('running MoveTo');
 		var context = this;
 		Pathfinding.moveActor(this.userData["self"], this.goal, function() {
 			context.notifySuccess();
@@ -68,7 +63,6 @@ MoveTo.prototype =
 	},
 	terminate: function()
 	{
-		print("cancel move");
 		Pathfinding.cancelMove(this.userData["self"]);
 	}
 }
@@ -110,25 +104,16 @@ Shoot.prototype =
 {
 	run: function()
 	{
-		print('running Shoot');
 		var context = this;
-
-		print(this.userData["self"].name + ' shooting.');
-
-		if(typeof(this.userData["nearest_enemy"]) === "undefined")
+		var actor = this.userData["self"];
+		var nearestName = this.userData["nearest_enemy"];
+		if(Scene.hasActor(nearestName))
 		{
-			// The actor we were shooting has been removed. (=killed)
-			this.notifySuccess();
-		}
-		else
-		{
-			shoot(this.userData["self"], 
-				  this.userData["nearest_enemy"]);
-
+			shoot(actor, Scene.getActorByName(nearestName));
 			this.handle = setTimeout(this.fireRate, function() {
 				// Shoot again when possible.
-				context.setStatus(Status.Running);
 				delete context.handle;
+				context.setStatus(Status.Running);
 			})
 
 			this.setStatus(Status.Waiting);
@@ -139,10 +124,10 @@ Shoot.prototype =
 	},
 	terminate: function() 
 	{
-		print("terminating SHOOT :: " + this.handle)
 		if(typeof(this.handle) !== "undefined")
 		{
 			clearTimeout(this.handle);
+			delete this.handle;
 		}
 	}
 }
@@ -153,11 +138,11 @@ function GuardCarrier()
 {
 	Behavior.call(this);
 }
+
 GuardCarrier.prototype =
 {
 	run: function()
 	{
-		print('running GuardCarrier');
 		var carrier = getFlagOwner(this.userData["team_color"]);
 		var self    = userData["self"];
 
@@ -210,13 +195,8 @@ function MonitorTask(actor)
 		}
 	})
 
-	var removalFun = function(actor) {
-		print("removing nearest_enemy")
-		actor.setKnowledge("enemy_in_range", false)
-		actor.removeKnowledge("nearest_enemy");
-	}
 	this.rangeHandle = setInterval(1000, function() {
-		var result = Scene.rangeQuery(actor.position, 2).actors
+		var result = Scene.rangeQuery(actor.position, 3).actors
 		for(var i = 0; i < result.length; ++i)
 		{
 			var other = result[i]
@@ -224,32 +204,12 @@ function MonitorTask(actor)
 			   other.getKnowledge("team_color") !== actor.getKnowledge("team_color"))
 			{
 				actor.setKnowledge("enemy_in_range", true)
-
-				if(actor.hasKnowledge("nearest_enemy"))
-				{
-					var old = actor.getKnowledge("nearest_enemy")
-					old.removedFromScene.disconnect(removalFun)
-				}
-
-				actor.setKnowledge("nearest_enemy", other)
-				other.removedFromScene.connect(removalFun)
+				actor.setKnowledge("nearest_enemy", other.name)
 				return
 			}
 		}
 		actor.setKnowledge("enemy_in_range", false)
 	})
-}
-
-function addTag(root, actor)
-{
-	if(root.children)
-	{
-		for(var i = 0; i < root.children.length; ++i)
-		{
-			addTag(root.children[i], actor);
-		}
-	}
-	root.tag = actor.name;
 }
 
 function constructBehaviorTreeForActor(actor)
@@ -259,18 +219,17 @@ function constructBehaviorTreeForActor(actor)
 					        new EnemyInRange(new Shoot(), actor), 
 					       	//new TeamHasFlag(new GuardCarrier(), actor),
 					       	new WalkTo(getOpponentFlagPos(color)));
-	addTag(root, actor);
+
 	actor.setKnowledge("self", actor);
 	actor.setKnowledge("has_flag", false);
 	actor.setKnowledge("team_has_flag", false);
 	actor.setKnowledge("enemy_in_range", false);
 	var monitorTask = new MonitorTask(actor);
 	actor.monitorTask = monitorTask;
+	root.setUserData(actor.knowledge);
 	actor.removedFromScene.connect(function() {
-		print('removing timers');
 		clearInterval(monitorTask.hasFlagHandle)
 		clearInterval(monitorTask.rangeHandle)
 	});
-	root.setUserData(actor.knowledge);
 	return root;
 }

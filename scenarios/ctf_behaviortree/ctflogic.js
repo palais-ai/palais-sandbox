@@ -25,17 +25,17 @@ function spawnFighter(startPos, teamColor, index) {
 	actor.setKnowledge("health", defaultHealth);
 
 	var root = constructBehaviorTreeForActor(actor);
-	actor.setKnowledge("behavior_tree", root);
 	Scheduler.enqueue(root);
 	actor.removedFromScene.connect(function() {
 		print("dequeueing for actor " + actor.name);
 		Scheduler.dequeue(root);
 	});
 
-	var teamKey = "team_" + teamColor;
+	/**var teamKey = "team_" + teamColor;
 	var before = Scene.getKnowledge(teamKey);
+	before.push(actor);
 	// Add actor to the team list.
-	Scene.setKnowledge(teamKey, before.push(actor));
+	Scene.setKnowledge(teamKey, before);*/
 }
 
 function spawnTeam(teamSize, startPos) {
@@ -49,7 +49,7 @@ function spawnTeam(teamSize, startPos) {
 
 var timer;
 function onStart() {
-	var teamSize = 1;
+	var teamSize = 5;
 	Scene.setKnowledge("team_red", []);
 	Scene.setKnowledge("team_green", []);
 	spawnTeam(teamSize, flag_red.position)
