@@ -31,10 +31,8 @@ public:
     void setSimulationSpeed(float speedFactor);
 
     OgreEngine* getOgreEngine();
-
     Scene* getCurrentScene();
     const Scene* getCurrentScene() const;
-
     Scene* loadScene(const QString& name, const QString& sceneFile, const QString& logicFile);
     void unloadCurrentScene();
 signals:

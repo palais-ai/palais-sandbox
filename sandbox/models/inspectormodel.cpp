@@ -251,11 +251,11 @@ QVariant InspectorModel::data(const QModelIndex &index, int role) const
             QObject* qobject = data.value<QObject*>();
             if(qobject->thread() != thread())
             {
-                qWarning() << "QObjects that are accessed through QML "
-                           << "must live in the QMLEngine's thread."
-                           << "Consider adding a wrapper class."
-                           << "The QObject will not be displayed.";
-                return QVariant::fromValue(static_cast<QObject*>(0));
+                // QObjects that are accessed through QML
+                // must live in the QMLEngine's thread.
+                // Consider adding a wrapper class.
+                // The QObject will not be displayed.
+                return "QObject (Not on mainthread)";
             }
         }
 

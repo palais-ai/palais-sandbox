@@ -7,6 +7,7 @@
 #include "Scheduler.h"
 #include "Any.h"
 #include <vector>
+#include <cstdlib>
 
 BEGIN_NS_AILIB
 
@@ -53,6 +54,7 @@ public:
     ~Composite();
 
     const BehaviorList& getChildren() const;
+    BehaviorList& getChildren();
     virtual void setUserData(const hold_any& data);
 private:
     BehaviorList mChildren;
@@ -147,7 +149,61 @@ private:
     Behavior* const mChild;
 };
 
-// TODO: BlackboardScope, random sequence / selector
+// Requires a random access iterator.
+template <typename ITER>
+void shuffle(ITER start, ITER end)
+{
+    AI_ASSERT(end-start <= std::numeric_limits<int32_t>::max(),
+              "Too many children - integer overflow.");
+
+    // Fisher-Yates shuffle, used by the random composites below.
+    for(int32_t i = end - start - 1; i > 0; --i)
+    {
+        // The rand() use can be made deterministic by calling srand() with the same seed on startup.
+        const uint32_t j = rand() % i;
+        typedef typename std::iterator_traits<ITER>::value_type ValueType;
+        ValueType tmp = *(start + i);
+        *(start + i) = *(start + j);
+        *(start + j) = tmp;
+    }
+}
+
+Composite::BehaviorList make_shuffled(const Composite::BehaviorList& children);
+
+template <typename T>
+class RandomComposite : public T
+{
+public:
+    RandomComposite(Scheduler& scheduler,
+                    const Composite::BehaviorList& children) :
+        T(scheduler, make_shuffled(children))
+    {
+        ;
+    }
+
+    virtual void terminate()
+    {
+        T::terminate();
+        // Re-shuffle on termination. (After terminating the children)
+        shuffle(Composite::getChildren().begin(), Composite::getChildren().end());
+    }
+};
+
+class RandomSelector : public RandomComposite<Selector>
+{
+public:
+    RandomSelector(Scheduler& scheduler,
+                   const Composite::BehaviorList& children);
+};
+
+class RandomSequence : public RandomComposite<Sequence>
+{
+public:
+    RandomSequence(Scheduler& scheduler,
+                   const Composite::BehaviorList& children);
+};
+
+// TODO: BlackboardScope
 
 END_NS_AILIB
 

@@ -122,6 +122,8 @@ void Behavior_register_prototype(QScriptEngine& engine)
     ctors["Sequence"] = composite_prototype_ctor<Sequence>;
     ctors["Selector"] = composite_prototype_ctor<Selector>;
     ctors["Parallel"] = composite_prototype_ctor<Parallel>;
+    ctors["RandomSequence"] = composite_prototype_ctor<RandomSequence>;
+    ctors["RandomSelector"] = composite_prototype_ctor<RandomSelector>;
     ctors["BlackboardDecorator"] = BlackboardDecorator_prototype_ctor;
 
     QScriptValue::PropertyFlags flags = QScriptValue::Undeletable | QScriptValue::ReadOnly;

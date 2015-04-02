@@ -78,11 +78,6 @@ Scene::~Scene()
         getOgreSceneManager()->destroyQuery(mRayQuery);
         mSphereQuery = NULL;
     }
-
-    for(QMap<QString, Actor*>::iterator it = mActors.begin(); it != mActors.end(); ++it)
-    {
-        delete it.value();
-    }
 }
 
 Ogre::SceneManager* Scene::getOgreSceneManager() const
@@ -515,6 +510,13 @@ void Scene::teardown()
     else
     {
         // No __onTeardown__ handler defined in script. This is not an error. (optional)
+    }
+
+    // Delete actors here to trigger any dangling __delete__ events that the script might be listening to.
+    // No scripts should be called in the destructor.
+    for(QMap<QString, Actor*>::iterator it = mActors.begin(); it != mActors.end(); ++it)
+    {
+        delete it.value();
     }
 }
 

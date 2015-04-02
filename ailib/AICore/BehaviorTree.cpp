@@ -96,13 +96,18 @@ const Composite::BehaviorList& Composite::getChildren() const
     return mChildren;
 }
 
+Composite::BehaviorList& Composite::getChildren()
+{
+    return mChildren;
+}
+
 void Composite::setUserData(const hold_any& data)
 {
     Behavior::setUserData(data);
     for(Composite::BehaviorList::iterator it = mChildren.begin();
         it != mChildren.end(); ++it)
     {
-        // Pass on tge data to all child nodes.
+        // Pass on the data to all child nodes.
         (*it)->setUserData(getUserData());
     }
 }
@@ -453,6 +458,27 @@ void Decorator::scheduleBehavior()
 void Decorator::terminateChild()
 {
     mChild->terminate();
+}
+
+Composite::BehaviorList make_shuffled(const Composite::BehaviorList& children)
+{
+    Composite::BehaviorList list = children;
+    shuffle(list.begin(), list.end());
+    return list;
+}
+
+RandomSelector::RandomSelector(Scheduler& scheduler,
+                               const Composite::BehaviorList& children) :
+    RandomComposite<Selector>::RandomComposite(scheduler, children)
+{
+    ;
+}
+
+RandomSequence::RandomSequence(Scheduler& scheduler,
+                               const Composite::BehaviorList& children) :
+    RandomComposite<Sequence>::RandomComposite(scheduler,children)
+{
+    ;
 }
 
 END_NS_AILIB

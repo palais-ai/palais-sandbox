@@ -50,7 +50,7 @@ public:
 
     void initNavGraphFromOgreNode(Ogre::SceneNode* node);
     void visualizeNavGraph(DebugDrawer* drawer) const;
-    Q_INVOKABLE void moveActor(Actor* actor,
+    Q_INVOKABLE bool moveActor(Actor* actor,
                                const Ogre::Vector3& target,
                                QScriptValue onFinishedCallback =  QScriptValue::UndefinedValue);
 

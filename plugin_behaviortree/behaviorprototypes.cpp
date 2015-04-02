@@ -178,7 +178,8 @@ static void checkTerminatedChildren(QScriptValue behaviorValue)
     }
 
     Behavior* behavior = extractBehavior(behaviorValue);
-    assert(behavior->getStatus() == StatusTerminated);
+    assert(behavior->getStatus() == StatusTerminated ||
+           behavior->getStatus() == StatusDormant);
 }
 
 void SchedulerPrototype::dequeue(QScriptValue behaviorValue)

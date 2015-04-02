@@ -32,7 +32,7 @@ PlayAnimation.prototype =
 		actor.removedFromScene.connect(function() {
 			context.actorRemoved = true;
 		})
-		this.setStatus(Status.Waiting);
+		this.notifySuccess();
 	},
 	terminate: function() {
 		if(this.actorRemoved)
@@ -56,10 +56,17 @@ MoveTo.prototype =
 	run: function()
 	{
 		var context = this;
-		Pathfinding.moveActor(this.userData["self"], this.goal, function() {
+		var hasRoute = Pathfinding.moveActor(this.userData["self"], this.goal, function() {
 			context.notifySuccess();
 		});
-		this.setStatus(Status.Waiting);
+		if(hasRoute)
+		{
+			this.setStatus(Status.Waiting);
+		}
+		else
+		{
+			this.notifyFailure();
+		}
 	},
 	terminate: function()
 	{
@@ -224,12 +231,11 @@ function constructBehaviorTreeForActor(actor)
 	actor.setKnowledge("has_flag", false);
 	actor.setKnowledge("team_has_flag", false);
 	actor.setKnowledge("enemy_in_range", false);
-	var monitorTask = new MonitorTask(actor);
-	actor.monitorTask = monitorTask;
+	actor.monitorTask = new MonitorTask(actor);
 	root.setUserData(actor.knowledge);
 	actor.removedFromScene.connect(function() {
-		clearInterval(monitorTask.hasFlagHandle)
-		clearInterval(monitorTask.rangeHandle)
+		clearInterval(actor.monitorTask.hasFlagHandle)
+		clearInterval(actor.monitorTask.rangeHandle)
 	});
 	return root;
 }

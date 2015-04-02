@@ -13,7 +13,7 @@ BEGIN_NS_AILIB
 Scheduler::Scheduler() :
     mListener(NULL)
 {
-
+    ;
 }
 
 void Scheduler::setListener(SchedulerListener* listener)

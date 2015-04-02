@@ -68,7 +68,9 @@ Rectangle {
         visible: typeNameForObject(value) !== "object"
 
         model: {
-            if(value.hasOwnProperty("getTextualRepresentation")) {
+            if(value === null && typeof value === "object") {
+                return "NULL";
+            } else if(value.hasOwnProperty("getTextualRepresentation")) {
                 return value.getTextualRepresentation();
             } else if(value instanceof Array) {
                 return value;

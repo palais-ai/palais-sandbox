@@ -225,7 +225,7 @@ Pathfinding::planPath(const Ogre::Vector3& from,
     const NavigationGraph::node_type* start = getNavNodeClosestToPoint(from);
     if(!start)
     {
-        qWarning() << "[PATHFINDING] Target position "
+        qWarning() << "[PATHFINDING] Start position "
                    << Ogre::StringConverter::toString(from).c_str()
                    << " is not covered by the navmesh. No valid path could be calculated.";
         return ailib::AStar<NavigationGraph>::path_type();
@@ -355,7 +355,7 @@ void Pathfinding::visualizeNavGraph(DebugDrawer* drawer) const
     qDebug() << "[PATHFINDING] Navigation mesh loaded with " << mGraph.getNumNodes() << " nodes.";
 }
 
-void Pathfinding::moveActor(Actor* actor,
+bool Pathfinding::moveActor(Actor* actor,
                             const Ogre::Vector3& target,
                             QScriptValue onFinishedCallback)
 {
@@ -370,14 +370,14 @@ void Pathfinding::moveActor(Actor* actor,
         qWarning() << "[PATHFINDING] Could not find a path for actor [ "
                    << actor->getName() << " ] to reach "
                    << Ogre::StringConverter::toString(target).c_str();
-        return;
+        return false;
     }
 
     if(isAlreadyThere)
     {
         qDebug() << "[PATHFINDING] Target triangle has already been reached.";
         actor->setKnowledge("movement_target", QVariant::fromValue(target));
-        return;
+        return false;
     }
 
     QVector<Ogre::Vector3> qpath;
@@ -403,6 +403,7 @@ void Pathfinding::moveActor(Actor* actor,
                 this, &Pathfinding::onActorRemoved);
         actor->setKnowledge("goal_reached_callback", QVariant::fromValue(onFinishedCallback));
     }
+    return true;
 }
 
 void Pathfinding::cancelMove(Actor* actor)
