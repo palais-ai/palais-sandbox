@@ -35,8 +35,7 @@ PlayAnimation.prototype =
 		this.notifySuccess();
 	},
 	terminate: function() {
-		if(this.actorRemoved)
-		{
+		if(this.actorRemoved) {
 			var actor = this.userData["self"];
 			actor.disableAnimation(this.animationName);
 		}
@@ -59,12 +58,9 @@ MoveTo.prototype =
 		var hasRoute = Pathfinding.moveActor(this.userData["self"], this.goal, function() {
 			context.notifySuccess();
 		});
-		if(hasRoute)
-		{
+		if(hasRoute) {
 			this.setStatus(Status.Waiting);
-		}
-		else
-		{
+		} else {
 			this.notifyFailure();
 		}
 	},
@@ -114,8 +110,7 @@ Shoot.prototype =
 		var context = this;
 		var actor = this.userData["self"];
 		var nearestName = this.userData["nearest_enemy"];
-		if(Scene.hasActor(nearestName))
-		{
+		if(Scene.hasActor(nearestName)) {
 			shoot(actor, Scene.getActorByName(nearestName));
 			this.handle = setTimeout(this.fireRate, function() {
 				// Shoot again when possible.
@@ -131,8 +126,7 @@ Shoot.prototype =
 	},
 	terminate: function() 
 	{
-		if(typeof(this.handle) !== "undefined")
-		{
+		if(typeof(this.handle) !== "undefined") {
 			clearTimeout(this.handle);
 			delete this.handle;
 		}
@@ -153,18 +147,14 @@ GuardCarrier.prototype =
 		var carrier = getFlagOwner(this.userData["team_color"]);
 		var self    = userData["self"];
 
-		if(self.position.distanceTo(carrier.position) > 0.1)
-		{
+		if(self.position.distanceTo(carrier.position) > 0.1) {
 			var context = this;
 			pathfinding.moveActor(this.userData["self"], 
 								  this.goal, 
-								  function()
-								  {
+								  function() {
 									  context.setStatus(Status.Running);
 								  });
-		}
-		else
-		{
+		} else {
 			setTimeout(500, this.runAgain);
 		}
 		setStatus(Status.Waiting);
@@ -177,8 +167,7 @@ function MonitorTask(actor)
 {
 	this.actor = actor;
 	this.hasFlagHandle = setInterval(250, function() {
-		if(actor.getKnowledge("team_has_flag") === true)
-		{
+		if(actor.getKnowledge("team_has_flag") === true) {
 			return;
 		}
 
@@ -189,14 +178,10 @@ function MonitorTask(actor)
 		var ownFlagPos = getOwnFlagPos(actor.getKnowledge("team_color"));
 		var opponentFlagPos = getOpponentFlagPos(actor.getKnowledge("team_color"));
 		var flagPos = actor.getKnowledge("has_flag") == true ? ownFlagPos : opponentFlagPos;
-		if(checkDistance(actor, flagPos))
-		{
-			if(flagPos.equals(opponentFlagPos))
-			{
+		if(checkDistance(actor, flagPos)) {
+			if(flagPos.equals(opponentFlagPos)) {
 				capture(actor)
-			}
-			else
-			{
+			} else {
 				score(actor)
 			}
 		}
@@ -204,12 +189,10 @@ function MonitorTask(actor)
 
 	this.rangeHandle = setInterval(1000, function() {
 		var result = Scene.rangeQuery(actor.position, 3).actors
-		for(var i = 0; i < result.length; ++i)
-		{
+		for(var i = 0; i < result.length; ++i) {
 			var other = result[i]
 			if(other.hasKnowledge("team_color") &&
-			   other.getKnowledge("team_color") !== actor.getKnowledge("team_color"))
-			{
+			   other.getKnowledge("team_color") !== actor.getKnowledge("team_color")) {
 				actor.setKnowledge("enemy_in_range", true)
 				actor.setKnowledge("nearest_enemy", other.name)
 				return
@@ -224,19 +207,21 @@ function constructAttackerBehaviorTree(actor)
 	var color = actor.getKnowledge("team_color");
 	var root = new Selector(new HasFlag(new WalkTo(getOwnFlagPos(color)), actor), 
 					        new EnemyInRange(new Shoot(), actor),
-					       	new WalkTo(getOpponentFlagPos(color)));
+					       	new WalkTo(getOpponentFlagPos(color)))
 	
-	
+	return root
 }
 
 function constructDefenderBehaviorTree(actor)
 {
-	
+	var root = new Selector(new EnemyInRange(new Shoot(), actor))
+	return root
 }
 
 function constructBehaviorTreeForActor(actor)
 {
-	var root = new RandomSelector(constructAttackerBehaviorTree(actor))
+	var root = new RandomSelector(constructAttackerBehaviorTree(actor))//,
+								  //constructDefenderBehaviorTree(actor))
 
 	actor.setKnowledge("self", actor);
 	actor.setKnowledge("has_flag", false);

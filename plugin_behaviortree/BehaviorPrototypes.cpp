@@ -74,6 +74,11 @@ BehaviorPrototype::BehaviorPrototype(QObject* parent) :
 void BehaviorPrototype::setUserData(QVariantMap* data)
 {
     Behavior* behavior = extractBehavior(thisObject());
+    if(!behavior)
+    {
+        return;
+    }
+
     behavior->setUserData(hold_any(data));
 }
 
@@ -81,7 +86,7 @@ QVariantMap BehaviorPrototype::getUserData() const
 {
     Behavior* behavior = extractBehavior(thisObject());
 
-    if(behavior->getUserData().empty())
+    if(!behavior || behavior->getUserData().empty())
     {
         return QVariantMap();
     }
@@ -114,30 +119,50 @@ void BehaviorPrototype::setStatus(int status)
 void BehaviorPrototype::setStatus(Status status)
 {
     Behavior* behavior = extractBehavior(thisObject());
+    if(!behavior)
+    {
+        return;
+    }
     behavior->setStatus(status);
 }
 
 Status BehaviorPrototype::getStatus() const
 {
     Behavior* behavior = extractBehavior(thisObject());
+    if(!behavior)
+    {
+        return StatusDormant;
+    }
     return behavior->getStatus();
 }
 
 void BehaviorPrototype::notifySuccess()
 {
     Behavior* behavior = extractBehavior(thisObject());
+    if(!behavior)
+    {
+        return;
+    }
     behavior->notifySuccess();
 }
 
 void BehaviorPrototype::notifyFailure()
 {
     Behavior* behavior = extractBehavior(thisObject());
+    if(!behavior)
+    {
+        return;
+    }
     behavior->notifyFailure();
 }
 
 void BehaviorPrototype::notifyReset()
 {
     Behavior* behavior = extractBehavior(thisObject());
+    if(!behavior)
+    {
+        return;
+    }
     behavior->notifyReset();
 }
 
@@ -160,6 +185,14 @@ void SchedulerPrototype::enqueue(QScriptValue behaviorValue)
 
     Scheduler* sched = qscriptvalue_cast<Scheduler*>(thisObject());
     Behavior* behavior = extractBehavior(behaviorValue);
+    mAddedBehaviors[behaviorValue.objectId()] = behavior;
+
+    if(!behavior)
+    {
+        qWarning() << "Scheduler.enqueue: Behavior pointer is missing from a ScriptBehavior. "
+                   << "Can't enqueue.";
+        return;
+    }
     sched->enqueue(behavior);
 }
 
@@ -191,6 +224,14 @@ void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
     }
 
     Behavior* behavior = extractBehavior(behaviorValue);
+    assert(behavior == mAddedBehaviors[behaviorValue.objectId()]);
+
+    if(!behavior)
+    {
+        qWarning() << "Scheduler.dequeue: Behavior pointer is missing from a ScriptBehavior. "
+                   << "Can't dequeue.";
+        return;
+    }
 
     // Cascade terminate the behaviors from the root.
     // This removes all references from the scheduler.
@@ -201,5 +242,5 @@ void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
     // Remove reference so that the behavior can be garbage collected by the script engine.
     int numRemoved = mActiveBehaviors.remove(behaviorValue.objectId());
     assert(numRemoved == 1);
-    behaviorValue.engine()->collectGarbage();
+    //behaviorValue.engine()->collectGarbage();
 }

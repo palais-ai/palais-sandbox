@@ -51,6 +51,7 @@ public:
     Q_INVOKABLE void dequeue(QScriptValue behaviorValue);
 private:
     QHash<qint64, QScriptValue> mActiveBehaviors;
+    QHash<qint64, Behavior*> mAddedBehaviors;
 };
 
 #endif // BEHAVIOR_P_H

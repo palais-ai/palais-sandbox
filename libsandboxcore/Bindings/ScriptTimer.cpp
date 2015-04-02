@@ -116,7 +116,7 @@ ScriptTimer::ScriptTimer(int interval,
 
 void ScriptTimer::timeout()
 {
-    if(mFunction.isFunction())
+    if(mFunction.isFunction() && mFunction.engine())
      {
          mFunction.call();
      }

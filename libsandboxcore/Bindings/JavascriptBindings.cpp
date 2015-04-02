@@ -323,7 +323,6 @@ void RangeQueryResult_register_prototype(QScriptEngine& engine)
 
 QScriptValue RangeQueryResult_prototype_actors(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     RangeQueryResult* res = qscriptvalue_cast<RangeQueryResult*>(context->thisObject());
 
     if (!res)
@@ -333,10 +332,15 @@ QScriptValue RangeQueryResult_prototype_actors(QScriptContext *context, QScriptE
                                     this object is not a RangeQueryResult");
     }
 
-    QScriptValue retVal = engine->newArray(res->actors.size());
+    QScriptValue retVal = engine->newArray();
     quint32 i = 0;
     foreach(Actor* actor, res->actors)
     {
+        if(!actor)
+        {
+            qWarning("RangeQueryResult.prototype.actors: Encountered NULL Actor. Skipping.");
+            continue;
+        }
         retVal.setProperty(i++, engine->toScriptValue(actor));
     }
     return retVal;
@@ -365,7 +369,6 @@ QScriptValue RaycastResult_prototype_distance(QScriptContext *context, QScriptEn
 {
     Q_UNUSED(engine);
 
-    // Cast to a pointer to be able to modify the underlying C++ value
     RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
 
     if (!res)
@@ -380,7 +383,6 @@ QScriptValue RaycastResult_prototype_distance(QScriptContext *context, QScriptEn
 
 QScriptValue RaycastResult_prototype_actor(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
 
     if (!res)
@@ -402,7 +404,6 @@ QScriptValue RaycastResult_prototype_hasHit(QScriptContext *context, QScriptEngi
 {
     Q_UNUSED(engine);
 
-    // Cast to a pointer to be able to modify the underlying C++ value
     RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
 
     if (!res)
@@ -487,7 +488,6 @@ QScriptValue Vector3_prototype_ctor(QScriptContext *context, QScriptEngine *engi
 
 QScriptValue Vector3_prototype_x(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -522,7 +522,6 @@ QScriptValue Vector3_prototype_x(QScriptContext *context, QScriptEngine *engine)
 
 QScriptValue Vector3_prototype_y(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -557,7 +556,6 @@ QScriptValue Vector3_prototype_y(QScriptContext *context, QScriptEngine *engine)
 
 QScriptValue Vector3_prototype_z(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -594,7 +592,6 @@ QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *
 {
     Q_UNUSED(engine);
 
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -613,7 +610,6 @@ QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *
 
 QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -643,7 +639,6 @@ QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engin
 
 QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -673,7 +668,6 @@ QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *
 
 QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -710,7 +704,6 @@ QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *
 
 QScriptValue Vector3_prototype_divide(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -747,7 +740,6 @@ QScriptValue Vector3_prototype_divide(QScriptContext *context, QScriptEngine *en
 
 QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -765,7 +757,6 @@ QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine 
 
 QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -793,7 +784,6 @@ QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *
 
 QScriptValue Vector3_prototype_equals(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)

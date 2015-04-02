@@ -16,8 +16,8 @@
 #include <QTime>
 #include <QDebug>
 #include <QThread>
-#include "../libqmlogre/ogreitem.h"
-#include "../libqmlogre/ogreengine.h"
+#include "ogreitem.h"
+#include "ogreengine.h"
 #include <Ogre.h>
 
 Q_DECLARE_METATYPE(ConsoleModel::LogLevel)

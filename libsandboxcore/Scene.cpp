@@ -82,28 +82,49 @@ Scene::~Scene()
 
 Ogre::SceneManager* Scene::getOgreSceneManager() const
 {
-    return Ogre::Root::getSingleton()
-            .getSceneManager(mSceneManagerName.toStdString());
+    return Ogre::Root::getSingleton().getSceneManager(mSceneManagerName.toStdString());
 }
 
-DebugDrawer* Scene::createDebugDrawer(const QString& name)
+DebugDrawer* Scene::createDebugDrawer(const QString& name, float opacity)
 {
-    mDrawers += new DebugDrawer(name.toStdString(), getOgreSceneManager(), 0.5);
-    return mDrawers.last();
+    if(mDrawers.contains(name))
+    {
+        qWarning() << "Scene.createDebugDrawer: Tried to add DebugDrawer with name ["
+                   << name << "] that already existed. "
+                   << "Names must be unique. Returning NULL.";
+        return NULL;
+    }
+    DebugDrawer* newDrawer = new DebugDrawer(name.toStdString(),
+                                             getOgreSceneManager(),
+                                             MIN(MAX(opacity, 0), 1));
+    mDrawers[name] = newDrawer;
+
+    // Add the DebugDrawer's scene node to the actor list.
+    addActor(getOgreSceneManager()->getSceneNode(name.toStdString()));
+
+    return newDrawer;
 }
 
 void Scene::destroyDebugDrawer(DebugDrawer* drawer)
 {
-    int idx = mDrawers.indexOf(drawer);
-
-    if(idx != -1)
+    if(!drawer)
     {
-        delete mDrawers[idx];
-        mDrawers.remove(idx);
+        qWarning() << "Scene.destroyDebugDrawer: Can't destroy a NULL drawer.";
+        return;
+    }
+
+    QString name = QString::fromStdString(drawer->getName());
+    QHash<QString, DebugDrawer*>::iterator it = mDrawers.find(name);
+    if(it != mDrawers.end())
+    {
+        DebugDrawer* drawer = it.value();
+        mDrawers.remove(name);
+        delete drawer;
     }
     else
     {
-        qWarning("Tried to remove inexistant debug drawer.");
+        qWarning() << "Scene.destroyDebugDrawer: Tried to destroy an inexistant DebugDrawer [ "
+                   << name << " ].";
     }
 }
 
@@ -159,15 +180,22 @@ bool Scene::frameEnded(const Ogre::FrameEvent& evt)
 
 Actor* Scene::getActorForNode(Ogre::SceneNode* node) const
 {
-    QMap<QString, Actor*>::const_iterator it = mActors.begin();
-    for(; it != mActors.end(); ++it)
+    Ogre::Any userAny = node->getUserAny();
+
+    if(userAny.isEmpty())
     {
-        if(it.value()->getSceneNode() == node)
-        {
-            return it.value();
-        }
+        return NULL;
     }
-    return NULL;
+
+    Actor** val = Ogre::any_cast<Actor*>(&userAny);
+    if(!val)
+    {
+        return NULL;
+    }
+    else
+    {
+        return *val;
+    }
 }
 
 RaycastResult Scene::raycast(const Ogre::Vector3& origin,
@@ -279,11 +307,12 @@ void Scene::destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
    }
 }
 
-void Scene::toggleHighlight(bool highlighted, int index)
+void Scene::toggleHighlight(const QString& name, bool highlighted)
 {
-    if(index >= 0 && index < mActors.size())
+    QHash<QString, Actor*>::iterator it = mActors.find(name);
+    if(it != mActors.end())
     {
-        mActors.values().at(index)->toggleHighlight(highlighted);
+        it.value()->toggleHighlight(highlighted);
     }
     else
     {
@@ -294,11 +323,6 @@ void Scene::toggleHighlight(bool highlighted, int index)
 const QString& Scene::getName() const
 {
     return mName;
-}
-
-const QMap<QString, Actor*>& Scene::getActors() const
-{
-    return mActors;
 }
 
 Actor* Scene::instantiate(const QString& name,
@@ -387,11 +411,6 @@ bool Scene::hasActor(const QString& actorName) const
     return mActors.contains(actorName);
 }
 
-Actor* Scene::getActorByIndex(unsigned int index)
-{
-    return mActors.values()[index];
-}
-
 Actor* Scene::getActorByName(const QString& actorName)
 {
     return getActor(actorName);
@@ -399,9 +418,10 @@ Actor* Scene::getActorByName(const QString& actorName)
 
 Actor* Scene::getActor(const QString& actorName)
 {
-    if(mActors.contains(actorName))
+    QHash<QString, Actor*>::iterator it = mActors.find(actorName);
+    if(it != mActors.end())
     {
-        return mActors[actorName];
+        return it.value();
     }
     else
     {
@@ -436,12 +456,10 @@ void Scene::onDestroyLater(Actor* actor)
 QObjectList Scene::getActorsArray() const
 {
     QObjectList list;
-
-    for(QMap<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
+    for(QHash<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
     {
         list += it.value();
     }
-
     return list;
 }
 
@@ -458,6 +476,7 @@ Actor* Scene::addActor(Ogre::SceneNode* node)
     QString name = node->getName().c_str();
 
     Actor* newActor = new Actor(node);
+
     mActors[name] = newActor;
     connect(newActor, &Actor::visibilityChanged,
             this, &Scene::onActorVisibilityChanged);
@@ -514,9 +533,10 @@ void Scene::teardown()
 
     // Delete actors here to trigger any dangling __delete__ events that the script might be listening to.
     // No scripts should be called in the destructor.
-    for(QMap<QString, Actor*>::iterator it = mActors.begin(); it != mActors.end(); ++it)
+    QStringList keys = mActors.keys();
+    foreach(const QString& actorName, keys)
     {
-        delete it.value();
+        destroy(getActorByName(actorName));
     }
 }
 
@@ -546,7 +566,7 @@ void Scene::update(float time)
     JavaScriptBindings::timers_update(deltaTimeInSeconds);
 
     // Update all actors.
-    for(QMap<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
+    for(QHash<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
     {
         it.value()->update(deltaTimeInSeconds);
     }

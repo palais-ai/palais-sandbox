@@ -269,8 +269,9 @@ void DebugDrawer::setIcoSphereRecursionLevel(int recursionLevel)
  
 void DebugDrawer::shutdown()
 {
-    sceneManager->destroySceneNode(name);
-    sceneManager->destroyManualObject(manualObject);
+    // The Scene handles this.
+    //sceneManager->destroySceneNode(name);
+    //sceneManager->destroyManualObject(manualObject);
 }
  
 void DebugDrawer::buildLine(const Ogre::Vector3& start,

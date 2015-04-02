@@ -154,7 +154,7 @@ void SequentialComposite::terminate()
 void SequentialComposite::onReset(Behavior* behavior)
 {
     const uint32_t idx = indexOf(behavior);
-    AI_ASSERT(idx < mCurrentBehavior,
+    AI_ASSERT(idx <= mCurrentBehavior,
               "A behavior running after the current behavior should not be reseting this node.");
 
     // Terminate all behaviors following this one.
@@ -181,15 +181,18 @@ void SequentialComposite::scheduleNextBehavior()
 
 void SequentialComposite::terminateFromIndex(uint32_t idx)
 {
-    AI_ASSERT(idx <= mCurrentBehavior,
-              "A behavior running after the current behavior should not be terminating.");
-    // Terminate all behaviors following (including) __idx__.
-    for(uint32_t i = idx; i <= mCurrentBehavior; ++i)
+    if(idx < getChildren().size())
     {
-        getChildren()[i]->terminate();
-    }
+        AI_ASSERT(idx <= mCurrentBehavior,
+                  "A behavior running after the current behavior should not be terminating.");
+        // Terminate all behaviors following (including) __idx__.
+        for(uint32_t i = idx; i <= mCurrentBehavior; ++i)
+        {
+            getChildren()[i]->terminate();
+        }
 
-    mCurrentBehavior = idx == 0 ? 0 : idx - 1;
+        mCurrentBehavior = idx == 0 ? 0 : idx - 1;
+    }
 }
 
 Selector::Selector(Scheduler& scheduler,

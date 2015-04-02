@@ -1,3 +1,5 @@
+
+
 macx {
     OGREDIR = $$(OGRE_HOME)
     isEmpty(OGREDIR) {
@@ -6,14 +8,26 @@ macx {
         message(Using Ogre libraries in $$OGREDIR)
         INCLUDEPATH += $$OGREDIR/include/OGRE
         INCLUDEPATH += $$OGREDIR/include/OGRE/RenderSystems/GL
-        QMAKE_LFLAGS += -F$$OGREDIR/lib/release
         LIBS += -framework Ogre -framework OpenGL
+
+        !exists($$OGREDIR/lib/macosx) { # Ogre 1.8
+message(ogre 1.8)
+            QMAKE_LFLAGS += -F$$OGREDIR/lib/release
+        } else { # Ogre 1.9
+message(ogre 1.9)
+            QMAKE_LFLAGS += -F$$OGREDIR/lib/macosx/Release
+        }
 
         BOOSTDIR = $$OGREDIR/boost
         !isEmpty(BOOSTDIR) {
             INCLUDEPATH += $$BOOSTDIR
-            LIBS += -L$$BOOSTDIR/lib -lboost_date_time-xgcc42-mt-1_49 -lboost_thread-xgcc42-mt-1_49
+            !exists($$OGREDIR/lib/macosx) { # Ogre 1.8
+                LIBS += -L$$BOOSTDIR/lib -lboost_date_time-xgcc42-mt-1_49 -lboost_thread-xgcc42-mt-1_49
+            } else { # Ogre 1.9
+                LIBS += -L$$BOOSTDIR/lib -lboost_date_time -lboost_chrono -lboost_system -lboost_thread
+            }
         }
+
     }
 } else:unix {
     CONFIG += link_pkgconfig
