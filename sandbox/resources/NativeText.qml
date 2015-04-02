@@ -1,6 +1,7 @@
 import QtQuick 2.0
 
 Text {
+    // Native rendering appears to be more robust on Mac OS.
     renderType: Text.NativeRendering
 
     Component.onCompleted: {

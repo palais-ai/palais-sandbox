@@ -167,7 +167,6 @@ void OgreNode::preprocess()
     }
 
     activateOgreContext();
-
     resetViewport();
 
     m_ogreEngineItem->getRoot()->_fireFrameStarted();

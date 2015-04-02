@@ -9,7 +9,6 @@
         <file>Ogre3DViewPlaybackControls.qml</file>
         <file>ActorTableCell.qml</file>
         <file>ActorTableHeader.qml</file>
-        <file>TextShadow.qml</file>
         <file>ListSeparator.qml</file>
         <file>InspectorArea.qml</file>
         <file>ConsoleArea.qml</file>

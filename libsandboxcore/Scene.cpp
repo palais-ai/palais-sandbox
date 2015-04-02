@@ -360,13 +360,13 @@ void Scene::destroy(Actor* actor)
         return;
     }
 
-    int numRemoved = mActors.remove(actor->getName());
-    IF_VERBOSE(qDebug() << "[" << actor->getName() << "] : Num. Removed: " << numRemoved);
-    assert(numRemoved == 1);
-
     emit actorRemoved(actor->getName());
     emit actorRemovedObject(actor);
     emit actor->removedFromScene(actor);
+
+    int numRemoved = mActors.remove(actor->getName());
+    IF_VERBOSE(qDebug() << "[" << actor->getName() << "] : Num. Removed: " << numRemoved);
+    assert(numRemoved == 1);
 
     JavaScriptBindings::removeActorBinding(actor, mLogicScript);
 

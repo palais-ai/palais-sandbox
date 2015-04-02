@@ -49,7 +49,7 @@ void ScriptBehavior::terminate()
     Behavior::terminate();
 }
 
-FORCE_INLINE static Behavior* extractBehavior(const QScriptValue& value)
+static Behavior* extractBehavior(const QScriptValue& value)
 {
     QScriptValue prop = value.property("__behavior");
 

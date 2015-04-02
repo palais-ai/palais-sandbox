@@ -21,7 +21,7 @@ class SceneNode;
 class Camera;
 }
 
-// Handles camera updates, operating in a thread-safe manner on the ogre engine thread.
+// Handles camera updates, operating in a thread-safe manner on the OgreEngine's thread.
 class CameraHandler : public QObject
 {
     Q_OBJECT
@@ -62,10 +62,13 @@ public:
     Ogre::Camera* camera() const;
 
     // Thread-safe
-    Q_INVOKABLE void yaw(qreal y); // Radians
+    Q_INVOKABLE void yaw(qreal y);   // Radians
     Q_INVOKABLE void pitch(qreal p); // Radians
-    Q_INVOKABLE void zoom(qreal z); // Times of original distance (fit to contain = 1)
+    Q_INVOKABLE void zoom(qreal z);  // Times of original distance (fit to contain = 1)
     qreal getZoom() const;
+
+    // This will cause the Ogre::Camera to depend on this scene node.
+    // To prevent a crash you should change the camera focus once a scene node is removed.
     Q_INVOKABLE void focus(Ogre::SceneNode* node);
 signals:
     void cameraChanged(Ogre::Camera* camera);

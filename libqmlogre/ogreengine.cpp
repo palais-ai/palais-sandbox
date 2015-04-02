@@ -153,66 +153,28 @@ void OgreEngine::setQuickWindow(QQuickWindow *window)
 
     m_qtContext = QOpenGLContext::currentContext();
     m_qtContext->doneCurrent();
-
     m_ogreContext = m_qtContext;
-
-    // create a new shared OpenGL context to be used exclusively by Ogre
-    /**m_ogreContext = new QOpenGLContext();
-    m_ogreContext->setFormat(m_quickWindow->requestedFormat());
-    m_ogreContext->setShareContext(m_qtContext);
-    m_ogreContext->create();
-
-    m_ogreContext->doneCurrent();*/
-
     m_qtContext->makeCurrent(m_quickWindow);
 }
 
 void OgreEngine::activateOgreContext()
 {
-    glPopAttrib();
-    glPopClientAttrib();
-
-    m_qtContext->functions()->glUseProgram(0);
-    m_qtContext->doneCurrent();
-
-    m_ogreContext->makeCurrent(m_quickWindow);
+    if(m_ogreContext != m_qtContext)
+    {
+        m_qtContext->doneCurrent();
+        m_ogreContext->makeCurrent(m_quickWindow);
+    }
 
     m_quickWindow->resetOpenGLState();
 }
 
 void OgreEngine::doneOgreContext()
 {
-    /**m_ogreContext->functions()->glBindBuffer(GL_ARRAY_BUFFER, 0);
-    m_ogreContext->functions()->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    m_ogreContext->functions()->glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    m_ogreContext->functions()->glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-
-    // unbind all possible remaining buffers; just to be on safe side
-    m_ogreContext->functions()->glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-#ifdef GL_VERSION_4_2
-    m_ogreContext->functions()->glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
-#endif
-
-    m_ogreContext->functions()->glBindBuffer(GL_COPY_READ_BUFFER, 0);
-    m_ogreContext->functions()->glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
-    m_ogreContext->functions()->glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-//    m_ogreContext->functions()->glBindBuffer(GL_DISPATCH_INDIRECT_BUFFER, 0);
-    m_ogreContext->functions()->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    m_ogreContext->functions()->glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-    m_ogreContext->functions()->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-//    m_ogreContext->functions()->glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    m_ogreContext->functions()->glBindBuffer(GL_TEXTURE_BUFFER, 0);
-    m_ogreContext->functions()->glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, 0);
-    m_ogreContext->functions()->glBindBuffer(GL_UNIFORM_BUFFER, 0);
-*/
-    m_ogreContext->doneCurrent();
-
-    m_qtContext->makeCurrent(m_quickWindow);
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-    glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
-
-    m_qtContext->functions()->glUseProgram(0);
+    if(m_ogreContext != m_qtContext)
+    {
+        m_ogreContext->doneCurrent();
+        m_qtContext->makeCurrent(m_quickWindow);
+    }
 
     m_quickWindow->resetOpenGLState();
 }

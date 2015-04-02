@@ -6,7 +6,7 @@ function getOwnFlagPos(color)
 {
 	var red   = Scene.getKnowledge("goal_red");
 	var green = Scene.getKnowledge("goal_green");
-	return color === "red"   ? red : green;
+	return color === "red" ? red : green;
 }
 
 function getOpponentFlagPos(color)
@@ -219,13 +219,24 @@ function MonitorTask(actor)
 	})
 }
 
-function constructBehaviorTreeForActor(actor)
+function constructAttackerBehaviorTree(actor)
 {
 	var color = actor.getKnowledge("team_color");
 	var root = new Selector(new HasFlag(new WalkTo(getOwnFlagPos(color)), actor), 
-					        new EnemyInRange(new Shoot(), actor), 
-					       	//new TeamHasFlag(new GuardCarrier(), actor),
+					        new EnemyInRange(new Shoot(), actor),
 					       	new WalkTo(getOpponentFlagPos(color)));
+	
+	
+}
+
+function constructDefenderBehaviorTree(actor)
+{
+	
+}
+
+function constructBehaviorTreeForActor(actor)
+{
+	var root = new RandomSelector(constructAttackerBehaviorTree(actor))
 
 	actor.setKnowledge("self", actor);
 	actor.setKnowledge("has_flag", false);

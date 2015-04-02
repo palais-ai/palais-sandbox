@@ -30,16 +30,15 @@ static ailib::real_type euclideanHeuristic(const Pathfinding::NavigationGraph::n
 
 void Pathfinding::updateActor(Actor &actor, float deltaTime)
 {
-    static const float defaultActorSpeed = 0.5;
+    static const float defaultActorSpeed = 0.5; // meters per second
     if(actor.hasKnowledge("movement_target"))
     {
         float actorSpeed;
-        if(actor.hasKnowledge("actor_speed"))
+        if(actor.hasKnowledge("movement_speed"))
         {
             bool ok;
-            actorSpeed = actor.getKnowledge("actor_speed").toFloat(&ok);
-
-            if(!ok)
+            actorSpeed = actor.getKnowledge("movement_speed").toFloat(&ok);
+            if(ok)
             {
                 actorSpeed = defaultActorSpeed;
             }
@@ -98,8 +97,35 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
         }
 
         Ogre::Vector3 step = (target - current).normalisedCopy() * (actorSpeed * deltaTime);
-
         actor.setPosition(current + step);
+    }
+
+    if(actor.hasKnowledge("lookat_target") &&
+       actor.getKnowledge("lookat_target").canConvert<Ogre::Vector3>())
+    {
+        Ogre::Quaternion before = actor.getRotation();
+        actor.lookAt(actor.getKnowledge("lookat_target").value<Ogre::Vector3>());
+        Ogre::Quaternion after  = actor.getRotation();
+        after.FromAngleAxis(after.getYaw(), Ogre::Vector3::UNIT_Y); // Lock pitch / roll.
+
+        float rotationSpeed = 140; // Degrees per second
+
+        if(actor.hasKnowledge("rotation_speed")  &&
+           actor.getKnowledge("rotation_speed").canConvert<float>())
+        {
+            rotationSpeed = actor.getKnowledge("rotation_speed").value<float>();
+        }
+
+        Ogre::Quaternion delta = after * before.Inverse();
+        delta.normalise();
+        Ogre::Vector3 axis;
+        Ogre::Degree angle;
+        delta.ToAngleAxis(angle, axis);
+
+        const float t = MIN((rotationSpeed * deltaTime) / angle.valueDegrees(), 1);
+        Ogre::Quaternion between = Ogre::Quaternion::Slerp(t, before, after, true);
+        between.normalise();
+        actor.setRotation(between);
     }
 }
 

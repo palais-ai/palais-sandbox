@@ -148,25 +148,26 @@ void ProjectManager::onUnselectActor()
 
 void ProjectManager::onActorRemoved(const QString& actorName)
 {
+    CameraNodeObject* cameraNode = getCameraWithName("cam1");
+    if(!cameraNode)
+    {
+        // A crash is immanent if this happens anyway - Exit through qFatal.
+        qFatal("Can't determine focused actor without a corresponding CameraNode.");
+    }
+    else
+    {
+        // Refocus the camera on the root scene node.
+        if(cameraNode->focusedNode() ==
+           mScenarioManager.getCurrentScene()->getActorByName(actorName)->getSceneNode())
+        {
+            Ogre::Root& root = Ogre::Root::getSingleton();
+            Ogre::SceneManager* mgr = root.getSceneManager(Application::sSceneManagerName);
+            cameraNode->focus(mgr->getRootSceneNode());
+        }
+    }
+
     if(mSelectedActor && mSelectedActor->getName() == actorName)
     {
-        CameraNodeObject* cameraNode = getCameraWithName("cam1");
-        if(!cameraNode)
-        {
-            // A crash is immanent if this happens anyway - Exit through qFatal.
-            qFatal("Can't determine focused actor without a corresponding CameraNode.");
-        }
-        else
-        {
-            // Refocus the camera on the root scene node.
-            if(cameraNode->focusedNode() == mSelectedActor->getSceneNode())
-            {
-                Ogre::Root& root = Ogre::Root::getSingleton();
-                Ogre::SceneManager* mgr = root.getSceneManager(Application::sSceneManagerName);
-                cameraNode->focus(mgr->getRootSceneNode());
-            }
-        }
-
         Scene* current = mScenarioManager.getCurrentScene();
         emit inspectorSelectionChanged(current->getName(), current);
         mSelectedActor = NULL;

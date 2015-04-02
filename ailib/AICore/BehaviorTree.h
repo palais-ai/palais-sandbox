@@ -153,7 +153,7 @@ private:
 template <typename ITER>
 void shuffle(ITER start, ITER end)
 {
-    AI_ASSERT(end-start <= std::numeric_limits<int32_t>::max(),
+    AI_ASSERT(end - start <= std::numeric_limits<int32_t>::max(),
               "Too many children - integer overflow.");
 
     // Fisher-Yates shuffle, used by the random composites below.
@@ -203,7 +203,7 @@ public:
                    const Composite::BehaviorList& children);
 };
 
-// TODO: BlackboardScope
+// TODO: UserDataScope
 
 END_NS_AILIB
 

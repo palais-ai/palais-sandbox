@@ -209,6 +209,8 @@ CameraNodeObject::CameraNodeObject(QObject *parent) :
     connect(mHandler.data(), &CameraHandler::setupChanged,
             this, &CameraNodeObject::onSetupChanged,
             Qt::DirectConnection);
+    connect(mHandler.data(), &CameraHandler::focusNodeChanged,
+            this, &CameraNodeObject::onFocusNodeChanged);
 
     createCameraWithCurrentSceneManager();
 

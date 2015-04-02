@@ -9,7 +9,7 @@
 #include <OgreColourValue.h>
 #include <OgreString.h>
 #include <map>
-#include <list>
+#include <vector>
 #include <stdint.h>
 
 namespace Ogre
@@ -50,9 +50,9 @@ public:
 	~IcoSphere();
  
 	void create(int recursionLevel);
-	void addToLineIndices(int baseIndex, std::list<int> *target);
-	int addToVertices(std::list<VertexPair> *target, const Ogre::Vector3 &position, const Ogre::ColourValue &colour, float scale);
-	void addToTriangleIndices(int baseIndex, std::list<int> *target);
+    void addToLineIndices(int baseIndex, std::vector<int> *target);
+    int addToVertices(std::vector<VertexPair> *target, const Ogre::Vector3 &position, const Ogre::ColourValue &colour, float scale);
+    void addToTriangleIndices(int baseIndex, std::vector<int> *target);
  
 private:
 	int addVertex(const Ogre::Vector3 &vertex);
@@ -64,9 +64,9 @@ private:
 	void removeLineIndices(int index0, int index1);
  
 	std::vector<Ogre::Vector3> vertices;
-	std::list<LineIndices> lineIndices;
-	std::list<int> triangleIndices;
-	std::list<TriangleIndices> faces;
+    std::vector<LineIndices> lineIndices;
+    std::vector<int> triangleIndices;
+    std::vector<TriangleIndices> faces;
     std::map<int64_t, int> middlePointIndexCache;
 	int index;
 };
@@ -108,8 +108,8 @@ private:
     // Added size tracking between build calls - for caching purposes.
     size_t lineIndicesSize, vertexIndicesSize;
 
-	std::list<VertexPair> lineVertices, triangleVertices;
-	std::list<int> lineIndices, triangleIndices;
+    std::vector<VertexPair> lineVertices, triangleVertices;
+    std::vector<int> lineIndices, triangleIndices;
  
 	int linesIndex, trianglesIndex;
 
