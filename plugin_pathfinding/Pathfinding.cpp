@@ -19,6 +19,7 @@
 #include <OgrePlane.h>
 #include <OgrePolygon.h>
 #include <OgreStringConverter.h>
+#include <algorithm>
 
 Q_DECLARE_METATYPE(QScriptValue)
 
@@ -122,7 +123,7 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
         Ogre::Degree angle;
         delta.ToAngleAxis(angle, axis);
 
-        const float t = MIN((rotationSpeed * deltaTime) / angle.valueDegrees(), 1);
+        const float t = std::min((rotationSpeed * deltaTime) / angle.valueDegrees(), 1.f);
         Ogre::Quaternion between = Ogre::Quaternion::Slerp(t, before, after, true);
         between.normalise();
         actor.setRotation(between);
