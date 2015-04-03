@@ -23,7 +23,7 @@ SOURCES += \
     OgreHelper.cpp \
     Scene.cpp \
     DebugDrawer.cpp \
-    SceneDynamics.cpp \
+   # SceneDynamics.cpp \
     Bindings/ScriptTimer.cpp
 
 HEADERS +=\
@@ -33,12 +33,12 @@ HEADERS +=\
     OgreHelper.h \
     Scene.h \
     DebugDrawer.h \
-    SceneDynamics.h \
+   # SceneDynamics.h \
     Bindings/ScriptTimer.h \
     Actor.h
 
 include(../linkOgreSDK.pri)
-include(../linkBulletSDK.pri)
+#include(../linkBulletSDK.pri)
 
 CONFIG(release, debug|release) {
     M_BUILD_DIR = release

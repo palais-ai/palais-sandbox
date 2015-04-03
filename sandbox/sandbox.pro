@@ -146,7 +146,7 @@ macx {
         message($$MY_BUNDLE_DIR is the bundle dir)
         message($$PWD/resources is the qml dir)
 
-        QMAKE_POST_LINK = $$[QT_INSTALL_LIBS]/../bin/windeployqt $$MY_BUNDLE_DIR --qmldir=$$PWD/resources --release --compiler-runtime
+        #QMAKE_POST_LINK = $$[QT_INSTALL_LIBS]/../bin/windeployqt $$MY_BUNDLE_DIR --qmldir=$$PWD/resources --release --compiler-runtime
 
         # Copy all resources to build folder
         Resources.path = $$DESTDIR/Resources
