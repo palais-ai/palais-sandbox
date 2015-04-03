@@ -3,755 +3,475 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		BB4DE38A6CA0006A883E2689 /* Qt Preprocess */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 6CC3B5D2136C7CD6A5CF5A59 /* Build configuration list for PBXNativeTarget "meshmagick" */;
+			buildPhases = (
+				5E618435888B9D49F8540165 /* Qt Qmake */,
+				7EF0942E79C014DCEC8976BC /* Qt Preprocessors */,
+			);
+			dependencies = (
+			);
+			name = "Qt Preprocess";
+			productName = "Qt Preprocess";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
-		4407848B0C09CE97006E496D /* Ogre.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44125AAF0C08418200C24C0A /* Ogre.framework */; };
-		440785950C09D01F006E496D /* meshmagick in Copy Executable */ = {isa = PBXBuildFile; fileRef = 8DD76F6C0486A84900D96B5E /* meshmagick */; };
-		440785A30C09D0CF006E496D /* MeshMagickPrerequisites.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 44125A770C08410200C24C0A /* MeshMagickPrerequisites.h */; };
-		440785A40C09D0CF006E496D /* MeshMergeTool.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 44125A780C08410200C24C0A /* MeshMergeTool.h */; };
-		440785A50C09D0CF006E496D /* OgreEnvironment.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 44125A7A0C08410200C24C0A /* OgreEnvironment.h */; };
-		440785A60C09D0CF006E496D /* OptionsParser.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 44125A7B0C08410200C24C0A /* OptionsParser.h */; };
-		440785A70C09D0CF006E496D /* StatefulMeshSerializer.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 44125A7C0C08410200C24C0A /* StatefulMeshSerializer.h */; };
-		440785A80C09D0CF006E496D /* StatefulSkeletonSerializer.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 44125A7D0C08410200C24C0A /* StatefulSkeletonSerializer.h */; };
-		440785A90C09D0CF006E496D /* Tool.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 44125A7E0C08410200C24C0A /* Tool.h */; };
-		440785AA0C09D0CF006E496D /* TransformTool.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 44125A810C08410200C24C0A /* TransformTool.h */; };
-		440785B00C09D103006E496D /* libmeshmagick.dylib in Copy Library */ = {isa = PBXBuildFile; fileRef = 44125A570C0840B400C24C0A /* libmeshmagick.dylib */; };
-		44125A520C08405800C24C0A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A510C08405800C24C0A /* main.cpp */; };
-		44125A660C0840ED00C24C0A /* InfoTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5A0C0840ED00C24C0A /* InfoTool.cpp */; };
-		44125A670C0840ED00C24C0A /* InfoToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5B0C0840ED00C24C0A /* InfoToolFactory.cpp */; };
-		44125A680C0840ED00C24C0A /* MeshMergeTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5C0C0840ED00C24C0A /* MeshMergeTool.cpp */; };
-		44125A690C0840ED00C24C0A /* MeshMergeToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5D0C0840ED00C24C0A /* MeshMergeToolFactory.cpp */; };
-		44125A6A0C0840ED00C24C0A /* OgreEnvironment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5E0C0840ED00C24C0A /* OgreEnvironment.cpp */; };
-		44125A6B0C0840ED00C24C0A /* OptionsParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5F0C0840ED00C24C0A /* OptionsParser.cpp */; };
-		44125A6C0C0840ED00C24C0A /* StatefulMeshSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A600C0840ED00C24C0A /* StatefulMeshSerializer.cpp */; };
-		44125A6D0C0840ED00C24C0A /* StatefulSkeletonSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A610C0840ED00C24C0A /* StatefulSkeletonSerializer.cpp */; };
-		44125A6E0C0840ED00C24C0A /* Tool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A620C0840ED00C24C0A /* Tool.cpp */; };
-		44125A6F0C0840ED00C24C0A /* ToolManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A630C0840ED00C24C0A /* ToolManager.cpp */; };
-		44125A700C0840ED00C24C0A /* TransformTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A640C0840ED00C24C0A /* TransformTool.cpp */; };
-		44125A710C0840ED00C24C0A /* TransformToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A650C0840ED00C24C0A /* TransformToolFactory.cpp */; };
-		44125A830C08410200C24C0A /* InfoTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A750C08410200C24C0A /* InfoTool.h */; };
-		44125A840C08410200C24C0A /* InfoToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A760C08410200C24C0A /* InfoToolFactory.h */; };
-		44125A850C08410200C24C0A /* MeshMagickPrerequisites.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A770C08410200C24C0A /* MeshMagickPrerequisites.h */; };
-		44125A860C08410200C24C0A /* MeshMergeTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A780C08410200C24C0A /* MeshMergeTool.h */; };
-		44125A870C08410200C24C0A /* MeshMergeToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A790C08410200C24C0A /* MeshMergeToolFactory.h */; };
-		44125A880C08410200C24C0A /* OgreEnvironment.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7A0C08410200C24C0A /* OgreEnvironment.h */; };
-		44125A890C08410200C24C0A /* OptionsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7B0C08410200C24C0A /* OptionsParser.h */; };
-		44125A8A0C08410200C24C0A /* StatefulMeshSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7C0C08410200C24C0A /* StatefulMeshSerializer.h */; };
-		44125A8B0C08410200C24C0A /* StatefulSkeletonSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7D0C08410200C24C0A /* StatefulSkeletonSerializer.h */; };
-		44125A8C0C08410200C24C0A /* Tool.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7E0C08410200C24C0A /* Tool.h */; };
-		44125A8D0C08410200C24C0A /* ToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7F0C08410200C24C0A /* ToolFactory.h */; };
-		44125A8E0C08410200C24C0A /* ToolManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A800C08410200C24C0A /* ToolManager.h */; };
-		44125A8F0C08410200C24C0A /* TransformTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A810C08410200C24C0A /* TransformTool.h */; };
-		44125A900C08410200C24C0A /* TransformToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A820C08410200C24C0A /* TransformToolFactory.h */; };
-		44125AB00C08418200C24C0A /* Ogre.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44125AAF0C08418200C24C0A /* Ogre.framework */; };
-		445A0C440C4AAA500029E457 /* EditableSkeleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 445A0C3E0C4AAA500029E457 /* EditableSkeleton.h */; };
-		445A0C450C4AAA500029E457 /* RenameTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 445A0C3F0C4AAA500029E457 /* RenameTool.h */; };
-		445A0C460C4AAA500029E457 /* RenameToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 445A0C400C4AAA500029E457 /* RenameToolFactory.h */; };
-		445A0C470C4AAA500029E457 /* EditableSkeleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445A0C410C4AAA500029E457 /* EditableSkeleton.cpp */; };
-		445A0C480C4AAA500029E457 /* RenameTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445A0C420C4AAA500029E457 /* RenameTool.cpp */; };
-		445A0C490C4AAA500029E457 /* RenameToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445A0C430C4AAA500029E457 /* RenameToolFactory.cpp */; };
-		4869D7370EF1A70900619D4D /* liblibmeshmagick_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4869D7340EF1A6E200619D4D /* liblibmeshmagick_static.a */; };
-		4869D7380EF1A72600619D4D /* InfoTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5A0C0840ED00C24C0A /* InfoTool.cpp */; };
-		4869D7390EF1A72600619D4D /* InfoToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5B0C0840ED00C24C0A /* InfoToolFactory.cpp */; };
-		4869D73A0EF1A72600619D4D /* MeshMergeTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5C0C0840ED00C24C0A /* MeshMergeTool.cpp */; };
-		4869D73B0EF1A72600619D4D /* MeshMergeToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5D0C0840ED00C24C0A /* MeshMergeToolFactory.cpp */; };
-		4869D73C0EF1A72600619D4D /* OgreEnvironment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5E0C0840ED00C24C0A /* OgreEnvironment.cpp */; };
-		4869D73D0EF1A72600619D4D /* OptionsParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A5F0C0840ED00C24C0A /* OptionsParser.cpp */; };
-		4869D73E0EF1A72600619D4D /* StatefulMeshSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A600C0840ED00C24C0A /* StatefulMeshSerializer.cpp */; };
-		4869D73F0EF1A72600619D4D /* StatefulSkeletonSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A610C0840ED00C24C0A /* StatefulSkeletonSerializer.cpp */; };
-		4869D7400EF1A72600619D4D /* Tool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A620C0840ED00C24C0A /* Tool.cpp */; };
-		4869D7410EF1A72600619D4D /* ToolManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A630C0840ED00C24C0A /* ToolManager.cpp */; };
-		4869D7420EF1A72600619D4D /* TransformTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A640C0840ED00C24C0A /* TransformTool.cpp */; };
-		4869D7430EF1A72600619D4D /* TransformToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44125A650C0840ED00C24C0A /* TransformToolFactory.cpp */; };
-		4869D7440EF1A72600619D4D /* EditableSkeleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445A0C410C4AAA500029E457 /* EditableSkeleton.cpp */; };
-		4869D7450EF1A72600619D4D /* RenameTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445A0C420C4AAA500029E457 /* RenameTool.cpp */; };
-		4869D7460EF1A72600619D4D /* RenameToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 445A0C430C4AAA500029E457 /* RenameToolFactory.cpp */; };
-		4869D7470EF1A72600619D4D /* OptimiseTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA48EDD90C65334D00DD2220 /* OptimiseTool.cpp */; };
-		4869D7480EF1A72600619D4D /* OptimiseToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA48EDDA0C65334D00DD2220 /* OptimiseToolFactory.cpp */; };
-		4869D7490EF1A72600619D4D /* EditableBone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48A52B800E0EEB56008DBDD8 /* EditableBone.cpp */; };
-		4869D74A0EF1A72600619D4D /* EditableMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48A52B810E0EEB56008DBDD8 /* EditableMesh.cpp */; };
-		4869D74B0EF1A72600619D4D /* MeshUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48A52B820E0EEB56008DBDD8 /* MeshUtils.cpp */; };
-		4869D74C0EF1A72600619D4D /* ToolsUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48A52B830E0EEB56008DBDD8 /* ToolsUtils.cpp */; };
-		4869D7500EF1A74900619D4D /* InfoTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A750C08410200C24C0A /* InfoTool.h */; };
-		4869D7510EF1A74900619D4D /* InfoToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A760C08410200C24C0A /* InfoToolFactory.h */; };
-		4869D7520EF1A74900619D4D /* MeshMagickPrerequisites.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A770C08410200C24C0A /* MeshMagickPrerequisites.h */; };
-		4869D7530EF1A74900619D4D /* MeshMergeTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A780C08410200C24C0A /* MeshMergeTool.h */; };
-		4869D7540EF1A74900619D4D /* MeshMergeToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A790C08410200C24C0A /* MeshMergeToolFactory.h */; };
-		4869D7550EF1A74900619D4D /* OgreEnvironment.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7A0C08410200C24C0A /* OgreEnvironment.h */; };
-		4869D7560EF1A74900619D4D /* OptionsParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7B0C08410200C24C0A /* OptionsParser.h */; };
-		4869D7570EF1A74900619D4D /* StatefulMeshSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7C0C08410200C24C0A /* StatefulMeshSerializer.h */; };
-		4869D7580EF1A74900619D4D /* StatefulSkeletonSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7D0C08410200C24C0A /* StatefulSkeletonSerializer.h */; };
-		4869D7590EF1A74900619D4D /* Tool.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7E0C08410200C24C0A /* Tool.h */; };
-		4869D75A0EF1A74900619D4D /* ToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A7F0C08410200C24C0A /* ToolFactory.h */; };
-		4869D75B0EF1A74900619D4D /* ToolManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A800C08410200C24C0A /* ToolManager.h */; };
-		4869D75C0EF1A74900619D4D /* TransformTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A810C08410200C24C0A /* TransformTool.h */; };
-		4869D75D0EF1A74900619D4D /* TransformToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 44125A820C08410200C24C0A /* TransformToolFactory.h */; };
-		4869D75E0EF1A74900619D4D /* EditableSkeleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 445A0C3E0C4AAA500029E457 /* EditableSkeleton.h */; };
-		4869D75F0EF1A74900619D4D /* RenameTool.h in Headers */ = {isa = PBXBuildFile; fileRef = 445A0C3F0C4AAA500029E457 /* RenameTool.h */; };
-		4869D7600EF1A74900619D4D /* RenameToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 445A0C400C4AAA500029E457 /* RenameToolFactory.h */; };
-		4869D7610EF1A74900619D4D /* OptimiseTool.h in Headers */ = {isa = PBXBuildFile; fileRef = AA48EDD30C65333600DD2220 /* OptimiseTool.h */; };
-		4869D7620EF1A74900619D4D /* OptimiseToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = AA48EDD40C65333600DD2220 /* OptimiseToolFactory.h */; };
-		4869D7630EF1A74900619D4D /* EditableBone.h in Headers */ = {isa = PBXBuildFile; fileRef = 48A52B780E0EEB48008DBDD8 /* EditableBone.h */; };
-		4869D7640EF1A74900619D4D /* EditableMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 48A52B790E0EEB48008DBDD8 /* EditableMesh.h */; };
-		4869D7650EF1A74900619D4D /* MeshUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 48A52B7A0E0EEB48008DBDD8 /* MeshUtils.h */; };
-		4869D7660EF1A74900619D4D /* ToolUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 48A52B7B0E0EEB48008DBDD8 /* ToolUtils.h */; };
-		4869D8580EF1A76800619D4D /* Ogre.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44125AAF0C08418200C24C0A /* Ogre.framework */; };
-		48A52B7C0E0EEB48008DBDD8 /* EditableBone.h in Headers */ = {isa = PBXBuildFile; fileRef = 48A52B780E0EEB48008DBDD8 /* EditableBone.h */; };
-		48A52B7D0E0EEB48008DBDD8 /* EditableMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = 48A52B790E0EEB48008DBDD8 /* EditableMesh.h */; };
-		48A52B7E0E0EEB48008DBDD8 /* MeshUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 48A52B7A0E0EEB48008DBDD8 /* MeshUtils.h */; };
-		48A52B7F0E0EEB48008DBDD8 /* ToolUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 48A52B7B0E0EEB48008DBDD8 /* ToolUtils.h */; };
-		48A52B840E0EEB56008DBDD8 /* EditableBone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48A52B800E0EEB56008DBDD8 /* EditableBone.cpp */; };
-		48A52B850E0EEB56008DBDD8 /* EditableMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48A52B810E0EEB56008DBDD8 /* EditableMesh.cpp */; };
-		48A52B860E0EEB56008DBDD8 /* MeshUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48A52B820E0EEB56008DBDD8 /* MeshUtils.cpp */; };
-		48A52B870E0EEB56008DBDD8 /* ToolsUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48A52B830E0EEB56008DBDD8 /* ToolsUtils.cpp */; };
-		AA48EDD50C65333600DD2220 /* OptimiseTool.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = AA48EDD30C65333600DD2220 /* OptimiseTool.h */; };
-		AA48EDD60C65333600DD2220 /* OptimiseToolFactory.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = AA48EDD40C65333600DD2220 /* OptimiseToolFactory.h */; };
-		AA48EDD70C65333600DD2220 /* OptimiseTool.h in Headers */ = {isa = PBXBuildFile; fileRef = AA48EDD30C65333600DD2220 /* OptimiseTool.h */; };
-		AA48EDD80C65333600DD2220 /* OptimiseToolFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = AA48EDD40C65333600DD2220 /* OptimiseToolFactory.h */; };
-		AA48EDDB0C65334D00DD2220 /* OptimiseTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA48EDD90C65334D00DD2220 /* OptimiseTool.cpp */; };
-		AA48EDDC0C65334D00DD2220 /* OptimiseToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA48EDDA0C65334D00DD2220 /* OptimiseToolFactory.cpp */; };
-		AA48EDDD0C65334D00DD2220 /* OptimiseTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA48EDD90C65334D00DD2220 /* OptimiseTool.cpp */; };
-		AA48EDDE0C65334D00DD2220 /* OptimiseToolFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA48EDDA0C65334D00DD2220 /* OptimiseToolFactory.cpp */; };
+		0C15762778748E1A3925B311 /* MmMeshMergeToolFactory.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = B7528012A8041A51E6C4A8D9 /* MmMeshMergeToolFactory.cpp */; settings = {ATTRIBUTES = (); }; };
+		1EEA6D58EB255EA322D41F7A /* MmToolsUtils.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = C33A092D682FCAF711DB5734 /* MmToolsUtils.cpp */; settings = {ATTRIBUTES = (); }; };
+		310A8F52605414310A06B610 /* MmInfoTool.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 54E86E47DBC602E8F04A0E96 /* MmInfoTool.cpp */; settings = {ATTRIBUTES = (); }; };
+		32256415F5826FB4DE119AA5 /* MmOptionsParser.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 6DE5E790B8FE22A139F55AE0 /* MmOptionsParser.cpp */; settings = {ATTRIBUTES = (); }; };
+		3734F4F4A90F675E136D8D93 /* MmTool.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 20174F85D47F2C38047E840F /* MmTool.cpp */; settings = {ATTRIBUTES = (); }; };
+		3D0B709CA6673DAC74033790 /* MmToolManager.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 6D85F6C8564E6993E5D330A5 /* MmToolManager.cpp */; settings = {ATTRIBUTES = (); }; };
+		3D3949E8842D44709CA70525 /* MmStatefulSkeletonSerializer.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 774EF35BB57E516832AFA006 /* MmStatefulSkeletonSerializer.cpp */; settings = {ATTRIBUTES = (); }; };
+		438194288DDF90526BF4E469 /* MmEditableBone.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = D59143A789D326B5EA2A5391 /* MmEditableBone.cpp */; settings = {ATTRIBUTES = (); }; };
+		575956C482D008492ABC094A /* MmTransformTool.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 17159BD01F7466AAD6FA9CB7 /* MmTransformTool.cpp */; settings = {ATTRIBUTES = (); }; };
+		5CD07E6EC7A8A6267948B44E /* MmStatefulMeshSerializer.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 2454E926DF47B235883B6445 /* MmStatefulMeshSerializer.cpp */; settings = {ATTRIBUTES = (); }; };
+		5DA35F68D2EB2412C067C9C8 /* MmEditableMesh.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 76E0FAD1D4B518F7350F3300 /* MmEditableMesh.cpp */; settings = {ATTRIBUTES = (); }; };
+		6E71E0442F9C8C1B88562A91 /* MmMeshUtils.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = CBA297ADCCBA23D010983ED8 /* MmMeshUtils.cpp */; settings = {ATTRIBUTES = (); }; };
+		74AE1D393BA0B40A55502C49 /* MmRenameTool.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 0DCDAE2E083C37EFC000225A /* MmRenameTool.cpp */; settings = {ATTRIBUTES = (); }; };
+		7C135277B916094DB5A2CE18 /* MmTransformToolFactory.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 27FFB866D60593B894B8DD33 /* MmTransformToolFactory.cpp */; settings = {ATTRIBUTES = (); }; };
+		9614EA409F51E1605AB36CBB /* MmMeshMergeTool.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 16B0DB6FA2944665D6C23371 /* MmMeshMergeTool.cpp */; settings = {ATTRIBUTES = (); }; };
+		A18CC81AB977E4C85699A538 /* MmInfoToolFactory.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = B308069B7B91DA1AAA98A1A4 /* MmInfoToolFactory.cpp */; settings = {ATTRIBUTES = (); }; };
+		A5A41C410BADE6FE515E3ABF /* MmRenameToolFactory.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = AE0E979509498ABD85174F57 /* MmRenameToolFactory.cpp */; settings = {ATTRIBUTES = (); }; };
+		DEBCD77F4C87763DEA7C0CA8 /* MmOptimiseToolFactory.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 36B2C1EB83ED4A5929E368BC /* MmOptimiseToolFactory.cpp */; settings = {ATTRIBUTES = (); }; };
+		E4860943451872F1204B9EE4 /* MmEditableSkeleton.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = 8F5B8FE0AB4185E61A94EED1 /* MmEditableSkeleton.cpp */; settings = {ATTRIBUTES = (); }; };
+		EAF79764454CD524EF428F4C /* MmOptimiseTool.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = ED308649FA5D6F490DB3B361 /* MmOptimiseTool.cpp */; settings = {ATTRIBUTES = (); }; };
+		F1F86635232A54473BA16B9A /* MeshMagick.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = E2B2CCE4199E0428EF86D08F /* MeshMagick.cpp */; settings = {ATTRIBUTES = (); }; };
+		FF9C1712F6E9E2847B6C5CF5 /* MmOgreEnvironment.cpp in Compile Sources */ = {isa = PBXBuildFile; fileRef = D2F1B0D58D53A6975EC61DFD /* MmOgreEnvironment.cpp */; settings = {ATTRIBUTES = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		4869D85B0EF1A7F700619D4D /* PBXContainerItemProxy */ = {
+		CDA46C171ACDC1DD00463E1D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			containerPortal = 6DB9C3763D02B1415CD9D565 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4869D7330EF1A6E200619D4D /* libmeshmagick_static */;
-			remoteInfo = libmeshmagick_static;
+			remoteGlobalIDString = BB4DE38A6CA0006A883E2689;
+			remoteInfo = "Qt Preprocess";
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		440785A10C09D097006E496D /* Copy Headers */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 8;
-			dstPath = ./include;
-			dstSubfolderSpec = 16;
-			files = (
-				440785A30C09D0CF006E496D /* MeshMagickPrerequisites.h in Copy Headers */,
-				440785A40C09D0CF006E496D /* MeshMergeTool.h in Copy Headers */,
-				440785A50C09D0CF006E496D /* OgreEnvironment.h in Copy Headers */,
-				440785A60C09D0CF006E496D /* OptionsParser.h in Copy Headers */,
-				440785A70C09D0CF006E496D /* StatefulMeshSerializer.h in Copy Headers */,
-				440785A80C09D0CF006E496D /* StatefulSkeletonSerializer.h in Copy Headers */,
-				440785A90C09D0CF006E496D /* Tool.h in Copy Headers */,
-				440785AA0C09D0CF006E496D /* TransformTool.h in Copy Headers */,
-				AA48EDD50C65333600DD2220 /* OptimiseTool.h in Copy Headers */,
-				AA48EDD60C65333600DD2220 /* OptimiseToolFactory.h in Copy Headers */,
-			);
-			name = "Copy Headers";
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-		440785AE0C09D0E0006E496D /* Copy Library */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 8;
-			dstPath = ../lib;
-			dstSubfolderSpec = 16;
-			files = (
-				440785B00C09D103006E496D /* libmeshmagick.dylib in Copy Library */,
-			);
-			name = "Copy Library";
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-		8DD76F690486A84900D96B5E /* Copy Executable */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 8;
-			dstPath = "";
-			dstSubfolderSpec = 16;
-			files = (
-				440785950C09D01F006E496D /* meshmagick in Copy Executable */,
-			);
-			name = "Copy Executable";
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		44125A510C08405800C24C0A /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ./src/main.cpp; sourceTree = "<group>"; };
-		44125A570C0840B400C24C0A /* libmeshmagick.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libmeshmagick.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		44125A5A0C0840ED00C24C0A /* InfoTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InfoTool.cpp; path = ./src/InfoTool.cpp; sourceTree = "<group>"; };
-		44125A5B0C0840ED00C24C0A /* InfoToolFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InfoToolFactory.cpp; path = ./src/InfoToolFactory.cpp; sourceTree = "<group>"; };
-		44125A5C0C0840ED00C24C0A /* MeshMergeTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MeshMergeTool.cpp; path = ./src/MeshMergeTool.cpp; sourceTree = "<group>"; };
-		44125A5D0C0840ED00C24C0A /* MeshMergeToolFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MeshMergeToolFactory.cpp; path = ./src/MeshMergeToolFactory.cpp; sourceTree = "<group>"; };
-		44125A5E0C0840ED00C24C0A /* OgreEnvironment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OgreEnvironment.cpp; path = ./src/OgreEnvironment.cpp; sourceTree = "<group>"; };
-		44125A5F0C0840ED00C24C0A /* OptionsParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OptionsParser.cpp; path = ./src/OptionsParser.cpp; sourceTree = "<group>"; };
-		44125A600C0840ED00C24C0A /* StatefulMeshSerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StatefulMeshSerializer.cpp; path = ./src/StatefulMeshSerializer.cpp; sourceTree = "<group>"; };
-		44125A610C0840ED00C24C0A /* StatefulSkeletonSerializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StatefulSkeletonSerializer.cpp; path = ./src/StatefulSkeletonSerializer.cpp; sourceTree = "<group>"; };
-		44125A620C0840ED00C24C0A /* Tool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Tool.cpp; path = ./src/Tool.cpp; sourceTree = "<group>"; };
-		44125A630C0840ED00C24C0A /* ToolManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ToolManager.cpp; path = ./src/ToolManager.cpp; sourceTree = "<group>"; };
-		44125A640C0840ED00C24C0A /* TransformTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransformTool.cpp; path = ./src/TransformTool.cpp; sourceTree = "<group>"; };
-		44125A650C0840ED00C24C0A /* TransformToolFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransformToolFactory.cpp; path = ./src/TransformToolFactory.cpp; sourceTree = "<group>"; };
-		44125A750C08410200C24C0A /* InfoTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoTool.h; path = ./include/InfoTool.h; sourceTree = "<group>"; };
-		44125A760C08410200C24C0A /* InfoToolFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InfoToolFactory.h; path = ./include/InfoToolFactory.h; sourceTree = "<group>"; };
-		44125A770C08410200C24C0A /* MeshMagickPrerequisites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MeshMagickPrerequisites.h; path = ./include/MeshMagickPrerequisites.h; sourceTree = "<group>"; };
-		44125A780C08410200C24C0A /* MeshMergeTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MeshMergeTool.h; path = ./include/MeshMergeTool.h; sourceTree = "<group>"; };
-		44125A790C08410200C24C0A /* MeshMergeToolFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MeshMergeToolFactory.h; path = ./include/MeshMergeToolFactory.h; sourceTree = "<group>"; };
-		44125A7A0C08410200C24C0A /* OgreEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OgreEnvironment.h; path = ./include/OgreEnvironment.h; sourceTree = "<group>"; };
-		44125A7B0C08410200C24C0A /* OptionsParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OptionsParser.h; path = ./include/OptionsParser.h; sourceTree = "<group>"; };
-		44125A7C0C08410200C24C0A /* StatefulMeshSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatefulMeshSerializer.h; path = ./include/StatefulMeshSerializer.h; sourceTree = "<group>"; };
-		44125A7D0C08410200C24C0A /* StatefulSkeletonSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StatefulSkeletonSerializer.h; path = ./include/StatefulSkeletonSerializer.h; sourceTree = "<group>"; };
-		44125A7E0C08410200C24C0A /* Tool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tool.h; path = ./include/Tool.h; sourceTree = "<group>"; };
-		44125A7F0C08410200C24C0A /* ToolFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ToolFactory.h; path = ./include/ToolFactory.h; sourceTree = "<group>"; };
-		44125A800C08410200C24C0A /* ToolManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ToolManager.h; path = ./include/ToolManager.h; sourceTree = "<group>"; };
-		44125A810C08410200C24C0A /* TransformTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TransformTool.h; path = ./include/TransformTool.h; sourceTree = "<group>"; };
-		44125A820C08410200C24C0A /* TransformToolFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TransformToolFactory.h; path = ./include/TransformToolFactory.h; sourceTree = "<group>"; };
-		44125AAF0C08418200C24C0A /* Ogre.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogre.framework; path = /Library/Frameworks/Ogre.framework; sourceTree = "<absolute>"; };
-		445A0C3E0C4AAA500029E457 /* EditableSkeleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EditableSkeleton.h; path = ./include/EditableSkeleton.h; sourceTree = "<group>"; };
-		445A0C3F0C4AAA500029E457 /* RenameTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenameTool.h; path = ./include/RenameTool.h; sourceTree = "<group>"; };
-		445A0C400C4AAA500029E457 /* RenameToolFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenameToolFactory.h; path = ./include/RenameToolFactory.h; sourceTree = "<group>"; };
-		445A0C410C4AAA500029E457 /* EditableSkeleton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditableSkeleton.cpp; path = ./src/EditableSkeleton.cpp; sourceTree = "<group>"; };
-		445A0C420C4AAA500029E457 /* RenameTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenameTool.cpp; path = ./src/RenameTool.cpp; sourceTree = "<group>"; };
-		445A0C430C4AAA500029E457 /* RenameToolFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenameToolFactory.cpp; path = ./src/RenameToolFactory.cpp; sourceTree = "<group>"; };
-		4869D7340EF1A6E200619D4D /* liblibmeshmagick_static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibmeshmagick_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		48A52B780E0EEB48008DBDD8 /* EditableBone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EditableBone.h; path = include/EditableBone.h; sourceTree = "<group>"; };
-		48A52B790E0EEB48008DBDD8 /* EditableMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EditableMesh.h; path = include/EditableMesh.h; sourceTree = "<group>"; };
-		48A52B7A0E0EEB48008DBDD8 /* MeshUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MeshUtils.h; path = include/MeshUtils.h; sourceTree = "<group>"; };
-		48A52B7B0E0EEB48008DBDD8 /* ToolUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ToolUtils.h; path = include/ToolUtils.h; sourceTree = "<group>"; };
-		48A52B800E0EEB56008DBDD8 /* EditableBone.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditableBone.cpp; path = src/EditableBone.cpp; sourceTree = "<group>"; };
-		48A52B810E0EEB56008DBDD8 /* EditableMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EditableMesh.cpp; path = src/EditableMesh.cpp; sourceTree = "<group>"; };
-		48A52B820E0EEB56008DBDD8 /* MeshUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MeshUtils.cpp; path = src/MeshUtils.cpp; sourceTree = "<group>"; };
-		48A52B830E0EEB56008DBDD8 /* ToolsUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ToolsUtils.cpp; path = src/ToolsUtils.cpp; sourceTree = "<group>"; };
-		8DD76F6C0486A84900D96B5E /* meshmagick */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = meshmagick; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA48EDD30C65333600DD2220 /* OptimiseTool.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OptimiseTool.h; path = include/OptimiseTool.h; sourceTree = "<group>"; };
-		AA48EDD40C65333600DD2220 /* OptimiseToolFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OptimiseToolFactory.h; path = include/OptimiseToolFactory.h; sourceTree = "<group>"; };
-		AA48EDD90C65334D00DD2220 /* OptimiseTool.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OptimiseTool.cpp; path = src/OptimiseTool.cpp; sourceTree = "<group>"; };
-		AA48EDDA0C65334D00DD2220 /* OptimiseToolFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OptimiseToolFactory.cpp; path = src/OptimiseToolFactory.cpp; sourceTree = "<group>"; };
+		0B336A1D639B9EA838BA963D /* MmOptionsParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmOptionsParser.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmOptionsParser.h; sourceTree = "<absolute>"; };
+		0DCDAE2E083C37EFC000225A /* MmRenameTool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmRenameTool.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmRenameTool.cpp; sourceTree = "<absolute>"; };
+		13C680053B5E80ED0A4B0C7D /* .qmake.stash */ = {isa = PBXFileReference; lastKnownFileType = text; name = .qmake.stash; path = /Users/patrick/Documents/projects/AISandbox/.qmake.stash; sourceTree = "<absolute>"; };
+		151551A277EAE9B40D204197 /* MeshMagickPrerequisites.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MeshMagickPrerequisites.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MeshMagickPrerequisites.h; sourceTree = "<absolute>"; };
+		16B0DB6FA2944665D6C23371 /* MmMeshMergeTool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmMeshMergeTool.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmMeshMergeTool.cpp; sourceTree = "<absolute>"; };
+		17159BD01F7466AAD6FA9CB7 /* MmTransformTool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmTransformTool.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmTransformTool.cpp; sourceTree = "<absolute>"; };
+		20174F85D47F2C38047E840F /* MmTool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmTool.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmTool.cpp; sourceTree = "<absolute>"; };
+		21830F69785FB2CFF9B386F2 /* MmStatefulMeshSerializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmStatefulMeshSerializer.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmStatefulMeshSerializer.h; sourceTree = "<absolute>"; };
+		21DCECCE6FFF8EF941A58F0A /* MmEditableMesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmEditableMesh.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmEditableMesh.h; sourceTree = "<absolute>"; };
+		232795AD90D88DCED91ED54F /* MmEditableBone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmEditableBone.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmEditableBone.h; sourceTree = "<absolute>"; };
+		2454E926DF47B235883B6445 /* MmStatefulMeshSerializer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmStatefulMeshSerializer.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmStatefulMeshSerializer.cpp; sourceTree = "<absolute>"; };
+		24DF5509ECB0F8D9F6F8345A /* MeshMagick.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MeshMagick.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MeshMagick.h; sourceTree = "<absolute>"; };
+		27FFB866D60593B894B8DD33 /* MmTransformToolFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmTransformToolFactory.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmTransformToolFactory.cpp; sourceTree = "<absolute>"; };
+		36B2C1EB83ED4A5929E368BC /* MmOptimiseToolFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmOptimiseToolFactory.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmOptimiseToolFactory.cpp; sourceTree = "<absolute>"; };
+		3A071D3D3619D7BA68C85331 /* MmToolFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmToolFactory.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmToolFactory.h; sourceTree = "<absolute>"; };
+		412245EDF03C238F18ED7869 /* MmInfoToolFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmInfoToolFactory.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmInfoToolFactory.h; sourceTree = "<absolute>"; };
+		45370C190375F5D6F244AD4B /* MmMeshUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmMeshUtils.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmMeshUtils.h; sourceTree = "<absolute>"; };
+		50E3AA39FD35456EFE9F3A39 /* MmToolUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmToolUtils.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmToolUtils.h; sourceTree = "<absolute>"; };
+		54E86E47DBC602E8F04A0E96 /* MmInfoTool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmInfoTool.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmInfoTool.cpp; sourceTree = "<absolute>"; };
+		56CBA3A15592F627F2AED308 /* MmStatefulSkeletonSerializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmStatefulSkeletonSerializer.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmStatefulSkeletonSerializer.h; sourceTree = "<absolute>"; };
+		56E925AFF57E74302E50E64F /* MmEditableSkeleton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmEditableSkeleton.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmEditableSkeleton.h; sourceTree = "<absolute>"; };
+		6D85F6C8564E6993E5D330A5 /* MmToolManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmToolManager.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmToolManager.cpp; sourceTree = "<absolute>"; };
+		6DE5E790B8FE22A139F55AE0 /* MmOptionsParser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmOptionsParser.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmOptionsParser.cpp; sourceTree = "<absolute>"; };
+		713F60185C47B0B3B45C1F44 /* MmRenameTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmRenameTool.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmRenameTool.h; sourceTree = "<absolute>"; };
+		76E0FAD1D4B518F7350F3300 /* MmEditableMesh.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmEditableMesh.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmEditableMesh.cpp; sourceTree = "<absolute>"; };
+		774EF35BB57E516832AFA006 /* MmStatefulSkeletonSerializer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmStatefulSkeletonSerializer.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmStatefulSkeletonSerializer.cpp; sourceTree = "<absolute>"; };
+		8F5B8FE0AB4185E61A94EED1 /* MmEditableSkeleton.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmEditableSkeleton.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmEditableSkeleton.cpp; sourceTree = "<absolute>"; };
+		9625B7F597C9BEC1B222F7F1 /* MmRenameToolFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmRenameToolFactory.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmRenameToolFactory.h; sourceTree = "<absolute>"; };
+		9869A9BC7E0624C5E2A5C146 /* MmMeshMergeTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmMeshMergeTool.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmMeshMergeTool.h; sourceTree = "<absolute>"; };
+		986AA54606F39EA1936583FB /* MmTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmTool.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmTool.h; sourceTree = "<absolute>"; };
+		A81DF9FF203BBE7ADB773EC6 /* MmTransformToolFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmTransformToolFactory.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmTransformToolFactory.h; sourceTree = "<absolute>"; };
+		AE0E979509498ABD85174F57 /* MmRenameToolFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmRenameToolFactory.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmRenameToolFactory.cpp; sourceTree = "<absolute>"; };
+		AFC6B97F482DD064BEEC1AA5 /* libmeshmagick.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmeshmagick.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		B308069B7B91DA1AAA98A1A4 /* MmInfoToolFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmInfoToolFactory.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmInfoToolFactory.cpp; sourceTree = "<absolute>"; };
+		B7528012A8041A51E6C4A8D9 /* MmMeshMergeToolFactory.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmMeshMergeToolFactory.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmMeshMergeToolFactory.cpp; sourceTree = "<absolute>"; };
+		BBEFA68687581463E589B1FD /* MmMeshMergeToolFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmMeshMergeToolFactory.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmMeshMergeToolFactory.h; sourceTree = "<absolute>"; };
+		C33A092D682FCAF711DB5734 /* MmToolsUtils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmToolsUtils.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmToolsUtils.cpp; sourceTree = "<absolute>"; };
+		C95D30DDE3609AA83339365D /* MmTransformTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmTransformTool.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmTransformTool.h; sourceTree = "<absolute>"; };
+		CBA297ADCCBA23D010983ED8 /* MmMeshUtils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmMeshUtils.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmMeshUtils.cpp; sourceTree = "<absolute>"; };
+		CD9D4B2F3A0B4E0D5D0D5815 /* libmeshmagick.pro */ = {isa = PBXFileReference; lastKnownFileType = text; name = libmeshmagick.pro; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/libmeshmagick.pro; sourceTree = "<absolute>"; };
+		D04EB4CC1A848587A8818AD9 /* MmOgreEnvironment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmOgreEnvironment.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmOgreEnvironment.h; sourceTree = "<absolute>"; };
+		D2F1B0D58D53A6975EC61DFD /* MmOgreEnvironment.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmOgreEnvironment.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmOgreEnvironment.cpp; sourceTree = "<absolute>"; };
+		D59143A789D326B5EA2A5391 /* MmEditableBone.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmEditableBone.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmEditableBone.cpp; sourceTree = "<absolute>"; };
+		E129F7493EB729EA201566D6 /* MmToolManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmToolManager.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmToolManager.h; sourceTree = "<absolute>"; };
+		E2B2CCE4199E0428EF86D08F /* MeshMagick.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MeshMagick.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MeshMagick.cpp; sourceTree = "<absolute>"; };
+		E7C636FAE047DE7CCA400AFB /* MmOptimiseTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmOptimiseTool.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmOptimiseTool.h; sourceTree = "<absolute>"; };
+		EB5127C959CA01CCA753FF51 /* MmOptimiseToolFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmOptimiseToolFactory.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmOptimiseToolFactory.h; sourceTree = "<absolute>"; };
+		ED308649FA5D6F490DB3B361 /* MmOptimiseTool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MmOptimiseTool.cpp; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/src/MmOptimiseTool.cpp; sourceTree = "<absolute>"; };
+		F645F9AEECEA84CE2E1F5DB6 /* linkOgreSDK.pri */ = {isa = PBXFileReference; lastKnownFileType = text; name = linkOgreSDK.pri; path = /Users/patrick/Documents/projects/AISandbox/linkOgreSDK.pri; sourceTree = "<absolute>"; };
+		FCFAF7F85F9A38BB3B996354 /* MmInfoTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MmInfoTool.h; path = /Users/patrick/Documents/projects/AISandbox/libmeshmagick/include/MmInfoTool.h; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		44125A550C0840B400C24C0A /* Frameworks */ = {
+		D1C883685E82D5676953459A /* Link Binary With Libraries */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				44125AB00C08418200C24C0A /* Ogre.framework in Frameworks */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4869D7320EF1A6E200619D4D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4869D8580EF1A76800619D4D /* Ogre.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8DD76F660486A84900D96B5E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4407848B0C09CE97006E496D /* Ogre.framework in Frameworks */,
-				4869D7370EF1A70900619D4D /* liblibmeshmagick_static.a in Frameworks */,
-			);
+			name = "Link Binary With Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		08FB7794FE84155DC02AAC07 /* meshmagick */ = {
+		10C0E51435348D4CF4483294 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				08FB7795FE84155DC02AAC07 /* Source */,
-				44125AAE0C08416200C24C0A /* External Frameworks and Libraries */,
-				1AB674ADFE9D54B511CA2CBB /* Products */,
+				24DF5509ECB0F8D9F6F8345A /* MeshMagick.h */,
+				151551A277EAE9B40D204197 /* MeshMagickPrerequisites.h */,
+				232795AD90D88DCED91ED54F /* MmEditableBone.h */,
+				21DCECCE6FFF8EF941A58F0A /* MmEditableMesh.h */,
+				56E925AFF57E74302E50E64F /* MmEditableSkeleton.h */,
+				FCFAF7F85F9A38BB3B996354 /* MmInfoTool.h */,
+				412245EDF03C238F18ED7869 /* MmInfoToolFactory.h */,
+				9869A9BC7E0624C5E2A5C146 /* MmMeshMergeTool.h */,
+				BBEFA68687581463E589B1FD /* MmMeshMergeToolFactory.h */,
+				45370C190375F5D6F244AD4B /* MmMeshUtils.h */,
+				D04EB4CC1A848587A8818AD9 /* MmOgreEnvironment.h */,
+				E7C636FAE047DE7CCA400AFB /* MmOptimiseTool.h */,
+				EB5127C959CA01CCA753FF51 /* MmOptimiseToolFactory.h */,
+				0B336A1D639B9EA838BA963D /* MmOptionsParser.h */,
+				713F60185C47B0B3B45C1F44 /* MmRenameTool.h */,
+				9625B7F597C9BEC1B222F7F1 /* MmRenameToolFactory.h */,
+				21830F69785FB2CFF9B386F2 /* MmStatefulMeshSerializer.h */,
+				56CBA3A15592F627F2AED308 /* MmStatefulSkeletonSerializer.h */,
+				986AA54606F39EA1936583FB /* MmTool.h */,
+				3A071D3D3619D7BA68C85331 /* MmToolFactory.h */,
+				E129F7493EB729EA201566D6 /* MmToolManager.h */,
+				50E3AA39FD35456EFE9F3A39 /* MmToolUtils.h */,
+				C95D30DDE3609AA83339365D /* MmTransformTool.h */,
+				A81DF9FF203BBE7ADB773EC6 /* MmTransformToolFactory.h */,
+			);
+			name = include;
+			sourceTree = "<Group>";
+		};
+		2EB56BE3C2D93CDAB0C52E67 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				921315FAA7F261D737F4F4C7 /* src */,
+				10C0E51435348D4CF4483294 /* include */,
+			);
+			name = Sources;
+			sourceTree = "<Group>";
+		};
+		74B182DB50CB5611B5C1C297 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CD9D4B2F3A0B4E0D5D0D5815 /* libmeshmagick.pro */,
+				13C680053B5E80ED0A4B0C7D /* .qmake.stash */,
+				F645F9AEECEA84CE2E1F5DB6 /* linkOgreSDK.pri */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<Group>";
+		};
+		921315FAA7F261D737F4F4C7 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				E2B2CCE4199E0428EF86D08F /* MeshMagick.cpp */,
+				D59143A789D326B5EA2A5391 /* MmEditableBone.cpp */,
+				76E0FAD1D4B518F7350F3300 /* MmEditableMesh.cpp */,
+				8F5B8FE0AB4185E61A94EED1 /* MmEditableSkeleton.cpp */,
+				54E86E47DBC602E8F04A0E96 /* MmInfoTool.cpp */,
+				B308069B7B91DA1AAA98A1A4 /* MmInfoToolFactory.cpp */,
+				16B0DB6FA2944665D6C23371 /* MmMeshMergeTool.cpp */,
+				B7528012A8041A51E6C4A8D9 /* MmMeshMergeToolFactory.cpp */,
+				CBA297ADCCBA23D010983ED8 /* MmMeshUtils.cpp */,
+				D2F1B0D58D53A6975EC61DFD /* MmOgreEnvironment.cpp */,
+				ED308649FA5D6F490DB3B361 /* MmOptimiseTool.cpp */,
+				36B2C1EB83ED4A5929E368BC /* MmOptimiseToolFactory.cpp */,
+				6DE5E790B8FE22A139F55AE0 /* MmOptionsParser.cpp */,
+				0DCDAE2E083C37EFC000225A /* MmRenameTool.cpp */,
+				AE0E979509498ABD85174F57 /* MmRenameToolFactory.cpp */,
+				2454E926DF47B235883B6445 /* MmStatefulMeshSerializer.cpp */,
+				774EF35BB57E516832AFA006 /* MmStatefulSkeletonSerializer.cpp */,
+				20174F85D47F2C38047E840F /* MmTool.cpp */,
+				6D85F6C8564E6993E5D330A5 /* MmToolManager.cpp */,
+				C33A092D682FCAF711DB5734 /* MmToolsUtils.cpp */,
+				17159BD01F7466AAD6FA9CB7 /* MmTransformTool.cpp */,
+				27FFB866D60593B894B8DD33 /* MmTransformToolFactory.cpp */,
+			);
+			name = src;
+			sourceTree = "<Group>";
+		};
+		E8C543AB96796ECAA2E65C57 /* meshmagick */ = {
+			isa = PBXGroup;
+			children = (
+				2EB56BE3C2D93CDAB0C52E67 /* Sources */,
+				74B182DB50CB5611B5C1C297 /* Supporting Files */,
+				FE0A091FDBFB3E9C31B7A1BD /* Products */,
 			);
 			name = meshmagick;
-			sourceTree = "<group>";
+			sourceTree = "<Group>";
 		};
-		08FB7795FE84155DC02AAC07 /* Source */ = {
+		FE0A091FDBFB3E9C31B7A1BD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				48A52B8A0E0EEC07008DBDD8 /* Source */,
-				48A52B890E0EEBF4008DBDD8 /* Headers */,
-			);
-			name = Source;
-			sourceTree = "<group>";
-		};
-		1AB674ADFE9D54B511CA2CBB /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8DD76F6C0486A84900D96B5E /* meshmagick */,
-				44125A570C0840B400C24C0A /* libmeshmagick.dylib */,
-				4869D7340EF1A6E200619D4D /* liblibmeshmagick_static.a */,
+				AFC6B97F482DD064BEEC1AA5 /* libmeshmagick.a */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		44125AAE0C08416200C24C0A /* External Frameworks and Libraries */ = {
-			isa = PBXGroup;
-			children = (
-				44125AAF0C08418200C24C0A /* Ogre.framework */,
-			);
-			name = "External Frameworks and Libraries";
-			sourceTree = "<group>";
-		};
-		48A52B890E0EEBF4008DBDD8 /* Headers */ = {
-			isa = PBXGroup;
-			children = (
-				AA48EDD30C65333600DD2220 /* OptimiseTool.h */,
-				AA48EDD40C65333600DD2220 /* OptimiseToolFactory.h */,
-				445A0C3E0C4AAA500029E457 /* EditableSkeleton.h */,
-				445A0C3F0C4AAA500029E457 /* RenameTool.h */,
-				445A0C400C4AAA500029E457 /* RenameToolFactory.h */,
-				44125A750C08410200C24C0A /* InfoTool.h */,
-				44125A760C08410200C24C0A /* InfoToolFactory.h */,
-				44125A770C08410200C24C0A /* MeshMagickPrerequisites.h */,
-				44125A780C08410200C24C0A /* MeshMergeTool.h */,
-				44125A790C08410200C24C0A /* MeshMergeToolFactory.h */,
-				44125A7A0C08410200C24C0A /* OgreEnvironment.h */,
-				44125A7B0C08410200C24C0A /* OptionsParser.h */,
-				44125A7C0C08410200C24C0A /* StatefulMeshSerializer.h */,
-				48A52B780E0EEB48008DBDD8 /* EditableBone.h */,
-				44125A7D0C08410200C24C0A /* StatefulSkeletonSerializer.h */,
-				44125A7E0C08410200C24C0A /* Tool.h */,
-				44125A7F0C08410200C24C0A /* ToolFactory.h */,
-				44125A800C08410200C24C0A /* ToolManager.h */,
-				44125A810C08410200C24C0A /* TransformTool.h */,
-				44125A820C08410200C24C0A /* TransformToolFactory.h */,
-				48A52B790E0EEB48008DBDD8 /* EditableMesh.h */,
-				48A52B7A0E0EEB48008DBDD8 /* MeshUtils.h */,
-				48A52B7B0E0EEB48008DBDD8 /* ToolUtils.h */,
-			);
-			name = Headers;
-			sourceTree = "<group>";
-		};
-		48A52B8A0E0EEC07008DBDD8 /* Source */ = {
-			isa = PBXGroup;
-			children = (
-				AA48EDD90C65334D00DD2220 /* OptimiseTool.cpp */,
-				AA48EDDA0C65334D00DD2220 /* OptimiseToolFactory.cpp */,
-				445A0C410C4AAA500029E457 /* EditableSkeleton.cpp */,
-				445A0C420C4AAA500029E457 /* RenameTool.cpp */,
-				445A0C430C4AAA500029E457 /* RenameToolFactory.cpp */,
-				48A52B800E0EEB56008DBDD8 /* EditableBone.cpp */,
-				48A52B810E0EEB56008DBDD8 /* EditableMesh.cpp */,
-				48A52B820E0EEB56008DBDD8 /* MeshUtils.cpp */,
-				48A52B830E0EEB56008DBDD8 /* ToolsUtils.cpp */,
-				44125A5A0C0840ED00C24C0A /* InfoTool.cpp */,
-				44125A5B0C0840ED00C24C0A /* InfoToolFactory.cpp */,
-				44125A5C0C0840ED00C24C0A /* MeshMergeTool.cpp */,
-				44125A5D0C0840ED00C24C0A /* MeshMergeToolFactory.cpp */,
-				44125A5E0C0840ED00C24C0A /* OgreEnvironment.cpp */,
-				44125A5F0C0840ED00C24C0A /* OptionsParser.cpp */,
-				44125A600C0840ED00C24C0A /* StatefulMeshSerializer.cpp */,
-				44125A610C0840ED00C24C0A /* StatefulSkeletonSerializer.cpp */,
-				44125A620C0840ED00C24C0A /* Tool.cpp */,
-				44125A630C0840ED00C24C0A /* ToolManager.cpp */,
-				44125A640C0840ED00C24C0A /* TransformTool.cpp */,
-				44125A650C0840ED00C24C0A /* TransformToolFactory.cpp */,
-				44125A510C08405800C24C0A /* main.cpp */,
-			);
-			name = Source;
-			sourceTree = "<group>";
+			sourceTree = "<Group>";
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		44125A530C0840B400C24C0A /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				44125A830C08410200C24C0A /* InfoTool.h in Headers */,
-				44125A840C08410200C24C0A /* InfoToolFactory.h in Headers */,
-				44125A850C08410200C24C0A /* MeshMagickPrerequisites.h in Headers */,
-				44125A860C08410200C24C0A /* MeshMergeTool.h in Headers */,
-				44125A870C08410200C24C0A /* MeshMergeToolFactory.h in Headers */,
-				44125A880C08410200C24C0A /* OgreEnvironment.h in Headers */,
-				44125A890C08410200C24C0A /* OptionsParser.h in Headers */,
-				44125A8A0C08410200C24C0A /* StatefulMeshSerializer.h in Headers */,
-				44125A8B0C08410200C24C0A /* StatefulSkeletonSerializer.h in Headers */,
-				44125A8C0C08410200C24C0A /* Tool.h in Headers */,
-				44125A8D0C08410200C24C0A /* ToolFactory.h in Headers */,
-				44125A8E0C08410200C24C0A /* ToolManager.h in Headers */,
-				44125A8F0C08410200C24C0A /* TransformTool.h in Headers */,
-				44125A900C08410200C24C0A /* TransformToolFactory.h in Headers */,
-				445A0C440C4AAA500029E457 /* EditableSkeleton.h in Headers */,
-				445A0C450C4AAA500029E457 /* RenameTool.h in Headers */,
-				445A0C460C4AAA500029E457 /* RenameToolFactory.h in Headers */,
-				AA48EDD70C65333600DD2220 /* OptimiseTool.h in Headers */,
-				AA48EDD80C65333600DD2220 /* OptimiseToolFactory.h in Headers */,
-				48A52B7C0E0EEB48008DBDD8 /* EditableBone.h in Headers */,
-				48A52B7D0E0EEB48008DBDD8 /* EditableMesh.h in Headers */,
-				48A52B7E0E0EEB48008DBDD8 /* MeshUtils.h in Headers */,
-				48A52B7F0E0EEB48008DBDD8 /* ToolUtils.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4869D7300EF1A6E200619D4D /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4869D7500EF1A74900619D4D /* InfoTool.h in Headers */,
-				4869D7510EF1A74900619D4D /* InfoToolFactory.h in Headers */,
-				4869D7520EF1A74900619D4D /* MeshMagickPrerequisites.h in Headers */,
-				4869D7530EF1A74900619D4D /* MeshMergeTool.h in Headers */,
-				4869D7540EF1A74900619D4D /* MeshMergeToolFactory.h in Headers */,
-				4869D7550EF1A74900619D4D /* OgreEnvironment.h in Headers */,
-				4869D7560EF1A74900619D4D /* OptionsParser.h in Headers */,
-				4869D7570EF1A74900619D4D /* StatefulMeshSerializer.h in Headers */,
-				4869D7580EF1A74900619D4D /* StatefulSkeletonSerializer.h in Headers */,
-				4869D7590EF1A74900619D4D /* Tool.h in Headers */,
-				4869D75A0EF1A74900619D4D /* ToolFactory.h in Headers */,
-				4869D75B0EF1A74900619D4D /* ToolManager.h in Headers */,
-				4869D75C0EF1A74900619D4D /* TransformTool.h in Headers */,
-				4869D75D0EF1A74900619D4D /* TransformToolFactory.h in Headers */,
-				4869D75E0EF1A74900619D4D /* EditableSkeleton.h in Headers */,
-				4869D75F0EF1A74900619D4D /* RenameTool.h in Headers */,
-				4869D7600EF1A74900619D4D /* RenameToolFactory.h in Headers */,
-				4869D7610EF1A74900619D4D /* OptimiseTool.h in Headers */,
-				4869D7620EF1A74900619D4D /* OptimiseToolFactory.h in Headers */,
-				4869D7630EF1A74900619D4D /* EditableBone.h in Headers */,
-				4869D7640EF1A74900619D4D /* EditableMesh.h in Headers */,
-				4869D7650EF1A74900619D4D /* MeshUtils.h in Headers */,
-				4869D7660EF1A74900619D4D /* ToolUtils.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
-		44125A560C0840B400C24C0A /* libmeshmagick */ = {
+		826A6BEAD3FF01773BF4D96D /* meshmagick */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 44125A720C0840ED00C24C0A /* Build configuration list for PBXNativeTarget "libmeshmagick" */;
+			buildConfigurationList = 6CC3B5D2136C7CD6A5CF5A59 /* Build configuration list for PBXNativeTarget "meshmagick" */;
 			buildPhases = (
-				44125A530C0840B400C24C0A /* Headers */,
-				44125A540C0840B400C24C0A /* Sources */,
-				44125A550C0840B400C24C0A /* Frameworks */,
+				F7E50F631C51CD5B5DC0BC43 /* Compile Sources */,
+				D1C883685E82D5676953459A /* Link Binary With Libraries */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-			);
-			name = libmeshmagick;
-			productName = libmeshmagick;
-			productReference = 44125A570C0840B400C24C0A /* libmeshmagick.dylib */;
-			productType = "com.apple.product-type.library.dynamic";
-		};
-		4869D7330EF1A6E200619D4D /* libmeshmagick_static */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4869D74F0EF1A74400619D4D /* Build configuration list for PBXNativeTarget "libmeshmagick_static" */;
-			buildPhases = (
-				4869D7300EF1A6E200619D4D /* Headers */,
-				4869D7310EF1A6E200619D4D /* Sources */,
-				4869D7320EF1A6E200619D4D /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = libmeshmagick_static;
-			productName = libmeshmagick_static;
-			productReference = 4869D7340EF1A6E200619D4D /* liblibmeshmagick_static.a */;
-			productType = "com.apple.product-type.library.static";
-		};
-		8DD76F620486A84900D96B5E /* meshmagick */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "meshmagick" */;
-			buildPhases = (
-				8DD76F640486A84900D96B5E /* Sources */,
-				8DD76F660486A84900D96B5E /* Frameworks */,
-				440785A10C09D097006E496D /* Copy Headers */,
-				440785AE0C09D0E0006E496D /* Copy Library */,
-				8DD76F690486A84900D96B5E /* Copy Executable */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4869D85C0EF1A7F700619D4D /* PBXTargetDependency */,
+				E21850FE0CC7A30652449A9B /* PBXTargetDependency */,
 			);
 			name = meshmagick;
-			productInstallPath = "$(HOME)/bin";
 			productName = meshmagick;
-			productReference = 8DD76F6C0486A84900D96B5E /* meshmagick */;
-			productType = "com.apple.product-type.tool";
+			productReference = AFC6B97F482DD064BEEC1AA5 /* libmeshmagick.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		08FB7793FE84155DC02AAC07 /* Project object */ = {
+		6DB9C3763D02B1415CD9D565 /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "meshmagick" */;
-			compatibilityVersion = "Xcode 2.4";
+			attributes = {
+			};
+			buildConfigurationList = DAC4C1AA5EDEA1C85E9CA5E6 /* Build configuration list for PBXProject "meshmagick" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
-			mainGroup = 08FB7794FE84155DC02AAC07 /* meshmagick */;
+			knownRegions = (
+				en,
+			);
+			mainGroup = E8C543AB96796ECAA2E65C57 /* meshmagick */;
+			productRefGroup = FE0A091FDBFB3E9C31B7A1BD /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8DD76F620486A84900D96B5E /* meshmagick */,
-				44125A560C0840B400C24C0A /* libmeshmagick */,
-				4869D7330EF1A6E200619D4D /* libmeshmagick_static */,
+				826A6BEAD3FF01773BF4D96D /* meshmagick */,
+				BB4DE38A6CA0006A883E2689 /* Qt Preprocess */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		5E618435888B9D49F8540165 /* Qt Qmake */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "Qt Qmake";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/patrick/Documents/projects/AISandbox/libmeshmagick -f meshmagick.xcodeproj/qt_makeqmake.mak";
+		};
+		7EF0942E79C014DCEC8976BC /* Qt Preprocessors */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "Qt Preprocessors";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/patrick/Documents/projects/AISandbox/libmeshmagick -f meshmagick.xcodeproj/qt_preprocess.mak";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
-		44125A540C0840B400C24C0A /* Sources */ = {
+		F7E50F631C51CD5B5DC0BC43 /* Compile Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				44125A660C0840ED00C24C0A /* InfoTool.cpp in Sources */,
-				44125A670C0840ED00C24C0A /* InfoToolFactory.cpp in Sources */,
-				44125A680C0840ED00C24C0A /* MeshMergeTool.cpp in Sources */,
-				44125A690C0840ED00C24C0A /* MeshMergeToolFactory.cpp in Sources */,
-				44125A6A0C0840ED00C24C0A /* OgreEnvironment.cpp in Sources */,
-				44125A6B0C0840ED00C24C0A /* OptionsParser.cpp in Sources */,
-				44125A6C0C0840ED00C24C0A /* StatefulMeshSerializer.cpp in Sources */,
-				44125A6D0C0840ED00C24C0A /* StatefulSkeletonSerializer.cpp in Sources */,
-				44125A6E0C0840ED00C24C0A /* Tool.cpp in Sources */,
-				44125A6F0C0840ED00C24C0A /* ToolManager.cpp in Sources */,
-				44125A700C0840ED00C24C0A /* TransformTool.cpp in Sources */,
-				44125A710C0840ED00C24C0A /* TransformToolFactory.cpp in Sources */,
-				445A0C470C4AAA500029E457 /* EditableSkeleton.cpp in Sources */,
-				445A0C480C4AAA500029E457 /* RenameTool.cpp in Sources */,
-				445A0C490C4AAA500029E457 /* RenameToolFactory.cpp in Sources */,
-				AA48EDDD0C65334D00DD2220 /* OptimiseTool.cpp in Sources */,
-				AA48EDDE0C65334D00DD2220 /* OptimiseToolFactory.cpp in Sources */,
-				48A52B840E0EEB56008DBDD8 /* EditableBone.cpp in Sources */,
-				48A52B850E0EEB56008DBDD8 /* EditableMesh.cpp in Sources */,
-				48A52B860E0EEB56008DBDD8 /* MeshUtils.cpp in Sources */,
-				48A52B870E0EEB56008DBDD8 /* ToolsUtils.cpp in Sources */,
+				F1F86635232A54473BA16B9A /* MeshMagick.cpp in Compile Sources */,
+				438194288DDF90526BF4E469 /* MmEditableBone.cpp in Compile Sources */,
+				5DA35F68D2EB2412C067C9C8 /* MmEditableMesh.cpp in Compile Sources */,
+				E4860943451872F1204B9EE4 /* MmEditableSkeleton.cpp in Compile Sources */,
+				310A8F52605414310A06B610 /* MmInfoTool.cpp in Compile Sources */,
+				A18CC81AB977E4C85699A538 /* MmInfoToolFactory.cpp in Compile Sources */,
+				9614EA409F51E1605AB36CBB /* MmMeshMergeTool.cpp in Compile Sources */,
+				0C15762778748E1A3925B311 /* MmMeshMergeToolFactory.cpp in Compile Sources */,
+				6E71E0442F9C8C1B88562A91 /* MmMeshUtils.cpp in Compile Sources */,
+				FF9C1712F6E9E2847B6C5CF5 /* MmOgreEnvironment.cpp in Compile Sources */,
+				EAF79764454CD524EF428F4C /* MmOptimiseTool.cpp in Compile Sources */,
+				DEBCD77F4C87763DEA7C0CA8 /* MmOptimiseToolFactory.cpp in Compile Sources */,
+				32256415F5826FB4DE119AA5 /* MmOptionsParser.cpp in Compile Sources */,
+				74AE1D393BA0B40A55502C49 /* MmRenameTool.cpp in Compile Sources */,
+				A5A41C410BADE6FE515E3ABF /* MmRenameToolFactory.cpp in Compile Sources */,
+				5CD07E6EC7A8A6267948B44E /* MmStatefulMeshSerializer.cpp in Compile Sources */,
+				3D3949E8842D44709CA70525 /* MmStatefulSkeletonSerializer.cpp in Compile Sources */,
+				3734F4F4A90F675E136D8D93 /* MmTool.cpp in Compile Sources */,
+				3D0B709CA6673DAC74033790 /* MmToolManager.cpp in Compile Sources */,
+				1EEA6D58EB255EA322D41F7A /* MmToolsUtils.cpp in Compile Sources */,
+				575956C482D008492ABC094A /* MmTransformTool.cpp in Compile Sources */,
+				7C135277B916094DB5A2CE18 /* MmTransformToolFactory.cpp in Compile Sources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4869D7310EF1A6E200619D4D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4869D7380EF1A72600619D4D /* InfoTool.cpp in Sources */,
-				4869D7390EF1A72600619D4D /* InfoToolFactory.cpp in Sources */,
-				4869D73A0EF1A72600619D4D /* MeshMergeTool.cpp in Sources */,
-				4869D73B0EF1A72600619D4D /* MeshMergeToolFactory.cpp in Sources */,
-				4869D73C0EF1A72600619D4D /* OgreEnvironment.cpp in Sources */,
-				4869D73D0EF1A72600619D4D /* OptionsParser.cpp in Sources */,
-				4869D73E0EF1A72600619D4D /* StatefulMeshSerializer.cpp in Sources */,
-				4869D73F0EF1A72600619D4D /* StatefulSkeletonSerializer.cpp in Sources */,
-				4869D7400EF1A72600619D4D /* Tool.cpp in Sources */,
-				4869D7410EF1A72600619D4D /* ToolManager.cpp in Sources */,
-				4869D7420EF1A72600619D4D /* TransformTool.cpp in Sources */,
-				4869D7430EF1A72600619D4D /* TransformToolFactory.cpp in Sources */,
-				4869D7440EF1A72600619D4D /* EditableSkeleton.cpp in Sources */,
-				4869D7450EF1A72600619D4D /* RenameTool.cpp in Sources */,
-				4869D7460EF1A72600619D4D /* RenameToolFactory.cpp in Sources */,
-				4869D7470EF1A72600619D4D /* OptimiseTool.cpp in Sources */,
-				4869D7480EF1A72600619D4D /* OptimiseToolFactory.cpp in Sources */,
-				4869D7490EF1A72600619D4D /* EditableBone.cpp in Sources */,
-				4869D74A0EF1A72600619D4D /* EditableMesh.cpp in Sources */,
-				4869D74B0EF1A72600619D4D /* MeshUtils.cpp in Sources */,
-				4869D74C0EF1A72600619D4D /* ToolsUtils.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8DD76F640486A84900D96B5E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				44125A520C08405800C24C0A /* main.cpp in Sources */,
-				AA48EDDB0C65334D00DD2220 /* OptimiseTool.cpp in Sources */,
-				AA48EDDC0C65334D00DD2220 /* OptimiseToolFactory.cpp in Sources */,
-			);
+			name = "Compile Sources";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		4869D85C0EF1A7F700619D4D /* PBXTargetDependency */ = {
+		E21850FE0CC7A30652449A9B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4869D7330EF1A6E200619D4D /* libmeshmagick_static */;
-			targetProxy = 4869D85B0EF1A7F700619D4D /* PBXContainerItemProxy */;
+			target = BB4DE38A6CA0006A883E2689 /* Qt Preprocess */;
+			targetProxy = CDA46C171ACDC1DD00463E1D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		1DEB923208733DC60010E9CD /* Debug */ = {
+		339EE1B2CC4FC24589A0EA95 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = /Library/Frameworks/Ogre.framework/Headers;
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/build/Release\"";
-				PRODUCT_NAME = meshmagick;
-				ZERO_LINK = YES;
-			};
-			name = Debug;
-		};
-		1DEB923308733DC60010E9CD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = x86_64;
+				CC = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang;
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1.0;
+				DYLIB_CURRENT_VERSION = 1.0.0;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = /Library/Frameworks/Ogre.framework/Headers;
-				INSTALL_PATH = "$(HOME)/bin";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					.,
+					include,
+					../../../OgreSDK/include/OGRE,
+					../../../OgreSDK/include/OGRE/RenderSystems/GL,
+					../../../OgreSDK/boost,
+					"../../../../Qt5/5.4/clang_64/mkspecs/macx-clang",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/build/Release\"";
+				INSTALL_PATH = "";
+				LDPLUSPLUS = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++";
+				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CFLAGS = (
+					"-pipe",
+					"-O2",
+					"-fPIC",
+					"-Wall",
+					"-W",
+					"-DMESHMAGICK_STATIC",
+					"-DQT_NO_DEBUG",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-pipe",
+					"-O2",
+					"-fPIC",
+					"-Wall",
+					"-W",
+					"-DMESHMAGICK_STATIC",
+					"-DQT_NO_DEBUG",
+				);
 				PRODUCT_NAME = meshmagick;
+				QT_LIBRARY_SUFFIX = "";
+				SDKROOT = macosx;
+				SYMROOT = /Users/patrick/Documents/projects/AISandbox/libmeshmagick;
 			};
 			name = Release;
 		};
-		1DEB923608733DC60010E9CD /* Debug */ = {
+		3AA6C32AC930069E80220CF1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-			};
-			name = Debug;
-		};
-		1DEB923708733DC60010E9CD /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-			};
-			name = Release;
-		};
-		44125A730C0840ED00C24C0A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = x86_64;
+				CC = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang;
 				COPY_PHASE_STRIP = NO;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1.0;
+				DYLIB_CURRENT_VERSION = 1.0.0;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				HEADER_SEARCH_PATHS = /Library/Frameworks/Ogre.framework/Headers;
-				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
-				PRODUCT_NAME = libmeshmagick;
-				ZERO_LINK = YES;
-			};
-			name = Debug;
-		};
-		44125A740C0840ED00C24C0A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				HEADER_SEARCH_PATHS = (
+					.,
+					include,
+					../../../OgreSDK/include/OGRE,
+					../../../OgreSDK/include/OGRE/RenderSystems/GL,
+					../../../OgreSDK/boost,
+					"../../../../Qt5/5.4/clang_64/mkspecs/macx-clang",
 				);
-				COPY_PHASE_STRIP = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				HEADER_SEARCH_PATHS = /Library/Frameworks/Ogre.framework/Headers;
-				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
-				PRODUCT_NAME = libmeshmagick;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
-		4869D7350EF1A6E300619D4D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = /Library/Frameworks/Ogre.framework/Headers;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = libmeshmagick_static;
+				INSTALL_PATH = "";
+				LDPLUSPLUS = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++";
+				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CFLAGS = (
+					"-pipe",
+					"-O2",
+					"-fPIC",
+					"-Wall",
+					"-W",
+					"-DMESHMAGICK_STATIC",
+					"-DQT_NO_DEBUG",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-pipe",
+					"-O2",
+					"-fPIC",
+					"-Wall",
+					"-W",
+					"-DMESHMAGICK_STATIC",
+					"-DQT_NO_DEBUG",
+				);
+				PRODUCT_NAME = meshmagick;
+				QT_LIBRARY_SUFFIX = _debug;
+				SDKROOT = macosx;
+				SYMROOT = /Users/patrick/Documents/projects/AISandbox/libmeshmagick;
 			};
 			name = Debug;
 		};
-		4869D7360EF1A6E300619D4D /* Release */ = {
+		6666AA5E688052234F6758D8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = /Library/Frameworks/Ogre.framework/Headers;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = libmeshmagick_static;
-				ZERO_LINK = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				LIBRARY_STYLE = STATIC;
+				PRODUCT_NAME = meshmagick;
+				QT_LIBRARY_SUFFIX = "";
+				SDKROOT = macosx;
 			};
 			name = Release;
+		};
+		77418F46922677BB04ED38DD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				LIBRARY_STYLE = STATIC;
+				PRODUCT_NAME = meshmagick;
+				QT_LIBRARY_SUFFIX = _debug;
+				SDKROOT = macosx;
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "meshmagick" */ = {
+		6CC3B5D2136C7CD6A5CF5A59 /* Build configuration list for PBXNativeTarget "meshmagick" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1DEB923208733DC60010E9CD /* Debug */,
-				1DEB923308733DC60010E9CD /* Release */,
+				77418F46922677BB04ED38DD /* Debug */,
+				6666AA5E688052234F6758D8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "meshmagick" */ = {
+		DAC4C1AA5EDEA1C85E9CA5E6 /* Build configuration list for PBXProject "meshmagick" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1DEB923608733DC60010E9CD /* Debug */,
-				1DEB923708733DC60010E9CD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		44125A720C0840ED00C24C0A /* Build configuration list for PBXNativeTarget "libmeshmagick" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				44125A730C0840ED00C24C0A /* Debug */,
-				44125A740C0840ED00C24C0A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4869D74F0EF1A74400619D4D /* Build configuration list for PBXNativeTarget "libmeshmagick_static" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4869D7350EF1A6E300619D4D /* Debug */,
-				4869D7360EF1A6E300619D4D /* Release */,
+				3AA6C32AC930069E80220CF1 /* Debug */,
+				339EE1B2CC4FC24589A0EA95 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+	rootObject = 6DB9C3763D02B1415CD9D565 /* Project object */;
 }

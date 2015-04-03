@@ -16,8 +16,8 @@
 #include <QTime>
 #include <QDebug>
 #include <QThread>
-#include "../libqmlogre/ogreitem.h"
-#include "../libqmlogre/ogreengine.h"
+#include "ogreitem.h"
+#include "ogreengine.h"
 #include <Ogre.h>
 
 Q_DECLARE_METATYPE(ConsoleModel::LogLevel)
@@ -198,6 +198,11 @@ void Application::initializeOgre()
     QObject::connect(mProjectManager, &ProjectManager::inspectorSelectionChanged,
                      this, &Application::onInspectorSelectionChanged);
 
+    // Must be direct because object could be deleted before the signal reaches the receiver..
+    QObject::connect(mProjectManager, &ProjectManager::inspectorResetModel,
+                     this, &Application::onInspectorResetModel,
+                     Qt::DirectConnection);
+
     {
         QString dialogName("openProjectDialog");
         QObject* projectDialog = window->findChild<QObject*>(dialogName);
@@ -263,7 +268,7 @@ void Application::onSceneLoaded(Scene* scene)
         return;
     }
 
-    mInspectorModel.reset(new InspectorModel(scene->getName(), scene));
+    mInspectorModel.reset(new InspectorModel(scene->getName(), scene->getKnowledge()));
 
     mSceneModel.reset(new SceneModel(scene->getName()));
 
@@ -295,17 +300,6 @@ void Application::onSceneLoaded(Scene* scene)
 
     emit(sceneLoadedChanged(getSceneLoaded()));
     emit(sceneSetupFinished());
-}
-
-void Application::onInspectorSelectionChanged(const QString& name,
-                                              const KnowledgeModel* knowledge)
-{
-    InspectorModel* oldModel = mInspectorModel.take();
-    mInspectorModel.reset(new InspectorModel(name, knowledge));
-    mApplicationEngine->rootContext()->setContextProperty("InspectorModel",
-                                                          mInspectorModel.data());
-
-    delete oldModel;
 }
 
 bool Application::getSceneLoaded() const
@@ -360,4 +354,16 @@ void Application::onPlayButtonPressed()
 void Application::onPlayingChanged(bool isPlaying)
 {
     emit scenePlayingChanged(isPlaying);
+}
+
+void Application::onInspectorSelectionChanged(QString name,
+                                              QVariantMap initial)
+{
+    mInspectorModel->setModel(name, initial);
+}
+
+
+void Application::onInspectorResetModel(const KnowledgeModel* model)
+{
+    mInspectorModel->connectTo(model);
 }

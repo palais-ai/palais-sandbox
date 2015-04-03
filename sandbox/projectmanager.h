@@ -50,8 +50,9 @@ signals:
                          const QString& sceneFile,
                          const QString& logicFile);
     void playingChanged(bool isPlaying);
-    void inspectorSelectionChanged(const QString& name,
-                                   const KnowledgeModel* knowledge);
+    void inspectorSelectionChanged(QString name,
+                                   QVariantMap initial);
+    void inspectorResetModel(const KnowledgeModel* knowledge);
     void timePassed(const QTime& time);
     void actorChangedSelected(const QString& actorName,
                               bool selected);

@@ -89,8 +89,15 @@ macx {
     ConfigFiles.files += config/resources.cfg
     ConfigFiles.path = Contents/MacOS
 
-    PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib
-    PluginFiles.files += $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib
+
+    !exists($$OGREDIR/lib/macosx) { # Ogre 1.8
+        PluginFiles.files += $$OGREDIR/lib/RenderSystem_GL.dylib
+        PluginFiles.files += $$OGREDIR/lib/Plugin_OctreeSceneManager.dylib
+    } else { # Ogre 1.9
+        PluginFiles.files += $$OGREDIR/lib/macosx/Release/RenderSystem_GL.dylib
+        PluginFiles.files += $$OGREDIR/lib/macosx/Release/Plugin_OctreeSceneManager.dylib
+    }
+
     PluginFiles.files += $$files($$BULLETDIR/src/BulletCollision/*.dylib)
     PluginFiles.files += $$files($$BULLETDIR/src/BulletDynamics/*.dylib)
     PluginFiles.files += $$files($$BULLETDIR/src/LinearMath/*.dylib)

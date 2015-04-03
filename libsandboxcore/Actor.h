@@ -4,13 +4,16 @@
 #include "KnowledgeModel.h"
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
+#include <OgreNode.h>
+
+extern QList<void*> gDeletedKnowledge;
 
 namespace Ogre
 {
 class SceneNode;
 }
 
-class DLL_EXPORT Actor : public KnowledgeModel
+class DLL_EXPORT Actor : public KnowledgeModel, public Ogre::Node::Listener
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ getName)
@@ -20,8 +23,12 @@ class DLL_EXPORT Actor : public KnowledgeModel
     Q_PROPERTY(bool visible WRITE setVisible)
 public:
     explicit Actor(Ogre::SceneNode* node);
+    ~Actor();
 
     void update(float deltaTime);
+
+    // OgreNodeListener
+    virtual void nodeDestroyed(const Ogre::Node* node);
 
     Q_INVOKABLE void toggleHighlight(bool highlighted);
     Q_INVOKABLE void setScale(float factor);
@@ -46,6 +53,8 @@ public:
 
     QString getName() const;
     Ogre::SceneNode* getSceneNode();
+
+    void emitSignalBeforeRemoval();
 signals:
     void visibilityChanged(Actor* self, bool visible);
     void removedFromScene(Actor* self);

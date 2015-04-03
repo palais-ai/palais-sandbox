@@ -23,10 +23,16 @@ void Scheduler::setListener(SchedulerListener* listener)
 
 void Scheduler::clear()
 {
+    std::cout << "Cleared " << mTasks.size() + mWaiting.empty() << " in Scheduler.";
     while(!mTasks.empty())
     {
         Task* current = *mTasks.begin();
-        current->setStatus(StatusDormant);
+        current->setStatus(StatusTerminated);
+    }
+    while(!mWaiting.empty())
+    {
+        Task* current = *mWaiting.begin();
+        current->setStatus(StatusTerminated);
     }
 }
 
@@ -101,6 +107,9 @@ HighResolutionTime::Timestamp Scheduler::update(HighResolutionTime::Timestamp ma
 
         // Take tasks from the end (lowest runtime to date).
         Task* current = *mTasks.begin();
+
+        // Ignore changes to the status of this task during its execution time.
+        current->setListener(NULL);
 #if PRINT_STATES
         std::cout << "Running " << typeid(*current).name() << "." << std::endl;
 #endif
@@ -125,6 +134,11 @@ HighResolutionTime::Timestamp Scheduler::update(HighResolutionTime::Timestamp ma
             enqueue(current);
         }
 
+        if(current->getStatus() != StatusTerminated)
+        {
+            current->setListener(this);
+        }
+
 #if PRINT_STATES
         printTasks(mTasks);
         printTasks(mWaiting);
@@ -136,25 +150,21 @@ HighResolutionTime::Timestamp Scheduler::update(HighResolutionTime::Timestamp ma
 
 void Scheduler::onStatusChanged(Task* task, Status from)
 {
-    const Status to = task->getStatus();
-    if(to == StatusRunning &&
-       from == StatusWaiting)
-    {
-        removeWaiting(task);
-        enqueue(task);
-    }
-    else if(to == StatusWaiting &&
-            from != StatusRunning)
-    {
-        enqueue(task);
-    }
-    else if(from == StatusWaiting)
+    // FIXME: Some tasks get lost in changes (probably from changing to running / waiting when they are not being executed..
+    //        Allow this to happen by checking for the currently executed task here explicitly.
+    if(from == StatusWaiting)
     {
         removeWaiting(task);
     }
     else if(from == StatusRunning)
     {
         removeRunning(task);
+    }
+
+    const Status to = task->getStatus();
+    if(to == StatusRunning || to == StatusWaiting)
+    {
+        enqueue(task);
     }
     else if(to == StatusTerminated)
     {

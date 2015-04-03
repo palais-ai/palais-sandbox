@@ -10,6 +10,8 @@
 #include <OgreQuaternion.h>
 #include <OgreFrameListener.h>
 
+extern QList<void*> gDeletedActors;
+
 class Actor;
 class OgreEngine;
 class DebugDrawer;
@@ -50,7 +52,7 @@ public:
     ~Scene();
 
     Ogre::SceneManager* getOgreSceneManager() const;
-    DebugDrawer* createDebugDrawer(const QString& name);
+    DebugDrawer* createDebugDrawer(const QString& name, float opacity = 0.5);
     void destroyDebugDrawer(DebugDrawer* drawer);
 
     // Frame Listener
@@ -58,7 +60,7 @@ public:
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
     virtual bool frameEnded(const Ogre::FrameEvent& evt);
 
-    Q_INVOKABLE void toggleHighlight(bool highlighted, int index);
+    Q_INVOKABLE void toggleHighlight(const QString& name, bool highlighted);
 
     Q_INVOKABLE Actor* instantiate(const QString& name,
                                    const QString& meshName,
@@ -86,9 +88,7 @@ public:
     const QString& getName() const;
 
     Actor* addActor(Ogre::SceneNode* node);
-    const QMap<QString, Actor*>& getActors() const;
     Q_INVOKABLE bool hasActor(const QString& actorName) const;
-    Q_INVOKABLE Actor* getActorByIndex(unsigned int index);
     Q_INVOKABLE Actor* getActorByName(const QString& actorName);
     Actor* getActor(const QString& actorName);
     Q_INVOKABLE QObjectList getActorsArray() const;
@@ -121,8 +121,8 @@ private:
     Ogre::RaySceneQuery* mRayQuery;
     Ogre::SphereSceneQuery* mSphereQuery;
     QScriptEngine mLogicScript;
-    QMap<QString, Actor*> mActors;
-    QVector<DebugDrawer*> mDrawers;
+    QHash<QString, Actor*> mActors;
+    QHash<QString, DebugDrawer*> mDrawers;
     bool mIsSetup;
 };
 

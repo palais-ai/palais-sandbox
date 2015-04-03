@@ -4,7 +4,7 @@
 #include "application.h"
 #include "utility/timedlogger.h"
 #include "Bindings/JavascriptBindings.h"
-#include "../libqmlogre/ogreengine.h"
+#include "ogreengine.h"
 #include <QtGlobal>
 #include <QTimerEvent>
 #include <QTime>
@@ -37,8 +37,8 @@ void SceneManager::unloadCurrentScene()
 {
     if(mCurrentScene)
     {
-        mCurrentScene->teardown();
         mPluginManager.sceneEnded(*mCurrentScene);
+        mCurrentScene->teardown();
         delete mCurrentScene;
         mCurrentScene = NULL;
     }

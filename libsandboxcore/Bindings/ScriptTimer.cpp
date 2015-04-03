@@ -21,7 +21,7 @@ qint32 ScriptTimerFactory::newTimer(int interval,
         ScriptTimer* timer = new ScriptTimer(interval, oneShot, function);
         qint32 nextId = mHandleCounter;
         mHandleCounter++;
-        mScriptTimers.insert(nextId, QSharedPointer<ScriptTimer>(timer));
+        mScriptTimers.insert(nextId, timer);
         return nextId;
     }
     else
@@ -33,14 +33,16 @@ qint32 ScriptTimerFactory::newTimer(int interval,
 
 bool ScriptTimerFactory::removeTimer(qint32 handle)
 {
-    QHash<qint32, QSharedPointer<ScriptTimer> >::iterator it = mScriptTimers.find(handle);
+    QHash<qint32, ScriptTimer*>::iterator it = mScriptTimers.find(handle);
     if(it != mScriptTimers.end())
     {
-        QSharedPointer<ScriptTimer> timer = it.value();
-        if(timer.data() != mCurrentTimer.data())
+        ScriptTimer* timer = it.value();
+        if(timer != mCurrentTimer)
         {
             const int numRemoved = mScriptTimers.remove(handle);
             assert(numRemoved == 1);
+
+            delete timer;
         }
         else
         {
@@ -63,19 +65,22 @@ void ScriptTimerFactory::updateTimers(float deltaTime)
     foreach(qint32 key, keys)
     {
         // Check on every iteration whether this key was removed by a previous timer.
-        QHash<qint32, QSharedPointer<ScriptTimer> >::iterator it = mScriptTimers.find(key);
+        QHash<qint32, ScriptTimer* >::iterator it = mScriptTimers.find(key);
         if(it != mScriptTimers.end())
         {
             mCurrentTimer = it.value();
             if(mCurrentTimer->update(deltaTime) ||
                mCurrentIsRemoved)
             {
-                mScriptTimers.remove(key);
+                const int numRemoved = mScriptTimers.remove(key);
+                assert(numRemoved == 1);
+
+                delete mCurrentTimer;
                 mCurrentIsRemoved = false;
             }
         }
     }
-    mCurrentTimer.reset();
+    mCurrentTimer = NULL;
 }
 
 bool ScriptTimer::update(float deltaTime)
@@ -116,7 +121,7 @@ ScriptTimer::ScriptTimer(int interval,
 
 void ScriptTimer::timeout()
 {
-    if(mFunction.isFunction())
+    if(mFunction.isFunction() && mFunction.engine())
      {
          mFunction.call();
      }

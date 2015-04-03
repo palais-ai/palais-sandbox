@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QScopedPointer>
 #include <QSharedPointer>
+#include <QVariant>
 
 class Scene;
 class ProjectManager;
@@ -61,8 +62,9 @@ public slots:
     void onSceneLoadFailed(const QString& message);
     void onPlayButtonPressed();
     void onPlayingChanged(bool isPlaying);
-    void onInspectorSelectionChanged(const QString& name,
-                                     const KnowledgeModel* knowledge);
+    void onInspectorSelectionChanged(QString name,
+                                     QVariantMap initial);
+    void onInspectorResetModel(const KnowledgeModel* model);
 private:
     QQmlApplicationEngine* mApplicationEngine;
     OgreEngine* mOgreEngine;

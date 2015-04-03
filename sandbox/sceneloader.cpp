@@ -10,8 +10,8 @@
 #include <OgreSceneManager.h>
 #include <OgreString.h>
 #include <OgreSceneNode.h>
-#include "../libqmlogre/ogreengine.h"
-#include "../libdotsceneloader/DotSceneLoader.h"
+#include "ogreengine.h"
+#include "DotSceneLoader.h"
 
 SceneLoader::SceneLoader()
 {

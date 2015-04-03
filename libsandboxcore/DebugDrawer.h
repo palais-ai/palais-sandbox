@@ -73,10 +73,7 @@ private:
  
 class DLL_EXPORT DebugDrawer
 {
-public:
-    DebugDrawer(const Ogre::String& name, Ogre::SceneManager *_sceneManager, float _fillAlpha);
-	~DebugDrawer();
- 
+public: 
     Ogre::String getName() const;
 
 	void build();
@@ -98,6 +95,12 @@ public:
 	void clear();
  
 private:
+    DebugDrawer(const Ogre::String& name, Ogre::SceneManager *_sceneManager, float _fillAlpha);
+    ~DebugDrawer();
+
+    // The scene acts as a factory class for DebugDrawers.
+    friend class Scene;
+
     Ogre::String name;
 	Ogre::SceneManager *sceneManager;
 	Ogre::ManualObject *manualObject;

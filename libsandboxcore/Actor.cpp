@@ -1,10 +1,12 @@
 #include "Actor.h"
 #include <cassert>
-#include <QDebug>
+#include <qDebug>
 #include <QVector>
 #include <OgreSceneNode.h>
 #include <OgreAnimation.h>
 #include <OgreEntity.h>
+
+QList<void*> gDeletedKnowledge;
 
 Actor::Actor(Ogre::SceneNode* node) :
     mNode(node)
@@ -13,11 +15,29 @@ Actor::Actor(Ogre::SceneNode* node) :
     {
         qFatal("Node must be initialized.");
     }
+    node->setListener(this);
+    node->setUserAny(Ogre::Any(this));
+}
+
+Actor::~Actor()
+{
+    gDeletedKnowledge += getKnowledgePtr();
+    if(mNode)
+    {
+        mNode->setListener(NULL);
+        mNode->setUserAny(Ogre::Any());
+        mNode = NULL;
+    }
 }
 
 Ogre::SceneNode* Actor::getSceneNode()
 {
     return mNode;
+}
+
+void Actor::emitSignalBeforeRemoval()
+{
+    emit removedFromScene(this);
 }
 
 void Actor::enableAnimation(const QString& name)
@@ -32,6 +52,8 @@ void Actor::disableAnimation(const QString& name)
 
 void Actor::setAnimationEnabled(const QString& name, bool enabled)
 {
+    assert(mNode);
+
     if(mNode->numAttachedObjects() == 0)
     {
         qWarning() << "Can't enable animation [" << name
@@ -68,6 +90,7 @@ void Actor::setAnimationEnabled(const QString& name, bool enabled)
 
 void Actor::lookAt(const Ogre::Vector3& target)
 {
+    assert(mNode);
     mNode->lookAt(target, Ogre::Node::TS_WORLD);
 }
 
@@ -83,6 +106,7 @@ void Actor::hide()
 
 void Actor::setCastShadows(bool hasShadows)
 {
+    assert(mNode);
     Ogre::SceneNode::ObjectIterator it = mNode->getAttachedObjectIterator();
     while(it.hasMoreElements())
     {
@@ -93,6 +117,7 @@ void Actor::setCastShadows(bool hasShadows)
 
 void Actor::setVisible(bool visible)
 {
+    assert(mNode);
     mNode->setVisible(visible);
 
     emit visibilityChanged(this, visible);
@@ -100,6 +125,7 @@ void Actor::setVisible(bool visible)
 
 void Actor::update(float deltaTime)
 {
+    assert(mNode);
     if(mNode->numAttachedObjects() == 0)
     {
         return;
@@ -129,48 +155,63 @@ void Actor::update(float deltaTime)
     }
 }
 
+void Actor::nodeDestroyed(const Ogre::Node* node)
+{
+    Q_UNUSED(node);
+    mNode = NULL;
+}
+
 const Ogre::Vector3& Actor::getPosition() const
 {
+    assert(mNode);
     return mNode->getPosition();
 }
 
 void Actor::setPosition(const Ogre::Vector3& position)
 {
+    assert(mNode);
     mNode->setPosition(position);
 }
 
 const Ogre::Quaternion& Actor::getRotation() const
 {
+    assert(mNode);
     return mNode->getOrientation();
 }
 
 void Actor::setRotation(const Ogre::Quaternion& rotation)
 {
+    assert(mNode);
     mNode->setOrientation(rotation);
 }
 
 const Ogre::Vector3& Actor::getScale() const
 {
+    assert(mNode);
     return mNode->getScale();
 }
 
 void Actor::setScale(const Ogre::Vector3& scale)
 {
+    assert(mNode);
     mNode->setScale(scale);
 }
 
 void Actor::setScale(float factor)
 {
+    assert(mNode);
     mNode->setScale(factor, factor, factor);
 }
 
 void Actor::toggleHighlight(bool highlighted)
 {
+    assert(mNode);
     mNode->showBoundingBox(highlighted);
 }
 
 QString Actor::getName() const
 {
+    assert(mNode);
     return QString::fromStdString(mNode->getName());
 }
 
@@ -181,6 +222,9 @@ QString Actor::toString() const
 
 void Actor::attach(Actor* other)
 {
+    assert(other);
+    assert(other->mNode);
+    assert(mNode);
     other->getSceneNode()->getParent()->removeChild(other->getSceneNode());
     mNode->addChild(other->getSceneNode());
 }

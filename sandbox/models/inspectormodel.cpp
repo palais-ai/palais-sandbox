@@ -84,10 +84,9 @@ void InspectorModel::declareQML()
 }
 
 InspectorModel::InspectorModel(const QString& name,
-                               const KnowledgeModel* knowledge) :
-    mCurrentModel(NULL)
+                               const QVariantMap& initial)
 {
-    setModel(name, knowledge);
+    setModel(name, initial);
 }
 
 const QString& InspectorModel::getName() const
@@ -96,40 +95,28 @@ const QString& InspectorModel::getName() const
 }
 
 void InspectorModel::setModel(const QString& name,
-                              const KnowledgeModel* knowledge)
+                              const QVariantMap& initial)
 {
-    if(mCurrentModel)
-    {
-        disconnect(mCurrentModel, &KnowledgeModel::knowledgeAdded,
-                   this, &InspectorModel::onKnowledgeAdded);
-
-        disconnect(mCurrentModel, &KnowledgeModel::knowledgeChanged,
-                   this, &InspectorModel::onKnowledgeChanged);
-
-        disconnect(mCurrentModel, &KnowledgeModel::knowledgeRemoved,
-                   this, &InspectorModel::onKnowledgeRemoved);
-
-        disconnect(mCurrentModel, &QObject::destroyed,
-                   this, &InspectorModel::onCurrentModelDestroyed);
-    }
-
+    beginResetModel();
     mName = name;
-    mCurrentModel = knowledge;
-    mKnowledge = knowledge->getKnowledge();
+    mKnowledge = initial;
+    endResetModel();
+    emit nameChanged(name);
+}
 
-    connect(knowledge, &KnowledgeModel::knowledgeAdded,
+void InspectorModel::connectTo(const KnowledgeModel* model)
+{
+    connect(model, &KnowledgeModel::knowledgeAdded,
             this, &InspectorModel::onKnowledgeAdded);
 
-    connect(knowledge, &KnowledgeModel::knowledgeChanged,
+    connect(model, &KnowledgeModel::knowledgeChanged,
             this, &InspectorModel::onKnowledgeChanged);
 
-    connect(knowledge, &KnowledgeModel::knowledgeRemoved,
+    connect(model, &KnowledgeModel::knowledgeRemoved,
             this, &InspectorModel::onKnowledgeRemoved);
 
-    connect(knowledge, &QObject::destroyed,
+    connect(model, &QObject::destroyed,
             this, &InspectorModel::onCurrentModelDestroyed);
-
-    emit(nameChanged(name));
 }
 
 void InspectorModel::onKnowledgeAdded(const QString& key, const QVariant& value)
@@ -166,7 +153,7 @@ void InspectorModel::onKnowledgeRemoved(const QString& key)
 
 void InspectorModel::onCurrentModelDestroyed()
 {
-    mCurrentModel = NULL;
+    ;
 }
 
 QHash<int, QByteArray> InspectorModel::roleNames() const

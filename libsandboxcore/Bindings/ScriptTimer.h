@@ -20,8 +20,8 @@ public:
 
     void updateTimers(float deltaTime);
 private:
-    QHash<qint32, QSharedPointer<ScriptTimer> > mScriptTimers;
-    QSharedPointer<ScriptTimer> mCurrentTimer;
+    QHash<qint32, ScriptTimer*> mScriptTimers;
+    ScriptTimer* mCurrentTimer;
     bool mCurrentIsRemoved;
     qint32 mHandleCounter;
 };

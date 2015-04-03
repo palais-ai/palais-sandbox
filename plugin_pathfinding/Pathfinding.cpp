@@ -132,12 +132,11 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
 
 void Pathfinding::update(Scene& scene, float deltaTime)
 {
-    QMapIterator<QString, Actor*> it(scene.getActors());
+    QListIterator<QObject*> it(scene.getActorsArray());
     while(it.hasNext())
     {
-        it.next();
-
-        updateActor(*it.value(), deltaTime);
+        Actor* actor = qobject_cast<Actor*>(it.next());
+        updateActor(*actor, deltaTime);
     }
 }
 

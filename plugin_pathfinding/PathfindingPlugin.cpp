@@ -23,20 +23,16 @@ void PathfindingPlugin::onSceneStarted(const PluginInterface& interface, Scene& 
 
     mPathfindingDrawer = scene.createDebugDrawer("navigation_graph");
 
-    QMapIterator<QString, Actor*> it(scene.getActors());
+    QListIterator<QObject*> it(scene.getActorsArray());
     while(it.hasNext())
     {
-        it.next();
+        Actor* value = qobject_cast<Actor*>(it.next());
+        QString key = value->getName();
 
-        const QString& key = it.key();
         if(key.toLower() == "navmesh")
         {
-            mPathfinding.initNavGraphFromOgreNode(it.value()->getSceneNode());
+            mPathfinding.initNavGraphFromOgreNode(value->getSceneNode());
             mPathfinding.visualizeNavGraph(mPathfindingDrawer);
-
-            Ogre::String name = mPathfindingDrawer->getName();
-            Ogre::SceneNode* vis = scene.getOgreSceneManager()->getSceneNode(name);
-            scene.addActor(vis);
             break;
         }
     }
