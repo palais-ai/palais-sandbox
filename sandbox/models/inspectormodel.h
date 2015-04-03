@@ -67,10 +67,12 @@ public:
     static void declareQML();
 
     InspectorModel(const QString& name,
-                   const KnowledgeModel* knowledge);
+                   const QVariantMap& initial);
 
     void setModel(const QString& name,
-                 const KnowledgeModel* knowledge);
+                  const QVariantMap& initial);
+
+    void connectTo(const KnowledgeModel* model);
 
     const QString& getName() const;
 
@@ -82,14 +84,13 @@ public:
     virtual int rowCount(const QModelIndex &parent) const;
 signals:
     void nameChanged(const QString& name);
-private slots:
+public slots:
     void onKnowledgeAdded(const QString& key, const QVariant& value);
     void onKnowledgeChanged(const QString& key, const QVariant& value);
     void onKnowledgeRemoved(const QString& key);
     void onCurrentModelDestroyed();
 private:
     QString mName;
-    const KnowledgeModel* mCurrentModel;
     QVariantMap mKnowledge;
 };
 

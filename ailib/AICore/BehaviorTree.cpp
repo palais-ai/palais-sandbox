@@ -3,8 +3,11 @@
 #include <cstring>
 #include <limits>
 #include <algorithm>
+#include "btHashMap.h"
 
 BEGIN_NS_AILIB
+
+btHashMap<btHashPtr, Behavior*> freeMap;
 
 void BehaviorListener::onReset(Behavior* behavior)
 {
@@ -19,7 +22,8 @@ Behavior::Behavior() :
 
 Behavior::~Behavior()
 {
-    ;
+    assert(freeMap.find(this) == NULL); // Check for double frees.
+    freeMap.insert(btHashPtr(this), this);
 }
 
 void Behavior::setListener(BehaviorListener* listener)

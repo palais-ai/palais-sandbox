@@ -2,6 +2,7 @@
 
 KnowledgeModel::KnowledgeModel()
 {
+    mKnowledge.setSharable(false);
 }
 
 bool KnowledgeModel::hasKnowledge(const QString &key) const

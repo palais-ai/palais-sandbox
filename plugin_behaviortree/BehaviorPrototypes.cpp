@@ -85,14 +85,12 @@ void BehaviorPrototype::setUserData(QVariantMap* data)
 QVariantMap BehaviorPrototype::getUserData() const
 {
     Behavior* behavior = extractBehavior(thisObject());
-
     if(!behavior || behavior->getUserData().empty())
     {
         return QVariantMap();
     }
 
     QVariantMap* ptr = any_cast<QVariantMap*>(behavior->getUserData());
-
     if(!ptr)
     {
         qWarning() << "Behavior.userData: Failed to convert userData to Object. Type mismatch.";
@@ -100,6 +98,7 @@ QVariantMap BehaviorPrototype::getUserData() const
     }
     else
     {
+        assert(!gDeletedKnowledge.contains(ptr));
         return *ptr;
     }
 }

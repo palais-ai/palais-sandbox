@@ -6,6 +6,8 @@
 #include <OgreAnimation.h>
 #include <OgreEntity.h>
 
+QList<void*> gDeletedKnowledge;
+
 Actor::Actor(Ogre::SceneNode* node) :
     mNode(node)
 {
@@ -19,16 +21,23 @@ Actor::Actor(Ogre::SceneNode* node) :
 
 Actor::~Actor()
 {
+    gDeletedKnowledge += getKnowledgePtr();
     if(mNode)
     {
         mNode->setListener(NULL);
         mNode->setUserAny(Ogre::Any());
+        mNode = NULL;
     }
 }
 
 Ogre::SceneNode* Actor::getSceneNode()
 {
     return mNode;
+}
+
+void Actor::emitSignalBeforeRemoval()
+{
+    emit removedFromScene(this);
 }
 
 void Actor::enableAnimation(const QString& name)
@@ -149,8 +158,6 @@ void Actor::update(float deltaTime)
 void Actor::nodeDestroyed(const Ogre::Node* node)
 {
     Q_UNUSED(node);
-    nameWas = QString::fromStdString(node->getName());
-    qWarning() << "Destroyed node " << node->getName().c_str();
     mNode = NULL;
 }
 

@@ -341,6 +341,9 @@ QScriptValue RangeQueryResult_prototype_actors(QScriptContext *context, QScriptE
             qWarning("RangeQueryResult.prototype.actors: Encountered NULL Actor. Skipping.");
             continue;
         }
+
+        assert(!gDeletedActors.contains(actor));
+
         retVal.setProperty(i++, engine->toScriptValue(actor));
     }
     return retVal;
@@ -419,10 +422,8 @@ QScriptValue RaycastResult_prototype_hasHit(QScriptContext *context, QScriptEngi
 
 void Actor_register_prototype(QScriptEngine& engine)
 {
-    const int actorTypeId = qRegisterMetaType<Actor*>("Actor*");
-
-    QScriptValue prototype = engine.newQObject((Actor*)0);
-    engine.setDefaultPrototype(actorTypeId, prototype);
+    Q_UNUSED(engine);
+    qRegisterMetaType<Actor*>("Actor*");
 }
 
 void Vector3_register_prototype(QScriptEngine& engine)

@@ -10,6 +10,8 @@
 #include <OgreQuaternion.h>
 #include <OgreFrameListener.h>
 
+extern QList<void*> gDeletedActors;
+
 class Actor;
 class OgreEngine;
 class DebugDrawer;

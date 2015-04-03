@@ -169,7 +169,8 @@ void ProjectManager::onActorRemoved(const QString& actorName)
     if(mSelectedActor && mSelectedActor->getName() == actorName)
     {
         Scene* current = mScenarioManager.getCurrentScene();
-        emit inspectorSelectionChanged(current->getName(), current);
+        emit inspectorResetModel(current);
+        emit inspectorSelectionChanged(current->getName(), current->getKnowledge());
         mSelectedActor = NULL;
     }
 }
@@ -236,7 +237,8 @@ void ProjectManager::onActorChangeSelected(const QString& actorName,
     if(newSelected == mSelectedActor && !selected)
     {
         emit actorChangedSelected(mSelectedActor->getName(), false);
-        emit inspectorSelectionChanged(current->getName(), current);
+        emit inspectorResetModel(current);
+        emit inspectorSelectionChanged(current->getName(), current->getKnowledge());
         mSelectedActor = NULL;
     }
     else if(selected)
@@ -249,8 +251,9 @@ void ProjectManager::onActorChangeSelected(const QString& actorName,
 
         mSelectedActor = newSelected;
         emit actorChangedSelected(mSelectedActor->getName(), true);
+        emit inspectorResetModel(mSelectedActor);
         emit inspectorSelectionChanged(mSelectedActor->getName(),
-                                       mSelectedActor);
+                                       mSelectedActor->getKnowledge());
     }
 }
 

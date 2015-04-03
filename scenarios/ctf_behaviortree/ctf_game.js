@@ -1,7 +1,13 @@
 require("global.js")
 
-var defaultHealth = 2;
-function spawnFighter(teamColor, name) {
+function setInitialState(actor) 
+{  
+    var defaultHealth = 2;
+    actor.setKnowledge("health", defaultHealth)
+}
+
+function spawnFighter(teamColor, name) 
+{
     var startPos = Scene.getKnowledge("goal_" + teamColor)
     var actor = Scene.instantiate(name,
                                   "Soldier2" + teamColor,
@@ -10,12 +16,13 @@ function spawnFighter(teamColor, name) {
     var lookAtPos = Scene.getKnowledge("goal_" + otherColor(teamColor))
     actor.lookAt(lookAtPos)
     actor.setScale(0.2)
+    setInitialState(actor)
     actor.setKnowledge("team_color", teamColor)
-    actor.setKnowledge("health", defaultHealth)
     actor.setKnowledge("movement_speed", 1)   // in meters per second.
     actor.setKnowledge("rotation_speed", 140) // in degrees per second.
 
     var root = constructBehaviorTreeForActor(actor)
+
     Scheduler.enqueue(root)
     actor.removedFromScene.connect(function() {
         Scheduler.dequeue(root)
@@ -29,10 +36,15 @@ function spawnFighter(teamColor, name) {
     })
 }
 
-var respawnTime = 5 // in seconds
+var respawnTime = 7 // in seconds
 var bulletCount = 0
+var i = 0;
 function shoot(actor, target)
 {
+    if(actor.position.distanceTo(target.position) > 7) {
+        return;
+    }
+
     var health    = target.getKnowledge("health")
     var newHealth = health - 1
 
@@ -55,10 +67,13 @@ function shoot(actor, target)
     if(newHealth <= 0) {
         var color = target.getKnowledge("team_color")
         var name = target.name
-        //setTimeout(respawnTime * 1000,
-        //           function() { print("respawning " + name); spawnFighter(color, name); })
-        //Scene.destroyLater(target)
-        target.position = new Vector3(100,100,100)
+        /*setTimeout(respawnTime * 1000,
+                   function() { target.position = Scene.getKnowledge("goal_" + color); })
+        target.position = new Vector3(500,500,500)*/
+
+        setTimeout(respawnTime * 1000,
+                   function() { spawnFighter(color, "test_" + i++) })
+        Scene.destroy(target)
     } else {
         target.setKnowledge("health", newHealth)
     }

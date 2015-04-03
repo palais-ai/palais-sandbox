@@ -175,9 +175,9 @@ function MonitorTask(actor)
 			return actor.position.distanceTo(flagPos) < 0.1;
 		};
 
-		var ownFlagPos = getOwnFlagPos(actor.getKnowledge("team_color"));
-		var opponentFlagPos = getOpponentFlagPos(actor.getKnowledge("team_color"));
-		var flagPos = actor.getKnowledge("has_flag") == true ? ownFlagPos : opponentFlagPos;
+		var ownFlagPos = getOwnFlagPos(actor.getKnowledge("team_color"))
+		var opponentFlagPos = getOpponentFlagPos(actor.getKnowledge("team_color"))
+		var flagPos = actor.getKnowledge("has_flag") == true ? ownFlagPos : opponentFlagPos
 		if(checkDistance(actor, flagPos)) {
 			if(flagPos.equals(opponentFlagPos)) {
 				capture(actor)
@@ -188,7 +188,8 @@ function MonitorTask(actor)
 	})
 
 	this.rangeHandle = setInterval(1000, function() {
-		var result = Scene.rangeQuery(actor.position, 3).actors
+		var query = Scene.rangeQuery(actor.position, 3)
+		var result = query.actors
 		for(var i = 0; i < result.length; ++i) {
 			var other = result[i]
 			if(other.hasKnowledge("team_color") &&

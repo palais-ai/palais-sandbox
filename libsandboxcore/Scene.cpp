@@ -17,6 +17,8 @@
 #include <OgreSceneQuery.h>
 #include <OgreStringConverter.h>
 
+QList<void*> gDeletedActors;
+
 #define VERBOSE_LOGGING false
 #define IF_VERBOSE(x__) do \
 {\
@@ -316,7 +318,8 @@ void Scene::toggleHighlight(const QString& name, bool highlighted)
     }
     else
     {
-        qWarning("Tried to access actor index beyond bounds idx = [ %d ].", index);
+        qWarning() << "Scene.toggleHighlight: Tried to access actor that doesn't exist [ "
+                   << name << " ].";
     }
 }
 
@@ -386,9 +389,9 @@ void Scene::destroy(Actor* actor)
 
     emit actorRemoved(actor->getName());
     emit actorRemovedObject(actor);
-    emit actor->removedFromScene(actor);
+    actor->emitSignalBeforeRemoval();
 
-    int numRemoved = mActors.remove(actor->getName());
+    const int numRemoved = mActors.remove(actor->getName());
     IF_VERBOSE(qDebug() << "[" << actor->getName() << "] : Num. Removed: " << numRemoved);
     assert(numRemoved == 1);
 
@@ -399,6 +402,7 @@ void Scene::destroy(Actor* actor)
     actor->getSceneNode()->getCreator()->destroySceneNode(actor->getSceneNode());
 
     delete actor;
+    gDeletedActors += actor;
 }
 
 void Scene::destroyLater(Actor* actor)

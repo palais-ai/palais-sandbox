@@ -6,6 +6,8 @@
 #include <OgreQuaternion.h>
 #include <OgreNode.h>
 
+extern QList<void*> gDeletedKnowledge;
+
 namespace Ogre
 {
 class SceneNode;
@@ -51,12 +53,13 @@ public:
 
     QString getName() const;
     Ogre::SceneNode* getSceneNode();
+
+    void emitSignalBeforeRemoval();
 signals:
     void visibilityChanged(Actor* self, bool visible);
     void removedFromScene(Actor* self);
 private:
     Ogre::SceneNode* mNode;
-    QString nameWas;
 };
 
 #endif // ACTOR_H

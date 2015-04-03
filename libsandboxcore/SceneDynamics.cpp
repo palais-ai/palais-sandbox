@@ -54,7 +54,18 @@ public:
 
     virtual void getWorldTransform(btTransform &worldTrans) const
     {
-        worldTrans = transformFromNode();
+        if(!mSceneNode)
+        {
+            qWarning() << "OgreMotionState.getWorldTransform: "
+                       << "Tried to get transform before node was set.";
+            btTransform trans;
+            trans.setIdentity();
+            worldTrans = trans;
+        }
+        else
+        {
+            worldTrans = transformFromNode();
+        }
     }
 
     virtual void setWorldTransform(const btTransform &worldTrans)
@@ -86,11 +97,12 @@ public:
     BulletDebugDrawer(DebugDrawer* drawer) :
         mDrawer(drawer)
     {
-
+        assert(mDrawer);
     }
 
     virtual void drawLine(const btVector3& from,const btVector3& to,const btVector3& color)
     {
+        assert(mDrawer);
         mDrawer->drawLine(Ogre::Vector3(from.getX(), from.getY(), from.getZ()),
                           Ogre::Vector3(to.getX(), to.getY(), to.getZ()),
                           Ogre::ColourValue(color.getX(), color.getY(), color.getZ()));
@@ -348,5 +360,5 @@ void SceneDynamics::update(float deltaTime)
     mWorld->updateAabbs();
     mWorld->computeOverlappingPairs();
     //mWorld->stepSimulation(deltaTime);
-    mWorld->debugDrawWorld();
+    //mWorld->debugDrawWorld();
 }
