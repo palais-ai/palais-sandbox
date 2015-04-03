@@ -72,7 +72,7 @@ function shoot(actor, target)
         target.position = new Vector3(500,500,500)*/
 
         setTimeout(respawnTime * 1000,
-                   function() { spawnFighter(color, "test_" + i++) })
+                   function() { spawnFighter(color, name) })
         Scene.destroy(target)
     } else {
         target.setKnowledge("health", newHealth)

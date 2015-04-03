@@ -47,9 +47,10 @@ public slots:
     void onActorChangedVisiblity(const QString& actorName, bool visible);
     void onActorChangedSelection(const QString& actorName, bool selected);
 private:
-    int indexForActorName(const QString& actorName) const;
+    ActorModel actorForIndex(int index) const;
+    int indexForName(const QString& name) const;
 
-    QVector<ActorModel> mActors;
+    QMap<QString, ActorModel> mActors;
     QString mName;
     bool mActorSelected;
 };

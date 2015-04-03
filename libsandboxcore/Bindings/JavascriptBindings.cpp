@@ -334,17 +334,16 @@ QScriptValue RangeQueryResult_prototype_actors(QScriptContext *context, QScriptE
 
     QScriptValue retVal = engine->newArray();
     quint32 i = 0;
-    foreach(Actor* actor, res->actors)
+    foreach(QWeakPointer<Actor> actor, res->actors)
     {
-        if(!actor)
+        QSharedPointer<Actor> strong = actor.toStrongRef();
+        if(!strong)
         {
             qWarning("RangeQueryResult.prototype.actors: Encountered NULL Actor. Skipping.");
             continue;
         }
 
-        assert(!gDeletedActors.contains(actor));
-
-        retVal.setProperty(i++, engine->toScriptValue(actor));
+        retVal.setProperty(i++, engine->toScriptValue(strong.data()));
     }
     return retVal;
 }
@@ -395,12 +394,13 @@ QScriptValue RaycastResult_prototype_actor(QScriptContext *context, QScriptEngin
                                     this object is not a RaycastResult");
     }
 
-    if(!res->actor)
+    QSharedPointer<Actor> strong = res->actor.toStrongRef();
+    if(!strong)
     {
         return engine->undefinedValue();
     }
 
-    return engine->toScriptValue(res->actor);
+    return engine->toScriptValue(strong.data());
 }
 
 QScriptValue RaycastResult_prototype_hasHit(QScriptContext *context, QScriptEngine *engine)

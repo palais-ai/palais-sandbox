@@ -180,23 +180,19 @@ bool Scene::frameEnded(const Ogre::FrameEvent& evt)
     return true;
 }
 
-Actor* Scene::getActorForNode(Ogre::SceneNode* node) const
+QWeakPointer<Actor> Scene::getActorForNode(Ogre::SceneNode* node) const
 {
-    Ogre::Any userAny = node->getUserAny();
+    assert(node);
+    QString name = QString::fromStdString(node->getName());
+    QHash<QString, QSharedPointer<Actor> >::const_iterator it = mActors.find(name);
 
-    if(userAny.isEmpty())
+    if(it == mActors.end())
     {
-        return NULL;
-    }
-
-    Actor** val = Ogre::any_cast<Actor*>(&userAny);
-    if(!val)
-    {
-        return NULL;
+        return QWeakPointer<Actor>();
     }
     else
     {
-        return *val;
+        return QWeakPointer<Actor>(it.value());
     }
 }
 
@@ -211,7 +207,6 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin,
     Ogre::RaySceneQueryResult& result = mRayQuery->execute();
 
     RaycastResult retVal;
-    retVal.actor = NULL;
     retVal.distance = 0;
 
     if(!result.empty())
@@ -226,7 +221,7 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin,
             return retVal;
         }
 
-        Actor* actor = getActorForNode(node);
+        QWeakPointer<Actor> actor = getActorForNode(node);
 
         if(!actor)
         {
@@ -263,7 +258,7 @@ RangeQueryResult Scene::rangeQuery(const Ogre::Vector3& origin, float distance)
             return retVal;
         }
 
-        Actor* actor = getActorForNode(node);
+        QWeakPointer<Actor> actor = getActorForNode(node);
 
         if(!actor)
         {
@@ -311,7 +306,7 @@ void Scene::destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
 
 void Scene::toggleHighlight(const QString& name, bool highlighted)
 {
-    QHash<QString, Actor*>::iterator it = mActors.find(name);
+    QHash<QString, QSharedPointer<Actor> >::iterator it = mActors.find(name);
     if(it != mActors.end())
     {
         it.value()->toggleHighlight(highlighted);
@@ -380,29 +375,32 @@ void Scene::destroy(Actor* actor)
         return;
     }
 
-    if(!mActors.contains(actor->getName()))
+    QHash<QString, QSharedPointer<Actor> >::iterator it = mActors.find(actor->getName());
+    if(it == mActors.end())
     {
         qWarning() << "Tried to destroy an actor with name " << actor->getName()
                    << " that didnt exist in the scene. The destruction is not performed.";
         return;
     }
 
-    emit actorRemoved(actor->getName());
-    emit actorRemovedObject(actor);
-    actor->emitSignalBeforeRemoval();
+    // Grab a shared instance so __actor__ doesnt get destroyed before we're done cleaning up.
+    QSharedPointer<Actor> actorRef = it.value();
 
-    const int numRemoved = mActors.remove(actor->getName());
-    IF_VERBOSE(qDebug() << "[" << actor->getName() << "] : Num. Removed: " << numRemoved);
+    emit actorRemoved(actorRef->getName());
+    emit actorRemovedObject(actorRef.data());
+    actorRef->emitSignalBeforeRemoval();
+
+    const int numRemoved = mActors.remove(actorRef->getName());
+    IF_VERBOSE(qDebug() << "[" << actorRef->getName() << "] : Num. Removed: " << numRemoved);
     assert(numRemoved == 1);
 
-    JavaScriptBindings::removeActorBinding(actor, mLogicScript);
+    JavaScriptBindings::removeActorBinding(actorRef.data(), mLogicScript);
 
     // Destroy the actor's scene node last. Since it contains data used by the Actor* instance.
-    destroyAllAttachedMovableObjects(actor->getSceneNode());
-    actor->getSceneNode()->getCreator()->destroySceneNode(actor->getSceneNode());
+    destroyAllAttachedMovableObjects(actorRef->getSceneNode());
+    actorRef->getSceneNode()->getCreator()->destroySceneNode(actorRef->getSceneNode());
 
-    delete actor;
-    gDeletedActors += actor;
+    gDeletedActors += actorRef.data();
 }
 
 void Scene::destroyLater(Actor* actor)
@@ -422,10 +420,10 @@ Actor* Scene::getActorByName(const QString& actorName)
 
 Actor* Scene::getActor(const QString& actorName)
 {
-    QHash<QString, Actor*>::iterator it = mActors.find(actorName);
+    QHash<QString, QSharedPointer<Actor> >::iterator it = mActors.find(actorName);
     if(it != mActors.end())
     {
-        return it.value();
+        return it.value().data();
     }
     else
     {
@@ -460,16 +458,17 @@ void Scene::onDestroyLater(Actor* actor)
 QObjectList Scene::getActorsArray() const
 {
     QObjectList list;
-    for(QHash<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
+    for(QHash<QString, QSharedPointer<Actor> >::const_iterator it = mActors.begin();
+        it != mActors.end(); ++it)
     {
-        list += it.value();
+        list += it.value().data();
     }
     return list;
 }
 
 void Scene::onRequestEmitCurrentActors()
 {
-    foreach(Actor* actor, mActors)
+    foreach(QSharedPointer<Actor> actor, mActors)
     {
         emit actorAdded(actor->getName());
     }
@@ -481,14 +480,14 @@ Actor* Scene::addActor(Ogre::SceneNode* node)
 
     Actor* newActor = new Actor(node);
 
-    mActors[name] = newActor;
+    mActors[name] = QSharedPointer<Actor>(newActor);
     connect(newActor, &Actor::visibilityChanged,
             this, &Scene::onActorVisibilityChanged);
 
     JavaScriptBindings::addActorBinding(newActor, mLogicScript);
 
     emit actorAdded(name);
-    return mActors[name];
+    return mActors[name].data();
 }
 
 void Scene::getActors(Ogre::SceneNode* root)
@@ -570,7 +569,8 @@ void Scene::update(float time)
     JavaScriptBindings::timers_update(deltaTimeInSeconds);
 
     // Update all actors.
-    for(QHash<QString, Actor*>::const_iterator it = mActors.begin(); it != mActors.end(); ++it)
+    for(QHash<QString, QSharedPointer<Actor> >::const_iterator it = mActors.begin();
+        it != mActors.end(); ++it)
     {
         it.value()->update(deltaTimeInSeconds);
     }

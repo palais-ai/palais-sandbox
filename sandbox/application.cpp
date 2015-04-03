@@ -195,12 +195,10 @@ void Application::initializeOgre()
     QObject::connect(mProjectManager, SIGNAL(sceneLoadFailed(QString)),
                      this, SLOT(onSceneLoadFailed(QString)));
 
+    // Must be direct because the KnowledgeModel could be deleted before the signal is received.
+    // The receiver must guarantee thread-safety.
     QObject::connect(mProjectManager, &ProjectManager::inspectorSelectionChanged,
-                     this, &Application::onInspectorSelectionChanged);
-
-    // Must be direct because object could be deleted before the signal reaches the receiver..
-    QObject::connect(mProjectManager, &ProjectManager::inspectorResetModel,
-                     this, &Application::onInspectorResetModel,
+                     this, &Application::onInspectorSelectionChanged,
                      Qt::DirectConnection);
 
     {
@@ -268,7 +266,7 @@ void Application::onSceneLoaded(Scene* scene)
         return;
     }
 
-    mInspectorModel.reset(new InspectorModel(scene->getName(), scene->getKnowledge()));
+    mInspectorModel.reset(new InspectorModel(scene->getName(), scene));
 
     mSceneModel.reset(new SceneModel(scene->getName()));
 
@@ -357,13 +355,7 @@ void Application::onPlayingChanged(bool isPlaying)
 }
 
 void Application::onInspectorSelectionChanged(QString name,
-                                              QVariantMap initial)
+                                              const KnowledgeModel* initial)
 {
     mInspectorModel->setModel(name, initial);
-}
-
-
-void Application::onInspectorResetModel(const KnowledgeModel* model)
-{
-    mInspectorModel->connectTo(model);
 }

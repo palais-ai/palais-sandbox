@@ -169,8 +169,7 @@ void ProjectManager::onActorRemoved(const QString& actorName)
     if(mSelectedActor && mSelectedActor->getName() == actorName)
     {
         Scene* current = mScenarioManager.getCurrentScene();
-        emit inspectorResetModel(current);
-        emit inspectorSelectionChanged(current->getName(), current->getKnowledge());
+        emit inspectorSelectionChanged(current->getName(), current);
         mSelectedActor = NULL;
     }
 }
@@ -208,8 +207,8 @@ void ProjectManager::onSelectActorAtClickpoint(float mouseX,
     Ogre::Ray mouseRay = camera->getCameraToViewportRay(mouseX, mouseY);
 
     Scene* current = mScenarioManager.getCurrentScene();
-    Actor* hitActor = current->raycast(mouseRay.getOrigin(),
-                                       mouseRay.getDirection()).actor;
+    QSharedPointer<Actor> hitActor = current->raycast(mouseRay.getOrigin(),
+                                                      mouseRay.getDirection()).actor.toStrongRef();
 
     if(hitActor)
     {
@@ -237,8 +236,7 @@ void ProjectManager::onActorChangeSelected(const QString& actorName,
     if(newSelected == mSelectedActor && !selected)
     {
         emit actorChangedSelected(mSelectedActor->getName(), false);
-        emit inspectorResetModel(current);
-        emit inspectorSelectionChanged(current->getName(), current->getKnowledge());
+        emit inspectorSelectionChanged(current->getName(), current);
         mSelectedActor = NULL;
     }
     else if(selected)
@@ -251,9 +249,8 @@ void ProjectManager::onActorChangeSelected(const QString& actorName,
 
         mSelectedActor = newSelected;
         emit actorChangedSelected(mSelectedActor->getName(), true);
-        emit inspectorResetModel(mSelectedActor);
         emit inspectorSelectionChanged(mSelectedActor->getName(),
-                                       mSelectedActor->getKnowledge());
+                                       mSelectedActor);
     }
 }
 

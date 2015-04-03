@@ -63,8 +63,7 @@ public slots:
     void onPlayButtonPressed();
     void onPlayingChanged(bool isPlaying);
     void onInspectorSelectionChanged(QString name,
-                                     QVariantMap initial);
-    void onInspectorResetModel(const KnowledgeModel* model);
+                                     const KnowledgeModel* initial);
 private:
     QQmlApplicationEngine* mApplicationEngine;
     OgreEngine* mOgreEngine;

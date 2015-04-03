@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 #include <QVector>
 #include <OgreVector3.h>
+#include <QMutex>
 
 class KnowledgeModel;
 
@@ -67,12 +68,10 @@ public:
     static void declareQML();
 
     InspectorModel(const QString& name,
-                   const QVariantMap& initial);
+                   const KnowledgeModel* knowledge);
 
     void setModel(const QString& name,
-                  const QVariantMap& initial);
-
-    void connectTo(const KnowledgeModel* model);
+                  const KnowledgeModel* knowledge);
 
     const QString& getName() const;
 
@@ -90,8 +89,10 @@ public slots:
     void onKnowledgeRemoved(const QString& key);
     void onCurrentModelDestroyed();
 private:
+    mutable QMutex mLock;
     QString mName;
     QVariantMap mKnowledge;
+    const KnowledgeModel* mCurrentModel;
 };
 
 #endif // INSPECTORMODEL_H

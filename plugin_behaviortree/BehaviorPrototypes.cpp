@@ -6,7 +6,7 @@
 
 using namespace ailib;
 
-Q_DECLARE_METATYPE(QSharedPointer<Behavior>)
+Q_DECLARE_METATYPE(Behavior*)
 Q_DECLARE_METATYPE(Scheduler*)
 Q_DECLARE_METATYPE(QVariantMap*)
 
@@ -59,10 +59,14 @@ static Behavior* extractBehavior(const QScriptValue& value)
         return NULL;
     }
 
-    QSharedPointer<Behavior> ptr =
-                qscriptvalue_cast<QSharedPointer<Behavior> >(prop);
+    Behavior* ptr = qscriptvalue_cast<Behavior*>(prop);
 
-    return ptr.data();
+    if(!ptr)
+    {
+        qWarning("Accessing deleted behavior.");
+    }
+
+    return ptr;
 }
 
 BehaviorPrototype::BehaviorPrototype(QObject* parent) :
@@ -98,7 +102,7 @@ QVariantMap BehaviorPrototype::getUserData() const
     }
     else
     {
-        assert(!gDeletedKnowledge.contains(ptr));
+        //assert(!gDeletedKnowledge.contains(ptr));
         return *ptr;
     }
 }
@@ -195,7 +199,7 @@ void SchedulerPrototype::enqueue(QScriptValue behaviorValue)
     sched->enqueue(behavior);
 }
 
-static void checkTerminatedChildren(QScriptValue behaviorValue)
+static void removeTerminatedRecursive(QScriptValue behaviorValue)
 {
     QScriptValue children = behaviorValue.property("children");
 
@@ -205,13 +209,17 @@ static void checkTerminatedChildren(QScriptValue behaviorValue)
         for(int i = 0; i < len; ++i)
         {
             QScriptValue child = children.property(i);
-            checkTerminatedChildren(child);
+            removeTerminatedRecursive(child);
         }
     }
 
     Behavior* behavior = extractBehavior(behaviorValue);
-    assert(behavior->getStatus() == StatusTerminated ||
-           behavior->getStatus() == StatusDormant);
+    if(behavior)
+    {
+        assert(behavior->getStatus() == StatusTerminated ||
+               behavior->getStatus() == StatusDormant);
+        delete behavior;
+    }
 }
 
 void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
@@ -236,10 +244,10 @@ void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
     // This removes all references from the scheduler.
     behavior->terminate();
 
-    checkTerminatedChildren(behaviorValue);
+    // Destroy this behavior and its children.
+    removeTerminatedRecursive(behaviorValue);
 
     // Remove reference so that the behavior can be garbage collected by the script engine.
     int numRemoved = mActiveBehaviors.remove(behaviorValue.objectId());
     assert(numRemoved == 1);
-    //behaviorValue.engine()->collectGarbage();
 }

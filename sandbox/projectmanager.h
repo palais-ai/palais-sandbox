@@ -51,8 +51,7 @@ signals:
                          const QString& logicFile);
     void playingChanged(bool isPlaying);
     void inspectorSelectionChanged(QString name,
-                                   QVariantMap initial);
-    void inspectorResetModel(const KnowledgeModel* knowledge);
+                                   const KnowledgeModel* knowledge);
     void timePassed(const QTime& time);
     void actorChangedSelected(const QString& actorName,
                               bool selected);

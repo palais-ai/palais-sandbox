@@ -6,8 +6,7 @@
 
 #define PRINT_DEBUG 0
 
-Q_DECLARE_METATYPE(QSharedPointer<Behavior>)
-Q_DECLARE_METATYPE(QSharedPointer<Behavior>*)
+Q_DECLARE_METATYPE(Behavior*)
 Q_DECLARE_METATYPE(Scheduler*)
 
 BlackboardDecorator::BlackboardDecorator(Scheduler& scheduler,
@@ -111,7 +110,6 @@ void Status_register(QScriptEngine& engine)
 void Behavior_register_prototype(QScriptEngine& engine)
 {
     const int typeId = qRegisterMetaType<Behavior*>("Behavior*");
-    qScriptRegisterSequenceMetaType<QVector< QSharedPointer<Behavior> > >(&engine);
 
     static BehaviorPrototype bp;
     QScriptValue prototype = engine.newQObject(&bp);
@@ -146,7 +144,7 @@ QScriptValue construct_shared_behavior(QScriptContext* context,
                                        Behavior* ptr)
 {
     context->thisObject().setProperty("__behavior",
-                                      engine->toScriptValue(QSharedPointer<Behavior>(ptr)),
+                                      engine->toScriptValue(ptr),
                                       QScriptValue::Undeletable | QScriptValue::ReadOnly);
 
     return engine->undefinedValue();
@@ -155,24 +153,23 @@ QScriptValue construct_shared_behavior(QScriptContext* context,
 QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScriptEngine *engine)
 {
     static const int numArgsExpected = 3;
-    QSharedPointer<Behavior> behaviorPtr;
+
     Behavior* child = NULL;
-    Actor*    actor = NULL;
+    Actor* actor = NULL;
     QString observedName;
     if(context->argumentCount() >= numArgsExpected)
     {
         {
             QScriptValue originalArg = context->argument(0);
             QScriptValue arg = originalArg.property("__behavior");
-            QSharedPointer<Behavior>* ptr = qscriptvalue_cast<QSharedPointer<Behavior>* >(arg);
+            Behavior* ptr = qscriptvalue_cast<Behavior*>(arg);
 
             if(!ptr)
             {
                 QString msg("BlackboardDecorator.prototype.ctor: Argument 1 must be a behavior.");
                 return context->throwError(QScriptContext::TypeError, msg);
             }
-            behaviorPtr = *ptr;
-            child = ptr->data();
+            child = ptr;
         }
 
         {

@@ -4,6 +4,7 @@
 #include <QtQml>
 #include <QSharedPointer>
 #include <QDebug>
+#include <QMutexLocker>
 #include "OgreStringConverter.h"
 
 void OgreVector3Model::declareQML()
@@ -58,12 +59,10 @@ OgreVector3ArrayModel::OgreVector3ArrayModel(const QVector<Ogre::Vector3>& vecto
 QVariantList OgreVector3ArrayModel::getTextualRepresentation() const
 {
     QVariantList list;
-
     foreach(Ogre::Vector3 vec, mVectors)
     {
         list += QString("%1, %2, %3").arg(vec.x).arg(vec.y).arg(vec.z);
     }
-
     return list;
 }
 
@@ -84,9 +83,10 @@ void InspectorModel::declareQML()
 }
 
 InspectorModel::InspectorModel(const QString& name,
-                               const QVariantMap& initial)
+                               const KnowledgeModel* knowledge) :
+    mCurrentModel(NULL)
 {
-    setModel(name, initial);
+    setModel(name, knowledge);
 }
 
 const QString& InspectorModel::getName() const
@@ -95,28 +95,44 @@ const QString& InspectorModel::getName() const
 }
 
 void InspectorModel::setModel(const QString& name,
-                              const QVariantMap& initial)
+                              const KnowledgeModel* knowledge)
 {
     beginResetModel();
-    mName = name;
-    mKnowledge = initial;
-    endResetModel();
-    emit nameChanged(name);
-}
 
-void InspectorModel::connectTo(const KnowledgeModel* model)
-{
-    connect(model, &KnowledgeModel::knowledgeAdded,
+    if(mCurrentModel)
+    {
+        disconnect(mCurrentModel, &KnowledgeModel::knowledgeAdded,
+                   this, &InspectorModel::onKnowledgeAdded);
+
+        disconnect(mCurrentModel, &KnowledgeModel::knowledgeChanged,
+                   this, &InspectorModel::onKnowledgeChanged);
+
+        disconnect(mCurrentModel, &KnowledgeModel::knowledgeRemoved,
+                   this, &InspectorModel::onKnowledgeRemoved);
+
+        disconnect(mCurrentModel, &QObject::destroyed,
+                   this, &InspectorModel::onCurrentModelDestroyed);
+    }
+
+    mName = name;
+    mCurrentModel = knowledge;
+    mKnowledge = knowledge->getKnowledge();
+
+    connect(knowledge, &KnowledgeModel::knowledgeAdded,
             this, &InspectorModel::onKnowledgeAdded);
 
-    connect(model, &KnowledgeModel::knowledgeChanged,
+    connect(knowledge, &KnowledgeModel::knowledgeChanged,
             this, &InspectorModel::onKnowledgeChanged);
 
-    connect(model, &KnowledgeModel::knowledgeRemoved,
+    connect(knowledge, &KnowledgeModel::knowledgeRemoved,
             this, &InspectorModel::onKnowledgeRemoved);
 
-    connect(model, &QObject::destroyed,
+    connect(knowledge, &QObject::destroyed,
             this, &InspectorModel::onCurrentModelDestroyed);
+
+    endResetModel();
+
+    emit(nameChanged(name));
 }
 
 void InspectorModel::onKnowledgeAdded(const QString& key, const QVariant& value)
@@ -153,7 +169,7 @@ void InspectorModel::onKnowledgeRemoved(const QString& key)
 
 void InspectorModel::onCurrentModelDestroyed()
 {
-    ;
+    mCurrentModel = NULL;
 }
 
 QHash<int, QByteArray> InspectorModel::roleNames() const
@@ -174,7 +190,6 @@ Qt::ItemFlags InspectorModel::flags(const QModelIndex &index) const
 QVariant InspectorModel::data(const QModelIndex &index, int role) const
 {
     QList<QString> keys = mKnowledge.keys();
-
     switch(role)
     {
     case ModelRoleIndex:

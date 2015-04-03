@@ -5,7 +5,6 @@
 #include <QScriptValue>
 #include <QVector>
 #include <QScriptEngine>
-#include <QSharedPointer>
 #include <QDebug>
 #include "BehaviorTree.h"
 #include "Blackboard.h"
@@ -49,8 +48,8 @@ QScriptValue composite_prototype_ctor(QScriptContext *context, QScriptEngine *en
     for(int i = 0; i < context->argumentCount(); ++i)
     {
         QScriptValue arg = context->argument(i);
-        QSharedPointer<Behavior>* behavior =
-                qscriptvalue_cast<QSharedPointer<Behavior>* >(arg.property("__behavior"));
+        Behavior* behavior =
+                qscriptvalue_cast<Behavior* >(arg.property("__behavior"));
 
         if(!behavior)
         {
@@ -58,7 +57,7 @@ QScriptValue composite_prototype_ctor(QScriptContext *context, QScriptEngine *en
                                        "Composite.prototype.ctor: Arguments must be behaviors. Did you forget to call the Behaviors constructor for one of your user-defined behaviors?");
         }
         sharedBehaviors.append(arg);
-        children.push_back(behavior->data());
+        children.push_back(behavior);
     }
     Scheduler* scheduler = qscriptvalue_cast<Scheduler*>(engine->globalObject()
                                                                .property("Scheduler"));

@@ -1,6 +1,7 @@
 #include "scenemodel.h"
 #include <QtQml>
 #include <stdint.h>
+#include <QDebug>
 
 void SceneModel::declareQML()
 {
@@ -53,11 +54,11 @@ QVariant SceneModel::data(const QModelIndex &index, int role) const
     case ModelRoleIndex:
         return idx;
     case ModelRoleName:
-        return mActors[idx].getName();
+        return actorForIndex(idx).getName();
     case ModelRoleIsVisible:
-        return mActors[idx].isVisible();
+        return actorForIndex(idx).isVisible();
     case ModelRoleIsSelected:
-        return mActors[idx].isSelected();
+        return actorForIndex(idx).isSelected();
     default:
         return QVariant(QVariant::Invalid);
     }
@@ -81,19 +82,30 @@ int SceneModel::rowCount(const QModelIndex& parent) const
 
 void SceneModel::onActorAdded(const QString& actorName)
 {
-    int index = mActors.size();
+    if(mActors.contains(actorName))
+    {
+        qWarning() << "SceneModel.onActorAdded: Tried to add actor with name [ "
+                   << actorName << " ] that already existed.";
+        return;
+    }
+
+    QMap<QString, ActorModel> copy = mActors;
+    copy[actorName] = ActorModel(actorName, true);
+    const int index = copy.keys().indexOf(actorName);
+
     beginInsertRows(QModelIndex(), index, index);
-    mActors += ActorModel(actorName, true);
+    mActors[actorName] = ActorModel(actorName, true);
     endInsertRows();
 }
 
 void SceneModel::onActorRemoved(const QString& actorName)
 {
-    int i = indexForActorName(actorName);
-    if(i != -1)
+    QMap<QString, ActorModel>::const_iterator it = mActors.find(actorName);
+    if(it != mActors.end())
     {
+        const int i = indexForName(actorName);
         beginRemoveRows(QModelIndex(), i, i);
-        mActors.remove(i);
+        mActors.remove(actorName);
         endRemoveRows();
     }
     else
@@ -105,10 +117,12 @@ void SceneModel::onActorRemoved(const QString& actorName)
 
 void SceneModel::onActorChangedVisiblity(const QString& actorName, bool visible)
 {
-    int i = indexForActorName(actorName);
-    if(i != -1)
+    QMap<QString, ActorModel>::iterator it = mActors.find(actorName);
+    if(it != mActors.end())
     {
-        mActors[i].setVisible(visible);
+        it->setVisible(visible);
+
+        const int i = indexForName(actorName);
         QVector<int> roles;
         roles += ModelRoleIsVisible;
         emit dataChanged(createIndex(i,i), createIndex(i,i), roles);
@@ -122,11 +136,13 @@ void SceneModel::onActorChangedVisiblity(const QString& actorName, bool visible)
 
 void SceneModel::onActorChangedSelection(const QString& actorName, bool selected)
 {
-    int i = indexForActorName(actorName);
-    if(i != -1)
+    QMap<QString, ActorModel>::iterator it = mActors.find(actorName);
+    if(it != mActors.end())
     {
         mActorSelected = selected;
-        mActors[i].setSelected(selected);
+        it->setSelected(selected);
+
+        const int i = indexForName(actorName);
         QVector<int> roles;
         roles += ModelRoleIsSelected;
         emit dataChanged(createIndex(i,i), createIndex(i,i), roles);
@@ -143,7 +159,7 @@ void SceneModel::setVisibleRequested(int index, bool visible)
 {
     if(index >= 0 && index < mActors.size())
     {
-        emit requestVisiblitiyChange(mActors[index].getName(), visible);
+        emit requestVisiblitiyChange(actorForIndex(index).getName(), visible);
     }
     else
     {
@@ -155,7 +171,7 @@ void SceneModel::setSelectedRequested(int index, bool selected)
 {
     if(index >= 0 && index < mActors.size())
     {
-        emit requestSelectionChange(mActors[index].getName(), selected);
+        emit requestSelectionChange(actorForIndex(index).getName(), selected);
     }
     else
     {
@@ -163,14 +179,19 @@ void SceneModel::setSelectedRequested(int index, bool selected)
     }
 }
 
-int SceneModel::indexForActorName(const QString& actorName) const
+ActorModel SceneModel::actorForIndex(int index) const
 {
-    for(int32_t i = 0; i < mActors.size(); ++i)
+    if(index >= mActors.size())
     {
-        if(mActors[i].getName() == actorName)
-        {
-            return i;
-        }
+        qWarning() << "Requested actor at index [ " << index
+                   << " ] that is out of bounds [ size=" << mActors.size()
+                   << " ].";
+        return ActorModel();
     }
-    return -1;
+    return mActors[mActors.keys().at(index)];
+}
+
+int SceneModel::indexForName(const QString& name) const
+{
+    return mActors.keys().indexOf(name);
 }

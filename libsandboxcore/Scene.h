@@ -5,6 +5,7 @@
 #include "KnowledgeModel.h"
 #include <QVector>
 #include <QScriptEngine>
+#include <QSharedPointer>
 #include <QMap>
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
@@ -25,14 +26,14 @@ class SceneManager;
 class DLL_EXPORT RaycastResult
 {
 public:
-    Actor* actor;
+    QWeakPointer<Actor> actor;
     float distance;
 };
 
 class DLL_EXPORT RangeQueryResult
 {
 public:
-    QList<Actor*> actors;
+    QList<QWeakPointer<Actor> > actors;
 };
 
 class DLL_EXPORT Scene : public KnowledgeModel,
@@ -110,7 +111,7 @@ private slots:
     void onDestroyLater(Actor* actor);
 private:
     void getActors(Ogre::SceneNode* root);
-    Actor* getActorForNode(Ogre::SceneNode* node) const;
+    QWeakPointer<Actor> getActorForNode(Ogre::SceneNode* node) const;
     void parseNavMesh(Actor* navmesh);
     void destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode);
 
@@ -121,7 +122,7 @@ private:
     Ogre::RaySceneQuery* mRayQuery;
     Ogre::SphereSceneQuery* mSphereQuery;
     QScriptEngine mLogicScript;
-    QHash<QString, Actor*> mActors;
+    QHash<QString, QSharedPointer<Actor> > mActors;
     QHash<QString, DebugDrawer*> mDrawers;
     bool mIsSetup;
 };
