@@ -195,32 +195,38 @@ Ogre::Vector3 Triangle::fromBarycentric(float x, float y, float z) const
     return (x / div) * a + (y / div) * b + (z / div) * c;
 }
 
+// CREDITS: http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+// Compute barycentric coordinates (u, v, w) for
+// point p with respect to triangle (a, b, c)
+static void barycentric(Ogre::Vector3 p, Ogre::Vector3 a, Ogre::Vector3 b, Ogre::Vector3 c,
+                        float &u, float &v, float &w)
+{
+    Ogre::Vector3 v0 = b - a, v1 = c - a, v2 = p - a;
+    float d00 = v0.dotProduct(v0);
+    float d01 = v0.dotProduct(v1);
+    float d11 = v1.dotProduct(v1);
+    float d20 = v2.dotProduct(v0);
+    float d21 = v2.dotProduct(v1);
+    float denom = d00 * d11 - d01 * d01;
+    v = (d11 * d20 - d01 * d21) / denom;
+    w = (d00 * d21 - d01 * d20) / denom;
+    u = 1.0f - v - w;
+}
+
+static inline float withinLimits(float f, float l, float u)
+{
+    return (f > l || fabs(f - l) < 0.0001) &&
+           (f < u || fabs(f - u) < 0.0001);
+}
+
 bool Triangle::isProjectionInside(const Ogre::Vector3& point) const
 {
     Ogre::Plane triPlane(a, b, c);
-    triPlane.normalise();
-
     Ogre::Vector3 pProjected = point - triPlane.getDistance(point)*triPlane.normal;
 
-    const float sign = sinf((b-a).angleBetween(c-a).valueRadians());
-
-    Ogre::Polygon poly;
-    // Counterclockwise
-    if(sign > 0.f)
-    {
-        poly.insertVertex(a);
-        poly.insertVertex(b);
-        poly.insertVertex(c);
-    }
-    // Clockwise
-    else
-    {
-        poly.insertVertex(c);
-        poly.insertVertex(b);
-        poly.insertVertex(a);
-    }
-
-    return poly.isPointInside(pProjected);
+    float u, v , w;
+    barycentric(pProjected, a, b, c, u, v, w);
+    return withinLimits(v, 0, 1) && withinLimits(w, 0, 1) && (u > 0 || fabs(u) < 0.0001);
 }
 
 const Pathfinding::NavigationGraph::node_type*
