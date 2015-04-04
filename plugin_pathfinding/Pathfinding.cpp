@@ -200,7 +200,7 @@ bool Triangle::isProjectionInside(const Ogre::Vector3& point) const
     Ogre::Plane triPlane(a, b, c);
     triPlane.normalise();
 
-    Ogre::Vector3 pt = triPlane.projectVector(point);
+    Ogre::Vector3 pProjected = point - triPlane.getDistance(point)*triPlane.normal;
 
     const float sign = sinf((b-a).angleBetween(c-a).valueRadians());
 
@@ -220,10 +220,7 @@ bool Triangle::isProjectionInside(const Ogre::Vector3& point) const
         poly.insertVertex(a);
     }
 
-    // TODO: Improve projection so this hack isnt necessary.
-    pt.y = a.y;
-
-    return poly.isPointInside(pt);
+    return poly.isPointInside(pProjected);
 }
 
 const Pathfinding::NavigationGraph::node_type*

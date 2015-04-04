@@ -67,12 +67,11 @@ function shoot(actor, target)
     if(newHealth <= 0) {
         var color = target.getKnowledge("team_color")
         var name = target.name
-        /*setTimeout(respawnTime * 1000,
-                   function() { target.position = Scene.getKnowledge("goal_" + color); })
-        target.position = new Vector3(500,500,500)*/
 
         setTimeout(respawnTime * 1000,
-                   function() { spawnFighter(color, name) })
+                   function() { 
+                        spawnFighter(color, name) 
+                   })
         Scene.destroy(target)
     } else {
         target.setKnowledge("health", newHealth)

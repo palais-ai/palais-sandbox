@@ -28,18 +28,3 @@ function extend(base, sub) {
     value: sub 
   });
 }
-
-if (typeof String.prototype.startsWith != 'function') {
-  // see below for better implementation!
-  String.prototype.startsWith = function (str){
-    return this.indexOf(str) === 0;
-  };
-}
-
-function construct(constructor, args) {
-    function F() {
-        return constructor.apply(this, args);
-    }
-    F.prototype = constructor.prototype;
-    return new F();
-}

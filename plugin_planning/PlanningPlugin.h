@@ -1,5 +1,5 @@
-#ifndef AILIBPLUGIN_H
-#define AILIBPLUGIN_H
+#ifndef PLANNINGPLUGIN_H
+#define PLANNINGPLUGIN_H
 
 #include <QObject>
 #include "PluginInterface.h"
@@ -21,4 +21,4 @@ public:
 private:
 };
 
-#endif // AILIBPLUGIN_H
+#endif // PLANNINGPLUGIN_H

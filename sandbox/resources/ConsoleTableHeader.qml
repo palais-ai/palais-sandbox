@@ -52,7 +52,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.topMargin: 4
         anchors.right: timeText.left
-        anchors.leftMargin: 8
+        anchors.rightMargin: 4
         text: ConsoleModel.fpsString + " |"
         font.family: openSans.name
         font.pointSize: 12

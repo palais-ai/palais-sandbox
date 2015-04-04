@@ -1,5 +1,5 @@
-#ifndef AILIBPLUGIN_H
-#define AILIBPLUGIN_H
+#ifndef PATHFINDINGPLUGIN_H
+#define PATHFINDINGPLUGIN_H
 
 #include <QObject>
 #include "PluginInterface.h"
@@ -24,4 +24,4 @@ private:
     DebugDrawer* mPathfindingDrawer;
 };
 
-#endif // AILIBPLUGIN_H
+#endif // PATHFINDINGPLUGIN_H

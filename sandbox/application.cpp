@@ -171,35 +171,32 @@ void Application::initializeOgre()
 
     mApplicationEngine->rootContext()->setContextProperty("ProjectManager", mProjectManager);
 
-    QObject::connect(mProjectManager, &ProjectManager::timePassed,
-                     mConsoleModel.data(), &ConsoleModel::onTimePassed);
+    connect(mProjectManager, &ProjectManager::timePassed,
+            mConsoleModel.data(), &ConsoleModel::onTimePassed);
 
-    QObject::connect(mProjectManager, &ProjectManager::oneSecondTimeout,
-                     mConsoleModel.data(), &ConsoleModel::onFPSTimeout);
+    connect(mProjectManager, &ProjectManager::oneSecondTimeout,
+            mConsoleModel.data(), &ConsoleModel::onFPSTimeout);
 
-    QObject::connect(this, &Application::sceneSetupFinished,
-                     mProjectManager, &ProjectManager::onSceneSetupFinished);
+    connect(this, &Application::sceneSetupFinished,
+            mProjectManager, &ProjectManager::onSceneSetupFinished);
 
-    QObject::connect(mProjectManager, &ProjectManager::playingChanged,
-                     this, &Application::onPlayingChanged);
+    connect(mProjectManager, &ProjectManager::playingChanged,
+            this, &Application::onPlayingChanged);
 
-    QObject::connect(this, &Application::selectActorAtClickpoint,
-                     mProjectManager, &ProjectManager::onSelectActorAtClickpoint);
+    connect(this, &Application::selectActorAtClickpoint,
+            mProjectManager, &ProjectManager::onSelectActorAtClickpoint);
 
-    QObject::connect(this, &Application::focusOnSelectedActor,
-                     mProjectManager, &ProjectManager::onFocusSelectedActor);
+    connect(this, &Application::focusOnSelectedActor,
+            mProjectManager, &ProjectManager::onFocusSelectedActor);
 
-    QObject::connect(mProjectManager, SIGNAL(sceneLoaded(Scene*)),
-                     this, SLOT(onSceneLoaded(Scene*)));
+    connect(mProjectManager, SIGNAL(sceneLoaded(Scene*)),
+            this, SLOT(onSceneLoaded(Scene*)));
 
-    QObject::connect(mProjectManager, SIGNAL(sceneLoadFailed(QString)),
-                     this, SLOT(onSceneLoadFailed(QString)));
+    connect(mProjectManager, SIGNAL(sceneLoadFailed(QString)),
+            this, SLOT(onSceneLoadFailed(QString)));
 
-    // Must be direct because the KnowledgeModel could be deleted before the signal is received.
-    // The receiver must guarantee thread-safety.
-    QObject::connect(mProjectManager, &ProjectManager::inspectorSelectionChanged,
-                     this, &Application::onInspectorSelectionChanged,
-                     Qt::DirectConnection);
+    connect(mProjectManager, &ProjectManager::inspectorSelectionChanged,
+            this, &Application::onInspectorSelectionChanged);
 
     {
         QString dialogName("openProjectDialog");

@@ -24,7 +24,7 @@ ConsoleModel::ConsoleModel() :
 
 void ConsoleModel::onMessageReceived(LogLevel level, const QString& msg)
 {
-    // Guard from endless chains of logs when a log triggers another log.
+    // Prevent endless chains of logs when a log event triggers another log event.
     if(!mIsLogging)
     {
         mIsLogging = true;

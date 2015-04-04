@@ -343,7 +343,9 @@ QScriptValue RangeQueryResult_prototype_actors(QScriptContext *context, QScriptE
             continue;
         }
 
-        retVal.setProperty(i++, engine->toScriptValue(strong.data()));
+        retVal.setProperty(i++, engine->newQObject(strong.data(),
+                                                   QScriptEngine::QtOwnership,
+                                                   QScriptEngine::PreferExistingWrapperObject));
     }
     return retVal;
 }
@@ -400,7 +402,9 @@ QScriptValue RaycastResult_prototype_actor(QScriptContext *context, QScriptEngin
         return engine->undefinedValue();
     }
 
-    return engine->toScriptValue(strong.data());
+    return engine->newQObject(strong.data(),
+                              QScriptEngine::QtOwnership,
+                              QScriptEngine::PreferExistingWrapperObject);
 }
 
 QScriptValue RaycastResult_prototype_hasHit(QScriptContext *context, QScriptEngine *engine)
