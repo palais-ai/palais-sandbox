@@ -16,8 +16,7 @@
 #include <OgreAnimationState.h>
 #include <OgreSceneQuery.h>
 #include <OgreStringConverter.h>
-
-QList<void*> gDeletedActors;
+#include <algorithm>
 
 #define VERBOSE_LOGGING false
 #define IF_VERBOSE(x__) do \
@@ -98,7 +97,7 @@ DebugDrawer* Scene::createDebugDrawer(const QString& name, float opacity)
     }
     DebugDrawer* newDrawer = new DebugDrawer(name.toStdString(),
                                              getOgreSceneManager(),
-                                             MIN(MAX(opacity, 0), 1));
+                                             std::min(std::max(opacity, 0.f), 1.f));
     mDrawers[name] = newDrawer;
 
     // Add the DebugDrawer's scene node to the actor list.
@@ -399,8 +398,6 @@ void Scene::destroy(Actor* actor)
     // Destroy the actor's scene node last. Since it contains data used by the Actor* instance.
     destroyAllAttachedMovableObjects(actorRef->getSceneNode());
     actorRef->getSceneNode()->getCreator()->destroySceneNode(actorRef->getSceneNode());
-
-    gDeletedActors += actorRef.data();
 }
 
 void Scene::destroyLater(Actor* actor)

@@ -134,35 +134,6 @@ Shoot.prototype =
 }
 extend(Behavior, Shoot);
 
-// FIXME: Replace this behavior with a decorator(isCloseToCarrier) + moveTo(carrier)
-function GuardCarrier()
-{
-	Behavior.call(this);
-}
-
-GuardCarrier.prototype =
-{
-	run: function()
-	{
-		var carrier = getFlagOwner(this.userData["team_color"]);
-		var self    = userData["self"];
-
-		if(self.position.distanceTo(carrier.position) > 0.1) {
-			var context = this;
-			pathfinding.moveActor(this.userData["self"], 
-								  this.goal, 
-								  function() {
-									  context.setStatus(Status.Running);
-								  });
-		} else {
-			setTimeout(500, this.runAgain);
-		}
-		setStatus(Status.Waiting);
-		// As was the case above, the decorator will cancel this behavior once it is no longer feasible.
-	}
-}
-extend(Behavior, GuardCarrier);
-
 function MonitorTask(actor)
 {
 	this.actor = actor;
@@ -203,12 +174,56 @@ function MonitorTask(actor)
 	})
 }
 
+var scenics = {
+	d1: [-2.559, 5.971],
+	d2: [-6.277, 4.558],
+	r1: [-5.868, 0.099],
+	r2: [-7.483, -2.438],
+	r3: [-4.344, -2.243],
+	m1: [0.784, 3.035],
+	m2: [-1.259, 2.440],
+	m3: [-3.415, 0.693],
+	l1: [1.082, 7,197],
+	l2: [3.518, 4.772],
+	l3: [5.133, 7.198],
+	c0: [0, 0],
+	f:  [flag_green.position.x, flag_green.position.z]
+}
+
+function inv(point)
+{
+	return [-1*point[0], -1*point[1]];
+}
+
+function own(color, point)
+{
+	var sign = color == "green" ? 1 : -1;
+	return [sign*point[0], sign*point[1]];
+}
+
+var atkRoute1 = [inv(scenics.f)]
+var atkRoute2 = [scenics.r2, inv(scenics.f)]
+var atkRoute3 = [inv(scenics.l3), inv(scenics.f)]
+
+function constructRoute(actor, route)
+{
+	var color = actor.getKnowledge("team_color");
+	var moves = [];
+	for(var i = 0; i < route.length; ++i) {
+		var p = own(color, route[i])
+		moves.push(new WalkTo(new Vector3(p[0], 0, p[1])))
+	}
+	return construct(Sequence, moves);
+}
+
 function constructAttackerBehaviorTree(actor)
 {
 	var color = actor.getKnowledge("team_color");
 	var root = new Selector(new HasFlag(new WalkTo(getOwnFlagPos(color)), actor), 
 					        new EnemyInRange(new Shoot(), actor),
-					       	new WalkTo(getOpponentFlagPos(color)))
+					       	new RandomSelector(constructRoute(actor, atkRoute1),
+					       					   constructRoute(actor, atkRoute2),
+					       					   constructRoute(actor, atkRoute3)))
 	
 	return root
 }
@@ -221,7 +236,7 @@ function constructDefenderBehaviorTree(actor)
 
 function constructBehaviorTreeForActor(actor)
 {
-	var root = new RandomSelector(constructAttackerBehaviorTree(actor))//,
+	var root = new RandomSelector(constructAttackerBehaviorTree(actor));
 								  //constructDefenderBehaviorTree(actor))
 
 	actor.setKnowledge("self", actor);

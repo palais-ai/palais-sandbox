@@ -81,8 +81,8 @@ void CameraHandler::onRelativePitchChanged(qreal p)
     mCamera->setPosition(mCamera->getAutoTrackTarget()->_getDerivedPosition());
 
     const Ogre::Radian after(mCamera->getOrientation().getPitch() + Ogre::Degree(p));
-    const Ogre::Radian lowerLimit(-Ogre::Math::PI/2 + 0.01);
-    const Ogre::Radian upperLimit(Ogre::Math::PI/2 - 0.01);
+    const Ogre::Radian lowerLimit(-Ogre::Math::PI/2 + 0.1);
+    const Ogre::Radian upperLimit(Ogre::Math::PI/2 - 0.1);
 
     if(after < lowerLimit || after > upperLimit)
     {
