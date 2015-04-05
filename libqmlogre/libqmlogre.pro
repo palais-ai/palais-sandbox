@@ -20,16 +20,16 @@ UI_DIR = ./.ui
 OBJECTS_DIR = ./.obj
 MOC_DIR = ./.moc
 
-SOURCES += ogreitem.cpp \
-    ogrenode.cpp \
-    cameranodeobject.cpp \
-    ogreengine.cpp
+SOURCES += OgreItem.cpp \
+    OgreNode.cpp \
+    CameraNodeObject.cpp \
+    OgreEngine.cpp
 
 HEADERS += \
-    ogreitem.h \
-    ogrenode.h \
-    cameranodeobject.h \
-    ogreengine.h \
+    OgreItem.h \
+    OgreNode.h \
+    CameraNodeObject.h \
+    OgreEngine.h \
     qmlogre_global.h
 
 # Copy all headers to build folder

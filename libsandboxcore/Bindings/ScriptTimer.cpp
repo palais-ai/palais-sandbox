@@ -1,6 +1,6 @@
 #include "ScriptTimer.h"
 #include "JavascriptBindings.h"
-#include <qDebug>
+#include <QDebug>
 #include <cassert>
 
 ScriptTimerFactory::ScriptTimerFactory(QObject* parent) :

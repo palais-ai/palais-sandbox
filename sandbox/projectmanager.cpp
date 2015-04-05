@@ -14,9 +14,9 @@
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
 #include <OgreCamera.h>
-#include "ogreengine.h"
-#include "cameranodeobject.h"
-#include "ogreitem.h"
+#include "OgreEngine.h"
+#include "CameraNodeObject.h"
+#include "OgreItem.h"
 
 std::string ProjectManager::sCurrentResourceGroupName = "CurrentScene";
 

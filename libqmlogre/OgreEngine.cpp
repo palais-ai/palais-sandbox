@@ -7,9 +7,9 @@
  * with this source code in the file LICENSE.}
  */
 
-#include "ogreengine.h"
-#include "ogreitem.h"
-#include "cameranodeobject.h"
+#include "OgreEngine.h"
+#include "OgreItem.h"
+#include "CameraNodeObject.h"
 #include <exception>
 #include <Ogre.h>
 #include <OgreAnimation.h>

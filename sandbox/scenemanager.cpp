@@ -4,7 +4,7 @@
 #include "application.h"
 #include "utility/timedlogger.h"
 #include "Bindings/JavascriptBindings.h"
-#include "ogreengine.h"
+#include "OgreEngine.h"
 #include <QtGlobal>
 #include <QTimerEvent>
 #include <QTime>

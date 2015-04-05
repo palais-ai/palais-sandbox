@@ -2,9 +2,10 @@
 #include "Actor.h"
 #include "Bindings/JavascriptBindings.h"
 #include "DebugDrawer.h"
-#include "../libqmlogre/cameranodeobject.h"
-#include "../libqmlogre/ogreengine.h"
+#include "CameraNodeObject.h"
+#include "OgreEngine.h"
 #include <cassert>
+#include <algorithm>
 #include <QDebug>
 #include <QVector>
 #include <QQuickWindow>
@@ -16,7 +17,6 @@
 #include <OgreAnimationState.h>
 #include <OgreSceneQuery.h>
 #include <OgreStringConverter.h>
-#include <algorithm>
 
 #define VERBOSE_LOGGING false
 #define IF_VERBOSE(x__) do \

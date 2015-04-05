@@ -10,7 +10,7 @@
 #include <OgreSceneManager.h>
 #include <OgreString.h>
 #include <OgreSceneNode.h>
-#include "ogreengine.h"
+#include "OgreEngine.h"
 #include "DotSceneLoader.h"
 
 SceneLoader::SceneLoader()

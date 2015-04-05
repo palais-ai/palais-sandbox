@@ -1,6 +1,6 @@
 #include "Actor.h"
 #include <cassert>
-#include <qDebug>
+#include <QDebug>
 #include <QVector>
 #include <OgreSceneNode.h>
 #include <OgreAnimation.h>

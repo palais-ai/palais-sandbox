@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.}
  */
 
-#include "cameranodeobject.h"
+#include "CameraNodeObject.h"
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>
 #include <OgreNode.h>
