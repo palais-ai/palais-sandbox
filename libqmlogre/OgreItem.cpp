@@ -16,10 +16,10 @@
 
 OgreItem::OgreItem(QQuickItem *parent)
     : QQuickItem(parent)
-    , m_backgroundColor(QColor::fromRgbF(0,0,0))
-    , m_camera(0)
-    , mLastNode(0)
-    , m_ogreEngineItem(0)
+    , mBackgroundColor(QColor::fromRgbF(0,0,0))
+    , mCamera(NULL)
+    , mLastNode(NULL)
+    , mOgreEngineItem(NULL)
 {
     setFlag(ItemHasContents);
     setSmooth(false);
@@ -36,22 +36,22 @@ void OgreItem::windowChanged(QQuickWindow *window)
 
 QColor OgreItem::backgroundColor() const
 {
-    return m_backgroundColor;
+    return mBackgroundColor;
 }
 
 void OgreItem::setBackgroundColor(QColor color)
 {
-    m_backgroundColor = color;
+    mBackgroundColor = color;
 }
 
 OgreEngine* OgreItem::ogreEngine() const
 {
-    return m_ogreEngineItem;
+    return mOgreEngineItem;
 }
 
 QObject* OgreItem::camera() const
 {
-    return dynamic_cast<QObject*>(m_camera);
+    return dynamic_cast<QObject*>(mCamera);
 }
 
 QImage OgreItem::saveCurrentImage()
@@ -61,7 +61,7 @@ QImage OgreItem::saveCurrentImage()
 
 QSGNode* OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    if (width() <= 0 || height() <= 0 || !m_camera || !m_camera->camera() || !m_ogreEngineItem)
+    if (width() <= 0 || height() <= 0 || !mCamera || !mCamera->camera() || !mOgreEngineItem)
     {
         delete oldNode;
         return 0;
@@ -71,14 +71,14 @@ QSGNode* OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     if (!node)
     {
         node = mLastNode = new OgreNode();
-        node->setCamera(m_camera->camera());
-        node->setOgreEngineItem(m_ogreEngineItem);
-        connect(m_camera, &CameraNodeObject::cameraChanged,
+        node->setCamera(mCamera->camera());
+        node->setOgreEngineItem(mOgreEngineItem);
+        connect(mCamera, &CameraNodeObject::cameraChanged,
                 mLastNode, &OgreNode::onCameraChanged);
     }
 
     node->setSize(QSize(width(), height()));
-    node->setBackgroundColor(m_backgroundColor);
+    node->setBackgroundColor(mBackgroundColor);
     node->update();
 
     // mark texture dirty, otherwise Qt will not trigger a redraw (preprocess())
@@ -89,23 +89,23 @@ QSGNode* OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 
 void OgreItem::setCamera(QObject *camera)
 {
-    if(m_camera && mLastNode)
+    if(mCamera && mLastNode)
     {
-        disconnect(m_camera, &CameraNodeObject::cameraChanged,
+        disconnect(mCamera, &CameraNodeObject::cameraChanged,
                    mLastNode, &OgreNode::onCameraChanged);
     }
 
-    m_camera = dynamic_cast<CameraNodeObject*>(camera);
+    mCamera = dynamic_cast<CameraNodeObject*>(camera);
 
     if(mLastNode)
     {
-        mLastNode->setCamera(m_camera->camera());
-        connect(m_camera, &CameraNodeObject::cameraChanged,
+        mLastNode->setCamera(mCamera->camera());
+        connect(mCamera, &CameraNodeObject::cameraChanged,
                 mLastNode, &OgreNode::onCameraChanged);
     }
 }
 
 void OgreItem::setOgreEngine(OgreEngine *ogreEngine)
 {
-    m_ogreEngineItem = ogreEngine;
+    mOgreEngineItem = ogreEngine;
 }

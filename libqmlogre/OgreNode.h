@@ -68,23 +68,23 @@ private:
     void resetViewport();
     int getNumberOfFSAASamples();
 
-    QSGTextureMaterial m_material;
-    QSGOpaqueTextureMaterial m_materialO;
-    QSGGeometry m_geometry;
-    QScopedPointer<QSGTexture> m_texture;
-    OgreEngine* m_ogreEngineItem;
+    QSGTextureMaterial mMaterial;
+    QSGOpaqueTextureMaterial mMaterial0;
+    QSGGeometry mGeometry;
+    QScopedPointer<QSGTexture> mTexture;
+    OgreEngine* mOgreEngineItem;
 
-    QColor m_backgroundColor;
-    QSize m_size;
+    QColor mBackgroundColor;
+    QSize mSize;
 
-    Ogre::Camera* m_camera;
-    Ogre::RenderTexture* m_renderTarget;
-    Ogre::TexturePtr m_rttTexture;
+    Ogre::Camera* mCamera;
+    Ogre::RenderTexture* mRenderTarget;
+    Ogre::TexturePtr mRTTTexture;
 
-    GLuint m_ogreFboId;
-    const float m_fboCreationDelay; // In seconds
-    float m_fboDelayAccumulator;
-    bool m_dirtyFBO;
+    GLuint mOgreFBOId;
+    const float mFBOCreationDelay; // In seconds
+    float mFBODelayAccumulator;
+    bool mDirtyFBO;
 };
 
 #endif // OGRENODE_H

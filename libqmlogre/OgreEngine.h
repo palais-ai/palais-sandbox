@@ -57,16 +57,11 @@ public:
     void setupResources(void);
 
 private:
-    Ogre::String m_resources_cfg;
-    Ogre::RenderWindow* m_ogreWindow;
+    Ogre::String mResourceConfig;
+    Ogre::RenderWindow* mOgreWindow;
     Ogre::Root* mRoot;
-
-    QQuickWindow* m_quickWindow;
-
-    /** Pointer to QOpenGLContext to be used by Ogre. */
-    QOpenGLContext* m_ogreContext;
-    /** Pointer to QOpenGLContext to be restored after Ogre context. */
-    QOpenGLContext* m_qtContext;
+    QQuickWindow* mQuickWindow;
+    QOpenGLContext* mOgreContext;
 protected:
     void setQuickWindow(QQuickWindow* window);
 };

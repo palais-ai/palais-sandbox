@@ -22,10 +22,10 @@ QThread* g_engineThread;
 
 OgreEngine::OgreEngine(QQuickWindow *window)
     : QObject(),
-      m_resources_cfg(Ogre::StringUtil::BLANK),
-      mRoot(0),
-      m_ogreContext(0),
-      m_qtContext(0)
+      mResourceConfig(Ogre::StringUtil::BLANK),
+      mRoot(NULL),
+      mQuickWindow(NULL),
+      mOgreContext(NULL)
 {
     qmlRegisterType<OgreItem>("Ogre", 1, 0, "OgreItem");
     qmlRegisterType<OgreEngine>("OgreEngine", 1, 0, "OgreEngine");
@@ -37,10 +37,7 @@ OgreEngine::OgreEngine(QQuickWindow *window)
 
 OgreEngine::~OgreEngine()
 {
-    if(m_ogreContext && m_ogreContext != m_qtContext)
-    {
-        delete m_ogreContext;
-    }
+    stopEngine();
 }
 
 Ogre::Root* OgreEngine::getRoot()
@@ -51,7 +48,7 @@ Ogre::Root* OgreEngine::getRoot()
 
 Ogre::RenderWindow* OgreEngine::getRenderWindow()
 {
-    return m_ogreWindow;
+    return mOgreWindow;
 }
 
 bool OgreEngine::isStarted() const
@@ -65,9 +62,9 @@ void OgreEngine::startEngine()
 
     QString basePath = QCoreApplication::applicationDirPath();
 
-    m_resources_cfg = (basePath + "/resources.cfg").toStdString();
+    mResourceConfig = (basePath + "/resources.cfg").toStdString();
 
-    Ogre::Root *ogreRoot = new Ogre::Root("", m_resources_cfg);
+    Ogre::Root *ogreRoot = new Ogre::Root("", mResourceConfig);
 
 #if defined(Q_OS_MAC)
     basePath += "/../Plugins";
@@ -115,10 +112,10 @@ void OgreEngine::startEngine()
 #endif
 
     //Finally create our window.
-    m_ogreWindow = ogreRoot->createRenderWindow("OgreWindow", 1, 1, false, &params);
-    m_ogreWindow->setActive(true);
-    m_ogreWindow->setVisible(false);
-    m_ogreWindow->update(false);
+    mOgreWindow = ogreRoot->createRenderWindow("OgreWindow", 1, 1, false, &params);
+    mOgreWindow->setActive(true);
+    mOgreWindow->setVisible(false);
+    mOgreWindow->update(false);
 
     Ogre::Animation::setDefaultInterpolationMode(Ogre::Animation::IM_LINEAR);
     Ogre::Animation::setDefaultRotationInterpolationMode(Ogre::Animation::RIM_LINEAR);
@@ -141,54 +138,40 @@ void OgreEngine::stopEngine()
 
 QQuickWindow* OgreEngine::getQQuickWindow()
 {
-    return m_quickWindow;
+    return mQuickWindow;
 }
 
 void OgreEngine::setQuickWindow(QQuickWindow *window)
 {
     Q_ASSERT(window);
 
-    m_quickWindow = window;
-    //m_quickWindow->setClearBeforeRendering(true);
+    mQuickWindow = window;
 
-    m_qtContext = QOpenGLContext::currentContext();
-    m_qtContext->doneCurrent();
-    m_ogreContext = m_qtContext;
-    m_qtContext->makeCurrent(m_quickWindow);
+    mOgreContext = QOpenGLContext::currentContext();
+    mOgreContext->doneCurrent();
+    mOgreContext->makeCurrent(mQuickWindow);
 }
 
 void OgreEngine::activateOgreContext()
 {
-    if(m_ogreContext != m_qtContext)
-    {
-        m_qtContext->doneCurrent();
-        m_ogreContext->makeCurrent(m_quickWindow);
-    }
-
-    m_quickWindow->resetOpenGLState();
+    mQuickWindow->resetOpenGLState();
 }
 
 void OgreEngine::doneOgreContext()
 {
-    if(m_ogreContext != m_qtContext)
-    {
-        m_ogreContext->doneCurrent();
-        m_qtContext->makeCurrent(m_quickWindow);
-    }
-
-    m_quickWindow->resetOpenGLState();
+    mQuickWindow->resetOpenGLState();
 }
 
 QOpenGLContext* OgreEngine::ogreContext() const
 {
-    return m_ogreContext;
+    return mOgreContext;
 }
 
 QSGTexture* OgreEngine::createTextureFromId(uint id,
                                             const QSize &size,
                                             QQuickWindow::CreateTextureOptions options) const
 {
-    return m_quickWindow->createTextureFromId(id, size, options);
+    return mQuickWindow->createTextureFromId(id, size, options);
 }
 
 void OgreEngine::setupResources(void)
@@ -197,7 +180,7 @@ void OgreEngine::setupResources(void)
 
     // Load resource paths from config file
     Ogre::ConfigFile cf;
-    cf.load(m_resources_cfg);
+    cf.load(mResourceConfig);
 
     // Go through all sections & settings in the file
     Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
@@ -213,12 +196,6 @@ void OgreEngine::setupResources(void)
             typeName = i->first;
             archName = i->second;
             archName = (basePath + "/" + QString::fromStdString(archName)).toStdString();
-
-            /*
-            qDebug() << "archName: " << QString::fromStdString(archName);
-            qDebug() << "typeName: " << QString::fromStdString(typeName);
-            qDebug() << "secName: " << QString::fromStdString(secName);
-            */
 
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
                 archName, typeName, secName);

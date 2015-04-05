@@ -47,10 +47,10 @@ private slots:
     void windowChanged(QQuickWindow* window);
 
 private:
-    QColor m_backgroundColor;
-    CameraNodeObject* m_camera;
+    QColor mBackgroundColor;
+    CameraNodeObject* mCamera;
     OgreNode* mLastNode;
-    OgreEngine* m_ogreEngineItem;
+    OgreEngine* mOgreEngineItem;
 };
 
 #endif // OGREITEM_H
