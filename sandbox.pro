@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
-SUBDIRS = libqmlogre \
+SUBDIRS = QOgre \
           libdotsceneloader \
           libmeshmagick \
           libsandboxcore \

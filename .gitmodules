@@ -1,0 +1,3 @@
+[submodule "QOgre"]
+	path = libQOgre
+	url = https://github.com/palais-ai/QOgre.git
