@@ -14,7 +14,7 @@ CONFIG(debug, debug|release) {
     DEFINES += DEBUG
 }
 
-include(../linkOgreSDK.pri)
+include(linkOgreSDK.pri)
 
 UI_DIR = ./.ui
 OBJECTS_DIR = ./.obj

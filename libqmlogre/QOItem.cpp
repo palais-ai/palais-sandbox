@@ -12,7 +12,6 @@
 #include "QOEngine.h"
 #include "QOCamera.h"
 #include <OgreCamera.h>
-#include <QQuickItemGrabResult>
 
 QOItem::QOItem(QQuickItem *parent)
     : QQuickItem(parent)
