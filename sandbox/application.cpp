@@ -16,8 +16,8 @@
 #include <QTime>
 #include <QDebug>
 #include <QThread>
-#include "OgreItem.h"
-#include "OgreEngine.h"
+#include "QOItem.h"
+#include "QOEngine.h"
 #include <Ogre.h>
 
 Q_DECLARE_METATYPE(ConsoleModel::LogLevel)
@@ -60,7 +60,7 @@ static void messageHandlerFun(QtMsgType type,
 Application::Application(QObject *parent) :
     QObject(parent),
     mApplicationEngine(NULL),
-    mOgreEngine(NULL),
+    mQOEngine(NULL),
     mProjectManager(NULL),
     mRoot(NULL),
     mSceneModel(NULL),
@@ -92,9 +92,9 @@ Application::~Application()
         delete mRoot;
     }
 
-    if(mOgreEngine)
+    if(mQOEngine)
     {
-        delete mOgreEngine;
+        delete mQOEngine;
     }
 }
 
@@ -140,7 +140,7 @@ int Application::onApplicationStarted(int argc, char **argv)
     return app.exec();
 }
 
-// This function is executed in the OgreEngine's thread.
+// This function is executed in the QOEngine's thread.
 void Application::initializeOgre()
 {
     QQuickWindow *window = qobject_cast<QQuickWindow *>(mApplicationEngine->rootObjects().first());
@@ -152,8 +152,8 @@ void Application::initializeOgre()
     TimedLogger engineStartupLogger;
 
     // Start up Ogre.
-    mOgreEngine = new OgreEngine(window);
-    mOgreEngine->startEngine();
+    mQOEngine = new QOEngine(window);
+    mQOEngine->startEngine();
 
     Ogre::LogManager::getSingleton().getDefaultLog()->addListener(mLogHandler.data());
 
@@ -161,10 +161,10 @@ void Application::initializeOgre()
     matMgr.setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
     matMgr.setDefaultAnisotropy(16);
 
-    mRoot = mOgreEngine->getRoot();
-    mOgreEngine->setupResources();
+    mRoot = mQOEngine->getRoot();
+    mQOEngine->setupResources();
 
-    mProjectManager = new ProjectManager(mOgreEngine);
+    mProjectManager = new ProjectManager(mQOEngine);
     mProjectManager->initializeSceneManager();
 
     engineStartupLogger.stop("Ogre3D startup");
@@ -237,7 +237,7 @@ void Application::initializeOgre()
     emit(ogreInitialized());
 }
 
-// This function is executed in the OgreEngine's thread.
+// This function is executed in the QOEngine's thread.
 void Application::onOgreIsReady()
 {
     if(!mApplicationEngine)
@@ -246,7 +246,7 @@ void Application::onOgreIsReady()
         return;
     }
 
-    mApplicationEngine->rootContext()->setContextProperty("OgreEngine", mOgreEngine);
+    mApplicationEngine->rootContext()->setContextProperty("OgreEngine", mQOEngine);
 
     QMetaObject::invokeMethod(mApplicationEngine->rootObjects().first(), "onOgreIsReady");
 

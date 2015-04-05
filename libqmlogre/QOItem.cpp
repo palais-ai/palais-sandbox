@@ -7,74 +7,74 @@
  * with this source code in the file LICENSE.}
  */
 
-#include "ogreitem.h"
-#include "ogrenode.h"
-#include "ogreengine.h"
-#include "cameranodeobject.h"
+#include "QOItem.h"
+#include "QONode.h"
+#include "QOEngine.h"
+#include "QOCamera.h"
 #include <OgreCamera.h>
 #include <QQuickItemGrabResult>
 
-OgreItem::OgreItem(QQuickItem *parent)
+QOItem::QOItem(QQuickItem *parent)
     : QQuickItem(parent)
     , mBackgroundColor(QColor::fromRgbF(0,0,0))
     , mCamera(NULL)
     , mLastNode(NULL)
-    , mOgreEngineItem(NULL)
+    , mEngineItem(NULL)
 {
     setFlag(ItemHasContents);
     setSmooth(false);
 
     connect(this, &QQuickItem::windowChanged,
-            this, &OgreItem::windowChanged);
+            this, &QOItem::windowChanged);
 }
 
-void OgreItem::windowChanged(QQuickWindow *window)
+void QOItem::windowChanged(QQuickWindow *window)
 {
     connect(window, &QQuickWindow::frameSwapped,
-            this, &OgreItem::update);
+            this, &QOItem::update);
 }
 
-QColor OgreItem::backgroundColor() const
+QColor QOItem::backgroundColor() const
 {
     return mBackgroundColor;
 }
 
-void OgreItem::setBackgroundColor(QColor color)
+void QOItem::setBackgroundColor(QColor color)
 {
     mBackgroundColor = color;
 }
 
-OgreEngine* OgreItem::ogreEngine() const
+QOEngine* QOItem::engine() const
 {
-    return mOgreEngineItem;
+    return mEngineItem;
 }
 
-QObject* OgreItem::camera() const
+QObject* QOItem::camera() const
 {
     return dynamic_cast<QObject*>(mCamera);
 }
 
-QImage OgreItem::saveCurrentImage()
+QImage QOItem::saveCurrentImage()
 {
     return mLastNode->renderToImage();
 }
 
-QSGNode* OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
+QSGNode* QOItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    if (width() <= 0 || height() <= 0 || !mCamera || !mCamera->camera() || !mOgreEngineItem)
+    if (width() <= 0 || height() <= 0 || !mCamera || !mCamera->camera() || !mEngineItem)
     {
         delete oldNode;
         return 0;
     }
 
-    OgreNode *node = static_cast<OgreNode *>(oldNode);
+    QONode *node = static_cast<QONode *>(oldNode);
     if (!node)
     {
-        node = mLastNode = new OgreNode();
+        node = mLastNode = new QONode();
         node->setCamera(mCamera->camera());
-        node->setOgreEngineItem(mOgreEngineItem);
-        connect(mCamera, &CameraNodeObject::cameraChanged,
-                mLastNode, &OgreNode::onCameraChanged);
+        node->setQOEngineItem(mEngineItem);
+        connect(mCamera, &QOCamera::cameraChanged,
+                mLastNode, &QONode::onCameraChanged);
     }
 
     node->setSize(QSize(width(), height()));
@@ -87,25 +87,25 @@ QSGNode* OgreItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     return node;
 }
 
-void OgreItem::setCamera(QObject *camera)
+void QOItem::setCamera(QObject *camera)
 {
     if(mCamera && mLastNode)
     {
-        disconnect(mCamera, &CameraNodeObject::cameraChanged,
-                   mLastNode, &OgreNode::onCameraChanged);
+        disconnect(mCamera, &QOCamera::cameraChanged,
+                   mLastNode, &QONode::onCameraChanged);
     }
 
-    mCamera = dynamic_cast<CameraNodeObject*>(camera);
+    mCamera = dynamic_cast<QOCamera*>(camera);
 
     if(mLastNode)
     {
         mLastNode->setCamera(mCamera->camera());
-        connect(mCamera, &CameraNodeObject::cameraChanged,
-                mLastNode, &OgreNode::onCameraChanged);
+        connect(mCamera, &QOCamera::cameraChanged,
+                mLastNode, &QONode::onCameraChanged);
     }
 }
 
-void OgreItem::setOgreEngine(OgreEngine *ogreEngine)
+void QOItem::setEngine(QOEngine *QOEngine)
 {
-    mOgreEngineItem = ogreEngine;
+    mEngineItem = QOEngine;
 }

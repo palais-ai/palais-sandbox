@@ -7,9 +7,9 @@
  * with this source code in the file LICENSE.}
  */
 
-#include "OgreEngine.h"
-#include "OgreItem.h"
-#include "CameraNodeObject.h"
+#include "QOEngine.h"
+#include "QOItem.h"
+#include "QOCamera.h"
 #include <exception>
 #include <Ogre.h>
 #include <OgreAnimation.h>
@@ -20,43 +20,43 @@
 
 QThread* g_engineThread;
 
-OgreEngine::OgreEngine(QQuickWindow *window)
+QOEngine::QOEngine(QQuickWindow *window)
     : QObject(),
       mResourceConfig(Ogre::StringUtil::BLANK),
       mRoot(NULL),
       mQuickWindow(NULL),
       mOgreContext(NULL)
 {
-    qmlRegisterType<OgreItem>("Ogre", 1, 0, "OgreItem");
-    qmlRegisterType<OgreEngine>("OgreEngine", 1, 0, "OgreEngine");
-    qmlRegisterType<CameraNodeObject>("Ogre", 1, 0, "Camera");
+    qmlRegisterType<QOItem>("Ogre", 1, 0, "QOItem");
+    qmlRegisterType<QOEngine>("QOEngine", 1, 0, "QOEngine");
+    qmlRegisterType<QOCamera>("Ogre", 1, 0, "Camera");
 
     g_engineThread = thread();
     setQuickWindow(window);
 }
 
-OgreEngine::~OgreEngine()
+QOEngine::~QOEngine()
 {
-    stopEngine();
+    ;
 }
 
-Ogre::Root* OgreEngine::getRoot()
+Ogre::Root* QOEngine::getRoot()
 {
     return mRoot;
 }
 
 
-Ogre::RenderWindow* OgreEngine::getRenderWindow()
+Ogre::RenderWindow* QOEngine::getRenderWindow()
 {
     return mOgreWindow;
 }
 
-bool OgreEngine::isStarted() const
+bool QOEngine::isStarted() const
 {
     return mRoot;
 }
 
-void OgreEngine::startEngine()
+void QOEngine::startEngine()
 {
     activateOgreContext();
 
@@ -125,7 +125,7 @@ void OgreEngine::startEngine()
     mRoot = ogreRoot;
 }
 
-void OgreEngine::stopEngine()
+void QOEngine::stopEngine()
 {
     if (mRoot)
     {
@@ -136,12 +136,12 @@ void OgreEngine::stopEngine()
     }
 }
 
-QQuickWindow* OgreEngine::getQQuickWindow()
+QQuickWindow* QOEngine::getQQuickWindow()
 {
     return mQuickWindow;
 }
 
-void OgreEngine::setQuickWindow(QQuickWindow *window)
+void QOEngine::setQuickWindow(QQuickWindow *window)
 {
     Q_ASSERT(window);
 
@@ -152,29 +152,29 @@ void OgreEngine::setQuickWindow(QQuickWindow *window)
     mOgreContext->makeCurrent(mQuickWindow);
 }
 
-void OgreEngine::activateOgreContext()
+void QOEngine::activateOgreContext()
 {
     mQuickWindow->resetOpenGLState();
 }
 
-void OgreEngine::doneOgreContext()
+void QOEngine::doneOgreContext()
 {
     mQuickWindow->resetOpenGLState();
 }
 
-QOpenGLContext* OgreEngine::ogreContext() const
+QOpenGLContext* QOEngine::ogreContext() const
 {
     return mOgreContext;
 }
 
-QSGTexture* OgreEngine::createTextureFromId(uint id,
+QSGTexture* QOEngine::createTextureFromId(uint id,
                                             const QSize &size,
                                             QQuickWindow::CreateTextureOptions options) const
 {
     return mQuickWindow->createTextureFromId(id, size, options);
 }
 
-void OgreEngine::setupResources(void)
+void QOEngine::setupResources(void)
 {
     QString basePath = QCoreApplication::applicationDirPath();
 

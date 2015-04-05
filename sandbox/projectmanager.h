@@ -6,9 +6,9 @@
 #include <QUrl>
 
 class Actor;
-class OgreEngine;
+class QOEngine;
 class Scene;
-class CameraNodeObject;
+class QOCamera;
 class KnowledgeModel;
 
 namespace Ogre
@@ -21,7 +21,7 @@ class ProjectManager : public QObject
     Q_OBJECT
     Q_PROPERTY(bool playing READ isPlaying NOTIFY playingChanged)
 public:
-    explicit ProjectManager(OgreEngine* engine);
+    explicit ProjectManager(QOEngine* engine);
     ~ProjectManager();
 
     bool getSceneLoaded() const;
@@ -82,8 +82,8 @@ private:
     static std::string sCurrentResourceGroupName;
 
     void loadResources(const QStringList& paths);
-    void prepareScene(CameraNodeObject* camera);
-    CameraNodeObject* getCameraWithName(const QString& name);
+    void prepareScene(QOCamera* camera);
+    QOCamera* getCameraWithName(const QString& name);
     void changeInspectorSelection(QString name,
                                   QVariantMap data,
                                   const KnowledgeModel* model);

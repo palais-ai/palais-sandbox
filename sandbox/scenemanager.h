@@ -7,7 +7,7 @@
 #include <QTime>
 #include <QAtomicInt>
 
-class OgreEngine;
+class QOEngine;
 class Scene;
 class QTimerEvent;
 
@@ -20,7 +20,7 @@ class SceneManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit SceneManager(OgreEngine* engine);
+    explicit SceneManager(QOEngine* engine);
 
     void pause();
     void start();
@@ -30,7 +30,7 @@ public:
     // __speedFactor__ must be in range between __sMinimumSpeedFactor__ and __sMaximumSpeedFactor__
     void setSimulationSpeed(float speedFactor);
 
-    OgreEngine* getOgreEngine();
+    QOEngine* getEngine();
     Scene* getCurrentScene();
     const Scene* getCurrentScene() const;
     Scene* loadScene(const QString& name, const QString& sceneFile, const QString& logicFile);
@@ -41,7 +41,7 @@ protected:
     void timerEvent(QTimerEvent *);
 private:
     PluginManager mPluginManager;
-    OgreEngine* mOgreEngine;
+    QOEngine* mEngine;
     Scene* mCurrentScene;
     QAtomicInt mSceneStarted;
     float mSimulationSpeedFactor;

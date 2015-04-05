@@ -7,8 +7,8 @@
  * with this source code in the file LICENSE.}
  */
 
-#ifndef OGREENGINEITEM_H
-#define OGREENGINEITEM_H
+#ifndef QOEngineITEM_H
+#define QOEngineITEM_H
 
 #include "qmlogre_global.h"
 #include <QObject>
@@ -26,16 +26,16 @@ class RenderWindow;
 }
 
 /**
- * @brief The OgreEngineItem class
+ * @brief The QOEngineItem class
  * Must only be constructed from within Qt QML rendering thread.
  */
-class DLL_EXPORT OgreEngine : public QObject
+class DLL_EXPORT QOEngine : public QObject
 {
     Q_OBJECT
 
 public:
-    OgreEngine(QQuickWindow* window = 0);
-    ~OgreEngine();
+    QOEngine(QQuickWindow* window = 0);
+    ~QOEngine();
 
     Ogre::Root* getRoot();
     Ogre::RenderWindow* getRenderWindow();
@@ -66,4 +66,4 @@ protected:
     void setQuickWindow(QQuickWindow* window);
 };
 
-#endif // OGREENGINEITEM_H
+#endif // QOEngineITEM_H

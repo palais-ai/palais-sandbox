@@ -14,7 +14,7 @@
 extern QList<void*> gDeletedActors;
 
 class Actor;
-class OgreEngine;
+class QOEngine;
 class DebugDrawer;
 
 namespace Ogre
@@ -47,7 +47,7 @@ public:
           const QString& sceneFile,
           const QString& logicFile,
           Ogre::SceneNode* root,
-          OgreEngine* engine,
+          QOEngine* engine,
           const QString& sceneManagerName);
 
     ~Scene();
@@ -116,7 +116,7 @@ private:
     void destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode);
 
     QString mName, mSceneFile, mLogicFile;
-    OgreEngine* mEngine;
+    QOEngine* mEngine;
     QString mSceneManagerName;
     Ogre::SceneNode* mRoot;
     Ogre::RaySceneQuery* mRayQuery;

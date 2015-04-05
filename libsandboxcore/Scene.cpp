@@ -2,8 +2,8 @@
 #include "Actor.h"
 #include "Bindings/JavascriptBindings.h"
 #include "DebugDrawer.h"
-#include "CameraNodeObject.h"
-#include "OgreEngine.h"
+#include "QOCamera.h"
+#include "QOEngine.h"
 #include <cassert>
 #include <algorithm>
 #include <QDebug>
@@ -29,7 +29,7 @@ Scene::Scene(const QString& name,
              const QString& sceneFile,
              const QString& logicFile,
              Ogre::SceneNode* root,
-             OgreEngine* engine,
+             QOEngine* engine,
              const QString& sceneManagerName) :
     mName(name),
     mSceneFile(sceneFile),
@@ -138,8 +138,8 @@ void Scene::setCameraFocus(Actor* actor)
     }
 
     const QString cameraName("cam1");
-    CameraNodeObject* camera = mEngine->getQQuickWindow()
-                                      ->findChild<CameraNodeObject*>(cameraName);
+    QOCamera* camera = mEngine->getQQuickWindow()
+                                      ->findChild<QOCamera*>(cameraName);
 
     if(!camera)
     {

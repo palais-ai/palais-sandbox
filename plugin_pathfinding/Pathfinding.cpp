@@ -279,7 +279,7 @@ Pathfinding::planPath(const Ogre::Vector3& from,
 }
 
 void
-Pathfinding::initNavGraphFromOgreNode(Ogre::SceneNode* node)
+Pathfinding::initNavGraphFromQONode(Ogre::SceneNode* node)
 {
     Pathfinding::NavigationGraph graph;
     ailib::AStar<Pathfinding::NavigationGraph>::Heuristic heuristic = euclideanHeuristic;

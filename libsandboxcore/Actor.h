@@ -27,7 +27,7 @@ public:
 
     void update(float deltaTime);
 
-    // OgreNodeListener
+    // QONodeListener
     virtual void nodeDestroyed(const Ogre::Node* node);
 
     Q_INVOKABLE void toggleHighlight(bool highlighted);

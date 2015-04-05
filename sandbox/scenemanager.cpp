@@ -4,7 +4,7 @@
 #include "application.h"
 #include "utility/timedlogger.h"
 #include "Bindings/JavascriptBindings.h"
-#include "OgreEngine.h"
+#include "QOEngine.h"
 #include <QtGlobal>
 #include <QTimerEvent>
 #include <QTime>
@@ -16,8 +16,8 @@ const float SceneManager::sMaximumSpeedFactor = 10.f;  // In times the normal sp
 const float SceneManager::sMaximumTickRate    = 100.f; // In ticks Per Second
 const float SceneManager::sAITickRate         = 100.f; // In ticks Per Second
 
-SceneManager::SceneManager(OgreEngine* engine) :
-    mOgreEngine(engine),
+SceneManager::SceneManager(QOEngine* engine) :
+    mEngine(engine),
     mCurrentScene(NULL),
     mSceneStarted(false),
     mSimulationSpeedFactor(1),
@@ -26,7 +26,7 @@ SceneManager::SceneManager(OgreEngine* engine) :
 {
     assert(engine);
     // This object must reside in the same thread as the ogre engine
-    assert(thread() == mOgreEngine->thread());
+    assert(thread() == mEngine->thread());
 
     mPluginManager.loadPlugins();
 
@@ -51,14 +51,14 @@ Scene* SceneManager::loadScene(const QString& name,
     TimedLogger logger;
     logger.start();
 
-    if(mOgreEngine)
+    if(mEngine)
     {       
         unloadCurrentScene();
 
         Ogre::SceneManager* scnMgr = Ogre::Root::getSingleton()
                                                 .getSceneManager(Application::sSceneManagerName);
 
-        Scene* nextScene = SceneLoader::loadScene(mOgreEngine,
+        Scene* nextScene = SceneLoader::loadScene(mEngine,
                                                   scnMgr,
                                                   name,
                                                   sceneFile,
@@ -139,9 +139,9 @@ void SceneManager::setSimulationSpeed(float speedFactor)
     }
 }
 
-OgreEngine* SceneManager::getOgreEngine()
+QOEngine* SceneManager::getEngine()
 {
-    return mOgreEngine;
+    return mEngine;
 }
 
 Scene* SceneManager::getCurrentScene()

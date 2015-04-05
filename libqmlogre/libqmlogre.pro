@@ -20,17 +20,18 @@ UI_DIR = ./.ui
 OBJECTS_DIR = ./.obj
 MOC_DIR = ./.moc
 
-SOURCES += OgreItem.cpp \
-    OgreNode.cpp \
-    CameraNodeObject.cpp \
-    OgreEngine.cpp
+SOURCES += \
+    QOCamera.cpp \
+    QONode.cpp \
+    QOEngine.cpp \
+    QOItem.cpp
 
 HEADERS += \
-    OgreItem.h \
-    OgreNode.h \
-    CameraNodeObject.h \
-    OgreEngine.h \
-    qmlogre_global.h
+    qmlogre_global.h \
+    QOCamera.h \
+    QONode.h \
+    QOItem.h \
+    QOEngine.h
 
 # Copy all headers to build folder
 Headers.path = $$OUT_PWD/include

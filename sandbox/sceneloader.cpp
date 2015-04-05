@@ -10,14 +10,14 @@
 #include <OgreSceneManager.h>
 #include <OgreString.h>
 #include <OgreSceneNode.h>
-#include "OgreEngine.h"
+#include "QOEngine.h"
 #include "DotSceneLoader.h"
 
 SceneLoader::SceneLoader()
 {
 }
 
-Scene* SceneLoader::loadScene(OgreEngine* engine,
+Scene* SceneLoader::loadScene(QOEngine* engine,
                               Ogre::SceneManager* sceneManager,
                               const QString& name,
                               const QString& sceneFile,
@@ -55,7 +55,7 @@ Scene* SceneLoader::loadScene(OgreEngine* engine,
     }
 }
 
-void SceneLoader::loadSceneVisuals(OgreEngine* engine,
+void SceneLoader::loadSceneVisuals(QOEngine* engine,
                                    Ogre::SceneManager* sceneManager,
                                    const QString& sceneFile)
 {

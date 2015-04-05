@@ -7,26 +7,26 @@
  * with this source code in the file LICENSE.}
  */
 
-#ifndef OGREITEM_H
-#define OGREITEM_H
+#ifndef QOItem_H
+#define QOItem_H
 
 #include "qmlogre_global.h"
 #include <QtQuick/QQuickItem>
 
-class OgreEngine;
-class OgreNode;
-class CameraNodeObject;
+class QOEngine;
+class QONode;
+class QOCamera;
 
-class DLL_EXPORT OgreItem : public QQuickItem
+class DLL_EXPORT QOItem : public QQuickItem
 {
     Q_OBJECT
 
     Q_PROPERTY(QObject* camera READ camera WRITE setCamera)
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor)
-    Q_PROPERTY(OgreEngine* ogreEngine READ ogreEngine WRITE setOgreEngine)
+    Q_PROPERTY(QOEngine* engine READ engine WRITE setEngine)
 
 public:
-    OgreItem(QQuickItem* parent = 0);
+    QOItem(QQuickItem* parent = 0);
 
     QObject* camera() const;
     void setCamera(QObject* camera);
@@ -37,8 +37,8 @@ public:
     QColor backgroundColor() const;
     void setBackgroundColor(QColor color);
 
-    OgreEngine* ogreEngine() const;
-    void setOgreEngine(OgreEngine* ogreEngine);
+    QOEngine* engine() const;
+    void setEngine(QOEngine* QOEngine);
 
 protected:
     virtual QSGNode* updatePaintNode(QSGNode*, UpdatePaintNodeData*);
@@ -48,9 +48,9 @@ private slots:
 
 private:
     QColor mBackgroundColor;
-    CameraNodeObject* mCamera;
-    OgreNode* mLastNode;
-    OgreEngine* mOgreEngineItem;
+    QOCamera* mCamera;
+    QONode* mLastNode;
+    QOEngine* mEngineItem;
 };
 
-#endif // OGREITEM_H
+#endif // QOItem_H

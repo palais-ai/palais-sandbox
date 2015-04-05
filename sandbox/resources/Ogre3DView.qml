@@ -9,12 +9,12 @@ Rectangle {
         objectName: "cam1"
     }
 
-    OgreItem {
-        id: ogreitem
-        objectName: "ogreItem"
+    QOItem {
+        id: qoItem
+        objectName: "qoItem"
         anchors.fill: parent;
         camera: cam1
-        ogreEngine: OgreEngine
+        engine: OgreEngine
         backgroundColor: colors.gray
 
         MouseArea {
@@ -27,19 +27,19 @@ Rectangle {
             onPositionChanged: {
                 if (pressedButtons & Qt.LeftButton) {
                     if (prevX > -1) {
-                        ogreitem.camera.yaw(-(mouse.x - prevX) / 2)
+                        qoItem.camera.yaw(-(mouse.x - prevX) / 2)
                     }
                     if (prevY > -1) {
-                        ogreitem.camera.pitch(-(mouse.y - prevY) / 2)
+                        qoItem.camera.pitch(-(mouse.y - prevY) / 2)
                     }
                     prevX = mouse.x
                     prevY = mouse.y
                 }
                 if (pressedButtons & Qt.RightButton) {
                     if (prevY > -1) {
-                        var cameraMovement = ogreitem.camera.zoom + (mouse.y - prevY) / 200
+                        var cameraMovement = qoItem.camera.zoom + (mouse.y - prevY) / 200
                         var zoomLevel = Math.min(6, Math.max(0.1, cameraMovement));
-                        ogreitem.camera.zoom = zoomLevel
+                        qoItem.camera.zoom = zoomLevel
                     }
 
                     prevY = mouse.y
@@ -61,12 +61,6 @@ Rectangle {
         }
 
         MainWindowControls {
-            MouseArea {
-                id: mainControlsArea
-                anchors.fill: parent
-                hoverEnabled: true
-            }
-
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 14
@@ -74,12 +68,6 @@ Rectangle {
         }
 
         Ogre3DCameraControls {
-            MouseArea {
-                id: cameraControlsArea
-                anchors.fill: parent
-                hoverEnabled: true
-            }
-
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.topMargin: 14
@@ -88,12 +76,6 @@ Rectangle {
         }
 
         Rectangle {
-            MouseArea {
-                id: playbackControlsArea
-                anchors.fill: parent
-                hoverEnabled: true
-            }
-
             color: "#80000000"
             width: playbackControls.width + 48
             height: playbackControls.height + 24
@@ -108,31 +90,6 @@ Rectangle {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 38
         }
-
-        states: [
-            State {
-                    name: "CONTROLS_HIDDEN"
-                    /**when: !mainControlsArea.containsMouse &&
-                          !cameraControlsArea.containsMouse &&
-                          !playbackControlsArea.containsMouse*/
-                    PropertyChanges {
-                        target: playbackControls
-                        opacity: 0
-                    }
-                    PropertyChanges {
-                        target: playbackControlsBackground
-                        opacity: 0
-                    }
-                    PropertyChanges {
-                        target: cameraControls
-                        opacity: 0
-                    }
-                    PropertyChanges {
-                        target: mainControls
-                        opacity: 0
-                    }
-            }
-        ]
     }
 }
 

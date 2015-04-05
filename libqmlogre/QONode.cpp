@@ -10,7 +10,7 @@
 #include <RenderSystems/GL/OgreGLTexture.h>
 #include <RenderSystems/GL/OgreGLFrameBufferObject.h>
 #include <RenderSystems/GL/OgreGLFBORenderTexture.h>
-#include "ogrenode.h"
+#include "QONode.h"
 #include <sstream>
 #include <cfloat>
 #include <Ogre.h>
@@ -23,11 +23,11 @@
 #include <QOpenGLFunctions>
 #include <QTime>
 
-OgreNode::OgreNode(float fboCreationDelay)
+QONode::QONode(float fboCreationDelay)
     : QSGGeometryNode()
     , mGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4)
     , mTexture(NULL)
-    , mOgreEngineItem(NULL)
+    , mQOEngineItem(NULL)
     , mBackgroundColor(QColor::fromRgbF(0,0,0))
     , mCamera(NULL)
     , mRenderTarget(NULL)
@@ -37,12 +37,12 @@ OgreNode::OgreNode(float fboCreationDelay)
     , mDirtyFBO(false)
 {
     setMaterial(&mMaterial);
-    setOpaqueMaterial(&mMaterialO);
+    setOpaqueMaterial(&mOpaqueMaterial);
     setGeometry(&mGeometry);
     setFlag(UsePreprocess);
 }
 
-OgreNode::~OgreNode()
+QONode::~QONode()
 {
     if(mRenderTarget)
     {
@@ -60,12 +60,12 @@ OgreNode::~OgreNode()
     }
 }
 
-void OgreNode::setOgreEngineItem(OgreEngine *ogreRootItem)
+void QONode::setQOEngineItem(QOEngine *ogreRootItem)
 {
-    mOgreEngineItem = ogreRootItem;
+    mQOEngineItem = ogreRootItem;
 }
 
-void OgreNode::doneOgreContext()
+void QONode::doneOgreContext()
 {
     if (mOgreFBOId != 0)
     {
@@ -75,17 +75,17 @@ void OgreNode::doneOgreContext()
         manager->unbind(mRenderTarget);
     }
 
-    mOgreEngineItem->doneOgreContext();
+    mQOEngineItem->doneOgreContext();
 }
 
-void OgreNode::activateOgreContext()
+void QONode::activateOgreContext()
 {
-    mOgreEngineItem->activateOgreContext();
-    mOgreEngineItem->ogreContext()->functions()->glBindFramebuffer(GL_FRAMEBUFFER_EXT,
+    mQOEngineItem->activateOgreContext();
+    mQOEngineItem->ogreContext()->functions()->glBindFramebuffer(GL_FRAMEBUFFER_EXT,
                                                                     mOgreFBOId);
 }
 
-GLuint OgreNode::getOgreFboId()
+GLuint QONode::getOgreFboId()
 {
     if (!mRenderTarget)
     {
@@ -104,7 +104,7 @@ GLuint OgreNode::getOgreFboId()
     return id;
 }
 
-void OgreNode::resetViewport()
+void QONode::resetViewport()
 {
     if(!mRenderTarget || !mCamera)
     {
@@ -126,7 +126,7 @@ void OgreNode::resetViewport()
     mRenderTarget->getViewport(0)->setOverlaysEnabled(false);
 }
 
-QImage OgreNode::renderToImage()
+QImage QONode::renderToImage()
 {
     const uint32_t w = mRenderTarget->getWidth();
     const uint32_t h = mRenderTarget->getHeight();
@@ -152,11 +152,11 @@ QImage OgreNode::renderToImage()
     return retVal;
 }
 
-void OgreNode::preprocess()
+void QONode::preprocess()
 {
-    if(!mOgreEngineItem || !mCamera)
+    if(!mQOEngineItem || !mCamera)
     {
-        qWarning("No engine or camera supplied to OgreNode.");
+        qWarning("No engine or camera supplied to QONode.");
         return;
     }
 
@@ -169,15 +169,15 @@ void OgreNode::preprocess()
     activateOgreContext();
     resetViewport();
 
-    mOgreEngineItem->getRoot()->_fireFrameStarted();
-    mOgreEngineItem->getRoot()->_fireFrameRenderingQueued();
+    mQOEngineItem->getRoot()->_fireFrameStarted();
+    mQOEngineItem->getRoot()->_fireFrameRenderingQueued();
     mRenderTarget->update();
-    mOgreEngineItem->getRoot()->_fireFrameEnded();
+    mQOEngineItem->getRoot()->_fireFrameEnded();
 
     doneOgreContext();
 }
 
-void OgreNode::update()
+void QONode::update()
 {
     static QTime last = QTime::currentTime();
 
@@ -205,12 +205,12 @@ void OgreNode::update()
     }
 }
 
-int OgreNode::getNumberOfFSAASamples()
+int QONode::getNumberOfFSAASamples()
 {
     int samples = 0;
     try
     {
-        Ogre::RenderSystem* renderSystem = mOgreEngineItem->getRoot()->getRenderSystem();
+        Ogre::RenderSystem* renderSystem = mQOEngineItem->getRoot()->getRenderSystem();
         Ogre::String samplesStr = renderSystem->getConfigOptions()["FSAA"].currentValue;
         std::stringstream ss(samplesStr);
         ss >> samples;
@@ -228,7 +228,7 @@ int OgreNode::getNumberOfFSAASamples()
     return samples;
 }
 
-void OgreNode::updateFBO()
+void QONode::updateFBO()
 {
     static const Ogre::String textureName = "RttTex";
 
@@ -269,33 +269,33 @@ void OgreNode::updateFBO()
 
     Ogre::GLTexture* nativeTexture = static_cast<Ogre::GLTexture*>(mRTTTexture.get());
 
-    mTexture.reset(mOgreEngineItem->createTextureFromId(nativeTexture->getGLID(), mSize));
+    mTexture.reset(mQOEngineItem->createTextureFromId(nativeTexture->getGLID(), mSize));
 
     mMaterial.setTexture(mTexture.data());
-    mMaterialO.setTexture(mTexture.data());
+    mOpaqueMaterial.setTexture(mTexture.data());
 }
 
-void OgreNode::onCameraChanged(Ogre::Camera* newCamera)
+void QONode::onCameraChanged(Ogre::Camera* newCamera)
 {
     mCamera = newCamera;
 }
 
-void OgreNode::setCamera(Ogre::Camera *camera)
+void QONode::setCamera(Ogre::Camera *camera)
 {
     mCamera = camera;
 }
 
-void OgreNode::setBackgroundColor(QColor color)
+void QONode::setBackgroundColor(QColor color)
 {
     mBackgroundColor = color;
 }
 
-QSize OgreNode::size() const
+QSize QONode::size() const
 {
     return mSize;
 }
 
-void OgreNode::setSize(const QSize &size)
+void QONode::setSize(const QSize &size)
 {
     if (size == mSize)
     {

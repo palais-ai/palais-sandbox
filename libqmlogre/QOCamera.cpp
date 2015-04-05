@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.}
  */
 
-#include "CameraNodeObject.h"
+#include "QOCamera.h"
 #include <OgreRoot.h>
 #include <OgreSceneNode.h>
 #include <OgreNode.h>
@@ -22,8 +22,8 @@ extern QThread* g_engineThread;
 
 CameraHandler::CameraHandler() :
     mInitialDistance(0),
-    mNode(0),
-    mCamera(0)
+    mNode(NULL),
+    mCamera(NULL)
 {
     moveToThread(g_engineThread);
 }
@@ -183,64 +183,64 @@ float CameraHandler::getDistanceToAutoTrackingTarget() const
             - mCamera->getAutoTrackTarget()->_getDerivedPosition()).length();;
 }
 
-CameraNodeObject::CameraNodeObject(QObject *parent) :
+QOCamera::QOCamera(QObject *parent) :
     QObject(parent),
     mZoom(0),
-    mNode(0),
-    mFocusNode(0),
-    mCamera(0),
+    mNode(NULL),
+    mFocusNode(NULL),
+    mCamera(NULL),
     mHandler(new CameraHandler)
 {
     // First one instantiation has to be direct.
-    connect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+    connect(this, &QOCamera::requestCreateCameraWithCurrentSceneManager,
             mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager,
             Qt::DirectConnection);
-    connect(this, &CameraNodeObject::requestRelativeYawChanged,
+    connect(this, &QOCamera::requestRelativeYawChanged,
             mHandler.data(), &CameraHandler::onRelativeYawChanged);
-    connect(this, &CameraNodeObject::requestRelativePitchChanged,
+    connect(this, &QOCamera::requestRelativePitchChanged,
             mHandler.data(), &CameraHandler::onRelativePitchChanged);
-    connect(this, &CameraNodeObject::requestZoomChanged,
+    connect(this, &QOCamera::requestZoomChanged,
             mHandler.data(), &CameraHandler::onZoomChanged);
-    connect(this, &CameraNodeObject::requestFocusSceneNode,
+    connect(this, &QOCamera::requestFocusSceneNode,
             mHandler.data(), &CameraHandler::onFocusSceneNode);
 
     connect(mHandler.data(), &CameraHandler::zoomChanged,
-            this, &CameraNodeObject::onZoomChanged);
+            this, &QOCamera::onZoomChanged);
     connect(mHandler.data(), &CameraHandler::setupChanged,
-            this, &CameraNodeObject::onSetupChanged,
+            this, &QOCamera::onSetupChanged,
             Qt::DirectConnection);
     connect(mHandler.data(), &CameraHandler::focusNodeChanged,
-            this, &CameraNodeObject::onFocusNodeChanged);
+            this, &QOCamera::onFocusNodeChanged);
 
     createCameraWithCurrentSceneManager();
 
     // The next one's should be auto-resolved.
-    disconnect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+    disconnect(this, &QOCamera::requestCreateCameraWithCurrentSceneManager,
                mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager);
-    connect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+    connect(this, &QOCamera::requestCreateCameraWithCurrentSceneManager,
             mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager);
 
     disconnect(mHandler.data(), &CameraHandler::setupChanged,
-               this, &CameraNodeObject::onSetupChanged);
+               this, &QOCamera::onSetupChanged);
     connect(mHandler.data(), &CameraHandler::setupChanged,
-            this, &CameraNodeObject::onSetupChanged);
+            this, &QOCamera::onSetupChanged);
 }
 
-void CameraNodeObject::createCameraWithCurrentSceneManager()
+void QOCamera::createCameraWithCurrentSceneManager()
 {
     if(QThread::currentThread() == g_engineThread)
     {
-        disconnect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+        disconnect(this, &QOCamera::requestCreateCameraWithCurrentSceneManager,
                 mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager);
         // Ensure this signal is handled synchronously if called from the engine's thread.
-        connect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+        connect(this, &QOCamera::requestCreateCameraWithCurrentSceneManager,
                 mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager,
                 Qt::DirectConnection);
 
         disconnect(mHandler.data(), &CameraHandler::setupChanged,
-                   this, &CameraNodeObject::onSetupChanged);
+                   this, &QOCamera::onSetupChanged);
         connect(mHandler.data(), &CameraHandler::setupChanged,
-                this, &CameraNodeObject::onSetupChanged,
+                this, &QOCamera::onSetupChanged,
                 Qt::DirectConnection);
     }
 
@@ -249,69 +249,69 @@ void CameraNodeObject::createCameraWithCurrentSceneManager()
     if(QThread::currentThread() == g_engineThread)
     {
         // The next one's should be auto-resolved.
-        disconnect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+        disconnect(this, &QOCamera::requestCreateCameraWithCurrentSceneManager,
                 mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager);
-        connect(this, &CameraNodeObject::requestCreateCameraWithCurrentSceneManager,
+        connect(this, &QOCamera::requestCreateCameraWithCurrentSceneManager,
                 mHandler.data(), &CameraHandler::onCreateCameraWithCurrentSceneManager);
 
         disconnect(mHandler.data(), &CameraHandler::setupChanged,
-                   this, &CameraNodeObject::onSetupChanged);
+                   this, &QOCamera::onSetupChanged);
         connect(mHandler.data(), &CameraHandler::setupChanged,
-                this, &CameraNodeObject::onSetupChanged);
+                this, &QOCamera::onSetupChanged);
     }
 }
 
-void CameraNodeObject::focus(Ogre::SceneNode* node)
+void QOCamera::focus(Ogre::SceneNode* node)
 {
     emit requestFocusSceneNode(node);
 }
 
-Ogre::SceneNode* CameraNodeObject::sceneNode() const
+Ogre::SceneNode* QOCamera::sceneNode() const
 {
     return mNode;
 }
 
-Ogre::SceneNode* CameraNodeObject::focusedNode() const
+Ogre::SceneNode* QOCamera::focusedNode() const
 {
     return mFocusNode;
 }
 
-Ogre::Camera* CameraNodeObject::camera() const
+Ogre::Camera* QOCamera::camera() const
 {
     return mCamera;
 }
 
-void CameraNodeObject::yaw(qreal y)
+void QOCamera::yaw(qreal y)
 {
     emit requestRelativeYawChanged(y);
 }
 
-void CameraNodeObject::pitch(qreal p)
+void QOCamera::pitch(qreal p)
 {
     emit requestRelativePitchChanged(p);
 }
 
-void CameraNodeObject::zoom(qreal z)
+void QOCamera::zoom(qreal z)
 {
     emit requestZoomChanged(z);
 }
 
-qreal CameraNodeObject::getZoom() const
+qreal QOCamera::getZoom() const
 {
     return mZoom;
 }
 
-void CameraNodeObject::onZoomChanged(qreal zoom)
+void QOCamera::onZoomChanged(qreal zoom)
 {
     mZoom = zoom;
 }
 
-void CameraNodeObject::onFocusNodeChanged(Ogre::SceneNode* focusNode)
+void QOCamera::onFocusNodeChanged(Ogre::SceneNode* focusNode)
 {
     mFocusNode = focusNode;
 }
 
-void CameraNodeObject::onSetupChanged(Ogre::Camera* camera, Ogre::SceneNode* sceneNode)
+void QOCamera::onSetupChanged(Ogre::Camera* camera, Ogre::SceneNode* sceneNode)
 {
     mCamera = camera;
     mNode = sceneNode;

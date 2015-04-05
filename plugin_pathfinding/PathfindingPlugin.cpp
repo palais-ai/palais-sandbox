@@ -31,7 +31,7 @@ void PathfindingPlugin::onSceneStarted(const PluginInterface& interface, Scene& 
 
         if(key.toLower() == "navmesh")
         {
-            mPathfinding.initNavGraphFromOgreNode(value->getSceneNode());
+            mPathfinding.initNavGraphFromQONode(value->getSceneNode());
             mPathfinding.visualizeNavGraph(mPathfindingDrawer);
             break;
         }

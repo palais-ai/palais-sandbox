@@ -22,9 +22,9 @@ class Root;
 class Camera;
 }
 
-class OgreEngine;
+class QOEngine;
 class QQmlApplicationEngine;
-class CameraNodeObject;
+class QOCamera;
 
 class Application : public QObject
 {
@@ -68,7 +68,7 @@ public slots:
                                      QVariantMap data);
 private:
     QQmlApplicationEngine* mApplicationEngine;
-    OgreEngine* mOgreEngine;
+    QOEngine* mQOEngine;
     ProjectManager* mProjectManager;
     Ogre::Root* mRoot;
     QScopedPointer<SceneModel> mSceneModel;

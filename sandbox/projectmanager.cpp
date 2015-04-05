@@ -14,13 +14,13 @@
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
 #include <OgreCamera.h>
-#include "OgreEngine.h"
-#include "CameraNodeObject.h"
-#include "OgreItem.h"
+#include "QOEngine.h"
+#include "QOCamera.h"
+#include "QOItem.h"
 
 std::string ProjectManager::sCurrentResourceGroupName = "CurrentScene";
 
-ProjectManager::ProjectManager(OgreEngine* engine) :
+ProjectManager::ProjectManager(QOEngine* engine) :
     QObject(0),
     mScenarioManager(engine),
     mSelectedActor(NULL)
@@ -83,7 +83,7 @@ void ProjectManager::onFocusSelectedActor()
         return;
     }
 
-    CameraNodeObject* cameraNode = getCameraWithName("cam1");
+    QOCamera* cameraNode = getCameraWithName("cam1");
     if(!cameraNode)
     {
         qWarning("Can't focus selected actor without a corresponding CameraNode.");
@@ -97,9 +97,9 @@ void ProjectManager::onSaveRenderView(const QUrl& url)
 {
     assert(QThread::currentThread() == thread());
 
-    QString itemName("ogreItem");
-    QQuickWindow* window = mScenarioManager.getOgreEngine()->getQQuickWindow();
-    OgreItem* item = window->findChild<OgreItem*>(itemName);
+    QString itemName("qoItem");
+    QQuickWindow* window = mScenarioManager.getEngine()->getQQuickWindow();
+    QOItem* item = window->findChild<QOItem*>(itemName);
 
     if(!item)
     {
@@ -150,7 +150,7 @@ void ProjectManager::onUnselectActor()
 
 void ProjectManager::onActorRemoved(const QString& actorName)
 {
-    CameraNodeObject* cameraNode = getCameraWithName("cam1");
+    QOCamera* cameraNode = getCameraWithName("cam1");
     if(!cameraNode)
     {
         // A crash is immanent if this happens anyway - Exit through qFatal.
@@ -193,7 +193,7 @@ void ProjectManager::onSelectActorAtClickpoint(float mouseX,
 {
     assert(QThread::currentThread() == thread());
 
-    CameraNodeObject* cameraNode = getCameraWithName("cam1");
+    QOCamera* cameraNode = getCameraWithName("cam1");
     if(!cameraNode)
     {
         qWarning("Cant determine an actor to select without a corresponding CameraNode.");
@@ -413,7 +413,7 @@ void ProjectManager::onOpenProject(const QUrl url)
     }
 
     QString cameraName("cam1");
-    CameraNodeObject* camera = getCameraWithName(cameraName);
+    QOCamera* camera = getCameraWithName(cameraName);
 
     if(!camera)
     {
@@ -475,7 +475,7 @@ void ProjectManager::loadResources(const QStringList& paths)
     rgm.initialiseResourceGroup(sCurrentResourceGroupName);
 }
 
-void ProjectManager::prepareScene(CameraNodeObject* camera)
+void ProjectManager::prepareScene(QOCamera* camera)
 {
     if(!camera)
     {
@@ -484,7 +484,6 @@ void ProjectManager::prepareScene(CameraNodeObject* camera)
     }
 
     Ogre::Root* root = Ogre::Root::getSingletonPtr();
-
     if(!root)
     {
         qFatal("An Ogre Root must be instantiated before scene load.");
@@ -496,10 +495,10 @@ void ProjectManager::prepareScene(CameraNodeObject* camera)
     camera->createCameraWithCurrentSceneManager();
 }
 
-CameraNodeObject* ProjectManager::getCameraWithName(const QString& cameraName)
+QOCamera* ProjectManager::getCameraWithName(const QString& cameraName)
 {
-    QQuickWindow *window = mScenarioManager.getOgreEngine()->getQQuickWindow();
-    CameraNodeObject* camera = window->findChild<CameraNodeObject*>(cameraName);
+    QQuickWindow *window = mScenarioManager.getEngine()->getQQuickWindow();
+    QOCamera* camera = window->findChild<QOCamera*>(cameraName);
 
     if(!camera)
     {

@@ -7,8 +7,8 @@
  * with this source code in the file LICENSE.}
  */
 
-#ifndef CAMERANODEOBJECT_H
-#define CAMERANODEOBJECT_H
+#ifndef QOCamera_H
+#define QOCamera_H
 
 #include "qmlogre_global.h"
 #include <QObject>
@@ -21,7 +21,7 @@ class SceneNode;
 class Camera;
 }
 
-// Handles camera updates, operating in a thread-safe manner on the OgreEngine's thread.
+// Handles camera updates, operating in a thread-safe manner on the QOEngine's thread.
 class CameraHandler : public QObject
 {
     Q_OBJECT
@@ -48,18 +48,18 @@ private:
     Ogre::Camera* mCamera;
 };
 
-class DLL_EXPORT CameraNodeObject : public QObject
+class DLL_EXPORT QOCamera : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(qreal zoom READ getZoom WRITE zoom)
 public:
-    explicit CameraNodeObject(QObject *parent = 0);
+    explicit QOCamera(QObject *parent = 0);
 
     void createCameraWithCurrentSceneManager();
 
     Ogre::SceneNode* sceneNode() const;
     Ogre::SceneNode* focusedNode() const;
-    Ogre::Camera* camera() const;
+    Ogre::Camera*    camera() const;
 
     // Thread-safe
     Q_INVOKABLE void yaw(qreal y);   // Radians
@@ -68,7 +68,7 @@ public:
     qreal getZoom() const;
 
     // This will cause the Ogre::Camera to depend on this scene node.
-    // To prevent a crash you should change the camera focus once a scene node is removed.
+    // NOTE: You must change the camera focus once a scene node is removed.
     Q_INVOKABLE void focus(Ogre::SceneNode* node);
 signals:
     void cameraChanged(Ogre::Camera* camera);
@@ -85,8 +85,8 @@ private:
     qreal mZoom;
     Ogre::SceneNode* mNode;
     Ogre::SceneNode* mFocusNode;
-    Ogre::Camera* mCamera;
+    Ogre::Camera*    mCamera;
     QScopedPointer<CameraHandler> mHandler;
 };
 
-#endif // CAMERANODEOBJECT_H
+#endif // QOCamera_H

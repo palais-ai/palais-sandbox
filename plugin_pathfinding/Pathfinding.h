@@ -48,7 +48,7 @@ public:
     void update(Scene& scene, float deltaTime);
     void updateActor(Actor& actor, float deltaTime);
 
-    void initNavGraphFromOgreNode(Ogre::SceneNode* node);
+    void initNavGraphFromQONode(Ogre::SceneNode* node);
     void visualizeNavGraph(DebugDrawer* drawer) const;
     Q_INVOKABLE bool moveActor(Actor* actor,
                                const Ogre::Vector3& target,

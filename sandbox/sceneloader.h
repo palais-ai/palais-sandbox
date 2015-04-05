@@ -4,7 +4,7 @@
 #include <QScriptEngine>
 
 class Scene;
-class OgreEngine;
+class QOEngine;
 class PluginManager;
 
 namespace Ogre
@@ -15,7 +15,7 @@ class SceneManager;
 class SceneLoader
 {
 public:
-    static Scene* loadScene(OgreEngine* engine,
+    static Scene* loadScene(QOEngine* engine,
                             Ogre::SceneManager* sceneManager,
                             const QString& name,
                             const QString& sceneFile,
@@ -23,7 +23,7 @@ public:
                             PluginManager& plugins
                             );
 private:
-    static void loadSceneVisuals(OgreEngine* engine,
+    static void loadSceneVisuals(QOEngine* engine,
                                  Ogre::SceneManager* sceneManager,
                                  const QString& sceneFile);
 

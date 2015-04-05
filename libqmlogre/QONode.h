@@ -7,11 +7,11 @@
  * with this source code in the file LICENSE.}
  */
 
-#ifndef OGRENODE_H
-#define OGRENODE_H
+#ifndef QONode_H
+#define QONode_H
 
 #include "qmlogre_global.h"
-#include "OgreEngine.h"
+#include "QOEngine.h"
 #include <QObject>
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGTextureMaterial>
@@ -31,17 +31,17 @@ class RenderTarget;
 class RenderWindow;
 }
 
-class CameraNodeObject;
+class QOCamera;
 
-class DLL_EXPORT OgreNode : public QObject,
+class DLL_EXPORT QONode : public QObject,
                             public QSGGeometryNode
 {
     Q_OBJECT
 public:
     // The fboCreationDelay is used to throttle the framebuffer recreation rate
     // when this QQuickItem's size is changed continuously.
-    OgreNode(float fboCreationDelay = 1.f); // In seconds
-    ~OgreNode();
+    QONode(float fboCreationDelay = 1.f); // In seconds
+    ~QONode();
 
     void setSize(const QSize &size);
     QSize size() const;
@@ -53,7 +53,7 @@ public:
     QImage renderToImage();
     GLuint getOgreFboId();
 
-    void setOgreEngineItem(OgreEngine* ogreRootItem);
+    void setQOEngineItem(QOEngine* ogreRootItem);
     void doneOgreContext();
     void activateOgreContext();
 
@@ -69,10 +69,10 @@ private:
     int getNumberOfFSAASamples();
 
     QSGTextureMaterial mMaterial;
-    QSGOpaqueTextureMaterial mMaterial0;
+    QSGOpaqueTextureMaterial mOpaqueMaterial;
     QSGGeometry mGeometry;
     QScopedPointer<QSGTexture> mTexture;
-    OgreEngine* mOgreEngineItem;
+    QOEngine* mQOEngineItem;
 
     QColor mBackgroundColor;
     QSize mSize;
@@ -87,4 +87,4 @@ private:
     bool mDirtyFBO;
 };
 
-#endif // OGRENODE_H
+#endif // QONode_H
