@@ -77,6 +77,7 @@ ApplicationWindow {
         property color black90: '#1a1a1a'
         property color black95: '#111111'
         property color black75: '#555555'
+        property color transparent: '#00ffffff'
     }
 
     Item {

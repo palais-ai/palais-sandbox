@@ -183,8 +183,6 @@ void SequentialComposite::terminateFromIndex(uint32_t idx)
 {
     if(idx < getChildren().size())
     {
-        AI_ASSERT(idx <= mCurrentBehavior,
-                  "A behavior running after the current behavior should not be terminating.");
         // Terminate all behaviors following (including) __idx__.
         for(uint32_t i = idx; i <= mCurrentBehavior; ++i)
         {

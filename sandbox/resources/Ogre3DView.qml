@@ -61,32 +61,78 @@ Rectangle {
         }
 
         MainWindowControls {
+            MouseArea {
+                id: mainControlsArea
+                anchors.fill: parent
+                hoverEnabled: true
+            }
+
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 14
+            id: mainControls
         }
 
         Ogre3DCameraControls {
+            MouseArea {
+                id: cameraControlsArea
+                anchors.fill: parent
+                hoverEnabled: true
+            }
+
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.topMargin: 14
             anchors.leftMargin: 14
+            id: cameraControls
         }
 
         Rectangle {
+            MouseArea {
+                id: playbackControlsArea
+                anchors.fill: parent
+                hoverEnabled: true
+            }
+
             color: "#80000000"
             width: playbackControls.width + 48
             height: playbackControls.height + 24
             radius: 3
             anchors.centerIn: playbackControls
+            id: playbackControlsBackground
         }
 
         Ogre3DViewPlaybackControls {
             id: playbackControls
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: parent.height * 0.10
+            anchors.bottomMargin: 38
         }
+
+        states: [
+            State {
+                    name: "CONTROLS_HIDDEN"
+                    /**when: !mainControlsArea.containsMouse &&
+                          !cameraControlsArea.containsMouse &&
+                          !playbackControlsArea.containsMouse*/
+                    PropertyChanges {
+                        target: playbackControls
+                        opacity: 0
+                    }
+                    PropertyChanges {
+                        target: playbackControlsBackground
+                        opacity: 0
+                    }
+                    PropertyChanges {
+                        target: cameraControls
+                        opacity: 0
+                    }
+                    PropertyChanges {
+                        target: mainControls
+                        opacity: 0
+                    }
+            }
+        ]
     }
 }
 

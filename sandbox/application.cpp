@@ -198,6 +198,12 @@ void Application::initializeOgre()
     connect(mProjectManager, &ProjectManager::inspectorSelectionChanged,
             this, &Application::onInspectorSelectionChanged);
 
+    // Must be direct to prevent multithreading issues with the model being deleted
+    // before this signal is received.
+    connect(mProjectManager, &ProjectManager::connectKnowledgeModel,
+            this, &Application::onConnectKnowledgeModel,
+            Qt::DirectConnection);
+
     {
         QString dialogName("openProjectDialog");
         QObject* projectDialog = window->findChild<QObject*>(dialogName);
@@ -263,7 +269,9 @@ void Application::onSceneLoaded(Scene* scene)
         return;
     }
 
-    mInspectorModel.reset(new InspectorModel(scene->getName(), scene));
+    mInspectorModel.reset(new InspectorModel(scene->getName(),
+                                             scene->getKnowledge(),
+                                             scene));
 
     mSceneModel.reset(new SceneModel(scene->getName()));
 
@@ -351,8 +359,13 @@ void Application::onPlayingChanged(bool isPlaying)
     emit scenePlayingChanged(isPlaying);
 }
 
-void Application::onInspectorSelectionChanged(QString name,
-                                              const KnowledgeModel* initial)
+void Application::onConnectKnowledgeModel(const KnowledgeModel* model)
 {
-    mInspectorModel->setModel(name, initial);
+    mInspectorModel->connectTo(model);
+}
+
+void Application::onInspectorSelectionChanged(QString name,
+                                              QVariantMap data)
+{
+    mInspectorModel->setModel(name, data);
 }

@@ -3,6 +3,9 @@ import QtQuick.Layouts 1.1
 
 Rectangle {
     id: viewControls
+    width: childLayout.width
+    height: childLayout.height
+    color: "transparent"
 
     Rectangle {
         color: "#80000000"

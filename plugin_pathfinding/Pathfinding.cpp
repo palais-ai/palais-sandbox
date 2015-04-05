@@ -213,12 +213,6 @@ static void barycentric(Ogre::Vector3 p, Ogre::Vector3 a, Ogre::Vector3 b, Ogre:
     u = 1.0f - v - w;
 }
 
-static inline float withinLimits(float f, float l, float u)
-{
-    return (f > l || fabs(f - l) < 0.0001) &&
-           (f < u || fabs(f - u) < 0.0001);
-}
-
 bool Triangle::isProjectionInside(const Ogre::Vector3& point) const
 {
     Ogre::Plane triPlane(a, b, c);
@@ -226,7 +220,9 @@ bool Triangle::isProjectionInside(const Ogre::Vector3& point) const
 
     float u, v , w;
     barycentric(pProjected, a, b, c, u, v, w);
-    return withinLimits(v, 0, 1) && withinLimits(w, 0, 1) && (u > 0 || fabs(u) < 0.0001);
+    return (v > 0 || fabs(v) < 0.0001) &&
+           (w > 0 || fabs(w) < 0.0001) &&
+           (u > 0 || fabs(u) < 0.0001);
 }
 
 const Pathfinding::NavigationGraph::node_type*

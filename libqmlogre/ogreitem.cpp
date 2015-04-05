@@ -12,6 +12,7 @@
 #include "ogreengine.h"
 #include "cameranodeobject.h"
 #include <OgreCamera.h>
+#include <QQuickItemGrabResult>
 
 OgreItem::OgreItem(QQuickItem *parent)
     : QQuickItem(parent)

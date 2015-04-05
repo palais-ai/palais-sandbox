@@ -28,17 +28,28 @@ function spawnFighter(teamColor, name)
         Scheduler.dequeue(root)
     });
 
-    actor.knowledgeChanged.connect(function(key, value){
+    actor.knowledgeChanged.connect(function(key, value) {
         if(key === "movement_target") {
             value.y = Plane.position.y
             actor.setKnowledge("lookat_target", value)
         }
     })
+    actor.knowledgeRemoved.connect(function(key) {
+        if(key === "movement_target") {
+            actor.removeKnowledge("lookat_target")
+        }
+    })
 }
 
-var respawnTime = 7 // in seconds
+var respawnTime = 50 // in seconds
 var bulletCount = 0
-var i = 0;
+var flagTaken = {"green": false, "red": false}
+var flagOwner = {"green": null,  "red": null}
+function getFlagOwner(color)
+{
+    return flagOwner[color]
+}
+
 function shoot(actor, target)
 {
     if(actor.position.distanceTo(target.position) > 7) {
@@ -67,11 +78,17 @@ function shoot(actor, target)
     if(newHealth <= 0) {
         var color = target.getKnowledge("team_color")
         var name = target.name
-
         setTimeout(respawnTime * 1000,
                    function() { 
                         spawnFighter(color, name) 
                    })
+
+        var owner = getFlagOwner(color)
+        if(owner !== null &&
+           target.name === owner.name) {
+            dropFlag(target, color)
+        }
+
         Scene.destroy(target)
     } else {
         target.setKnowledge("health", newHealth)
@@ -81,27 +98,14 @@ function shoot(actor, target)
 function setAllTeamHasFlags(color, value)
 {
     var teamMembers = Scene.getKnowledge("team_" + color)
-
     for(var member in teamMembers) {
         member.setKnowledge("team_has_flag", value)
     }
 }
 
 var global = this
-var flagTaken = {"green": false, "red": false}
-var flagOwner = {"green": null,  "red": null}
-function getFlagOwner(color)
+function takeFlag(actor, color)
 {
-    return flagOwner[color]
-}
-
-function capture(actor)
-{
-    var color = actor.getKnowledge("team_color")
-    if(flagTaken[color] === true) {
-        return;
-    }
-
     var otherColor = color === "red" ? "green" : "red"
 
     actor.setKnowledge("has_flag", true)
@@ -116,6 +120,34 @@ function capture(actor)
     flag.position = new Vector3(0,0,0)
 }
 
+function dropFlag(actor, color)
+{
+    var otherColor = color === "red" ? "green" : "red"
+
+    actor.setKnowledge("has_flag", false)
+    setAllTeamHasFlags(color, false)
+    flagTaken[color] = false
+    flagOwner[color] = null
+
+    var flag = global["flag_" + otherColor]
+    var flagPosKey = "goal_" + otherColor
+
+    // Reset the flag position
+    Scene.attach(flag)
+    flag.scale = flag.scale.multiply(actor.scale)
+    flag.position = Scene.getKnowledge(flagPosKey)
+}
+
+function capture(actor)
+{
+    var color = actor.getKnowledge("team_color")
+    if(flagTaken[color] === true) {
+        return;
+    }
+
+    takeFlag(actor, color)
+}
+
 Scene.setKnowledge("score_green", 0)
 Scene.setKnowledge("score_red", 0)
 function score(actor)
@@ -126,22 +158,9 @@ function score(actor)
         return;
     }
 
-    var otherColor = color === "red" ? "green" : "red"
-
     var scoreKey = "score_" + color
     var score = Scene.getKnowledge(scoreKey)
     Scene.setKnowledge(scoreKey, score + 1)
 
-    actor.setKnowledge("has_flag", false)
-    setAllTeamHasFlags(color, false)
-    flagTaken[color] = false
-    flagOwner[color] = null
-
-    var flagPosKey = "goal_" + otherColor
-    var flag = global["flag_" + otherColor]
-
-    // Reset the flag position
-    Scene.attach(flag)
-    flag.scale = flag.scale.multiply(actor.scale)
-    flag.position = Scene.getKnowledge(flagPosKey)
+    dropFlag(actor, color)
 }

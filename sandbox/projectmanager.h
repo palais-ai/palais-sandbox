@@ -51,7 +51,8 @@ signals:
                          const QString& logicFile);
     void playingChanged(bool isPlaying);
     void inspectorSelectionChanged(QString name,
-                                   const KnowledgeModel* knowledge);
+                                   QVariantMap data);
+    void connectKnowledgeModel(const KnowledgeModel* model);
     void timePassed(const QTime& time);
     void actorChangedSelected(const QString& actorName,
                               bool selected);
@@ -67,6 +68,7 @@ public slots:
     void onTimePassed(const QTime& time);
     void onOpenProject(const QUrl url);
     void onSceneSetupFinished();
+
     // Coordinates are in normalized screen coordinates.
     void onSelectActorAtClickpoint(float mouseX,
                                    float mouseY);
@@ -78,9 +80,13 @@ protected:
     void timerEvent(QTimerEvent *);
 private:
     static std::string sCurrentResourceGroupName;
+
     void loadResources(const QStringList& paths);
     void prepareScene(CameraNodeObject* camera);
     CameraNodeObject* getCameraWithName(const QString& name);
+    void changeInspectorSelection(QString name,
+                                  QVariantMap data,
+                                  const KnowledgeModel* model);
 
     QUrl mLastOpenedUrl, mCurrentProjectUrl;
     SceneManager mScenarioManager;

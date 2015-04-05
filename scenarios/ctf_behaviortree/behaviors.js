@@ -16,6 +16,29 @@ function getOpponentFlagPos(color)
 	return color === "red" ? green : red;
 }
 
+function Idle(timeInMS)
+{
+	this.idleTime = timeInMS;
+	Behavior.call(this);
+}
+
+Idle.prototype = {
+	run: function() {
+		var context = this;
+		this.handle = setTimeout(this.idleTime, function() {
+			delete context.handle
+			context.notifySuccess();
+		})
+		this.setStatus(Status.Waiting)
+	},
+	terminate: function() {
+		if(typeof(this.handle) !== "undefined") {
+			clearTimeout(this.handle)
+		}
+	}
+}
+extend(Behavior, Idle)
+
 function PlayAnimation(animationName)
 {
 	this.animationName = animationName;
@@ -134,6 +157,7 @@ Shoot.prototype =
 }
 extend(Behavior, Shoot);
 
+var rangeTickTime = 1000
 function MonitorTask(actor)
 {
 	this.actor = actor;
@@ -158,7 +182,7 @@ function MonitorTask(actor)
 		}
 	})
 
-	this.rangeHandle = setInterval(1000, function() {
+	this.rangeHandle = setInterval(rangeTickTime, function() {
 		var query = Scene.rangeQuery(actor.position, 3)
 		var result = query.actors
 		for(var i = 0; i < result.length; ++i) {
@@ -205,14 +229,21 @@ var atkRoute1 = [inv(scenics.f)]
 var atkRoute2 = [scenics.r2, inv(scenics.f)]
 var atkRoute3 = [inv(scenics.l3), inv(scenics.f)]
 
+function scenic2vec(p)
+{
+	return new Vector3(p[0], 0, p[1]);
+}
+
 function constructRoute(actor, route)
 {
 	var color = actor.getKnowledge("team_color");
 	var moves = [];
 	for(var i = 0; i < route.length; ++i) {
 		var p = own(color, route[i])
-		moves.push(new WalkTo(new Vector3(p[0], 0, p[1])))
+		moves.push(new WalkTo(scenic2vec(p)))
 	}
+	// Idle at the goal position (=flag), to give the monitor task enough time to run.
+	moves.push(new Idle(rangeTickTime))
 	return construct(Sequence, moves);
 }
 
@@ -222,22 +253,26 @@ function constructAttackerBehaviorTree(actor)
 	var root = new Selector(new HasFlag(new WalkTo(getOwnFlagPos(color)), actor), 
 					        new EnemyInRange(new Shoot(), actor),
 					       	new RandomSelector(constructRoute(actor, atkRoute1),
-					       					   constructRoute(actor, atkRoute2),
-					       					   constructRoute(actor, atkRoute3)))
+					       				 	   constructRoute(actor, atkRoute2),
+					       				 	   constructRoute(actor, atkRoute3)))
 	
 	return root
 }
 
 function constructDefenderBehaviorTree(actor)
 {
-	var root = new Selector(new EnemyInRange(new Shoot(), actor))
+	var color = actor.getKnowledge("team_color");
+	var root = new Selector(new EnemyInRange(new Shoot(), actor),
+							new RandomSelector(new WalkTo(scenic2vec(own(color, scenics.d1))),
+											   new WalkTo(scenic2vec(own(color, scenics.d2))),
+											   new WalkTo(scenic2vec(own(color, scenics.l1)))));
 	return root
 }
 
 function constructBehaviorTreeForActor(actor)
 {
-	var root = new RandomSelector(constructAttackerBehaviorTree(actor));
-								  //constructDefenderBehaviorTree(actor))
+	var root = new RandomSelector(constructAttackerBehaviorTree(actor),
+								  constructAttackerBehaviorTree(actor))
 
 	actor.setKnowledge("self", actor);
 	actor.setKnowledge("has_flag", false);

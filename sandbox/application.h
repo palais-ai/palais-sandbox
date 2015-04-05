@@ -62,8 +62,10 @@ public slots:
     void onSceneLoadFailed(const QString& message);
     void onPlayButtonPressed();
     void onPlayingChanged(bool isPlaying);
+    // Thread-safe
+    void onConnectKnowledgeModel(const KnowledgeModel* model);
     void onInspectorSelectionChanged(QString name,
-                                     const KnowledgeModel* initial);
+                                     QVariantMap data);
 private:
     QQmlApplicationEngine* mApplicationEngine;
     OgreEngine* mOgreEngine;

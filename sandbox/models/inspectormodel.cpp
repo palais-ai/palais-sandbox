@@ -4,7 +4,6 @@
 #include <QtQml>
 #include <QSharedPointer>
 #include <QDebug>
-#include <QMutexLocker>
 #include "OgreStringConverter.h"
 
 void OgreVector3Model::declareQML()
@@ -23,9 +22,7 @@ OgreVector3Model::OgreVector3Model(const Ogre::Vector3& vector) :
 QVariantList OgreVector3Model::getTextualRepresentation() const
 {
     QVariantList list;
-
     list << QString("%1, %2, %3").arg(mVector.x).arg(mVector.y).arg(mVector.z);
-
     return list;
 }
 
@@ -83,10 +80,12 @@ void InspectorModel::declareQML()
 }
 
 InspectorModel::InspectorModel(const QString& name,
+                               const QVariantMap& data,
                                const KnowledgeModel* knowledge) :
     mCurrentModel(NULL)
 {
-    setModel(name, knowledge);
+    connectTo(knowledge);
+    setModel(name, data);
 }
 
 const QString& InspectorModel::getName() const
@@ -95,10 +94,20 @@ const QString& InspectorModel::getName() const
 }
 
 void InspectorModel::setModel(const QString& name,
-                              const KnowledgeModel* knowledge)
+                              const QVariantMap& data)
 {
     beginResetModel();
 
+    mName = name;
+    mKnowledge = data;
+
+    endResetModel();
+
+    emit(nameChanged(name));
+}
+
+void InspectorModel::connectTo(const KnowledgeModel* knowledge)
+{
     if(mCurrentModel)
     {
         disconnect(mCurrentModel, &KnowledgeModel::knowledgeAdded,
@@ -109,14 +118,9 @@ void InspectorModel::setModel(const QString& name,
 
         disconnect(mCurrentModel, &KnowledgeModel::knowledgeRemoved,
                    this, &InspectorModel::onKnowledgeRemoved);
-
-        disconnect(mCurrentModel, &QObject::destroyed,
-                   this, &InspectorModel::onCurrentModelDestroyed);
     }
 
-    mName = name;
     mCurrentModel = knowledge;
-    mKnowledge = knowledge->getKnowledge();
 
     connect(knowledge, &KnowledgeModel::knowledgeAdded,
             this, &InspectorModel::onKnowledgeAdded);
@@ -126,13 +130,6 @@ void InspectorModel::setModel(const QString& name,
 
     connect(knowledge, &KnowledgeModel::knowledgeRemoved,
             this, &InspectorModel::onKnowledgeRemoved);
-
-    connect(knowledge, &QObject::destroyed,
-            this, &InspectorModel::onCurrentModelDestroyed);
-
-    endResetModel();
-
-    emit(nameChanged(name));
 }
 
 void InspectorModel::onKnowledgeAdded(const QString& key, const QVariant& value)
@@ -165,11 +162,6 @@ void InspectorModel::onKnowledgeRemoved(const QString& key)
     const int numRemoved = mKnowledge.remove(key);
     assert(numRemoved == 1);
     endRemoveRows();
-}
-
-void InspectorModel::onCurrentModelDestroyed()
-{
-    mCurrentModel = NULL;
 }
 
 QHash<int, QByteArray> InspectorModel::roleNames() const
@@ -257,8 +249,12 @@ QVariant InspectorModel::data(const QModelIndex &index, int role) const
                 // must live in the QMLEngine's thread.
                 // Consider adding a wrapper class.
                 // The QObject will not be displayed.
-                return "QObject (Not on mainthread)";
+                return "QObject (Other Thread)";
             }
+
+            // This is important, otherwise the QMLEngine will take ownership of the returend object
+            // by default.
+            QQmlEngine::setObjectOwnership(qobject, QQmlEngine::CppOwnership);
         }
 
         return data;

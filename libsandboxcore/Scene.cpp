@@ -274,8 +274,6 @@ RangeQueryResult Scene::rangeQuery(const Ogre::Vector3& origin, float distance)
 }
 
 // CREDITS: http://www.ogre3d.org/forums/viewtopic.php?f=2&t=53647&start=0
-// FIXME: This would delete an attached __Actor__ aswell..
-//        -> Prevent deletion of attached actors and move them to the root scene node instead.
 void Scene::destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
 {
    if ( !i_pSceneNode )
@@ -299,6 +297,27 @@ void Scene::destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
    while ( itChild.hasMoreElements() )
    {
       Ogre::SceneNode* pChildNode = static_cast<Ogre::SceneNode*>(itChild.getNext());
+
+      Ogre::Any any = pChildNode->getUserAny();
+      if(!any.isEmpty())
+      {
+          Actor* actor = Ogre::any_cast<Actor*>(any);
+          if(actor)
+          {
+              qDebug() << "Detaching actor before destruction.";
+              // Make sure we don't delete any attached actors.
+              // Re-attach any found actors to the scene.
+              Ogre::Vector3 pos = pChildNode->_getDerivedPosition();
+              Ogre::Quaternion rot = pChildNode->_getDerivedOrientation();
+              Ogre::Vector3 scale = pChildNode->_getDerivedScale();
+              attach(actor);
+              actor->setPosition(pos);
+              actor->setScale(scale);
+              actor->setRotation(rot);
+              continue;
+          }
+      }
+
       destroyAllAttachedMovableObjects( pChildNode );
    }
 }
@@ -361,9 +380,7 @@ Actor* Scene::instantiate(const QString& name,
     entity->setCastShadows(true);
     node->attachObject(entity);
 
-    Actor* retVal = addActor(node);
-
-    return retVal;
+    return addActor(node);
 }
 
 void Scene::destroy(Actor* actor)

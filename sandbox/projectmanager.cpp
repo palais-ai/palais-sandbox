@@ -95,6 +95,8 @@ void ProjectManager::onFocusSelectedActor()
 
 void ProjectManager::onSaveRenderView(const QUrl& url)
 {
+    assert(QThread::currentThread() == thread());
+
     QString itemName("ogreItem");
     QQuickWindow* window = mScenarioManager.getOgreEngine()->getQQuickWindow();
     OgreItem* item = window->findChild<OgreItem*>(itemName);
@@ -169,7 +171,9 @@ void ProjectManager::onActorRemoved(const QString& actorName)
     if(mSelectedActor && mSelectedActor->getName() == actorName)
     {
         Scene* current = mScenarioManager.getCurrentScene();
-        emit inspectorSelectionChanged(current->getName(), current);
+        changeInspectorSelection(current->getName(),
+                                 current->getKnowledge(),
+                                 current);
         mSelectedActor = NULL;
     }
 }
@@ -188,7 +192,6 @@ void ProjectManager::onSelectActorAtClickpoint(float mouseX,
                                                float mouseY)
 {
     assert(QThread::currentThread() == thread());
-
 
     CameraNodeObject* cameraNode = getCameraWithName("cam1");
     if(!cameraNode)
@@ -236,7 +239,7 @@ void ProjectManager::onActorChangeSelected(const QString& actorName,
     if(newSelected == mSelectedActor && !selected)
     {
         emit actorChangedSelected(mSelectedActor->getName(), false);
-        emit inspectorSelectionChanged(current->getName(), current);
+        changeInspectorSelection(current->getName(), current->getKnowledge(), current);
         mSelectedActor = NULL;
     }
     else if(selected)
@@ -249,8 +252,9 @@ void ProjectManager::onActorChangeSelected(const QString& actorName,
 
         mSelectedActor = newSelected;
         emit actorChangedSelected(mSelectedActor->getName(), true);
-        emit inspectorSelectionChanged(mSelectedActor->getName(),
-                                       mSelectedActor);
+        changeInspectorSelection(mSelectedActor->getName(),
+                                 mSelectedActor->getKnowledge(),
+                                 mSelectedActor);
     }
 }
 
@@ -442,6 +446,11 @@ void ProjectManager::onOpenProject(const QUrl url)
     emit(sceneLoaded(scene));
 }
 
+void ProjectManager::onSceneSetupFinished()
+{
+    mCurrentProjectUrl = mLastOpenedUrl;
+}
+
 void ProjectManager::loadResources(const QStringList& paths)
 {
     Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
@@ -501,7 +510,10 @@ CameraNodeObject* ProjectManager::getCameraWithName(const QString& cameraName)
     return camera;
 }
 
-void ProjectManager::onSceneSetupFinished()
+void ProjectManager::changeInspectorSelection(QString name,
+                                              QVariantMap data,
+                                              const KnowledgeModel* model)
 {
-    mCurrentProjectUrl = mLastOpenedUrl;
+    emit connectKnowledgeModel(model);
+    emit inspectorSelectionChanged(name, data);
 }
