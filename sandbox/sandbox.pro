@@ -56,7 +56,7 @@ CONFIG(release, debug|release) {
     M_BUILD_DIR = debug
 }
 
-include(../linkOgreSDK.pri)
+include(../QOgre/linkOgreSDK.pri)
 
 macx {
     BULLETDIR = $$(BULLET_HOME)
@@ -101,7 +101,7 @@ macx {
     PluginFiles.files += $$files($$BULLETDIR/src/BulletCollision/*.dylib)
     PluginFiles.files += $$files($$BULLETDIR/src/BulletDynamics/*.dylib)
     PluginFiles.files += $$files($$BULLETDIR/src/LinearMath/*.dylib)
-    PluginFiles.files += $$OUT_PWD/../libqmlogre/libqmlogre.1.dylib
+    PluginFiles.files += $$OUT_PWD/../QOgre/libQOgre.1.dylib
     PluginFiles.files += $$OUT_PWD/../libsandboxcore/libsandboxcore.1.dylib
     PluginFiles.files += $$OUT_PWD/../plugin_pathfinding/libplugin_pathfinding.dylib
     PluginFiles.files += $$OUT_PWD/../plugin_planning/libplugin_planning.dylib
@@ -134,7 +134,7 @@ macx {
         plugins.CONFIG = no_check_exist
 
         package.path = $$DESTDIR
-        package.files += $$OUT_PWD/../libqmlogre/$$M_BUILD_DIR/qmlogre.dll
+        package.files += $$OUT_PWD/../QOgre/$$M_BUILD_DIR/QOgre.dll
         package.files += $$OUT_PWD/../libsandboxcore/$$M_BUILD_DIR/sandboxcore.dll
 
         OGRE_LIBS_SUFFIX =
@@ -187,13 +187,6 @@ DEPENDPATH += $$PWD/../libdotsceneloader
 win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/$$M_BUILD_DIR/dotsceneloader.lib
 else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libdotsceneloader/libdotsceneloader.a
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqmlogre/release/ -lqmlogre
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqmlogre/debug/ -lqmlogre
-else:unix: LIBS += -L$$OUT_PWD/../libqmlogre/ -lqmlogre
-
-INCLUDEPATH += $$PWD/../libqmlogre
-DEPENDPATH += $$PWD/../libqmlogre
-
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libsandboxcore/release/ -lsandboxcore
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libsandboxcore/debug/ -lsandboxcore
 else:unix: LIBS += -L$$OUT_PWD/../libsandboxcore/ -lsandboxcore
@@ -201,3 +194,9 @@ else:unix: LIBS += -L$$OUT_PWD/../libsandboxcore/ -lsandboxcore
 INCLUDEPATH += $$PWD/../libsandboxcore
 DEPENDPATH += $$PWD/../libsandboxcore
 
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QOgre/release/ -lQOgre
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QOgre/debug/ -lQOgre
+else:unix: LIBS += -L$$OUT_PWD/../QOgre/ -lQOgre
+
+INCLUDEPATH += $$PWD/../QOgre
+DEPENDPATH += $$PWD/../QOgre

@@ -18,4 +18,4 @@ Headers.path = $$OUT_PWD/include
 Headers.files = $$files(*.h)
 INSTALLS += Headers
 
-include(../linkOgreSDK.pri)
+include(../QOgre/linkOgreSDK.pri)

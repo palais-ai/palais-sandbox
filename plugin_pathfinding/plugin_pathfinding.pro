@@ -25,7 +25,7 @@ HEADERS += \
     Pathfinding.h \
     PathfindingPlugin.h
 
-include(../linkOgreSDK.pri)
+include(../QOgre/linkOgreSDK.pri)
 
 CONFIG(release, debug|release) {
     M_BUILD_DIR = release

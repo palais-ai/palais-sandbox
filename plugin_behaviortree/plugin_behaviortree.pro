@@ -29,7 +29,7 @@ HEADERS += \
     BehaviorPlugin.h \
     BehaviorPrototypes.h
 
-include(../linkOgreSDK.pri)
+include(../QOgre/linkOgreSDK.pri)
 
 INCLUDEPATH += ../sandbox/
 

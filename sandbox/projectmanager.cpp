@@ -100,7 +100,6 @@ void ProjectManager::onSaveRenderView(const QUrl& url)
     QString itemName("qoItem");
     QQuickWindow* window = mScenarioManager.getEngine()->getQQuickWindow();
     QOItem* item = window->findChild<QOItem*>(itemName);
-
     if(!item)
     {
         qFatal("Couldn't find ogre item with name (objectName=%s).",
@@ -414,7 +413,6 @@ void ProjectManager::onOpenProject(const QUrl url)
 
     QString cameraName("cam1");
     QOCamera* camera = getCameraWithName(cameraName);
-
     if(!camera)
     {
         QString msg = QString("Couldn't find first camera (id=%1).").arg(cameraName);

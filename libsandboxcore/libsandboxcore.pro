@@ -37,7 +37,8 @@ HEADERS +=\
     Bindings/ScriptTimer.h \
     Actor.h
 
-include(../linkOgreSDK.pri)
+
+include(../QOgre/linkOgreSDK.pri)
 #include(../linkBulletSDK.pri)
 
 CONFIG(release, debug|release) {
@@ -60,9 +61,9 @@ DEPENDPATH += $$PWD/../libmeshmagick
 win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libmeshmagick/$$M_BUILD_DIR/meshmagick.lib
 else:unix|win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../libmeshmagick/libmeshmagick.a
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libqmlogre/release/ -lqmlogre
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libqmlogre/debug/ -lqmlogre
-else:unix: LIBS += -L$$OUT_PWD/../libqmlogre/ -lqmlogre
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../QOgre/release/ -lQOgre
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../QOgre/debug/ -lQOgre
+else:unix: LIBS += -L$$OUT_PWD/../QOgre/ -lQOgre
 
-INCLUDEPATH += $$PWD/../libqmlogre
-DEPENDPATH += $$PWD/../libqmlogre
+INCLUDEPATH += $$PWD/../QOgre
+DEPENDPATH += $$PWD/../QOgre

@@ -212,7 +212,6 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin,
     {
         Ogre::MovableObject* obj = result.front().movable;
         Ogre::SceneNode* node = obj->getParentSceneNode();
-
         if(!node)
         {
             qWarning("No parent node attached to movable object %s in raycast query.",
@@ -221,7 +220,6 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin,
         }
 
         QWeakPointer<Actor> actor = getActorForNode(node);
-
         if(!actor)
         {
             qWarning("No actor found for scene node %s in raycast query.",
@@ -249,7 +247,6 @@ RangeQueryResult Scene::rangeQuery(const Ogre::Vector3& origin, float distance)
     {
         Ogre::MovableObject* obj = *it;
         Ogre::SceneNode* node = obj->getParentSceneNode();
-
         if(!node)
         {
             qWarning("No parent node attached to movable object %s in sphere query.",
@@ -258,7 +255,6 @@ RangeQueryResult Scene::rangeQuery(const Ogre::Vector3& origin, float distance)
         }
 
         QWeakPointer<Actor> actor = getActorForNode(node);
-
         if(!actor)
         {
             qWarning("No actor found for scene node %s in sphere query.",
