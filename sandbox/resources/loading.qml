@@ -7,13 +7,10 @@ Rectangle {
     NativeText {
         id: loadingIcon
         anchors.centerIn: parent
-        font.pointSize: 40
+        font.pointSize: 48
         font.family: fontAwesome.name
         color: colors.primaryColorDarker
-        width: 40
-        height: 40
         text: "\uf1ce"
-        smooth: true
     }
 
     RotationAnimation {

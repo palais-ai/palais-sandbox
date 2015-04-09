@@ -1,8 +1,10 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
+import QtQuick.Controls.Styles 1.3
 
 RowLayout {
+    id: playbackRow
     spacing: 24
 
     FAIconButton {
@@ -24,6 +26,7 @@ RowLayout {
         spacing: 6
 
         NativeText {
+            id: speedText
             text: "speed: " + speedSlider.value.toFixed(1)
             font.family: openSans.name;
             font.pointSize: 11
@@ -32,6 +35,14 @@ RowLayout {
         }
 
         Slider {
+            style: SliderStyle {
+                groove: Rectangle {
+                    implicitWidth: 70
+                    implicitHeight: 8
+                    color: colors.dimmedTextColor
+                    radius: 8
+                }
+            }
             id: speedSlider
             minimumValue: 0.1
             maximumValue: 10

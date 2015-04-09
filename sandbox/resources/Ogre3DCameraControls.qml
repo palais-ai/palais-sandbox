@@ -19,36 +19,10 @@ Rectangle {
         id: childLayout
         spacing: 12
         focus: true
-        Keys.onPressed: {
-            switch(event.key) {
-            case Qt.Key_Left:
-                appWindow.changeControlAreaState()
-                break;
-            case Qt.Key_Right:
-                appWindow.changeInspectorState()
-                break;
-            case Qt.Key_Down:
-                appWindow.changeConsoleState()
-                break;
-            case Qt.Key_Minus:
-                zoomOutButton.performZoom()
-                event.accepted = true
-                break;
-            case Qt.Key_Plus:
-                zoomInButton.performZoom()
-                event.accepted = true
-                break;
-            case Qt.Key_P:
-                if(ApplicationWrapper.sceneLoaded) {
-                    ApplicationWrapper.onPlayButtonPressed()
-                    event.accepted = true
-                }
-                break;
-            }
-        }
 
         FAIconButton {
             id: zoomOutButton
+            objectName: "zoomOutButton"
             unicode: "\uf010"
             onPressed: performZoom()
 
@@ -59,6 +33,7 @@ Rectangle {
 
         FAIconButton {
             id: zoomInButton
+            objectName: "zoomInButton"
             unicode: "\uf00e"
             onPressed: performZoom()
 

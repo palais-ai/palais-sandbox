@@ -195,6 +195,9 @@ void Application::initializeOgre()
     connect(mProjectManager, SIGNAL(sceneLoadFailed(QString)),
             this, SLOT(onSceneLoadFailed(QString)));
 
+    connect(mProjectManager, &ProjectManager::createProjectFailed,
+            this, &Application::onCreateProjectFailed);
+
     connect(mProjectManager, &ProjectManager::inspectorSelectionChanged,
             this, &Application::onInspectorSelectionChanged);
 
@@ -205,32 +208,46 @@ void Application::initializeOgre()
             Qt::DirectConnection);
 
     {
-        QString dialogName("openProjectDialog");
-        QObject* projectDialog = window->findChild<QObject*>(dialogName);
-
-        if(projectDialog)
+        QString dialogName("newProjectDialog");
+        QObject* dialog = window->findChild<QObject*>(dialogName);
+        if(dialog)
         {
-            QObject::connect(projectDialog, SIGNAL(projectFileSelected(QUrl)),
+            QObject::connect(dialog, SIGNAL(createdNewProject(QString, QString, QString)),
+                             mProjectManager, SLOT(onNewProject(QString, QString, QString)));
+        }
+        else
+        {
+            qFatal("Couldn't find dialog (id=%s).", dialogName.toStdString().c_str());
+        }
+    }
+
+    {
+        QString dialogName("openProjectDialog");
+        QObject* dialog = window->findChild<QObject*>(dialogName);
+
+        if(dialog)
+        {
+            QObject::connect(dialog, SIGNAL(projectFileSelected(QUrl)),
                              mProjectManager, SLOT(onOpenProject(QUrl)));
         }
         else
         {
-            qFatal("Couldn't find project dialog (id=%s).", dialogName.toStdString().c_str());
+            qFatal("Couldn't find dialog (id=%s).", dialogName.toStdString().c_str());
         }
     }
 
     {
         QString dialogName("saveRenderingDialog");
-        QObject* projectDialog = window->findChild<QObject*>(dialogName);
+        QObject* dialog = window->findChild<QObject*>(dialogName);
 
-        if(projectDialog)
+        if(dialog)
         {
-            QObject::connect(projectDialog, SIGNAL(renderingFileSelected(QUrl)),
+            QObject::connect(dialog, SIGNAL(renderingFileSelected(QUrl)),
                              mProjectManager, SLOT(onSaveRenderView(QUrl)));
         }
         else
         {
-            qFatal("Couldn't find rendering dialog (id=%s).", dialogName.toStdString().c_str());
+            qFatal("Couldn't find dialog (id=%s).", dialogName.toStdString().c_str());
         }
     }
 
@@ -315,6 +332,11 @@ bool Application::getScenePlaying() const
     return mProjectManager ? mProjectManager->isPlaying() : false;
 }
 
+void Application::onCreateProjectFailed(const QString& message)
+{
+    onSceneLoadFailed(message);
+}
+
 void Application::onSceneLoadFailed(const QString& message)
 {
     if(mApplicationEngine)
@@ -328,6 +350,22 @@ void Application::onSceneLoadFailed(const QString& message)
     {
         qWarning("Application engine should already be running when a scene load fails.");
     }
+}
+
+void Application::onZoomIn()
+{
+    QMetaObject::invokeMethod(mApplicationEngine->rootObjects()
+                                                .first()
+                                                ->findChild<QObject*>("zoomInButton"),
+                              "performZoom");
+}
+
+void Application::onZoomOut()
+{
+    QMetaObject::invokeMethod(mApplicationEngine->rootObjects()
+                                                .first()
+                                                ->findChild<QObject*>("zoomOutButton"),
+                              "performZoom");
 }
 
 void Application::onPlayButtonPressed()

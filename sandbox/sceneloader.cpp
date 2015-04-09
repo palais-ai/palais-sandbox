@@ -26,7 +26,10 @@ Scene* SceneLoader::loadScene(QOEngine* engine,
 {
     if(engine && sceneManager)
     {
-        loadSceneVisuals(engine, sceneManager, sceneFile);
+        if(!sceneFile.isEmpty())
+        {
+            loadSceneVisuals(engine, sceneManager, sceneFile);
+        }
 
         QString sceneMgrName = QString("%1").arg(Application::sSceneManagerName.c_str());
         QScopedPointer<Scene> scene(new Scene(name,

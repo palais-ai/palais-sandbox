@@ -42,6 +42,7 @@ public:
     // Thread-safe
     Q_INVOKABLE void unselectActor();
 signals:
+    void createProjectFailed(const QString& errorMessage);
     void startSceneLoad(const QString& sceneFile,
                         const QString& logicFile);
     void sceneLoaded(Scene* scene);
@@ -66,6 +67,7 @@ public slots:
     void onActorChangeSelected(const QString& actorName,
                                bool selected);
     void onTimePassed(const QTime& time);
+    void onNewProject(QString name, QString logicFile, QString directory);
     void onOpenProject(const QUrl url);
     void onSceneSetupFinished();
 
@@ -80,6 +82,12 @@ protected:
     void timerEvent(QTimerEvent *);
 private:
     static std::string sCurrentResourceGroupName;
+    static QString sProjectKeyName;
+    static QString sProjectKeyScene;
+    static QString sProjectKeyResources;
+    static QString sProjectKeyLogic;
+    static QString sNewProjectTemplate;
+    static QString sLogicFileTemplate;
 
     void loadResources(const QStringList& paths);
     void prepareScene(QOCamera* camera);

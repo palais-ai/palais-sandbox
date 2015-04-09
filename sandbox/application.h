@@ -59,7 +59,10 @@ public slots:
     void initializeOgre();
     void onOgreIsReady();
     void onSceneLoaded(Scene* scene);
+    void onCreateProjectFailed(const QString& message);
     void onSceneLoadFailed(const QString& message);
+    void onZoomIn();
+    void onZoomOut();
     void onPlayButtonPressed();
     void onPlayingChanged(bool isPlaying);
     // Thread-safe

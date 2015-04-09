@@ -23,14 +23,21 @@ ApplicationWindow {
             enabled: isOgreInitialized
 
             MenuItem {
-                text: "Open scenario"
+                text: "New project"
+                shortcut: "Ctrl+N"
+
+                onTriggered: newProjectDialog.open()
+            }
+
+            MenuItem {
+                text: "Open project"
                 shortcut: "Ctrl+O"
 
                 onTriggered: openProjectDialog.open()
             }
 
             MenuItem {
-                text: "Reload scenario"
+                text: "Reload project"
                 shortcut: "Ctrl+L"
                 enabled: ApplicationWrapper.sceneLoaded
                 onTriggered: ProjectManager.reloadProject()
@@ -38,6 +45,13 @@ ApplicationWindow {
         }
         Menu {
             title: "Edit"
+
+            MenuItem {
+                text: "Play / Pause simulation"
+                shortcut: "Ctrl+R"
+                enabled: ApplicationWrapper.sceneLoaded
+                onTriggered: ApplicationWrapper.onPlayButtonPressed()
+            }
 
             MenuItem {
                 text: "Unselect actor"
@@ -51,9 +65,41 @@ ApplicationWindow {
 
             MenuItem {
                 text: "Save rendering"
-                shortcut: "Ctrl+R"
+                shortcut: "Ctrl+C"
                 enabled: ApplicationWrapper.sceneLoaded
                 onTriggered: saveRenderingDialog.open()
+            }
+
+            MenuItem {
+                text: "Zoom in"
+                shortcut: "+"
+                enabled: ApplicationWrapper.sceneLoaded
+                onTriggered: ApplicationWrapper.onZoomIn()
+            }
+
+            MenuItem {
+                text: "Zoom out"
+                shortcut: "-"
+                enabled: ApplicationWrapper.sceneLoaded
+                onTriggered: ApplicationWrapper.onZoomOut()
+            }
+
+            MenuItem {
+                text: "Show / Hide Scene Overview"
+                shortcut: "Left"
+                onTriggered: appWindow.changeControlAreaState()
+            }
+
+            MenuItem {
+                text: "Show / Hide Knowledge Inspector"
+                shortcut: "Right"
+                onTriggered: appWindow.changeInspectorState()
+            }
+
+            MenuItem {
+                text: "Show / Hide Console"
+                shortcut: "Down"
+                onTriggered: appWindow.changeConsoleState()
             }
         }
     }
@@ -204,6 +250,80 @@ ApplicationWindow {
         icon: StandardIcon.Critical
         visible: false
         standardButtons: StandardButton.Ok
+    }
+
+    Dialog {
+        id: newProjectDialog
+        objectName: "newProjectDialog"
+        title: "Create a new project"
+        visible: false
+        standardButtons: StandardButton.Ok | StandardButton.Cancel
+        width: 420
+        height: 165
+
+        Rectangle {
+            id: projectForm
+            width: 300
+            height: parent.height
+            clip: false
+
+            FormRow {
+                id: nameRow
+                anchors.top: parent.top
+                key: "Name"
+                value: "my_scene"
+            }
+
+            FormRow {
+                id: logicRow
+                anchors.top: nameRow.bottom
+                anchors.topMargin: 12
+                key: "Main Logic File"
+                value: "main.js"
+            }
+
+            FormRow {
+                id: directoryRow
+                anchors.top: logicRow.bottom
+                anchors.topMargin: 12
+                key: "DIRECTORY"
+                value: ""
+                editable: false
+            }
+
+            CallToActionButton {
+                text: "choose"
+                height: directoryRow.height - 3
+                width: newProjectDialog.width - projectForm.width - 32
+                anchors.left: projectForm.right
+                anchors.leftMargin: 8
+                anchors.verticalCenter: directoryRow.verticalCenter
+
+                onPressed: {
+                    newProjectDialog.close()
+                    newProjectDirectoryDialog.open()
+                }
+            }
+        }
+
+        signal createdNewProject(string name, string logicFileName, string directory)
+
+        onAccepted: newProjectDialog.createdNewProject(nameRow.value,
+                                                       logicRow.value,
+                                                       directoryRow.value)
+    }
+
+    FileDialog {
+        id: newProjectDirectoryDialog
+        title: "Please choose a directory to create your project in"
+        visible: false
+        selectMultiple: false
+        selectFolder: true
+
+        onAccepted: {
+            newProjectDialog.open()
+            directoryRow.value = newProjectDirectoryDialog.fileUrl
+        }
     }
 
     FileDialog {

@@ -45,7 +45,7 @@ Rectangle {
         }
     }
 
-    NativeText {
+    TextEdit {
         id: logText
         width: parent.width - logIcon.width - logIcon.anchors.leftMargin * 2
         anchors.top: parent.top
@@ -57,6 +57,11 @@ Rectangle {
         wrapMode: Text.WordWrap
         font.pointSize: 12
         color: colors.almostWhite
+        renderType: Text.NativeRendering
+        readOnly: true
+        selectByMouse: true
+        selectedTextColor: "black"
+        selectionColor: "white"
     }
 
     ListSeparator {

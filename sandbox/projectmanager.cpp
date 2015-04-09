@@ -19,6 +19,24 @@
 #include "QOItem.h"
 
 std::string ProjectManager::sCurrentResourceGroupName = "CurrentScene";
+QString ProjectManager::sProjectKeyName = "name";
+QString ProjectManager::sProjectKeyScene = "scene";
+QString ProjectManager::sProjectKeyResources = "resources";
+QString ProjectManager::sProjectKeyLogic = "logic";
+QString ProjectManager::sNewProjectTemplate = "{\n\
+    \"" + ProjectManager::sProjectKeyName + "\" : \"%1\",\n\
+    \"" + ProjectManager::sProjectKeyScene + "\" : \"\",\n\
+    \"" + ProjectManager::sProjectKeyResources + "\" : [],\n\
+    \"" + ProjectManager::sProjectKeyLogic + "\"  : \"%2\"\n\
+}";
+QString ProjectManager::sLogicFileTemplate = "function onSetup() {\n\
+}\n\
+\n\
+function onTeardown() {\n\
+}\n\
+\n\
+function update(deltaTime) {\n\
+}";
 
 ProjectManager::ProjectManager(QOEngine* engine) :
     QObject(0),
@@ -298,13 +316,99 @@ void ProjectManager::onSetSimulationSpeed(float speedFactor)
     mScenarioManager.setSimulationSpeed(speedFactor);
 }
 
+void ProjectManager::onNewProject(QString name, QString logicFile, QString directory)
+{
+    if(name.isEmpty())
+    {
+        QString errorMsg("Please enter a name for your project.");
+        emit(createProjectFailed(errorMsg));
+        return;
+    }
+
+    if(logicFile.isEmpty())
+    {
+        QString errorMsg("Please enter a name for the main logic file of your project.");
+        emit(createProjectFailed(errorMsg));
+        return;
+    }
+
+    if(!logicFile.endsWith(".js", Qt::CaseInsensitive))
+    {
+        logicFile += ".js";
+    }
+
+    QUrl url = QUrl(directory);
+    if(!url.isValid() || url.isEmpty())
+    {
+        QString errorMsg = QString("Directory at %1 is not a valid directory.")
+                                    .arg(url.toLocalFile());
+
+        emit(createProjectFailed(errorMsg));
+        return;
+    }
+
+    QDir dir(url.toLocalFile());
+    if(!dir.exists())
+    {
+        QString errorMsg = QString("Project directory at %1 doesn't exist.")
+                                    .arg(url.toLocalFile());
+
+        emit(createProjectFailed(errorMsg));
+        return;
+    }
+
+    QString encodedName = QUrl::toPercentEncoding(name);
+    if(!dir.mkdir(encodedName))
+    {
+        QString errorMsg = QString("Failed to create new project directory at %1/%2.")
+                                    .arg(url.toLocalFile())
+                                    .arg(encodedName);
+
+        emit(createProjectFailed(errorMsg));
+        return;
+    }
+
+    dir.cd(encodedName);
+    dir.absolutePath();
+
+    QString projectFileName = dir.absolutePath() + "/project.js";
+    QFile projectFile(projectFileName);
+    if(!projectFile.open(QIODevice::ReadWrite))
+    {
+        QString errorMsg = QString("Failed to open the new project file at %1.")
+                                    .arg(projectFileName);
+
+        emit(createProjectFailed(errorMsg));
+        return;
+    }
+
+    QString newProjectContent = QString(sNewProjectTemplate).arg(name)
+                                                            .arg(logicFile);
+    projectFile.write(newProjectContent.toLocal8Bit());
+    projectFile.close();
+
+    QString encodedLogic = QUrl::toPercentEncoding(logicFile);
+    QString mainFileName = dir.absolutePath() + "/" + encodedLogic;
+    QFile mainFile(mainFileName);
+    if(!mainFile.open(QIODevice::ReadWrite))
+    {
+        QString errorMsg = QString("Failed to open the new project file at %1.")
+                                    .arg(mainFileName);
+
+        emit(createProjectFailed(errorMsg));
+        return;
+    }
+
+    mainFile.write(sLogicFileTemplate.toLocal8Bit());
+    mainFile.close();
+}
+
 // FIXME: Move the parsing code to a separate class
 void ProjectManager::onOpenProject(const QUrl url)
 {
     assert(QThread::currentThread() == thread());
 
     QFile file(url.toLocalFile());
-
     if(!file.open(QIODevice::ReadOnly))
     {
         QString errorMsg = QString("Failed to open the project file at %1.")
@@ -319,7 +423,6 @@ void ProjectManager::onOpenProject(const QUrl url)
 
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson(ba, &error);
-
     if(error.error != QJsonParseError::NoError)
     {
         QString errorMsg = QString("Failed to parse the project file at %0, because it isn't a JSON document.")
@@ -330,31 +433,40 @@ void ProjectManager::onOpenProject(const QUrl url)
 
     QJsonObject obj = doc.object();
 
-    QString visualPropertyName("visual");
+    QString visualPropertyName(sProjectKeyScene);
     QString sceneFile;
     if(obj.contains(visualPropertyName))
     {
-        sceneFile = url.adjusted(QUrl::RemoveFilename).toLocalFile()
-                    + obj[visualPropertyName].toString();
+        QString value = obj[visualPropertyName].toString();
+        if(value.isEmpty())
+        {
+            qDebug() << "Scene property was empty.";
+            sceneFile = "";
+        }
+        else
+        {
+            sceneFile = url.adjusted(QUrl::RemoveFilename).toLocalFile() + value;
+        }
     }
     else
     {
-        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.")
-                             .arg(url.toLocalFile())
-                             .arg(visualPropertyName)));
-        return;
+        qDebug() << "No scene file in project at " << url.toLocalFile()
+                 << ". Specify a scene via the \"" << sProjectKeyScene << "\" property.";
     }
 
-    QString logicPropertyName("logic");
+    QString logicPropertyName(sProjectKeyLogic);
     QString logicFile;
     if(obj.contains(logicPropertyName))
     {
-        qDebug("logic file path: %s, adjusted: %s",
-               url.toLocalFile().toStdString().c_str(),
-               url.adjusted(QUrl::RemoveFilename).toLocalFile().toStdString().c_str());
-
-        logicFile = url.adjusted(QUrl::RemoveFilename).toLocalFile()
-                    + obj[logicPropertyName].toString();
+        QString value = obj[logicPropertyName].toString();
+        if(value.isEmpty())
+        {
+            emit(sceneLoadFailed(QString("Failed to load the project file at %0, because the mandatory property %1 is empty.")
+                                 .arg(url.toLocalFile())
+                                 .arg(logicPropertyName)));
+            return;
+        }
+        logicFile = url.adjusted(QUrl::RemoveFilename).toLocalFile() + value;
     }
     else
     {
@@ -364,7 +476,7 @@ void ProjectManager::onOpenProject(const QUrl url)
         return;
     }
 
-    QString namePropertyName("name");
+    QString namePropertyName(sProjectKeyName);
     QString name;
     if(obj.contains(namePropertyName))
     {
@@ -378,7 +490,7 @@ void ProjectManager::onOpenProject(const QUrl url)
         return;
     }
 
-    QString resourcesPropertyName("resources");
+    QString resourcesPropertyName(sProjectKeyResources);
     QStringList resources;
     if(obj.contains(resourcesPropertyName))
     {
@@ -388,7 +500,6 @@ void ProjectManager::onOpenProject(const QUrl url)
             resources << (url.adjusted(QUrl::RemoveFilename).toLocalFile() + val.toString());
         }
     }
-
 
     const bool isReopen = mCurrentProjectUrl == url;
     mLastOpenedUrl = url;
@@ -429,7 +540,6 @@ void ProjectManager::onOpenProject(const QUrl url)
            logicFile.toStdString().c_str());
 
     Scene* scene = mScenarioManager.loadScene(name, sceneFile, logicFile);
-
     if(!scene)
     {
         emit(sceneLoadFailed(QString("Failed to load scene %1.")
@@ -469,8 +579,10 @@ void ProjectManager::loadResources(const QStringList& paths)
                        << path << "] because it doesn't exist.";
         }
     }
-
-    rgm.initialiseResourceGroup(sCurrentResourceGroupName);
+    if(rgm.resourceGroupExists(sCurrentResourceGroupName))
+    {
+        rgm.initialiseResourceGroup(sCurrentResourceGroupName);
+    }
 }
 
 void ProjectManager::prepareScene(QOCamera* camera)
