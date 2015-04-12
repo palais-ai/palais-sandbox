@@ -63,7 +63,26 @@ QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *
 QScriptValue Vector3_prototype_divide(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Vector3_prototype_dot(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Vector3_prototype_cross(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Vector3_prototype_rotateBy(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Vector3_prototype_length(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Vector3_prototype_equals(QScriptContext *context, QScriptEngine *engine);
+
+void Quaternion_register_prototype(QScriptEngine& engine);
+QScriptValue Quaternion_prototype_ctor(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_x(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_y(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_z(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_w(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_normalize(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_inverse(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_multiply(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_slerp(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_nlerp(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_length(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_toString(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Quaternion_prototype_equals(QScriptContext *context, QScriptEngine *engine);
 }
 
 #endif // JAVASCRIPTBINDINGS_H

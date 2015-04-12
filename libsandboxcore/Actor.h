@@ -20,7 +20,7 @@ class DLL_EXPORT Actor : public KnowledgeModel, public Ogre::Node::Listener
     Q_PROPERTY(Ogre::Vector3 position READ getPosition WRITE setPosition)
     Q_PROPERTY(Ogre::Quaternion rotation READ getRotation WRITE setRotation)
     Q_PROPERTY(Ogre::Vector3 scale READ getScale WRITE setScale)
-    Q_PROPERTY(bool visible WRITE setVisible)
+    Q_PROPERTY(bool visible READ isVisible WRITE setVisible)
 public:
     explicit Actor(Ogre::SceneNode* node);
     ~Actor();
@@ -42,6 +42,7 @@ public:
     Q_INVOKABLE QString toString() const;
     Q_INVOKABLE void attach(Actor* other);
 
+    bool isVisible() const;
     void setVisible(bool visible);
 
     const Ogre::Vector3& getPosition() const;

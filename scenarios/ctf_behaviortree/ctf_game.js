@@ -72,6 +72,7 @@ function shoot(actor, target)
     impactPoint.y += shotHeight
     bullet.setScale(0.1)
     bullet.setKnowledge("movement_target", impactPoint)
+    bullet.setKnowledge("movement_speed", 10)   // in meters per second.
     bullet.knowledgeRemoved.connect(function(key) {
         if(key === "movement_target") {
             Scene.destroyLater(bullet)

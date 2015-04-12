@@ -374,14 +374,12 @@ QScriptValue RaycastResult_prototype_distance(QScriptContext *context, QScriptEn
     Q_UNUSED(engine);
 
     RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
-
     if (!res)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "RaycastResult.prototype.distance: \
                                     this object is not a RaycastResult");
     }
-
     return res->distance;
 }
 
@@ -412,14 +410,12 @@ QScriptValue RaycastResult_prototype_hasHit(QScriptContext *context, QScriptEngi
     Q_UNUSED(engine);
 
     RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
-
     if (!res)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "RaycastResult.prototype.distance: \
                                     this object is not a RaycastResult");
     }
-
     return res->actor != NULL;
 }
 
@@ -448,6 +444,10 @@ void Vector3_register_prototype(QScriptEngine& engine)
     obj.setProperty("divide", engine.newFunction(Vector3_prototype_divide));
     obj.setProperty("normalize", engine.newFunction(Vector3_prototype_normalize));
     obj.setProperty("distanceTo", engine.newFunction(Vector3_prototype_distance));
+    obj.setProperty("dot", engine.newFunction(Vector3_prototype_dot));
+    obj.setProperty("cross", engine.newFunction(Vector3_prototype_cross));
+    obj.setProperty("rotateBy", engine.newFunction(Vector3_prototype_rotateBy));
+    obj.setProperty("length", engine.newFunction(Vector3_prototype_length));
     obj.setProperty("equals", engine.newFunction(Vector3_prototype_equals));
 
     engine.setDefaultPrototype(qMetaTypeId<Ogre::Vector3>(), obj);
@@ -487,6 +487,7 @@ QScriptValue Vector3_prototype_ctor(QScriptContext *context, QScriptEngine *engi
     }
     else
     {
+        qWarning("Vector3.ctor: Please use the 'new' operator.");
         return engine->undefinedValue();
     }
 }
@@ -511,7 +512,7 @@ QScriptValue Vector3_prototype_x(QScriptContext *context, QScriptEngine *engine)
     }
 
     QScriptValue result;
-    if (context->argumentCount() == 1)
+    if (context->argumentCount() >= 1)
     {
         float val = context->argument(0).toNumber();
         result = val;
@@ -545,7 +546,7 @@ QScriptValue Vector3_prototype_y(QScriptContext *context, QScriptEngine *engine)
     }
 
     QScriptValue result;
-    if (context->argumentCount() == 1)
+    if (context->argumentCount() >= 1)
     {
         float val = context->argument(0).toNumber();
         result = val;
@@ -579,7 +580,7 @@ QScriptValue Vector3_prototype_z(QScriptContext *context, QScriptEngine *engine)
     }
 
     QScriptValue result;
-    if (context->argumentCount() == 1)
+    if (context->argumentCount() >= 1)
     {
         float val = context->argument(0).toNumber();
         result = val;
@@ -596,7 +597,6 @@ QScriptValue Vector3_prototype_z(QScriptContext *context, QScriptEngine *engine)
 QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *engine)
 {
     Q_UNUSED(engine);
-
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
     if (!v)
@@ -606,7 +606,6 @@ QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *
                                     this object is not a Ogre::Vector3");
     }
 
-    QString t;
     return QString("Vector3 (x: %1, y: %2, z: %3)")
                   .arg(v->x)
                   .arg(v->y)
@@ -624,14 +623,21 @@ QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engin
                                     this object is not a Ogre::Vector3");
     }
 
-    if (context->argumentCount() == 1)
+    if (context->argumentCount() >= 1)
     {
         Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
         if (!v2)
         {
+            if(context->argument(0).isNumber())
+            {
+                *v += context->argument(0).toNumber();
+
+                return engine->toScriptValue(v);
+            }
+
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.add: \
-                                        Argument #0 object is not a Ogre::Vector3");
+                                        Argument #0 object is not a Ogre::Vector3 or number.");
         }
 
         *v += *v2;
@@ -650,17 +656,24 @@ QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.subtract: \
-                                    this object is not a Ogre::Vector3");
+                                    this object is not a Ogre::Vector3 or number.");
     }
 
-    if (context->argumentCount() == 1)
+    if (context->argumentCount() >= 1)
     {
+        if(context->argument(0).isNumber())
+        {
+            *v -= context->argument(0).toNumber();
+
+            return engine->toScriptValue(v);
+        }
+
         Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
         if (!v2)
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.subtract: \
-                                        Argument #0 object is not a Ogre::Vector3");
+                                        Argument #0 object is not a Ogre::Vector3 or number.");
         }
 
         *v -= *v2;
@@ -679,10 +692,10 @@ QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.multiply: \
-                                    this object is not a Ogre::Vector3");
+                                    this object is not a Ogre::Vector3 or number.");
     }
 
-    if (context->argumentCount() == 1)
+    if (context->argumentCount() >= 1)
     {
         if(context->argument(0).isNumber())
         {
@@ -696,7 +709,7 @@ QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.multiply:\
-                                        Argument #0 object is not a Ogre::Vector3 or a number");
+                                        Argument #0 object is not a Ogre::Vector3 or a number.");
         }
 
         *v *= *v2;
@@ -715,10 +728,10 @@ QScriptValue Vector3_prototype_divide(QScriptContext *context, QScriptEngine *en
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.divide: \
-                                    this object is not a Ogre::Vector3");
+                                    this object is not a Ogre::Vector3 or number.");
     }
 
-    if (context->argumentCount() == 1)
+    if (context->argumentCount() >= 1)
     {
         if(context->argument(0).isNumber())
         {
@@ -732,7 +745,7 @@ QScriptValue Vector3_prototype_divide(QScriptContext *context, QScriptEngine *en
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.divide:\
-                                        Argument #0 object is not a Ogre::Vector3 or a number");
+                                        Argument #0 object is not a Ogre::Vector3 or a number.");
         }
 
         *v /= *v2;
@@ -771,7 +784,7 @@ QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *
                                     this object is not a Ogre::Vector3");
     }
 
-    if (context->argumentCount() == 1)
+    if (context->argumentCount() >= 1)
     {
         Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
         if (!v2)
@@ -787,10 +800,102 @@ QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *
     return engine->undefinedValue();
 }
 
-QScriptValue Vector3_prototype_equals(QScriptContext *context, QScriptEngine *engine)
+QScriptValue Vector3_prototype_dot(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
 
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Vector3.prototype.dot: \
+                                    this object is not a Ogre::Vector3");
+    }
+
+    if (context->argumentCount() >= 1)
+    {
+        Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
+        if (!v2)
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Vector3.prototype.dot:\
+                                        Argument #0 object is not a Ogre::Vector3");
+        }
+
+        return engine->toScriptValue(v->dotProduct(*v2));
+    }
+
+    return engine->undefinedValue();
+}
+
+QScriptValue Vector3_prototype_cross(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Vector3.prototype.cross: \
+                                    this object is not a Ogre::Vector3");
+    }
+
+    if (context->argumentCount() >= 1)
+    {
+        Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
+        if (!v2)
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Vector3.prototype.cross:\
+                                        Argument #0 object is not a Ogre::Vector3");
+        }
+
+        return engine->toScriptValue(v->crossProduct(*v2));
+    }
+
+    return engine->undefinedValue();
+}
+
+QScriptValue Vector3_prototype_rotateBy(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Vector3.prototype.rotateBy: \
+                                    this object is not a Ogre::Vector3");
+    }
+
+    if (context->argumentCount() >= 1)
+    {
+        Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->argument(0));
+        if (!q)
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Vector3.prototype.rotateBy:\
+                                        Argument #0 object is not a Ogre::Quaternion");
+        }
+        return engine->toScriptValue(*q * *v);
+    }
+
+    return engine->undefinedValue();
+}
+
+QScriptValue Vector3_prototype_length(QScriptContext *context, QScriptEngine *engine)
+{
+    Q_UNUSED(engine);
+    Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Vector3.prototype.length: \
+                                    this object is not a Ogre::Vector3");
+    }
+
+    return v->length();
+}
+
+QScriptValue Vector3_prototype_equals(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
@@ -798,7 +903,7 @@ QScriptValue Vector3_prototype_equals(QScriptContext *context, QScriptEngine *en
                                     this object is not a Ogre::Vector3");
     }
 
-    if (context->argumentCount() == 1)
+    if (context->argumentCount() >= 1)
     {
         Ogre::Vector3* v2 = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
         if (!v2)
@@ -810,9 +915,430 @@ QScriptValue Vector3_prototype_equals(QScriptContext *context, QScriptEngine *en
 
         return v->distance(*v2) < 0.001f;
     }
-
     return engine->undefinedValue();
 }
+
+void Quaternion_register_prototype(QScriptEngine& engine)
+{
+    engine.setDefaultPrototype(qMetaTypeId<Ogre::Quaternion*>(), QScriptValue());
+    QScriptValue obj = engine.newVariant(QVariant::fromValue((Ogre::Quaternion*)0));
+
+    obj.setProperty("w", engine.newFunction(Quaternion_prototype_w),
+                    QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
+    obj.setProperty("x", engine.newFunction(Quaternion_prototype_x),
+                    QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
+    obj.setProperty("y", engine.newFunction(Quaternion_prototype_y),
+                    QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
+    obj.setProperty("z", engine.newFunction(Quaternion_prototype_z),
+                    QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
+    obj.setProperty("normalize", engine.newFunction(Quaternion_prototype_normalize));
+    obj.setProperty("inverse", engine.newFunction(Quaternion_prototype_inverse));
+    obj.setProperty("multiply", engine.newFunction(Quaternion_prototype_multiply));
+    obj.setProperty("slerp", engine.newFunction(Quaternion_prototype_slerp));
+    obj.setProperty("nlerp", engine.newFunction(Quaternion_prototype_nlerp));
+    obj.setProperty("toString", engine.newFunction(Quaternion_prototype_toString));
+    obj.setProperty("equals", engine.newFunction(Quaternion_prototype_equals));
+
+    engine.setDefaultPrototype(qMetaTypeId<Ogre::Quaternion>(), obj);
+    engine.setDefaultPrototype(qMetaTypeId<Ogre::Quaternion*>(), obj);
+
+    engine.globalObject().setProperty("Quaternion",
+                                      engine.newFunction(Quaternion_prototype_ctor));
+
+    qScriptRegisterSequenceMetaType<QVector<Ogre::Quaternion> >(&engine);
+    qScriptRegisterSequenceMetaType<QVector<Ogre::Quaternion*> >(&engine);
+}
+
+QScriptValue Quaternion_prototype_ctor(QScriptContext *context, QScriptEngine *engine)
+{
+    if (context->isCalledAsConstructor())
+    {
+        Ogre::Quaternion q;
+
+        if(context->argumentCount() > 0)
+        {
+            Ogre::Vector3* axis = qscriptvalue_cast<Ogre::Vector3*>(context->argument(0));
+            if(axis)
+            {
+                float angle = 0;
+                if(context->argumentCount() > 1 && context->argument(1).isNumber())
+                {
+                    angle = context->argument(1).toNumber();
+                }
+                q = Ogre::Quaternion(Ogre::Radian(angle), *axis);
+            }
+            else if (context->argument(0).isNumber())
+            {
+                float x = 0, y = 0, z = 0, w = 0;
+                w = context->argument(0).toNumber();
+
+                if (context->argumentCount() > 1 && context->argument(1).isNumber())
+                {
+                    x = context->argument(1).toNumber();
+
+                    if (context->argumentCount() > 2 && context->argument(2).isNumber())
+                    {
+                        y = context->argument(2).toNumber();
+
+                        if(context->argumentCount() > 3 && context->argument(3).isNumber())
+                        {
+                            z = context->argument(3).toNumber();
+                        }
+                    }
+                }
+
+                q = Ogre::Quaternion(w,x,y,z);
+            }
+        }
+
+        return engine->toScriptValue(q);
+    }
+    else
+    {
+        qWarning("Quaternion.ctor: Please use the 'new' operator.");
+        return engine->undefinedValue();
+    }
+}
+
+QScriptValue Quaternion_prototype_x(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.x: \
+                                    this object is not a Ogre::Quaternion");
+    }
+
+    QScriptValue obj = context->thisObject();
+    QScriptValue data = obj.data();
+    if (!data.isValid())
+    {
+        data = engine->newObject();
+        obj.setData(data);
+    }
+
+    QScriptValue result;
+    if (context->argumentCount() >= 1)
+    {
+        float val = context->argument(0).toNumber();
+        result = val;
+        q->x = val;
+    }
+    else
+    {
+        result = q->x;
+    }
+
+    return result;
+}
+
+QScriptValue Quaternion_prototype_y(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.x: \
+                                    this object is not a Ogre::Quaternion");
+    }
+
+    QScriptValue obj = context->thisObject();
+    QScriptValue data = obj.data();
+    if (!data.isValid())
+    {
+        data = engine->newObject();
+        obj.setData(data);
+    }
+
+    QScriptValue result;
+    if (context->argumentCount() >= 1)
+    {
+        float val = context->argument(0).toNumber();
+        result = val;
+        q->y = val;
+    }
+    else
+    {
+        result = q->y;
+    }
+
+    return result;
+}
+
+QScriptValue Quaternion_prototype_z(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.x: \
+                                    this object is not a Ogre::Quaternion");
+    }
+
+    QScriptValue obj = context->thisObject();
+    QScriptValue data = obj.data();
+    if (!data.isValid())
+    {
+        data = engine->newObject();
+        obj.setData(data);
+    }
+
+    QScriptValue result;
+    if (context->argumentCount() >= 1)
+    {
+        float val = context->argument(0).toNumber();
+        result = val;
+        q->z = val;
+    }
+    else
+    {
+        result = q->z;
+    }
+
+    return result;
+}
+
+QScriptValue Quaternion_prototype_w(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.x: \
+                                    this object is not a Ogre::Quaternion");
+    }
+
+    QScriptValue obj = context->thisObject();
+    QScriptValue data = obj.data();
+    if (!data.isValid())
+    {
+        data = engine->newObject();
+        obj.setData(data);
+    }
+
+    QScriptValue result;
+    if (context->argumentCount() >= 1)
+    {
+        float val = context->argument(0).toNumber();
+        result = val;
+        q->w = val;
+    }
+    else
+    {
+        result = q->w;
+    }
+
+    return result;
+}
+
+QScriptValue Quaternion_prototype_normalize(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.normalize: \
+                                    this object is not a Ogre::Quaternion");
+    }
+    q->normalise();
+    return engine->toScriptValue(q);
+}
+
+QScriptValue Quaternion_prototype_inverse(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.inverse: \
+                                    this object is not a Ogre::Quaternion");
+    }
+    return engine->toScriptValue(q->Inverse());
+}
+
+QScriptValue Quaternion_prototype_multiply(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.multiply: \
+                                    this object is not a Ogre::Quaternion or number.");
+    }
+
+    if (context->argumentCount() >= 1)
+    {
+        Ogre::Quaternion* q2 = qscriptvalue_cast<Ogre::Quaternion*>(context->argument(0));
+        if (!q2)
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Quaternion.prototype.multiply:\
+                                        Argument #0 object is not a Ogre::Quaternion or a number or number.");
+        }
+
+        *q = *q * *q2;
+
+        return engine->toScriptValue(q);
+    }
+    return engine->undefinedValue();
+}
+
+QScriptValue Quaternion_prototype_slerp(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.slerp: \
+                                    this object is not a Ogre::Quaternion or number.");
+    }
+
+    if (context->argumentCount() >= 2)
+    {
+        float t = 0;
+        if(context->argument(0).isNumber())
+        {
+            t = context->argument(0).toNumber();
+        }
+        else
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Quaternion.prototype.slerp:\
+                                        Argument #0 object is not a number.");
+        }
+
+        Ogre::Quaternion* q2 = qscriptvalue_cast<Ogre::Quaternion*>(context->argument(1));
+        if (!q2)
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Quaternion.prototype.slerp:\
+                                        Argument #1 object is not a Ogre::Quaternion.");
+        }
+
+        bool shortestPath = true;
+        if(context->argumentCount() > 2 && context->argument(2).isBool())
+        {
+            shortestPath = context->argument(2).toBool();
+        }
+
+        return engine->toScriptValue(Ogre::Quaternion::Slerp(t, *q, *q2, shortestPath));
+    }
+    else
+    {
+        qWarning() << "Quaternion.prototype.slerp: Must be called with 2 arguments: "
+                   << "The interpolation point t on [0,1] and the quaternion to rotate to.";
+    }
+    return engine->undefinedValue();
+}
+
+QScriptValue Quaternion_prototype_nlerp(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.nlerp: \
+                                    this object is not a Ogre::Quaternion or number.");
+    }
+
+    if (context->argumentCount() >= 2)
+    {
+        float t = 0;
+        if(context->argument(0).isNumber())
+        {
+            t = context->argument(0).toNumber();
+        }
+        else
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Quaternion.prototype.nlerp:\
+                                        Argument #0 object is not a number.");
+        }
+
+        Ogre::Quaternion* q2 = qscriptvalue_cast<Ogre::Quaternion*>(context->argument(1));
+        if (!q2)
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Quaternion.prototype.nlerp:\
+                                        Argument #1 object is not a Ogre::Quaternion.");
+        }
+
+        bool shortestPath = true;
+        if(context->argumentCount() > 2 && context->argument(2).isBool())
+        {
+            shortestPath = context->argument(2).toBool();
+        }
+
+        return engine->toScriptValue(Ogre::Quaternion::nlerp(t, *q, *q2, shortestPath));
+    }
+    else
+    {
+        qWarning() << "Quaternion.prototype.nlerp: Must be called with 2 arguments: "
+                   << "The interpolation point t on [0,1] and the quaternion to rotate to.";
+    }
+    return engine->undefinedValue();
+}
+
+QScriptValue Quaternion_prototype_length(QScriptContext *context, QScriptEngine *engine)
+{
+    Q_UNUSED(engine);
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.length: \
+                                    this object is not a Ogre::Quaternion");
+    }
+    return q->Norm();
+}
+
+QScriptValue Quaternion_prototype_toString(QScriptContext *context, QScriptEngine *engine)
+{
+    Q_UNUSED(engine);
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.toString: \
+                                    this object is not a Ogre::Quaternion");
+    }
+
+    return QString("Quaternion (w: %0, x: %1, y: %2, z: %3)")
+                  .arg(q->w)
+                  .arg(q->x)
+                  .arg(q->y)
+                  .arg(q->z);
+}
+
+QScriptValue Quaternion_prototype_equals(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::Quaternion* q = qscriptvalue_cast<Ogre::Quaternion*>(context->thisObject());
+    if (!q)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Quaternion.prototype.equals: \
+                                    this object is not a Ogre::Quaternion");
+    }
+
+    if (context->argumentCount() == 1)
+    {
+        Ogre::Quaternion* q2 = qscriptvalue_cast<Ogre::Quaternion*>(context->argument(0));
+        if (!q2)
+        {
+            return context->throwError(QScriptContext::TypeError,
+                                       "Quaternion.prototype.equals:\
+                                        Argument #0 object is not a Ogre::Quaternion");
+        }
+
+        return fabs(q->w - q2->w) < 0.001f &&
+               fabs(q->x - q2->x) < 0.001f &&
+               fabs(q->y - q2->y) < 0.001f &&
+               fabs(q->z - q2->z) < 0.001f;
+    }
+    return engine->undefinedValue();
+}
+
 
 void addActorBinding(Actor* actor, QScriptEngine& engine)
 {

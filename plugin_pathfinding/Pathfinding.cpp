@@ -39,7 +39,7 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
         {
             bool ok;
             actorSpeed = actor.getKnowledge("movement_speed").toFloat(&ok);
-            if(ok)
+            if(!ok)
             {
                 actorSpeed = defaultActorSpeed;
             }
@@ -51,8 +51,8 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
 
         Ogre::Vector3 target = actor.getKnowledge("movement_target").value<Ogre::Vector3>();
         const Ogre::Vector3& current = actor.getPosition();
-
-        if(current.distance(target) < 0.01)
+        const float distanceToTarget = current.distance(target);
+        if(distanceToTarget < 0.01)
         {
             if(actor.hasKnowledge("current_path"))
             {
@@ -97,7 +97,8 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
             }
         }
 
-        Ogre::Vector3 step = (target - current).normalisedCopy() * (actorSpeed * deltaTime);
+        const float stepDistance = std::min(distanceToTarget, actorSpeed * deltaTime);
+        Ogre::Vector3 step = (target - current).normalisedCopy() * stepDistance;
         actor.setPosition(current + step);
     }
 

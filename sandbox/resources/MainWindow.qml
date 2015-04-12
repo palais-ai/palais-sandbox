@@ -9,7 +9,7 @@ ApplicationWindow {
     width: 1024
     height: 660
     visible: true
-    title: "Palais"
+    title: "palais"
     color: colors.gray
 
     minimumWidth: 1024

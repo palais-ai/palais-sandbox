@@ -115,6 +115,21 @@ void Actor::setCastShadows(bool hasShadows)
     }
 }
 
+bool Actor::isVisible() const
+{
+    assert(mNode);
+    Ogre::SceneNode::ObjectIterator it = mNode->getAttachedObjectIterator();
+    while(it.hasMoreElements())
+    {
+        Ogre::MovableObject* obj = static_cast<Ogre::MovableObject*>(it.getNext());
+        if(!obj->isVisible())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Actor::setVisible(bool visible)
 {
     assert(mNode);
