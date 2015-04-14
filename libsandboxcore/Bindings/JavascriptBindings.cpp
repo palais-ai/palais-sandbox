@@ -62,6 +62,7 @@ void addBindings(QScriptEngine& engine, Scene* scene)
     engine.globalObject().setProperty("require", engine.newFunction(script_require));
 
     Vector3_register_prototype(engine);
+    Quaternion_register_prototype(engine);
     RangeQueryResult_register_prototype(engine);
     RaycastResult_register_prototype(engine);
 }
@@ -965,7 +966,7 @@ QScriptValue Quaternion_prototype_ctor(QScriptContext *context, QScriptEngine *e
                 {
                     angle = context->argument(1).toNumber();
                 }
-                q = Ogre::Quaternion(Ogre::Radian(angle), *axis);
+                q = Ogre::Quaternion(Ogre::Degree(angle), *axis);
             }
             else if (context->argument(0).isNumber())
             {

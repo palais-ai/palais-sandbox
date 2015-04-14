@@ -19,11 +19,11 @@ function spawnTeam(teamSize) {
 
 var timer;
 function onSetup() {
-	var teamSize = 5;
+	var teamSize = 1;
 	Scene.setKnowledge("goal_red", flag_red.position);
 	Scene.setKnowledge("goal_green", flag_green.position);
 	spawnTeam(teamSize)
-	spawnTeam(teamSize)
+	//spawnTeam(teamSize)
 
 	Plane.setCastShadows(false)
 }
