@@ -23,6 +23,7 @@ void Scheduler::setListener(SchedulerListener* listener)
 
 void Scheduler::clear()
 {
+    assert(mTasks.size() + mWaiting.empty() == 0);
     std::cout << "Cleared " << mTasks.size() + mWaiting.empty() << " in Scheduler.";
     while(!mTasks.empty())
     {
@@ -107,6 +108,11 @@ HighResolutionTime::Timestamp Scheduler::update(HighResolutionTime::Timestamp ma
 
         // Take tasks from the end (lowest runtime to date).
         Task* current = *mTasks.begin();
+
+        if(mListener)
+        {
+            mListener->onBeginRunTask(current);
+        }
 
         // Ignore changes to the status of this task during its execution time.
         current->setListener(NULL);

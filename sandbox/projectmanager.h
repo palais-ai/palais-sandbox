@@ -10,6 +10,7 @@ class QOEngine;
 class Scene;
 class QOCamera;
 class KnowledgeModel;
+class InspectorModel;
 
 namespace Ogre
 {
@@ -21,7 +22,7 @@ class ProjectManager : public QObject
     Q_OBJECT
     Q_PROPERTY(bool playing READ isPlaying NOTIFY playingChanged)
 public:
-    explicit ProjectManager(QOEngine* engine);
+    explicit ProjectManager(QOEngine* engine, QThread* guiThread);
     ~ProjectManager();
 
     bool getSceneLoaded() const;
@@ -51,9 +52,7 @@ signals:
                          const QString& sceneFile,
                          const QString& logicFile);
     void playingChanged(bool isPlaying);
-    void inspectorSelectionChanged(QString name,
-                                   QVariantMap data);
-    void connectKnowledgeModel(const KnowledgeModel* model);
+    void inspectorSelectionChanged(InspectorModel* model);
     void timePassed(const QTime& time);
     void actorChangedSelected(const QString& actorName,
                               bool selected);
@@ -99,6 +98,7 @@ private:
     QUrl mLastOpenedUrl, mCurrentProjectUrl;
     SceneManager mScenarioManager;
     Actor* mSelectedActor;
+    QThread* mGuiThread;
 };
 
 #endif // PROJECTMANAGER_H

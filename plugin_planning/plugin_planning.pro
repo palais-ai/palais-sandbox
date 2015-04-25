@@ -26,6 +26,7 @@ HEADERS += \
     Planning.h
 
 include(../QOgre/linkOgreSDK.pri)
+include(../ailib/sparsehash/sparsehash.pri)
 
 CONFIG(release, debug|release) {
     M_BUILD_DIR = release

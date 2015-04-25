@@ -19,7 +19,7 @@ Behavior::Behavior() :
 
 Behavior::~Behavior()
 {
-    ;
+    puts("behavior dtor");
 }
 
 void Behavior::setListener(BehaviorListener* listener)

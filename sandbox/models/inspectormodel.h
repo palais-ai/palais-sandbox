@@ -85,9 +85,9 @@ public:
 signals:
     void nameChanged(const QString& name);
 public slots:
-    void onKnowledgeAdded(const QString& key, const QVariant& value);
-    void onKnowledgeChanged(const QString& key, const QVariant& value);
-    void onKnowledgeRemoved(const QString& key);
+    void onKnowledgeAdded(QString key, QVariant value);
+    void onKnowledgeChanged(QString key, QVariant value);
+    void onKnowledgeRemoved(QString key);
 private:
     QString mName;
     QVariantMap mKnowledge;

@@ -66,9 +66,7 @@ public slots:
     void onPlayButtonPressed();
     void onPlayingChanged(bool isPlaying);
     // Thread-safe
-    void onConnectKnowledgeModel(const KnowledgeModel* model);
-    void onInspectorSelectionChanged(QString name,
-                                     QVariantMap data);
+    void onInspectorSelectionChanged(InspectorModel* model);
 private:
     QQmlApplicationEngine* mApplicationEngine;
     QOEngine* mQOEngine;

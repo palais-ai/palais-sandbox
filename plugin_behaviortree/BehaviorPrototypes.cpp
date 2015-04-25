@@ -6,7 +6,7 @@
 
 using namespace ailib;
 
-Q_DECLARE_METATYPE(Behavior*)
+Q_DECLARE_METATYPE(ailib::Behavior*)
 Q_DECLARE_METATYPE(Scheduler*)
 Q_DECLARE_METATYPE(QVariantMap*)
 
@@ -218,7 +218,15 @@ static void removeTerminatedRecursive(QScriptValue behaviorValue)
     {
         assert(behavior->getStatus() == StatusTerminated ||
                behavior->getStatus() == StatusDormant);
-        delete behavior;
+
+        // TODO: This delete leads to crashes by heap corruption, we simply leak the memory until we discover the real cause.
+        //delete behavior;
+
+        behaviorValue.setProperty("__behavior", QScriptValue());
+    }
+    else
+    {
+        assert(false);
     }
 }
 

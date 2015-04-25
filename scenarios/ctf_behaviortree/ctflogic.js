@@ -12,7 +12,8 @@ function spawnTeam(teamSize) {
 	var meshSuffix = numCalls == 1 ? "red" : "green";
 	var spawnDelay = 1000; // in ms
 	for(var i = 0; i < teamSize; ++i) {
-		setTimeout(spawnDelay*i, partial(spawnFighter, meshSuffix, "player_team_" + meshSuffix + "_" + i));
+		setTimeout(spawnDelay*i, partial(spawnFighter, 
+			meshSuffix, "player_team_" + meshSuffix + "_" + i));
 	}
 	numCalls++;
 }

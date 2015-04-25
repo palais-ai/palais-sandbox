@@ -27,8 +27,20 @@ class SchedulerListener
 {
 public:
     virtual ~SchedulerListener() {}
-    virtual void   onTaskAdded(Task* task) = 0;
-    virtual void onTaskRemoved(Task* task) = 0;
+    virtual void   onTaskAdded(Task* task)
+    {
+        UNUSED(task)
+    }
+
+    virtual void onTaskRemoved(Task* task)
+    {
+        UNUSED(task)
+    }
+
+    virtual void onBeginRunTask(Task* task)
+    {
+        UNUSED(task)
+    }
 };
 
 class Scheduler : private TaskListener

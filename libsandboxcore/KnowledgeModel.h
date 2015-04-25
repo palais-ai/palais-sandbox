@@ -20,9 +20,9 @@ public:
     Q_INVOKABLE void setKnowledge(const QString& key, const QVariant& value);
     Q_INVOKABLE void removeKnowledge(const QString& key);
 signals:
-    void knowledgeAdded(const QString& key, const QVariant& knowledge);
-    void knowledgeChanged(const QString& key, const QVariant& knowledge);
-    void knowledgeRemoved(const QString& key);
+    void knowledgeAdded(QString key, QVariant knowledge);
+    void knowledgeChanged(QString key, QVariant knowledge);
+    void knowledgeRemoved(QString key);
 private:
     QVariantMap mKnowledge;
 };

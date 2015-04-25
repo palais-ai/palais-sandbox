@@ -20,7 +20,7 @@ public:
                                bool& skipThisMessage);
 signals:
     void newMessageReceived(ConsoleModel::LogLevel level,
-                            const QString& message);
+                            QString message);
 };
 
 

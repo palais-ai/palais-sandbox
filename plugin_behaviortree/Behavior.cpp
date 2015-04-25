@@ -6,7 +6,7 @@
 
 #define PRINT_DEBUG 0
 
-Q_DECLARE_METATYPE(Behavior*)
+Q_DECLARE_METATYPE(ailib::Behavior*)
 Q_DECLARE_METATYPE(Scheduler*)
 
 BlackboardDecorator::BlackboardDecorator(Scheduler& scheduler,

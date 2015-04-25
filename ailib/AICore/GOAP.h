@@ -5,6 +5,7 @@
 
 #include "ai_global.h"
 #include "Graph.h"
+#include <sparsehash/sparse_hash_map>
 
 BEGIN_NS_AILIB
 
@@ -21,13 +22,22 @@ public:
     virtual float getCost(const state_type& state) const = 0;
 };
 
-template <typename STATE, size_t MAX_ACTIONS = 0>
+template <typename T>
+struct Hash;
+
+template <typename STATE, size_t MAX_ACTIONS = 0, typename HASH_FUN = Hash<STATE> >
 class GOAPPlanner
 {
 public:
     typedef STATE state_type;
     typedef Action<state_type> action_type;
     typedef Graph<state_type, MAX_ACTIONS, UserDataEdge<action_type> > graph_type;
+    typedef google::sparse_hash_map<STATE, uint16_t, HASH_FUN> hash_type;
+
+    GOAPPlanner()
+    {
+        ;
+    }
 
     void addAction(action_type* action)
     {
@@ -39,9 +49,10 @@ public:
         return mGraph;
     }
 
-    size_t buildGraph(const state_type& startState, const state_type& endState, uint32_t maxDepth)
+    size_t buildGraph(const state_type& startState, const state_type& endState, uint16_t maxDepth)
     {
         UNUSED(endState);
+        mHashTable.clear();
         mGraph = graph_type(); //< Clear before build.
         size_t startIdx = mGraph.addNode(startState);
         recursiveBuildGraph(startIdx, maxDepth, 0);
@@ -50,8 +61,8 @@ public:
 
 private:
     void recursiveBuildGraph(size_t currentIdx,
-                             uint32_t maxDepth,
-                             uint32_t currentDepth)
+                             uint16_t maxDepth,
+                             uint16_t currentDepth)
     {
         const state_type currentState = *mGraph.getNode(currentIdx);
 
@@ -64,8 +75,28 @@ private:
             {
                 state_type nextState = currentState;
                 action->applyPostcondition(nextState);
+
                 const size_t nextIdx = mGraph.addNode(nextState);
                 mGraph.addEdge(currentIdx, nextIdx, action->getCost(currentState), action);
+
+                typename hash_type::iterator it = mHashTable.find(nextState);
+                if(it == mHashTable.end())
+                {
+                    // Store this world state to avoid re-processing it.
+                    mHashTable[nextState] = currentDepth;
+                }
+                else
+                {
+                    if(currentDepth < (*it).second)
+                    {
+                        (*it).second = currentDepth;
+                    }
+                    else
+                    {
+                        // Avoid processing following world states.
+                        continue;
+                    }
+                }
 
                 if(currentDepth < maxDepth)
                 {
@@ -76,6 +107,7 @@ private:
     }
 
     graph_type mGraph;
+    hash_type mHashTable;
     std::vector<action_type*> mActions;
 };
 

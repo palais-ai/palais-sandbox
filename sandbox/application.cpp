@@ -164,7 +164,7 @@ void Application::initializeOgre()
     mRoot = mQOEngine->getRoot();
     mQOEngine->setupResources();
 
-    mProjectManager = new ProjectManager(mQOEngine);
+    mProjectManager = new ProjectManager(mQOEngine, this->thread());
     mProjectManager->initializeSceneManager();
 
     engineStartupLogger.stop("Ogre3D startup");
@@ -200,12 +200,6 @@ void Application::initializeOgre()
 
     connect(mProjectManager, &ProjectManager::inspectorSelectionChanged,
             this, &Application::onInspectorSelectionChanged);
-
-    // Must be direct to prevent multithreading issues with the model being deleted
-    // before this signal is received.
-    connect(mProjectManager, &ProjectManager::connectKnowledgeModel,
-            this, &Application::onConnectKnowledgeModel,
-            Qt::DirectConnection);
 
     {
         QString dialogName("newProjectDialog");
@@ -313,10 +307,10 @@ void Application::onSceneLoaded(Scene* scene)
 
     mSceneModel->requestCurrentActors();
 
-    mApplicationEngine->rootContext()->setContextProperty("ActorModel",
-                                                          mSceneModel.data());
     mApplicationEngine->rootContext()->setContextProperty("InspectorModel",
                                                           mInspectorModel.data());
+    mApplicationEngine->rootContext()->setContextProperty("ActorModel",
+                                                          mSceneModel.data());
 
     emit(sceneLoadedChanged(getSceneLoaded()));
     emit(sceneSetupFinished());
@@ -397,13 +391,9 @@ void Application::onPlayingChanged(bool isPlaying)
     emit scenePlayingChanged(isPlaying);
 }
 
-void Application::onConnectKnowledgeModel(const KnowledgeModel* model)
+void Application::onInspectorSelectionChanged(InspectorModel* model)
 {
-    mInspectorModel->connectTo(model);
-}
-
-void Application::onInspectorSelectionChanged(QString name,
-                                              QVariantMap data)
-{
-    mInspectorModel->setModel(name, data);
+    mInspectorModel.reset(model);
+    mApplicationEngine->rootContext()->setContextProperty("InspectorModel",
+                                                          mInspectorModel.data());
 }

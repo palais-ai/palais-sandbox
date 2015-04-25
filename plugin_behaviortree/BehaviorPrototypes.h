@@ -9,6 +9,7 @@
 #include <QVariant>
 #include <QScriptable>
 #include <QHash>
+#include <QDebug>
 
 using namespace ailib;
 
@@ -16,6 +17,10 @@ class ScriptBehavior : public Behavior
 {
 public:
     ScriptBehavior(const QScriptValue& obj);
+    virtual ~ScriptBehavior()
+    {
+        ;
+    }
 
     virtual void run();
     virtual void terminate();

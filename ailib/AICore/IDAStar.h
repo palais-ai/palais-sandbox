@@ -17,6 +17,7 @@ private:
 public:
     typedef typename GRAPH::node_type node_type;
     typedef std::vector<const node_type*> path_type;
+    typedef std::vector<Connection> connections_type;
     typedef real_type(*Heuristic)(const node_type&,
                                   const node_type&);
 
@@ -29,24 +30,53 @@ public:
     path_type findPath(const node_type* const start,
                        const node_type* const goal,
                        Heuristic heuristic,
-                       uint32_t maxDepth) const
+                       const uint32_t maxDepth,
+                       connections_type* /* out */ connections = NULL) const
     {
         AI_ASSERT(start, "Supplied a NULL start node.");
         AI_ASSERT(goal, "Supplied a NULL goal node.");
 
-        real_type estimate = heuristic(*start, *goal);
+        if(maxDepth == 0)
+        {
+            // Do nothing if search depth is 0.
+            if(connections)
+            {
+                *connections = connections_type();
+            }
+            return path_type;
+        }
 
+        path_type retVal;
+        connections_type tmpConnections;
+        real_type estimate = heuristic(*start, *goal);
         while(true)
         {
             real_type newEstimate;
-            DepthSearchResult res = depthSearch(start, goal, 0, estimate, heuristic, newEstimate);
+            DepthSearchResult res = depthSearch(start,
+                                                goal,
+                                                retVal,
+                                                0, //< current cost
+                                                estimate,
+                                                heuristic,
+                                                1, // < depth
+                                                maxDepth,
+                                                newEstimate,
+                                                tmpConnections);
 
             if(res == DepthSearchResultFound)
             {
-                return path_type();
+                if(connections)
+                {
+                    *connections = tmpConnections;
+                }
+                return retVal;
             }
             else if(res == DepthSearchResultUnreachable)
             {
+                if(connections)
+                {
+                    *connections = connections_type();
+                }
                 return path_type();
             }
 
@@ -63,13 +93,16 @@ private:
 
     DepthSearchResult depthSearch(const node_type* node,
                                   const node_type* const goal,
+                                  path_type& currentPath,
                                   real_type currentCost,
                                   real_type currentEstimate,
                                   Heuristic heuristic,
-                                  real_type& /* out */ nextEstimate) const
+                                  const uint32_t depth,
+                                  const uint32_t maxDepth,
+                                  real_type& /* out */ nextEstimate,
+                                  connections_type* /* out */ connections) const
     {
         real_type estimate = currentCost + heuristic(*node, *goal);
-
         if(estimate > currentEstimate)
         {
             nextEstimate = estimate;
@@ -78,7 +111,15 @@ private:
 
         if(node == goal)
         {
+            currentPath.resize(depth);
+            connections->resize(depth - 1);
+            currentPath[depth - 1] = node;
             return DepthSearchResultFound;
+        }
+
+        if(depth == maxDepth)
+        {
+            return DepthSearchResultUnreachable;
         }
 
         const node_type* const firstNode = mGraph.getNodesBegin();
@@ -93,13 +134,18 @@ private:
             real_type tmp = std::numeric_limits<real_type>::max();
             DepthSearchResult res = depthSearch(mGraph.getNode(it->targetIndex),
                                                 goal,
+                                                currentPath,
                                                 currentCost + it->cost,
                                                 currentEstimate,
                                                 heuristic,
-                                                tmp);
+                                                depth + 1,
+                                                maxDepth,
+                                                tmp,
+                                                connections);
 
             if(res == DepthSearchResultFound)
             {
+                (*connections)[depth - 1] = Connection::makeConnection(nodeIdx, it - begin);
                 return DepthSearchResultFound;
             }
             else if(tmp < min)

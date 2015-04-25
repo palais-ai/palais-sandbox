@@ -22,7 +22,7 @@ ConsoleModel::ConsoleModel() :
     ;
 }
 
-void ConsoleModel::onMessageReceived(LogLevel level, const QString& msg)
+void ConsoleModel::onMessageReceived(LogLevel level, QString msg)
 {
     // Prevent endless chains of logs when a log event triggers another log event.
     if(!mIsLogging)
@@ -97,6 +97,11 @@ Qt::ItemFlags ConsoleModel::flags(const QModelIndex &index) const
 
 QVariant ConsoleModel::data(const QModelIndex &index, int role) const
 {
+    if(index.row() >= mLog.size())
+    {
+        return QVariant(QVariant::Invalid);
+    }
+
     switch(role)
     {
     case ModelRoleIndex:

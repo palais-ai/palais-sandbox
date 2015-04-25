@@ -52,7 +52,7 @@ signals:
 public slots:
     void clear();
     void onTimePassed(const QTime& passedTime);
-    void onMessageReceived(LogLevel level, const QString& msg);
+    void onMessageReceived(LogLevel level, QString msg);
     void onFrameSwapped();
     void onFPSTimeout();
 private:

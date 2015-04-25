@@ -59,9 +59,7 @@ QScriptValue planning_default_postcondition(QScriptContext *context, QScriptEngi
 
 QScriptValue planning_add_action(QScriptContext *context, QScriptEngine *engine)
 {
-    // Cast to a pointer to be able to modify the underlying C++ value
     Planner* planner = qscriptvalue_cast<Planner*>(context->thisObject());
-
     if(!planner)
     {
         return context->throwError(QScriptContext::TypeError,
@@ -69,6 +67,7 @@ QScriptValue planning_add_action(QScriptContext *context, QScriptEngine *engine)
     }
 
     QScriptValue precondition, postcondition, cost, perform;
+    QString name;
     if(context->argumentCount() >= 4)
     {
         for(int i = 0; i < 4; ++i)
@@ -97,6 +96,15 @@ QScriptValue planning_add_action(QScriptContext *context, QScriptEngine *engine)
                 break;
             }
         }
+
+        if(context->argumentCount() > 4)
+        {
+            QScriptValue val = context->argument(4);
+            if(val.isString())
+            {
+                name = val.toString();
+            }
+        }
     }
     else
     {
@@ -106,7 +114,7 @@ QScriptValue planning_add_action(QScriptContext *context, QScriptEngine *engine)
         perform = engine->newFunction(planning_default_cost);
     }
 
-    planner->addAction(new ScriptAction(precondition, postcondition, cost, perform));
+    planner->addAction(new ScriptAction(precondition, postcondition, cost, perform, name));
 
     return engine->undefinedValue();
 }
@@ -114,11 +122,13 @@ QScriptValue planning_add_action(QScriptContext *context, QScriptEngine *engine)
 ScriptAction::ScriptAction(const QScriptValue& precondition,
                            const QScriptValue& postcondition,
                            const QScriptValue& cost,
-                           const QScriptValue& perform) :
+                           const QScriptValue& perform,
+                           const QString& name) :
     mPrecondition(precondition),
     mPostcondition(postcondition),
     mCost(cost),
-    mPerform(perform)
+    mPerform(perform),
+    mName(name)
 {
     ;
 }
@@ -126,7 +136,6 @@ ScriptAction::ScriptAction(const QScriptValue& precondition,
 bool ScriptAction::isPreconditionFulfilled(const planner_state_type& state) const
 {
     QScriptEngine* engine = mPrecondition.engine();
-
     if(!engine)
     {
         qWarning("Precondition script function was invalidated.");
@@ -162,6 +171,11 @@ void ScriptAction::perform(Actor* actor)
 {
     QScriptValue value = mPerform.engine()->toScriptValue(actor);
     mPerform.call(QScriptValue(), QScriptValueList() << value);
+}
+
+QString ScriptAction::getName() const
+{
+    return mName;
 }
 
 Planner::Planner(QObject *parent) :
@@ -255,7 +269,7 @@ void Planner::makePlan(Actor* actor,
     }
     else if(isAlreadyThere)
     {
-        qDebug("Goal has already been reached.");
+        qDebug("Plan's goal has already been reached.");
     }
     else
     {
@@ -266,14 +280,22 @@ void Planner::makePlan(Actor* actor,
 
         const planner_type::graph_type& graph = mPlanner.getGraph();
         ailib::AStar<planner_type::graph_type>::connections_type::const_iterator it;
+        QStringList names;
         for(it = connections.begin(); it != connections.end(); ++it)
         {
-            qDebug() << it->edgeIndex;
-            qDebug() << graph.getNumEdges(it->fromNode);
-            static_cast<ScriptAction*>((graph.getSuccessorsBegin(it->fromNode) +
-                                        it->edgeIndex)->userData)
-                                      ->perform(actor);
+            ScriptAction* action = static_cast<ScriptAction*>((graph.getSuccessorsBegin(it->fromNode) +
+                                                               it->edgeIndex)->userData);
+
+            if(action)
+            {
+                names.append(action->getName());
+            }
+            else
+            {
+                qWarning("ScriptAction wasn't set.");
+            }
         }
+        actor->setKnowledge("plan", names);
     }
 }
 

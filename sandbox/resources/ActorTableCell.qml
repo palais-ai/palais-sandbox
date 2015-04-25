@@ -85,7 +85,7 @@ Rectangle {
     states: [
         State {
             name: 'HOVER'
-            when: cellMouseArea.containsMouse
+            //when: cellMouseArea.containsMouse
             PropertyChanges {
                 target: actorCell
                 color: colors.darkerGray

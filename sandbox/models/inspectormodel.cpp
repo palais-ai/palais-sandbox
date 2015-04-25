@@ -84,6 +84,7 @@ InspectorModel::InspectorModel(const QString& name,
                                const KnowledgeModel* knowledge) :
     mCurrentModel(NULL)
 {
+    mKnowledge.setSharable(false);
     connectTo(knowledge);
     setModel(name, data);
 }
@@ -132,7 +133,7 @@ void InspectorModel::connectTo(const KnowledgeModel* knowledge)
             this, &InspectorModel::onKnowledgeRemoved);
 }
 
-void InspectorModel::onKnowledgeAdded(const QString& key, const QVariant& value)
+void InspectorModel::onKnowledgeAdded(QString key, QVariant value)
 {
     QVariantMap tmp = mKnowledge;
     tmp[key] = value;
@@ -143,7 +144,7 @@ void InspectorModel::onKnowledgeAdded(const QString& key, const QVariant& value)
     endInsertRows();
 }
 
-void InspectorModel::onKnowledgeChanged(const QString& key, const QVariant& value)
+void InspectorModel::onKnowledgeChanged(QString key, QVariant value)
 {
     QList<QString> keys = mKnowledge.keys();
     const int i = keys.indexOf(key);
@@ -153,7 +154,7 @@ void InspectorModel::onKnowledgeChanged(const QString& key, const QVariant& valu
     emit dataChanged(createIndex(i,i), createIndex(i,i));
 }
 
-void InspectorModel::onKnowledgeRemoved(const QString& key)
+void InspectorModel::onKnowledgeRemoved(QString key)
 {
     QList<QString> keys = mKnowledge.keys();
     const int i = keys.indexOf(key);

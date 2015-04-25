@@ -30,22 +30,50 @@ public:
     ScriptAction(const QScriptValue& precondition,
                  const QScriptValue& postcondition,
                  const QScriptValue& cost,
-                 const QScriptValue& perform);
+                 const QScriptValue& perform,
+                 const QString& name);
 
     virtual bool isPreconditionFulfilled(const planner_state_type& state) const;
     virtual void applyPostcondition(planner_state_type& state) const;
     virtual float getCost(const planner_state_type& state) const;
 
     void perform(Actor* actor);
+
+    QString getName() const;
 private:
     mutable QScriptValue mPrecondition, mPostcondition, mCost, mPerform;
+    QString mName;
+};
+
+template <typename T>
+struct PlanningHash;
+
+template <>
+struct PlanningHash<planner_state_type>
+{
+    uint64_t operator()(const planner_state_type& state) const
+    {
+        // CREDITS: FNV-1a algorithm primes from http://www.isthe.com/chongo/tech/comp/fnv/
+        // (public domain)
+        static const uint64_t fnv_prime    =        1099511628211u;
+        static const uint64_t offset_basis = 14695981039346656037u;
+
+        uint64_t hash = offset_basis;
+        // Combine the hashes of the individual keys.
+        for(planner_state_type::const_iterator it = state.begin(); it != state.end(); ++it)
+        {
+            hash *= fnv_prime;
+            hash += qHash(it.key());
+        }
+        return hash;
+    }
 };
 
 class Planner : public QObject
 {
     Q_OBJECT
 public:
-    typedef ailib::GOAPPlanner<planner_state_type> planner_type;
+    typedef ailib::GOAPPlanner<planner_state_type, 0, PlanningHash<planner_state_type> > planner_type;
 
     explicit Planner(QObject *parent = 0);
     ~Planner();

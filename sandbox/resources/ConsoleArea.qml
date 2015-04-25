@@ -57,15 +57,21 @@ Rectangle {
                 completed = true
             }
 
+            Component.onDestruction: {
+                timer.stop()
+                completed = false
+            }
+
             Timer {
                 id: timer
                 // We need to schedule this call for after ListView has
                 // finished all of its work. Using a symbolic 1 ms.
-                interval: 1
+                interval: 10
                 running: false
                 repeat: false
                 onTriggered: {
                      if(consoleListView.completed) {
+                         // TODO: This crashes sometimes (why?)
                          consoleListView.positionViewAtEnd()
                      }
                  }

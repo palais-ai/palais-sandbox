@@ -51,7 +51,7 @@ public:
     typedef std::vector<Behavior*> BehaviorList;
 
     Composite(Scheduler& scheduler, const BehaviorList& children);
-    ~Composite();
+    virtual ~Composite();
 
     const BehaviorList& getChildren() const;
     BehaviorList& getChildren();
@@ -70,6 +70,8 @@ public:
     SequentialComposite(Scheduler& scheduler,
                         const Composite::BehaviorList& children);
 
+    virtual ~SequentialComposite() {}
+
     virtual void run();
     virtual void terminate();
     virtual void onReset(Behavior* behavior);
@@ -87,6 +89,7 @@ class Selector : public SequentialComposite
 public:
     Selector(Scheduler& scheduler,
              const Composite::BehaviorList& children);
+    virtual ~Selector() {}
 
     virtual void onSuccess(Behavior* behavior);
     virtual void onFailure(Behavior* behavior);
@@ -97,6 +100,7 @@ class Sequence : public SequentialComposite
 public:
     Sequence(Scheduler& scheduler,
              const Composite::BehaviorList& children);
+    virtual ~Sequence() {}
 
     virtual void onSuccess(Behavior* behavior);
     virtual void onFailure(Behavior* behavior);
@@ -107,6 +111,7 @@ class Parallel : public Composite
 public:
     Parallel(Scheduler& scheduler,
              const Composite::BehaviorList& children);
+    virtual ~Parallel() {}
 
     virtual void run();
     virtual void terminate();
@@ -132,7 +137,7 @@ class Decorator : public Behavior, public BehaviorListener
 {
 public:
     Decorator(Scheduler& scheduler, Behavior* child);
-    ~Decorator();
+    virtual ~Decorator();
 
     virtual void terminate();
     virtual void onSuccess(Behavior* behavior);
@@ -181,6 +186,8 @@ public:
         ;
     }
 
+    virtual ~RandomComposite() {}
+
     virtual void terminate()
     {
         T::terminate();
@@ -194,6 +201,7 @@ class RandomSelector : public RandomComposite<Selector>
 public:
     RandomSelector(Scheduler& scheduler,
                    const Composite::BehaviorList& children);
+    virtual ~RandomSelector() {}
 };
 
 class RandomSequence : public RandomComposite<Sequence>
@@ -201,6 +209,7 @@ class RandomSequence : public RandomComposite<Sequence>
 public:
     RandomSequence(Scheduler& scheduler,
                    const Composite::BehaviorList& children);
+    virtual ~RandomSequence() {}
 };
 
 // TODO: UserDataScope

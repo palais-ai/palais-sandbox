@@ -17,6 +17,7 @@
 #include "QOEngine.h"
 #include "QOCamera.h"
 #include "QOItem.h"
+#include "models/inspectormodel.h"
 
 std::string ProjectManager::sCurrentResourceGroupName = "CurrentScene";
 QString ProjectManager::sProjectKeyName = "name";
@@ -38,10 +39,12 @@ function onTeardown() {\n\
 function update(deltaTime) {\n\
 }";
 
-ProjectManager::ProjectManager(QOEngine* engine) :
+ProjectManager::ProjectManager(QOEngine* engine,
+                               QThread* guiThread) :
     QObject(0),
     mScenarioManager(engine),
-    mSelectedActor(NULL)
+    mSelectedActor(NULL),
+    mGuiThread(guiThread)
 {
     assert(thread() == engine->thread());
 
@@ -623,6 +626,7 @@ void ProjectManager::changeInspectorSelection(QString name,
                                               QVariantMap data,
                                               const KnowledgeModel* model)
 {
-    emit connectKnowledgeModel(model);
-    emit inspectorSelectionChanged(name, data);
+    InspectorModel* newModel = new InspectorModel(name, data, model);
+    newModel->moveToThread(mGuiThread);
+    emit inspectorSelectionChanged(newModel);
 }

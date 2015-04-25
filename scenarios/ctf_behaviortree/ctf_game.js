@@ -1,4 +1,5 @@
 require("global.js")
+require("actions.js")
 
 var gPos = flag_green.position;
 flag_red.position = new Vector3(gPos.x * -1, gPos.y, gPos.z * -1)
@@ -7,6 +8,28 @@ function setInitialState(actor)
 {  
     var defaultHealth = 2;
     actor.setKnowledge("health", defaultHealth)
+}
+
+function calculatePlan(actor) 
+{
+    var teamColor = actor.getKnowledge("team_color");
+    var otherFlag = teamColor == "red" ? flag_green.position : flag_red.position;
+    var ownFlag = teamColor == "red" ? flag_red.position : flag_green.position;
+
+    var planner = new Planner();
+    var moveToOwnFlagAction = new MoveToFlagAction(ownFlag);
+    var moveToOtherFlagAction = new MoveToFlagAction(otherFlag);
+    planner.addAction(moveToOwnFlagAction.precondition,
+                      moveToOwnFlagAction.postcondition,
+                      moveToOwnFlagAction.cost,
+                      moveToOwnFlagAction.perform, "moveToOwnFlag");
+
+    planner.addAction(moveToOtherFlagAction.precondition,
+                      moveToOtherFlagAction.postcondition,
+                      moveToOtherFlagAction.cost,
+                      moveToOtherFlagAction.perform, "moveToOtherFlag");
+
+    planner.makePlan(actor, {"made_points" : true});
 }
 
 function spawnFighter(teamColor, name) 
@@ -42,6 +65,8 @@ function spawnFighter(teamColor, name)
             actor.removeKnowledge("lookat_target")
         }
     })
+
+    calculatePlan(actor);
 }
 
 var respawnTime = 50 // in seconds

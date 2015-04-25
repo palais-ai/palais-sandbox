@@ -59,6 +59,7 @@ Rectangle {
         color: colors.lightGray
     }
 
+
     ComboBox {
         id: textualRepresentation
         anchors.top: knowledgeName.bottom
@@ -67,17 +68,27 @@ Rectangle {
         width: parent.width - horizontalMargin*2
         visible: typeNameForObject(value) !== "object"
 
-        model: {
-            if(value === null && typeof value === "object") {
-                return "NULL";
-            } else if(value.hasOwnProperty("getTextualRepresentation")) {
-                return value.getTextualRepresentation();
-            } else if(value instanceof Array) {
-                return value;
-            } else if(typeNameForObject(value) === "object") {
-                return [];
-            } else {
-                return [value];
+        Component.onCompleted: loadModel.start()
+        Timer {
+            id: loadModel
+            interval: 1
+            running: false
+            repeat: false
+            onTriggered: {
+                var getModel = function() {
+                    if(value === null && typeof value === "object") {
+                        return "NULL";
+                    } else if(value.hasOwnProperty("getTextualRepresentation")) {
+                        return value.getTextualRepresentation();
+                    } else if(value instanceof Array) {
+                        return value;
+                    } else if(typeNameForObject(value) === "object") {
+                        return [];
+                    } else {
+                        return [value];
+                    }
+                };
+                textualRepresentation.model = getModel();
             }
         }
 
@@ -113,7 +124,7 @@ Rectangle {
     states: [
         State {
             name: 'HOVER'
-            when: cellMouseArea.containsMouse
+            //when: cellMouseArea.containsMouse
             PropertyChanges {
                 target: inspectorCell
                 color: colors.darkerGray

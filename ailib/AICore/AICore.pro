@@ -17,7 +17,8 @@ SOURCES += \
     Task.cpp \
     Graph.cpp \
     BehaviorTree.cpp \
-    HighResolutionTime.cpp
+    HighResolutionTime.cpp \
+    Steering.cpp
 
 win32 {
     SOURCES += platform/win32/win32_time.cpp
@@ -38,8 +39,8 @@ HEADERS +=\
     BehaviorTree.h \
     Scheduler.h \
     Task.h \
-    HighResolutionTime.h
-
+    HighResolutionTime.h \
+    Steering.h
 
 CONFIG(release, debug|release) {
     M_BUILD_DIR = release
@@ -60,3 +61,5 @@ DEPENDPATH += $$PWD/../LinearMath
 win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../LinearMath/$$M_BUILD_DIR/libLinearMath.a
 else:win32:!win32-g++: PRE_TARGETDEPS += $$OUT_PWD/../LinearMath/$$M_BUILD_DIR/LinearMath.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../LinearMath/libLinearMath.a
+
+include(../sparsehash/sparsehash.pri)
