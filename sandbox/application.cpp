@@ -76,6 +76,9 @@ Application::Application(QObject *parent) :
 
     connect(mLogHandler.data(), &LogHandler::newMessageReceived,
             mConsoleModel.data(), &ConsoleModel::onMessageReceived);
+
+    connect(this, &Application::sceneSetupFinished,
+            mConsoleModel.data(), &ConsoleModel::onReload);
 }
 
 Application::~Application()

@@ -71,7 +71,6 @@ Rectangle {
                 repeat: false
                 onTriggered: {
                      if(consoleListView.completed) {
-                         // TODO: This crashes sometimes (why?)
                          consoleListView.positionViewAtEnd()
                      }
                  }

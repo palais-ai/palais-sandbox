@@ -55,6 +55,7 @@ public slots:
     void onMessageReceived(LogLevel level, QString msg);
     void onFrameSwapped();
     void onFPSTimeout();
+    void onReload();
 private:
     struct LogEntry
     {

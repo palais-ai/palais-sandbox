@@ -243,3 +243,9 @@ void Actor::attach(Actor* other)
     other->getSceneNode()->getParent()->removeChild(other->getSceneNode());
     mNode->addChild(other->getSceneNode());
 }
+
+void Actor::rotateBy(const Ogre::Vector3& axis, float angleDegrees)
+{
+    assert(mNode);
+    mNode->rotate(axis, Ogre::Degree(angleDegrees));
+}

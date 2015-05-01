@@ -8,6 +8,7 @@
 #include <OgreVector3.h>
 #include <OgreColourValue.h>
 #include <OgreString.h>
+#include <QObject>
 #include <map>
 #include <vector>
 #include <stdint.h>
@@ -71,8 +72,10 @@ private:
 	int index;
 };
  
-class DLL_EXPORT DebugDrawer
+class DLL_EXPORT DebugDrawer : public QObject
 {
+    Q_OBJECT
+    Q_PROPERTY(bool enabled READ getEnabled WRITE setEnabled)
 public: 
     Ogre::String getName() const;
 
@@ -80,19 +83,26 @@ public:
  
 	void setIcoSphereRecursionLevel(int recursionLevel);
  
-	void drawLine(const Ogre::Vector3 &start, const Ogre::Vector3 &end, const Ogre::ColourValue &colour);
-	void drawCircle(const Ogre::Vector3 &centre, float radius, int segmentsCount, const Ogre::ColourValue& colour, bool isFilled = false);
-	void drawCylinder(const Ogre::Vector3 &centre, float radius, int segmentsCount, float height, const Ogre::ColourValue& colour, bool isFilled = false);
-	void drawQuad(const Ogre::Vector3 *vertices, const Ogre::ColourValue& colour, bool isFilled = false);
-	void drawCuboid(const Ogre::Vector3 *vertices, const Ogre::ColourValue& colour, bool isFilled = false);
-	void drawSphere(const Ogre::Vector3 &centre, float radius, const Ogre::ColourValue& colour, bool isFilled = false);
-	void drawTetrahedron(const Ogre::Vector3 &centre, float scale, const Ogre::ColourValue& colour, bool isFilled = false);
+    Q_INVOKABLE void drawLine(const Ogre::Vector3 &start, const Ogre::Vector3 &end, const Ogre::ColourValue &colour);
+    Q_INVOKABLE void drawCircle(const Ogre::Vector3 &centre, float radius, int segmentsCount, const Ogre::ColourValue& colour, bool isFilled = false);
+    Q_INVOKABLE void drawCylinder(const Ogre::Vector3 &centre, float radius, int segmentsCount, float height, const Ogre::ColourValue& colour, bool isFilled = false);
+    Q_INVOKABLE void drawQuad(const Ogre::Vector3 *vertices, const Ogre::ColourValue& colour, bool isFilled = false);
+    Q_INVOKABLE void drawCuboid(const Ogre::Vector3 *vertices, const Ogre::ColourValue& colour, bool isFilled = false);
+    Q_INVOKABLE void drawSphere(const Ogre::Vector3 &centre, float radius, const Ogre::ColourValue& colour, bool isFilled = false);
+    Q_INVOKABLE void drawTetrahedron(const Ogre::Vector3 &centre, float scale, const Ogre::ColourValue& colour, bool isFilled = false);
 
-	bool getEnabled() { return isEnabled; }
-	void setEnabled(bool _isEnabled) { isEnabled = _isEnabled; }
+    Q_INVOKABLE void drawArrow(const Ogre::Vector3 &start, const Ogre::Vector3 &end, const Ogre::ColourValue &colour, float headRadius = 0.02f)
+    {
+        drawLine(start, end, colour);
+        Ogre::Vector3 dir = (end - start).normalisedCopy();
+        drawSphere(end - dir * headRadius, headRadius, colour, true);
+    }
+
+    Q_INVOKABLE bool getEnabled() { return isEnabled; }
+    Q_INVOKABLE void setEnabled(bool _isEnabled) { isEnabled = _isEnabled; }
 	void switchEnabled() { isEnabled = !isEnabled; }
 	
-	void clear();
+    Q_INVOKABLE void clear();
  
 private:
     DebugDrawer(const Ogre::String& name, Ogre::SceneManager *_sceneManager, float _fillAlpha);

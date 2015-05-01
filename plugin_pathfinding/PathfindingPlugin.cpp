@@ -3,7 +3,8 @@
 #include <OgreSceneManager.h>
 
 PathfindingPlugin::PathfindingPlugin(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    mPathfindingDrawer(NULL)
 {
 }
 
@@ -21,8 +22,6 @@ void PathfindingPlugin::onSceneStarted(const PluginInterface& interface, Scene& 
 {
     Q_UNUSED(interface);
 
-    mPathfindingDrawer = scene.createDebugDrawer("navigation_graph");
-
     QListIterator<QObject*> it(scene.getActorsArray());
     while(it.hasNext())
     {
@@ -31,6 +30,7 @@ void PathfindingPlugin::onSceneStarted(const PluginInterface& interface, Scene& 
 
         if(key.toLower() == "navmesh")
         {
+            mPathfindingDrawer = scene.createDebugDrawer("navigation_graph");
             mPathfinding.initNavGraphFromQONode(value->getSceneNode());
             mPathfinding.visualizeNavGraph(mPathfindingDrawer);
             break;
@@ -46,7 +46,11 @@ void PathfindingPlugin::onSceneStarted(const PluginInterface& interface, Scene& 
 void PathfindingPlugin::onSceneEnded(const PluginInterface& interface, Scene& scene)
 {
     Q_UNUSED(interface);
-    scene.destroyDebugDrawer(mPathfindingDrawer);
+    if(mPathfindingDrawer)
+    {
+        scene.destroyDebugDrawer(mPathfindingDrawer);
+        mPathfindingDrawer = NULL;
+    }
 }
 
 void PathfindingPlugin::update(const PluginInterface& interface, Scene& scene, float deltaTime)

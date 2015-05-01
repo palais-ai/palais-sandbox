@@ -143,7 +143,7 @@ public:
         ;
     }
 
-    FORCE_INLINE unsigned int getHash()const
+    FORCE_INLINE unsigned int getHash() const
     {
         return mHash;
     }

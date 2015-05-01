@@ -68,27 +68,17 @@ Rectangle {
         width: parent.width - horizontalMargin*2
         visible: typeNameForObject(value) !== "object"
 
-        Component.onCompleted: loadModel.start()
-        Timer {
-            id: loadModel
-            interval: 1
-            running: false
-            repeat: false
-            onTriggered: {
-                var getModel = function() {
-                    if(value === null && typeof value === "object") {
-                        return "NULL";
-                    } else if(value.hasOwnProperty("getTextualRepresentation")) {
-                        return value.getTextualRepresentation();
-                    } else if(value instanceof Array) {
-                        return value;
-                    } else if(typeNameForObject(value) === "object") {
-                        return [];
-                    } else {
-                        return [value];
-                    }
-                };
-                textualRepresentation.model = getModel();
+        model: {
+            if(value === null && typeof value === "object") {
+                return "NULL";
+            } else if(value.hasOwnProperty("getTextualRepresentation")) {
+                return value.getTextualRepresentation();
+            } else if(value instanceof Array) {
+                return value;
+            } else if(typeNameForObject(value) === "object") {
+                return [];
+            } else {
+                return [value];
             }
         }
 

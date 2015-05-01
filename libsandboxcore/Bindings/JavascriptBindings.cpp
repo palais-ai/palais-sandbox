@@ -1,6 +1,7 @@
 #include "JavascriptBindings.h"
 #include "../Actor.h"
 #include "../Scene.h"
+#include "../DebugDrawer.h"
 #include "ScriptTimer.h"
 #include <QScriptEngine>
 #include <QTextStream>
@@ -16,13 +17,15 @@
 #include <OgreVector3.h>
 
 Q_DECLARE_METATYPE(Actor*)
+Q_DECLARE_METATYPE(DebugDrawer*)
 Q_DECLARE_METATYPE(Ogre::Vector3)
 Q_DECLARE_METATYPE(Ogre::Vector3*)
 Q_DECLARE_METATYPE(QVector<Ogre::Vector3>)
 Q_DECLARE_METATYPE(QVector<Ogre::Vector3*>)
 Q_DECLARE_METATYPE(Ogre::Quaternion)
 Q_DECLARE_METATYPE(Ogre::Quaternion*)
-
+Q_DECLARE_METATYPE(Ogre::ColourValue)
+Q_DECLARE_METATYPE(Ogre::ColourValue*)
 Q_DECLARE_METATYPE(RaycastResult)
 Q_DECLARE_METATYPE(RaycastResult*)
 Q_DECLARE_METATYPE(RangeQueryResult)
@@ -54,7 +57,9 @@ void addBindings(QScriptEngine& engine, Scene* scene)
     installModuleSystem(engine, scene);
     timers_register(engine);
 
+    Random_register(engine);
     Actor_register_prototype(engine);
+    qRegisterMetaType<DebugDrawer*>("DebugDrawer*");
 
     QScriptValue sceneVal = engine.newQObject(scene);
 
@@ -65,6 +70,7 @@ void addBindings(QScriptEngine& engine, Scene* scene)
     Quaternion_register_prototype(engine);
     RangeQueryResult_register_prototype(engine);
     RaycastResult_register_prototype(engine);
+    Color_register_prototype(engine);
 }
 
 static bool loadScript(QScriptEngine *engine, const QString& filename)
@@ -185,6 +191,41 @@ void timers_register(QScriptEngine& engine)
 void timers_update(float deltaTime)
 {
     gTimerFactory->updateTimers(deltaTime);
+}
+
+void Random_register(QScriptEngine& engine)
+{
+    // Reset the random seed.
+    qsrand(777);
+
+    QScriptValue random = engine.newObject();
+
+    random.setProperty("uniform", engine.newFunction(Random_uniform));
+    random.setProperty("uniformInt", engine.newFunction(Random_uniformInt));
+    engine.globalObject().setProperty("Random", random);
+}
+
+QScriptValue Random_uniform(QScriptContext *context, QScriptEngine *engine)
+{
+    Q_UNUSED(engine);
+
+    float low = 0, high = 1;
+    if(context->argumentCount() > 0)
+    {
+        low = context->argument(0).toNumber();
+
+        if(context->argumentCount() > 1)
+        {
+            high = context->argument(1).toNumber();
+        }
+    }
+
+    return low + static_cast<float>(qrand()) / static_cast<float>(RAND_MAX / (high - low));
+}
+
+QScriptValue Random_uniformInt(QScriptContext *context, QScriptEngine *engine)
+{
+    return floorf(Random_uniform(context, engine).toNumber() + 0.5);
 }
 
 void checkScriptEngineException(QScriptEngine& engine, const QString& context)
@@ -459,6 +500,11 @@ void Vector3_register_prototype(QScriptEngine& engine)
 
     qScriptRegisterSequenceMetaType<QVector<Ogre::Vector3> >(&engine);
     qScriptRegisterSequenceMetaType<QVector<Ogre::Vector3*> >(&engine);
+
+    engine.globalObject().setProperty("Vectors",
+                                      engine.evaluate("({'UNIT_X': new Vector3(0,0,1),"
+                                                      " 'UNIT_Y': new Vector3(0,1,0),"
+                                                      " 'UNIT_Z'  : new Vector3(0,0,1)})"));
 }
 
 QScriptValue Vector3_prototype_ctor(QScriptContext *context, QScriptEngine *engine)
@@ -1340,6 +1386,225 @@ QScriptValue Quaternion_prototype_equals(QScriptContext *context, QScriptEngine 
     return engine->undefinedValue();
 }
 
+void Color_register_prototype(QScriptEngine& engine)
+{
+    engine.setDefaultPrototype(qMetaTypeId<Ogre::ColourValue*>(), QScriptValue());
+    QScriptValue obj = engine.newVariant(QVariant::fromValue((Ogre::ColourValue*)0));
+
+    obj.setProperty("r", engine.newFunction(Color_prototype_r),
+                    QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
+    obj.setProperty("g", engine.newFunction(Color_prototype_g),
+                    QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
+    obj.setProperty("b", engine.newFunction(Color_prototype_b),
+                    QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
+    obj.setProperty("a", engine.newFunction(Color_prototype_a),
+                    QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
+    obj.setProperty("toString", engine.newFunction(Color_prototype_toString));
+
+    engine.setDefaultPrototype(qMetaTypeId<Ogre::ColourValue>(), obj);
+    engine.setDefaultPrototype(qMetaTypeId<Ogre::ColourValue*>(), obj);
+
+    engine.globalObject().setProperty("Color",
+                                      engine.newFunction(Color_prototype_ctor));
+
+    engine.globalObject().setProperty("Colors",
+                                      engine.evaluate("({'BLACK': new Color(0,0,0,1),"
+                                                      " 'WHITE': new Color(1,1,1,1),"
+                                                      " 'RED'  : new Color(1,0,0,1),"
+                                                      " 'GREEN': new Color(0,1,0,1),"
+                                                      " 'BLUE' : new Color(0,0,1,1)})"));
+}
+
+QScriptValue Color_prototype_ctor(QScriptContext *context, QScriptEngine *engine)
+{
+    if (context->isCalledAsConstructor())
+    {
+        float r = 0, g = 0, b = 0, a = 0;
+
+        if (context->argumentCount() > 0)
+        {
+            r = context->argument(0).toNumber();
+
+            if (context->argumentCount() > 1)
+            {
+                g = context->argument(1).toNumber();
+
+                if (context->argumentCount() > 2)
+                {
+                    b = context->argument(2).toNumber();
+
+                    if (context->argumentCount() > 3)
+                    {
+                        a = context->argument(3).toNumber();
+                    }
+                }
+            }
+        }
+
+        Ogre::ColourValue v(r,g,b,a);
+        return engine->toScriptValue(v);
+    }
+    else
+    {
+        qWarning("Color.ctor: Please use the 'new' operator.");
+        return engine->undefinedValue();
+    }
+}
+
+QScriptValue Color_prototype_r(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::ColourValue* v = qscriptvalue_cast<Ogre::ColourValue*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Color.prototype.r: \
+                                    this object is not a Ogre::ColourValue");
+    }
+
+    QScriptValue obj = context->thisObject();
+    QScriptValue data = obj.data();
+    if (!data.isValid())
+    {
+        data = engine->newObject();
+        obj.setData(data);
+    }
+
+    QScriptValue result;
+    if (context->argumentCount() >= 1)
+    {
+        float val = context->argument(0).toNumber();
+        result = val;
+        v->r = val;
+    }
+    else
+    {
+        result = v->r;
+    }
+
+    return result;
+}
+
+QScriptValue Color_prototype_g(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::ColourValue* v = qscriptvalue_cast<Ogre::ColourValue*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Color.prototype.g: \
+                                    this object is not a Ogre::ColourValue");
+    }
+
+    QScriptValue obj = context->thisObject();
+    QScriptValue data = obj.data();
+    if (!data.isValid())
+    {
+        data = engine->newObject();
+        obj.setData(data);
+    }
+
+    QScriptValue result;
+    if (context->argumentCount() >= 1)
+    {
+        float val = context->argument(0).toNumber();
+        result = val;
+        v->g = val;
+    }
+    else
+    {
+        result = v->g;
+    }
+
+    return result;
+}
+
+QScriptValue Color_prototype_b(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::ColourValue* v = qscriptvalue_cast<Ogre::ColourValue*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Color.prototype.b: \
+                                    this object is not a Ogre::ColourValue");
+    }
+
+    QScriptValue obj = context->thisObject();
+    QScriptValue data = obj.data();
+    if (!data.isValid())
+    {
+        data = engine->newObject();
+        obj.setData(data);
+    }
+
+    QScriptValue result;
+    if (context->argumentCount() >= 1)
+    {
+        float val = context->argument(0).toNumber();
+        result = val;
+        v->b = val;
+    }
+    else
+    {
+        result = v->b;
+    }
+
+    return result;
+}
+
+QScriptValue Color_prototype_a(QScriptContext *context, QScriptEngine *engine)
+{
+    Ogre::ColourValue* v = qscriptvalue_cast<Ogre::ColourValue*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Color.prototype.r: \
+                                    this object is not a Ogre::ColourValue");
+    }
+
+    QScriptValue obj = context->thisObject();
+    QScriptValue data = obj.data();
+    if (!data.isValid())
+    {
+        data = engine->newObject();
+        obj.setData(data);
+    }
+
+    QScriptValue result;
+    if (context->argumentCount() >= 1)
+    {
+        float val = context->argument(0).toNumber();
+        result = val;
+        v->a = val;
+    }
+    else
+    {
+        result = v->a;
+    }
+
+    return result;
+}
+
+QScriptValue Color_prototype_toString(QScriptContext *context, QScriptEngine *engine)
+{
+    Q_UNUSED(engine);
+    Ogre::ColourValue* v = qscriptvalue_cast<Ogre::ColourValue*>(context->thisObject());
+
+    if (!v)
+    {
+        return context->throwError(QScriptContext::TypeError,
+                                   "Color.prototype.toString: \
+                                    this object is not a Ogre::ColourValue");
+    }
+
+    return QString("Color (r: %1, g: %2, b: %3, a: %4)")
+                  .arg(v->r)
+                  .arg(v->g)
+                  .arg(v->b)
+                  .arg(v->a);
+}
 
 void addActorBinding(Actor* actor, QScriptEngine& engine)
 {

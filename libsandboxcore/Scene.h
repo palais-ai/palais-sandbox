@@ -53,8 +53,8 @@ public:
     ~Scene();
 
     Ogre::SceneManager* getOgreSceneManager() const;
-    DebugDrawer* createDebugDrawer(const QString& name, float opacity = 0.5);
-    void destroyDebugDrawer(DebugDrawer* drawer);
+    Q_INVOKABLE DebugDrawer* createDebugDrawer(const QString& name, float opacity = 0.5);
+    Q_INVOKABLE void destroyDebugDrawer(DebugDrawer* drawer);
 
     // Frame Listener
     virtual bool frameStarted(const Ogre::FrameEvent& evt);

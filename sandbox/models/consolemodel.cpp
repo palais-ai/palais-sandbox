@@ -44,10 +44,15 @@ void ConsoleModel::onFPSTimeout()
     mFrameCount = 0;
 }
 
+void ConsoleModel::onReload()
+{
+    mPassedTime = QTime(0,0,0,0);
+    emit passedTimeStringChanged(getPassedTimeString());
+}
+
 void ConsoleModel::onTimePassed(const QTime& passedTime)
 {
     mPassedTime = mPassedTime.addMSecs(passedTime.msec());
-
     emit passedTimeStringChanged(getPassedTimeString());
 }
 

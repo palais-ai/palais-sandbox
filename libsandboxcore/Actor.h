@@ -41,6 +41,7 @@ public:
     Q_INVOKABLE void setCastShadows(bool hasShadows);
     Q_INVOKABLE QString toString() const;
     Q_INVOKABLE void attach(Actor* other);
+    Q_INVOKABLE void rotateBy(const Ogre::Vector3& axis, float angleDegrees);
 
     bool isVisible() const;
     void setVisible(bool visible);

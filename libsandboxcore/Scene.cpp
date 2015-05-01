@@ -63,8 +63,6 @@ Scene::~Scene()
 
     foreach(DebugDrawer* drawer, mDrawers)
     {
-        qWarning() << "User forgot to destroy debug drawer [" << drawer->getName().c_str() << "]."
-                   << "Cleaning up automatically.";
         delete drawer;
     }
 
@@ -511,6 +509,11 @@ void Scene::getActors(Ogre::SceneNode* root)
     while (children.hasMoreElements())
     {
         Ogre::SceneNode* child = static_cast<Ogre::SceneNode*>(children.getNext());
+        if(child->getName() == "Camera")
+        {
+            continue;
+        }
+
         // Recursively add children
         getActors(child);
         addActor(child);

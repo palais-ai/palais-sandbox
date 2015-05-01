@@ -29,6 +29,10 @@ void DLL_EXPORT checkScriptEngineException(QScriptEngine& engine, const QString&
 void DLL_EXPORT timers_register(QScriptEngine& engine);
 void DLL_EXPORT timers_update(float deltaTime); //< To be called by the active scene
 
+void Random_register(QScriptEngine& engine);
+QScriptValue Random_uniform(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Random_uniformInt(QScriptContext *context, QScriptEngine *engine);
+
 QScriptValue script_addTimer_private(QScriptContext *context, QScriptEngine *engine, bool oneShot);
 QScriptValue script_removeTimer_private(QScriptContext *context, QScriptEngine *engine);
 
@@ -83,6 +87,14 @@ QScriptValue Quaternion_prototype_nlerp(QScriptContext *context, QScriptEngine *
 QScriptValue Quaternion_prototype_length(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Quaternion_prototype_toString(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Quaternion_prototype_equals(QScriptContext *context, QScriptEngine *engine);
+
+void Color_register_prototype(QScriptEngine& engine);
+QScriptValue Color_prototype_ctor(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Color_prototype_r(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Color_prototype_g(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Color_prototype_b(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Color_prototype_a(QScriptContext *context, QScriptEngine *engine);
+QScriptValue Color_prototype_toString(QScriptContext *context, QScriptEngine *engine);
 }
 
 #endif // JAVASCRIPTBINDINGS_H

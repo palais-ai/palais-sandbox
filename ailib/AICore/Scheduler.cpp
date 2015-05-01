@@ -23,8 +23,7 @@ void Scheduler::setListener(SchedulerListener* listener)
 
 void Scheduler::clear()
 {
-    assert(mTasks.size() + mWaiting.empty() == 0);
-    std::cout << "Cleared " << mTasks.size() + mWaiting.empty() << " in Scheduler.";
+    std::cout << "Cleared " << mTasks.size() + mWaiting.size() << " in Scheduler.";
     while(!mTasks.empty())
     {
         Task* current = *mTasks.begin();
