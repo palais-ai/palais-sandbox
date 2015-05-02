@@ -6,8 +6,6 @@
 #include <OgreAnimation.h>
 #include <OgreEntity.h>
 
-QList<void*> gDeletedKnowledge;
-
 Actor::Actor(Ogre::SceneNode* node) :
     mNode(node)
 {
@@ -21,7 +19,6 @@ Actor::Actor(Ogre::SceneNode* node) :
 
 Actor::~Actor()
 {
-    gDeletedKnowledge += getKnowledgePtr();
     if(mNode)
     {
         mNode->setListener(NULL);

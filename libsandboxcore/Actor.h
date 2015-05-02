@@ -6,8 +6,6 @@
 #include <OgreQuaternion.h>
 #include <OgreNode.h>
 
-extern QList<void*> gDeletedKnowledge;
-
 namespace Ogre
 {
 class SceneNode;
@@ -27,7 +25,7 @@ public:
 
     void update(float deltaTime);
 
-    // QONodeListener
+    // Ogre::Node::Listener
     virtual void nodeDestroyed(const Ogre::Node* node);
 
     Q_INVOKABLE void toggleHighlight(bool highlighted);

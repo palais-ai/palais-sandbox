@@ -127,6 +127,29 @@ void Scene::destroyDebugDrawer(DebugDrawer* drawer)
     }
 }
 
+DebugDrawer* Scene::createDrawer(const QString& name, float opacity)
+{
+    return createDebugDrawer(name, opacity);
+}
+
+void Scene::destroyDrawer(DebugDrawer* drawer)
+{
+    destroyDebugDrawer(drawer);
+}
+
+void Scene::destroyDrawer(const QString& name)
+{
+    QHash<QString, DebugDrawer*>::iterator it = mDrawers.find(name);
+    if(it != mDrawers.end())
+    {
+        destroyDebugDrawer(it.value());
+    }
+    else
+    {
+        qWarning() << "There's no drawer with the name [" << name << "].";
+    }
+}
+
 void Scene::setCameraFocus(Actor* actor)
 {
     if(!actor)

@@ -11,8 +11,6 @@
 #include <OgreQuaternion.h>
 #include <OgreFrameListener.h>
 
-extern QList<void*> gDeletedActors;
-
 class Actor;
 class QOEngine;
 class DebugDrawer;
@@ -53,8 +51,12 @@ public:
     ~Scene();
 
     Ogre::SceneManager* getOgreSceneManager() const;
-    Q_INVOKABLE DebugDrawer* createDebugDrawer(const QString& name, float opacity = 0.5);
-    Q_INVOKABLE void destroyDebugDrawer(DebugDrawer* drawer);
+
+    DebugDrawer* createDebugDrawer(const QString& name, float opacity = 0.5);
+    void destroyDebugDrawer(DebugDrawer* drawer);
+    Q_INVOKABLE DebugDrawer* createDrawer(const QString& name, float opacity = 0.5);
+    Q_INVOKABLE void destroyDrawer(DebugDrawer* drawer);
+    Q_INVOKABLE void destroyDrawer(const QString& name);
 
     // Frame Listener
     virtual bool frameStarted(const Ogre::FrameEvent& evt);
