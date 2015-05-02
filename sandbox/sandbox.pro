@@ -1,4 +1,4 @@
-CONFIG += qt debug
+CONFIG += qt
 QT += qml quick script
 TEMPLATE = app
 TARGET = Palais
