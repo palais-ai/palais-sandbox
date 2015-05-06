@@ -21,7 +21,7 @@ public:
                         Behavior* child,
                         Actor* actor,
                         QString observedValue);
-    virtual ~BlackboardDecorator() {}
+    virtual ~BlackboardDecorator();
 
     virtual void run();
     virtual void terminate();

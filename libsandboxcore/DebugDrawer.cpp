@@ -602,7 +602,12 @@ void DebugDrawer::drawSphere(const Ogre::Vector3 &centre,
 	if (isFilled)
 	{
 		baseIndex = trianglesIndex;
-		trianglesIndex += icoSphere.addToVertices(&triangleVertices, centre, Ogre::ColourValue(colour.r, colour.g, colour.b, fillAlpha), radius);
+        trianglesIndex += icoSphere.addToVertices(&triangleVertices, centre,
+                                                  Ogre::ColourValue(colour.r,
+                                                                    colour.g,
+                                                                    colour.b,
+                                                                    fillAlpha),
+                                                  radius);
 		icoSphere.addToTriangleIndices(baseIndex, &triangleIndices);
 	}
 }
@@ -614,6 +619,16 @@ void DebugDrawer::drawTetrahedron(const Ogre::Vector3 &centre,
 {
 	buildTetrahedron(centre, scale, colour);
 	if (isFilled) buildFilledTetrahedron(centre, scale, colour, fillAlpha);
+}
+
+void DebugDrawer::drawArrow(const Ogre::Vector3 &start,
+                            const Ogre::Vector3 &end,
+                            const Ogre::ColourValue &colour,
+                            float headRadius)
+{
+    drawLine(start, end, colour);
+    Ogre::Vector3 dir = (end - start).normalisedCopy();
+    drawSphere(end - dir * headRadius, headRadius, colour, true);
 }
  
 void DebugDrawer::build()

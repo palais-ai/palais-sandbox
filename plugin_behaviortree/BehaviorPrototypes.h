@@ -17,10 +17,7 @@ class ScriptBehavior : public Behavior
 {
 public:
     ScriptBehavior(const QScriptValue& obj);
-    virtual ~ScriptBehavior()
-    {
-        ;
-    }
+    virtual ~ScriptBehavior();
 
     virtual void run();
     virtual void terminate();

@@ -138,7 +138,8 @@ void ProjectManager::onSaveRenderView(const QUrl& url)
     QString path = url.toLocalFile();
     if(!img.save(path + ".png", "PNG", 100))
     {
-        qWarning("Failed to save current scene screenshot to %s", path.toLocal8Bit().constData());
+        qWarning("Failed to save current scene screenshot to %s",
+                 path.toLocal8Bit().constData());
     }
 }
 
@@ -428,7 +429,8 @@ void ProjectManager::onOpenProject(const QUrl url)
     QJsonDocument doc = QJsonDocument::fromJson(ba, &error);
     if(error.error != QJsonParseError::NoError)
     {
-        QString errorMsg = QString("Failed to parse the project file at %0, because it isn't a JSON document.")
+        QString errorMsg = QString("Failed to parse the project file at %0, "
+                                   "because it isn't a valid project meta-data JSON document.")
                                     .arg(url.toLocalFile());
         emit(sceneLoadFailed(errorMsg));
         return;
@@ -464,7 +466,8 @@ void ProjectManager::onOpenProject(const QUrl url)
         QString value = obj[logicPropertyName].toString();
         if(value.isEmpty())
         {
-            emit(sceneLoadFailed(QString("Failed to load the project file at %0, because the mandatory property %1 is empty.")
+            emit(sceneLoadFailed(QString("Failed to load the project file at %0, "
+                                         "because the mandatory property %1 is empty.")
                                  .arg(url.toLocalFile())
                                  .arg(logicPropertyName)));
             return;
@@ -473,7 +476,8 @@ void ProjectManager::onOpenProject(const QUrl url)
     }
     else
     {
-        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.")
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0, "
+                                     "because it is missing the mandatory property %1.")
                              .arg(url.toLocalFile())
                              .arg(logicPropertyName)));
         return;
@@ -487,7 +491,8 @@ void ProjectManager::onOpenProject(const QUrl url)
     }
     else
     {
-        emit(sceneLoadFailed(QString("Failed to load the project file at %0, because it is missing the mandatory property %1.")
+        emit(sceneLoadFailed(QString("Failed to load the project file at %0, "
+                                     "because it is missing the mandatory property %1.")
                              .arg(url.toLocalFile())
                              .arg(namePropertyName)));
         return;

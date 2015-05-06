@@ -20,7 +20,7 @@ void PluginManager::loadPlugins()
 #endif
     pluginsDir.cd("Plugins");
 
-    foreach (QString fileName, pluginsDir.entryList(QDir::Files))
+    foreach(QString fileName, pluginsDir.entryList(QDir::Files))
     {
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = pluginLoader.instance();

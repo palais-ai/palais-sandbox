@@ -45,7 +45,7 @@ public:
 public slots:
     void timeout();
 private:
-    // Timers may only be instantiated by the ScriptTimerFactory above.
+    // Timers may only be instantiated by the ScriptTimerFactory.
     ScriptTimer(int interval,
                 bool oneShot,
                 const QScriptValue& function);

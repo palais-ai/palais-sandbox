@@ -20,6 +20,11 @@ BlackboardDecorator::BlackboardDecorator(Scheduler& scheduler,
     AI_ASSERT(actor, "Actor mustn't be NULL.");
 }
 
+BlackboardDecorator::~BlackboardDecorator()
+{
+    ;
+}
+
 void BlackboardDecorator::run()
 {
     if(getStatus() == StatusRunning)

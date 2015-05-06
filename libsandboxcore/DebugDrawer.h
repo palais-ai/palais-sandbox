@@ -90,13 +90,7 @@ public:
     Q_INVOKABLE void drawCuboid(const Ogre::Vector3 *vertices, const Ogre::ColourValue& colour, bool isFilled = false);
     Q_INVOKABLE void drawSphere(const Ogre::Vector3 &centre, float radius, const Ogre::ColourValue& colour, bool isFilled = false);
     Q_INVOKABLE void drawTetrahedron(const Ogre::Vector3 &centre, float scale, const Ogre::ColourValue& colour, bool isFilled = false);
-
-    Q_INVOKABLE void drawArrow(const Ogre::Vector3 &start, const Ogre::Vector3 &end, const Ogre::ColourValue &colour, float headRadius = 0.02f)
-    {
-        drawLine(start, end, colour);
-        Ogre::Vector3 dir = (end - start).normalisedCopy();
-        drawSphere(end - dir * headRadius, headRadius, colour, true);
-    }
+    Q_INVOKABLE void drawArrow(const Ogre::Vector3 &start, const Ogre::Vector3 &end, const Ogre::ColourValue &colour, float headRadius = 0.02f);
 
     Q_INVOKABLE bool getEnabled() { return isEnabled; }
     Q_INVOKABLE void setEnabled(bool _isEnabled) { isEnabled = _isEnabled; }

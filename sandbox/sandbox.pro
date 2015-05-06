@@ -79,7 +79,7 @@ macx {
     message($$MY_BUNDLE_DIR is the bundle dir)
     message($$PWD/resources is the qml dir)
 
-    QMAKE_POST_LINK = macdeployqt $$MY_BUNDLE_DIR -qmldir=$$PWD/resources
+    #QMAKE_POST_LINK = macdeployqt $$MY_BUNDLE_DIR -qmldir=$$PWD/resources
 
     FrameworkFiles.path = Contents/Frameworks
 

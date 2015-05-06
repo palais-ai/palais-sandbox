@@ -71,6 +71,7 @@ function spawnFighter(teamColor, name)
 
     // For testing purposes:
     // calculatePlan(actor);
+    return actor;
 }
 
 var respawnTime = 50 // in seconds

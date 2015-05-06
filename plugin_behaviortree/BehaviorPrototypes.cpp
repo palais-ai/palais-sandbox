@@ -16,6 +16,11 @@ ScriptBehavior::ScriptBehavior(const QScriptValue& obj) :
     ;
 }
 
+ScriptBehavior::~ScriptBehavior()
+{
+    ;
+}
+
 void ScriptBehavior::run()
 {
     QScriptValue runVal = mScript.property("run");

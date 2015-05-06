@@ -114,7 +114,6 @@ private slots:
 private:
     void getActors(Ogre::SceneNode* root);
     QWeakPointer<Actor> getActorForNode(Ogre::SceneNode* node) const;
-    void parseNavMesh(Actor* navmesh);
     void destroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode);
 
     QString mName, mSceneFile, mLogicFile;
