@@ -1,4 +1,4 @@
-#include "scenemodel.h"
+#include "SceneModel.h"
 #include <QtQml>
 #include <stdint.h>
 #include <QDebug>

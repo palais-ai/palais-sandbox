@@ -1,8 +1,8 @@
-#include "scenemanager.h"
-#include "sceneloader.h"
+#include "SceneManager.h"
+#include "SceneLoader.h"
 #include "Scene.h"
-#include "application.h"
-#include "utility/timedlogger.h"
+#include "Application.h"
+#include "utility/TimedLogger.h"
 #include "Bindings/JavascriptBindings.h"
 #include "QOEngine.h"
 #include <QtGlobal>

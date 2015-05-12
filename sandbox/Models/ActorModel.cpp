@@ -1,4 +1,4 @@
-#include "actormodel.h"
+#include "ActorModel.h"
 
 ActorModel::ActorModel(const QString& name,
                        bool isVisible) :

@@ -1,4 +1,4 @@
-#include "timedlogger.h"
+#include "TimedLogger.h"
 #include <QDebug>
 
 TimedLogger::TimedLogger() :

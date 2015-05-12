@@ -1,7 +1,7 @@
 #ifndef SCENEMODEL_H
 #define SCENEMODEL_H
 
-#include "actormodel.h"
+#include "ActorModel.h"
 #include <QAbstractListModel>
 #include <QVector>
 

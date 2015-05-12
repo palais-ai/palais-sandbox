@@ -1,8 +1,8 @@
-#include "sceneloader.h"
+#include "SceneLoader.h"
 #include "Scene.h"
 #include "Actor.h"
 #include "Bindings/JavascriptBindings.h"
-#include "application.h"
+#include "Application.h"
 #include "PluginManager.h"
 #include <exception>
 #include <QScopedPointer>

@@ -1,7 +1,7 @@
 #ifndef PROJECTMANAGER_H
 #define PROJECTMANAGER_H
 
-#include "scenemanager.h"
+#include "SceneManager.h"
 #include <QObject>
 #include <QUrl>
 

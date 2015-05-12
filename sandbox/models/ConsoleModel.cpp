@@ -1,4 +1,4 @@
-#include "consolemodel.h"
+#include "ConsoleModel.h"
 
 ConsoleModel::LogEntry::LogEntry(const QString& message,
                                  ConsoleModel::LogLevel level) :

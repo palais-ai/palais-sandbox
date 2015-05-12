@@ -1,7 +1,7 @@
-#include "projectmanager.h"
+#include "ProjectManager.h"
 #include "Scene.h"
 #include "Actor.h"
-#include "application.h"
+#include "Application.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -17,7 +17,7 @@
 #include "QOEngine.h"
 #include "QOCamera.h"
 #include "QOItem.h"
-#include "models/inspectormodel.h"
+#include "models/InspectorModel.h"
 
 std::string ProjectManager::sCurrentResourceGroupName = "CurrentScene";
 QString ProjectManager::sProjectKeyName = "name";

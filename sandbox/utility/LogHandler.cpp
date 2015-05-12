@@ -1,4 +1,4 @@
-#include "loghandler.h"
+#include "LogHandler.h"
 
 void LogHandler::broadcastNewMessageReceived(ConsoleModel::LogLevel level,
                                              const QString& message)

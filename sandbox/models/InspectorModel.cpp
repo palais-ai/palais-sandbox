@@ -1,4 +1,4 @@
-#include "inspectormodel.h"
+#include "InspectorModel.h"
 #include "KnowledgeModel.h"
 #include "utility/MetatypeDeclarations.h"
 #include <QtQml>
