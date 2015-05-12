@@ -13,29 +13,29 @@ ICON = $$PWD/intermediary/Icon.icns
 RC_FILE = $$PWD/intermediary/Palais.rc
 
 SOURCES += main.cpp \
-    application.cpp \
-    scenemanager.cpp \
-    sceneloader.cpp \
-    projectmanager.cpp \
-    models/actormodel.cpp \
-    models/consolemodel.cpp \
-    models/inspectormodel.cpp \
-    utility/timedlogger.cpp \
-    utility/loghandler.cpp \
-    models/scenemodel.cpp \
+    Application.cpp \
+    SceneManager.cpp \
+    SceneLoader.cpp \
+    ProjectManager.cpp \
+    models/ActorModel.cpp \
+    models/ConsoleModel.cpp \
+    models/InspectorModel.cpp \
+    utility/TimedLogger.cpp \
+    utility/LogHandler.cpp \
+    models/SceneModel.cpp \
     PluginManager.cpp
 
 HEADERS += \
-    application.h \
-    scenemanager.h \
-    sceneloader.h \
-    projectmanager.h \
-    models/actormodel.h \
-    models/consolemodel.h \
-    models/inspectormodel.h \
-    utility/timedlogger.h \
-    utility/loghandler.h \
-    models/scenemodel.h \
+    Application.h \
+    SceneManager.h \
+    SceneLoader.h \
+    ProjectManager.h \
+    models/ActorModel.h \
+    models/ConsoleModel.h \
+    models/InspectorModel.h \
+    utility/TimedLogger.h \
+    utility/LogHandler.h \
+    models/SceneModel.h \
     PluginInterface.h \
     utility/MetatypeDeclarations.h \
     PluginManager.h
