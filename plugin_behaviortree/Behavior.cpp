@@ -1,10 +1,8 @@
 #include "Behavior.h"
-#include "scene.h"
-#include "actor.h"
+#include "Scene.h"
+#include "Actor.h"
 #include "BehaviorPrototypes.h"
 #include <QDebug>
-
-#define PRINT_DEBUG 0
 
 Q_DECLARE_METATYPE(ailib::Behavior*)
 Q_DECLARE_METATYPE(Scheduler*)
@@ -29,9 +27,6 @@ void BlackboardDecorator::run()
 {
     if(getStatus() == StatusRunning)
     {
-#if PRINT_DEBUG
-        qDebug() << "Registering [" << mObservedValue << "]";
-#endif
         connect(mActor, &KnowledgeModel::knowledgeChanged,
                 this, &BlackboardDecorator::onKnowledgeChanged);
     }
@@ -57,9 +52,6 @@ void BlackboardDecorator::run()
 
 void BlackboardDecorator::terminate()
 {
-#if PRINT_DEBUG
-    qDebug() << "Unregistering [" << mObservedValue << "]";
-#endif
     disconnect(mActor, &KnowledgeModel::knowledgeChanged,
                this, &BlackboardDecorator::onKnowledgeChanged);
     Decorator::terminate();
@@ -70,9 +62,6 @@ void BlackboardDecorator::onKnowledgeChanged(const QString& key, const QVariant&
     UNUSED(knowledge);
     if(key == mObservedValue)
     {
-#if PRINT_DEBUG
-        qDebug() << "Key [" << key << "] changed to " << knowledge;
-#endif
         if(getStatus() == StatusWaiting)
         {
             terminateChild();
@@ -93,7 +82,6 @@ void Status_register(QScriptEngine& engine)
     QScriptValue obj = engine.newObject();
 
     QScriptValue::PropertyFlags flags = QScriptValue::Undeletable | QScriptValue::ReadOnly;
-
     obj.setProperty("Waiting",
                     engine.toScriptValue((uint32_t)StatusDormant),
                     flags);
@@ -219,9 +207,11 @@ QScriptValue BlackboardDecorator_prototype_ctor(QScriptContext *context, QScript
 
     QScriptValue array = engine->newArray();
     array.property("push").call(array, QScriptValueList() << context->argument(0));
+
     // Increase the internal ref count of the child node.
     context->thisObject().setProperty("children",
                                       array,
                                       QScriptValue::Undeletable | QScriptValue::ReadOnly);
+
     return engine->undefinedValue();
 }

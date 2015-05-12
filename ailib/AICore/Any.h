@@ -17,6 +17,7 @@ template<class T> struct remove_reference<T&>
     typedef T type;
 };
 
+// For C++11 builds.
 template<class T> struct remove_reference<T&&>
 {
     typedef T type;

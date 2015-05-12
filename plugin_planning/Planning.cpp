@@ -225,7 +225,7 @@ Planner::findPlan(const QVariantMap& startState,
     const int32_t maxDepth = 5;
     size_t startIdx = mPlanner.buildGraph(startState, endState, maxDepth);
 
-    qDebug() << "[PLANNER] Built a planning state graph with "
+    qDebug() << "Planner.findPlan: Built a planning state graph with "
              << mPlanner.getGraph().getNumNodes()
              << " nodes. (maxdepth="
              << maxDepth
@@ -241,9 +241,9 @@ Planner::findPlan(const QVariantMap& startState,
 
     if(path.empty())
     {
-        qWarning("Could not make a plan that leads to the desired end state.");
-        qWarning() << "Start state: " << startState;
-        qWarning() << "End state: " << endState;
+        qWarning() << "Planner.findPlan: Could not make a plan that leads to the desired end state."
+                   << "Start state: " << startState
+                   << "End state: "   << endState;
     }
 
     if(isAlreadyThere)
@@ -265,17 +265,17 @@ void Planner::makePlan(Actor* actor,
 
     if(connections.empty())
     {
-        qDebug("No possible solution found.");
+        qDebug("Planner.makePlan: No possible solution found.");
     }
     else if(isAlreadyThere)
     {
-        qDebug("Plan's goal has already been reached.");
+        qDebug("Planner.makePlan: Plan's goal has already been reached.");
     }
     else
     {
         // TODO: Kickoff to sequentially perform actions,
         // recalculate the plan if unexpected state changes happen.
-        qDebug() << "[PLANNER] Found planning solutions with "
+        qDebug() << "Planner.makePlan: Found planning solutions with "
                  << connections.size() << " steps.";
 
         const planner_type::graph_type& graph = mPlanner.getGraph();
@@ -292,7 +292,7 @@ void Planner::makePlan(Actor* actor,
             }
             else
             {
-                qWarning("ScriptAction wasn't set.");
+                qWarning("Planner.makePlan: ScriptAction wasn't set.");
             }
         }
         actor->setKnowledge("plan", names);

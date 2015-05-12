@@ -56,7 +56,7 @@ void BehaviorPlugin::update(const PluginInterface& interface, Scene& scene, floa
     HighResolutionTime::Timestamp timeInMs =
             HighResolutionTime::milliseconds(mScheduler.update(HighResolutionTime::milliseconds(8.f),
                                                                deltaTime));
-    if(timeInMs > 0)
+    if(timeInMs > 16)
     {
         //qDebug() << "Excessive frametime: " << timeInMs;
     }

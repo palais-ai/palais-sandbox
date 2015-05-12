@@ -18,7 +18,6 @@ QVariant KnowledgeModel::getKnowledge(const QString& key) const
 void KnowledgeModel::removeKnowledge(const QString& key)
 {
     int numRemoved = mKnowledge.remove(key);
-
     if(numRemoved != 0)
     {
         emit knowledgeRemoved(key);

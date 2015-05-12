@@ -6,6 +6,11 @@
 
 BEGIN_NS_AILIB
 
+BehaviorListener::~BehaviorListener()
+{
+    ;
+}
+
 void BehaviorListener::onReset(Behavior* behavior)
 {
     UNUSED(behavior);
@@ -19,7 +24,7 @@ Behavior::Behavior() :
 
 Behavior::~Behavior()
 {
-    puts("behavior dtor");
+    ;
 }
 
 void Behavior::setListener(BehaviorListener* listener)
@@ -76,7 +81,7 @@ Composite::Composite(Scheduler& scheduler,
     for(Composite::BehaviorList::iterator it = mChildren.begin();
         it != mChildren.end(); ++it)
     {
-        // Composites listen to their children's result codes
+        // Composites listen to their children's result codes.
         (*it)->setListener(this);
     }
 }
@@ -86,7 +91,7 @@ Composite::~Composite()
     for(Composite::BehaviorList::iterator it = mChildren.begin();
         it != mChildren.end(); ++it)
     {
-        // Composites listen to their children's result codes
+        // Reset children's listeners.
         (*it)->setListener(NULL);
     }
 }
@@ -126,6 +131,11 @@ SequentialComposite::SequentialComposite(Scheduler& scheduler,
                                          const Composite::BehaviorList& children) :
     Composite(scheduler, children),
     mCurrentBehavior(0)
+{
+    ;
+}
+
+SequentialComposite::~SequentialComposite()
 {
     ;
 }
@@ -200,6 +210,11 @@ Selector::Selector(Scheduler& scheduler,
     ;
 }
 
+Selector::~Selector()
+{
+    ;
+}
+
 void Selector::onSuccess(Behavior* behavior)
 {
     const uint32_t idx = indexOf(behavior);
@@ -233,6 +248,11 @@ void Selector::onFailure(Behavior* behavior)
 Sequence::Sequence(Scheduler& scheduler,
                    const Composite::BehaviorList& children) :
     SequentialComposite(scheduler, children)
+{
+    ;
+}
+
+Sequence::~Sequence()
 {
     ;
 }
@@ -273,6 +293,11 @@ Parallel::Parallel(Scheduler& scheduler,
     AI_ASSERT(children.size() <= sMaxChildCount,
               "A parallel node can't run more than __sMaxChildCount__ parallel tasks.");
     resetCodes();
+}
+
+Parallel::~Parallel()
+{
+    ;
 }
 
 void Parallel::run()
@@ -475,9 +500,19 @@ RandomSelector::RandomSelector(Scheduler& scheduler,
     ;
 }
 
+RandomSelector::~RandomSelector()
+{
+    ;
+}
+
 RandomSequence::RandomSequence(Scheduler& scheduler,
                                const Composite::BehaviorList& children) :
     RandomComposite<Sequence>::RandomComposite(scheduler,children)
+{
+    ;
+}
+
+RandomSequence::~RandomSequence()
 {
     ;
 }

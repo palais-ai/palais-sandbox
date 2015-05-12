@@ -8,7 +8,7 @@
 #endif
 
 #if defined _WIN32 || defined __CYGWIN__
-  #ifdef SMASTAR_LIBRARY
+  #ifdef IS_SHARED_LIBRARY
     #ifdef defined(__GNUC__) || defined(__clang__)
       #define DLL_PUBLIC __attribute__ ((dllexport))
     #else

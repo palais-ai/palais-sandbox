@@ -129,6 +129,6 @@ void ScriptTimer::timeout()
      {
          qWarning("ScriptTimer.timeout: The second parameter to setTimeout/setInterval must be a function.");
      }
-    JavaScriptBindings::checkScriptEngineException(*getEngine(), "script timer's timeout");
+    JavaScriptBindings::checkScriptEngineException(*getEngine(), "ScriptTimer.timeout");
 }
 

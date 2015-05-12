@@ -55,7 +55,9 @@ QScriptValue composite_prototype_ctor(QScriptContext *context, QScriptEngine *en
         if(!behavior)
         {
             return context->throwError(QScriptContext::TypeError,
-                                       "Composite.prototype.ctor: Arguments must be behaviors. Did you forget to call the Behaviors constructor for one of your user-defined behaviors?");
+                                       "Composite.prototype.ctor: Arguments must be behaviors. "
+                                       "Did you forget to call the Behaviors constructor for one "
+                                       "of your user-defined behaviors?");
         }
         sharedBehaviors.append(arg);
         children.push_back(behavior);

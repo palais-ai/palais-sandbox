@@ -7,7 +7,7 @@ function flee(agent, targetPosition, maxSpeed /* in m / s */) {
 }
 
 function movementBehavior(agent, targetPosition, maxSpeed /* in m / s */) {
-	//return seek(agent, targetPosition, maxSpeed);
-	return flee(agent, targetPosition, maxSpeed);
-	return new Vector3(0,0,0);
+	return seek(agent, targetPosition, maxSpeed);
+	//return flee(agent, targetPosition, maxSpeed);
+	//return new Vector3(0,0,0);
 }

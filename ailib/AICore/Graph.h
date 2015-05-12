@@ -145,7 +145,7 @@ public:
     typedef std::vector<node_type> node_collection;
     typedef std::vector<connections_type> connection_collection;
 
-    FORCE_INLINE size_t addNode(const NODE_TYPE& node)
+    size_t addNode(const NODE_TYPE& node)
     {
         mNodes.push_back(node);
         mConnections.push_back(connections_type());

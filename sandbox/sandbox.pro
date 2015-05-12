@@ -3,15 +3,9 @@ QT += qml quick script
 TEMPLATE = app
 TARGET = Palais
 
-#CONFIG += c++11
-
 UI_DIR = ./.ui
 OBJECTS_DIR = ./.obj
 MOC_DIR = ./.moc
-
-# This is important for win32 linkage.
-DEFINES -= QJSONRPC_BUILD
-DEFINES += QJSONRPC_SHARED
 
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
 
@@ -79,6 +73,7 @@ macx {
     message($$MY_BUNDLE_DIR is the bundle dir)
     message($$PWD/resources is the qml dir)
 
+    # Uncomment this line for deployment.
     #QMAKE_POST_LINK = macdeployqt $$MY_BUNDLE_DIR -qmldir=$$PWD/resources
 
     FrameworkFiles.path = Contents/Frameworks
@@ -113,62 +108,64 @@ macx {
 
     QMAKE_BUNDLE_DATA += FrameworkFiles ConfigFiles PluginFiles MediaFiles LicenseFiles
 } else:unix {
+    # TODO: Linux build / deployment
     CONFIG += link_pkgconfig
     PKGCONFIG += OGRE
 } else:win32 {
     OGREDIR = $$(OGRE_HOME)
     isEmpty(OGREDIR) {
         error($$TARGET needs Ogre to be built. Please set the environment variable OGRE_HOME pointing to your Ogre root directory.)
-    } else {
-        message(Packaging Ogre libraries in $$OGREDIR)
-
-        DESTDIR = $$OUT_PWD/$$M_BUILD_DIR
-
-        message(Putting libraries in $$DESTDIR)
-        message(QDIRs are in $$[QT_INSTALL_LIBS])
-
-        plugins.path = $$DESTDIR/Plugins
-        plugins.files += $$OUT_PWD/../plugin_pathfinding/$$M_BUILD_DIR/plugin_pathfinding.dll
-        plugins.files += $$OUT_PWD/../plugin_planning/$$M_BUILD_DIR/plugin_planning.dll
-        plugins.files += $$OUT_PWD/../plugin_behaviortree/$$M_BUILD_DIR/plugin_behaviortree.dll
-        plugins.CONFIG = no_check_exist
-
-        package.path = $$DESTDIR
-        package.files += $$OUT_PWD/../QOgre/$$M_BUILD_DIR/QOgre.dll
-        package.files += $$OUT_PWD/../libsandboxcore/$$M_BUILD_DIR/sandboxcore.dll
-
-        OGRE_LIBS_SUFFIX =
-        CONFIG(debug, debug|release) {
-            OGRE_LIBS_SUFFIX = _d
-        }
-
-        OGRE_LIBS += OgreMain$$OGRE_LIBS_SUFFIX
-        OGRE_LIBS += RenderSystem_GL$$OGRE_LIBS_SUFFIX
-        OGRE_LIBS += Plugin_OctreeSceneManager$$OGRE_LIBS_SUFFIX
-
-        for(the_lib, OGRE_LIBS):package.files += $$OGREDIR/bin/$$M_BUILD_DIR/$${the_lib}.dll
-        package.CONFIG = no_check_exist
-
-        MY_BUNDLE_DIR = $$DESTDIR/$$basename(TARGET).exe
-        message($$MY_BUNDLE_DIR is the bundle dir)
-        message($$PWD/resources is the qml dir)
-
-        #QMAKE_POST_LINK = $$[QT_INSTALL_LIBS]/../bin/windeployqt $$MY_BUNDLE_DIR --qmldir=$$PWD/resources --release --compiler-runtime
-
-        # Copy all resources to build folder
-        Resources.path = $$DESTDIR/Resources
-        Resources.files += media/*
-
-        # Copy all config files to build folder
-        Config.path = $$DESTDIR
-        Config.files += config/resources.cfg
-        Config.files += config/$$M_BUILD_DIR/plugins.cfg
-
-        Licenses.path = $$DESTDIR/Licenses
-        Licenses.files += $$PWD/licenses/*
-
-        INSTALLS += package plugins Resources Config Licenses
     }
+
+    message(Packaging Ogre libraries in $$OGREDIR)
+
+    DESTDIR = $$OUT_PWD/$$M_BUILD_DIR
+
+    message(Putting libraries in $$DESTDIR)
+    message(QDIRs are in $$[QT_INSTALL_LIBS])
+
+    plugins.path = $$DESTDIR/Plugins
+    plugins.files += $$OUT_PWD/../plugin_pathfinding/$$M_BUILD_DIR/plugin_pathfinding.dll
+    plugins.files += $$OUT_PWD/../plugin_planning/$$M_BUILD_DIR/plugin_planning.dll
+    plugins.files += $$OUT_PWD/../plugin_behaviortree/$$M_BUILD_DIR/plugin_behaviortree.dll
+    plugins.CONFIG = no_check_exist
+
+    package.path = $$DESTDIR
+    package.files += $$OUT_PWD/../QOgre/$$M_BUILD_DIR/QOgre.dll
+    package.files += $$OUT_PWD/../libsandboxcore/$$M_BUILD_DIR/sandboxcore.dll
+
+    OGRE_LIBS_SUFFIX =
+    CONFIG(debug, debug|release) {
+        OGRE_LIBS_SUFFIX = _d
+    }
+
+    OGRE_LIBS += OgreMain$$OGRE_LIBS_SUFFIX
+    OGRE_LIBS += RenderSystem_GL$$OGRE_LIBS_SUFFIX
+    OGRE_LIBS += Plugin_OctreeSceneManager$$OGRE_LIBS_SUFFIX
+
+    for(the_lib, OGRE_LIBS):package.files += $$OGREDIR/bin/$$M_BUILD_DIR/$${the_lib}.dll
+    package.CONFIG = no_check_exist
+
+    MY_BUNDLE_DIR = $$DESTDIR/$$basename(TARGET).exe
+    message($$MY_BUNDLE_DIR is the bundle dir)
+    message($$PWD/resources is the qml dir)
+
+    # Uncomment this line for deployment.
+    #QMAKE_POST_LINK = $$[QT_INSTALL_LIBS]/../bin/windeployqt $$MY_BUNDLE_DIR --qmldir=$$PWD/resources --release --compiler-runtime
+
+    # Copy all resources to build folder
+    Resources.path = $$DESTDIR/Resources
+    Resources.files += media/*
+
+    # Copy all config files to build folder
+    Config.path = $$DESTDIR
+    Config.files += config/resources.cfg
+    Config.files += config/$$M_BUILD_DIR/plugins.cfg
+
+    Licenses.path = $$DESTDIR/Licenses
+    Licenses.files += $$PWD/licenses/*
+
+    INSTALLS += package plugins Resources Config Licenses
 }
 
 RESOURCES += resources/resources.qrc

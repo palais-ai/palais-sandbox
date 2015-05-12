@@ -10,7 +10,7 @@ TARGET = ailib
 TEMPLATE = lib
 CONFIG += staticlib
 
-DEFINES += SMASTAR_LIBRARY
+DEFINES += IS_SHARED_LIBRARY
 
 SOURCES += \
     Scheduler.cpp \

@@ -79,6 +79,7 @@ private:
                 const size_t nextIdx = mGraph.addNode(nextState);
                 mGraph.addEdge(currentIdx, nextIdx, action->getCost(currentState), action);
 
+                // Check if this exact state has been processed before.
                 typename hash_type::iterator it = mHashTable.find(nextState);
                 if(it == mHashTable.end())
                 {

@@ -83,7 +83,8 @@ void Pathfinding::updateActor(Actor &actor, float deltaTime)
                     {
                         val.call();
                         JavaScriptBindings::checkScriptEngineException(*val.engine(),
-                                                                       "Pathfinding.GoalReachedCallback");
+                                                                       "Pathfinding."
+                                                                       "GoalReachedCallback");
                     }
                     else
                     {
@@ -196,9 +197,10 @@ Ogre::Vector3 Triangle::fromBarycentric(float x, float y, float z) const
     return (x / div) * a + (y / div) * b + (z / div) * c;
 }
 
-// CREDITS: http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+// CREDITS:
+// http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 // Compute barycentric coordinates (u, v, w) for
-// point p with respect to triangle (a, b, c)
+// point p with respect to triangle (a, b, c).
 static void barycentric(Ogre::Vector3 p, Ogre::Vector3 a, Ogre::Vector3 b, Ogre::Vector3 c,
                         float &u, float &v, float &w)
 {
@@ -239,7 +241,6 @@ Pathfinding::getNavNodeClosestToPoint(const Ogre::Vector3& point)
            return &node;
         }
     }
-
     return NULL;
 }
 
@@ -251,7 +252,7 @@ Pathfinding::planPath(const Ogre::Vector3& from,
     const NavigationGraph::node_type* start = getNavNodeClosestToPoint(from);
     if(!start)
     {
-        qWarning() << "[PATHFINDING] Start position "
+        qWarning() << "Pathfinding.planPath: Start position "
                    << Ogre::StringConverter::toString(from).c_str()
                    << " is not covered by the navmesh. No valid path could be calculated.";
         return ailib::AStar<NavigationGraph>::path_type();
@@ -260,7 +261,7 @@ Pathfinding::planPath(const Ogre::Vector3& from,
     const NavigationGraph::node_type* goal = getNavNodeClosestToPoint(to);
     if(!goal)
     {
-        qWarning() << "[PATHFINDING] Target position "
+        qWarning() << "Pathfinding.planPath: Target position "
                    << Ogre::StringConverter::toString(to).c_str()
                    << " is not covered by the navmesh. No valid path could be calculated.";
         return ailib::AStar<NavigationGraph>::path_type();
@@ -270,7 +271,6 @@ Pathfinding::planPath(const Ogre::Vector3& from,
     ailib::AStar<NavigationGraph>::path_type path = astar.findPath(start,
                                                                    *goal,
                                                                    euclideanHeuristic);
-
     if(isAlreadyThere)
     {
         *isAlreadyThere = path.size() == 1 && path[0] == start;
@@ -280,7 +280,7 @@ Pathfinding::planPath(const Ogre::Vector3& from,
 }
 
 void
-Pathfinding::initNavGraphFromQONode(Ogre::SceneNode* node)
+Pathfinding::initNavGraphFromNode(Ogre::SceneNode* node)
 {
     Pathfinding::NavigationGraph graph;
     ailib::AStar<Pathfinding::NavigationGraph>::Heuristic heuristic = euclideanHeuristic;
@@ -293,7 +293,8 @@ Pathfinding::initNavGraphFromQONode(Ogre::SceneNode* node)
 
         if(!mesh.get())
         {
-            qWarning() << "[PATHFINDING] Optimized mesh ptr was null. Returning empty nav graph.";
+            qWarning("Pathfinding.initNavGraphFromNode: Optimized mesh ptr was null. "
+                     "Returning empty nav graph.");
             mGraph = graph;
             return;
         }
@@ -351,8 +352,8 @@ Pathfinding::initNavGraphFromQONode(Ogre::SceneNode* node)
     }
     else
     {
-        qWarning() << "[PATHFINDING] No meshes were attached to the navmesh scene node. "
-                   << "Returning an empty navgraph.";
+        qWarning("Pathfinding.initNavGraphFromNode: No meshes were attached to the navmesh scene "
+                 "node. Returning an empty navgraph.");
     }
 
     mGraph = graph;
@@ -378,7 +379,8 @@ void Pathfinding::visualizeNavGraph(DebugDrawer* drawer) const
         }
     }
 
-    qDebug() << "[PATHFINDING] Navigation mesh loaded with " << mGraph.getNumNodes() << " nodes.";
+    qDebug() << "Pathfinding.visualizeNavGraph: Navigation mesh loaded with "
+             << mGraph.getNumNodes() << " nodes.";
 }
 
 bool Pathfinding::moveActor(Actor* actor,
@@ -393,7 +395,7 @@ bool Pathfinding::moveActor(Actor* actor,
 
     if(path.empty())
     {
-        qWarning() << "[PATHFINDING] Could not find a path for actor [ "
+        qWarning() << "Pathfinding.moveActor: Could not find a path for actor [ "
                    << actor->getName() << " ] to reach "
                    << Ogre::StringConverter::toString(target).c_str();
         return false;
@@ -401,7 +403,7 @@ bool Pathfinding::moveActor(Actor* actor,
 
     if(isAlreadyThere)
     {
-        qDebug() << "[PATHFINDING] Target triangle has already been reached.";
+        qDebug() << "Pathfinding.moveActor: Target triangle has already been reached.";
         actor->setKnowledge("movement_target", QVariant::fromValue(target));
         return false;
     }

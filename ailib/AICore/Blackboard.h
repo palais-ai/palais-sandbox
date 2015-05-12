@@ -21,7 +21,9 @@ public:
 typedef uint32_t Handle;
 const static Handle INVALID_HANDLE = 0;
 
-// A generic class to store knowledge by unique keys.
+/**
+ * @brief Blackboard A generic class to store knowledge associated to unique keys.
+ */
 template <typename KEY>
 class Blackboard
 {

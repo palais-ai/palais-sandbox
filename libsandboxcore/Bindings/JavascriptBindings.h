@@ -29,6 +29,7 @@ void DLL_EXPORT checkScriptEngineException(QScriptEngine& engine, const QString&
 void DLL_EXPORT timers_register(QScriptEngine& engine);
 void DLL_EXPORT timers_update(float deltaTime); //< To be called by the active scene
 
+// TODO: Split the bindings into multiple files.
 void Random_register(QScriptEngine& engine);
 QScriptValue Random_uniform(QScriptContext *context, QScriptEngine *engine);
 QScriptValue Random_uniformInt(QScriptContext *context, QScriptEngine *engine);

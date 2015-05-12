@@ -32,7 +32,8 @@ void ScriptBehavior::run()
     }
     else
     {
-        qWarning("ScriptBehavior should overwrite the __run__ method -- Notifying failure.");
+        qWarning("ScriptBehavior.run: ScriptBehaviors should overwrite the __run__ method"
+                 "-- Notifying failure.");
         notifyFailure();
     }
 }
@@ -60,7 +61,8 @@ static Behavior* extractBehavior(const QScriptValue& value)
 
     if(!prop.isValid())
     {
-        qWarning("Script behavior didnt have their internal data set. Did you forget to call the 'Behavior' constructor?");
+        qWarning("BehaviorPrototypes.extractBehavior: A ScriptBehavior didn't have its internal data set. "
+                 "Did you forget to call the 'Behavior' constructor?");
         return NULL;
     }
 
@@ -68,7 +70,7 @@ static Behavior* extractBehavior(const QScriptValue& value)
 
     if(!ptr)
     {
-        qWarning("Accessing deleted behavior.");
+        qWarning("BehaviorPrototypes.extractBehavior: Accessing deleted behavior.");
     }
 
     return ptr;
@@ -102,12 +104,11 @@ QVariantMap BehaviorPrototype::getUserData() const
     QVariantMap* ptr = any_cast<QVariantMap*>(behavior->getUserData());
     if(!ptr)
     {
-        qWarning() << "Behavior.userData: Failed to convert userData to Object. Type mismatch.";
+        qWarning("Behavior.userData: Failed to convert userData to Object. Type mismatch.");
         return QVariantMap();
     }
     else
     {
-        //assert(!gDeletedKnowledge.contains(ptr));
         return *ptr;
     }
 }
@@ -120,7 +121,7 @@ void BehaviorPrototype::setStatus(int status)
     }
     else
     {
-        qWarning("Called Behavior.setStatus with invalid value.");
+        qWarning("Behavior.setStatus: Called with invalid status value.");
     }
 }
 
@@ -184,7 +185,7 @@ void SchedulerPrototype::enqueue(QScriptValue behaviorValue)
 {
     if(mActiveBehaviors.contains(behaviorValue.objectId()))
     {
-        qWarning() << "Scheduler.enqueue: Can't schedule the same behavior twice.";
+        qWarning("Scheduler.enqueue: Can't schedule the same behavior twice.");
         return;
     }
 
@@ -197,8 +198,8 @@ void SchedulerPrototype::enqueue(QScriptValue behaviorValue)
 
     if(!behavior)
     {
-        qWarning() << "Scheduler.enqueue: Behavior pointer is missing from a ScriptBehavior. "
-                   << "Can't enqueue.";
+        qWarning("Scheduler.enqueue: Behavior pointer is missing from a ScriptBehavior. "
+                 "Can't enqueue.");
         return;
     }
     sched->enqueue(behavior);
@@ -224,14 +225,15 @@ static void removeTerminatedRecursive(QScriptValue behaviorValue)
         assert(behavior->getStatus() == StatusTerminated ||
                behavior->getStatus() == StatusDormant);
 
-        // TODO: This delete leads to crashes by heap corruption, we simply leak the memory until we discover the real cause.
+        // TODO: This delete leads to crashes due to heap corruption,
+        //       leak the memory until we discover the bug.
         //delete behavior;
 
         behaviorValue.setProperty("__behavior", QScriptValue());
     }
     else
     {
-        assert(false);
+        AI_ASSERT(false, "Internal behavior pointer must be set.");
     }
 }
 
@@ -239,7 +241,7 @@ void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
 {
     if(!mActiveBehaviors.contains(behaviorValue.objectId()))
     {
-        qWarning() << "Scheduler.dequeue: Can't dequeue behavior that hasn't been enqueued before.";
+        qWarning("Scheduler.dequeue: Can't dequeue behavior that hasn't been enqueued before.");
         return;
     }
 
@@ -248,8 +250,8 @@ void SchedulerPrototype::dequeue(QScriptValue behaviorValue)
 
     if(!behavior)
     {
-        qWarning() << "Scheduler.dequeue: Behavior pointer is missing from a ScriptBehavior. "
-                   << "Can't dequeue.";
+        qWarning("Scheduler.dequeue: Behavior pointer is missing from a ScriptBehavior. "
+                 "Can't dequeue.");
         return;
     }
 

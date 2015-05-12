@@ -9,6 +9,12 @@
 
 BEGIN_NS_AILIB
 
+/**
+ * @brief The IDAStar class implements the Iterative Deepening A* algorithm. The algorithm requires
+ * a constant amount of memory and is thus more suitable for extremely large search spaces than
+ * the A* algorithm. However, reducing the memory requirements comes at the cost of performance,
+ * because nodes may be expanded multiple times in one search.
+ */
 template <typename GRAPH>
 class IDAStar
 {

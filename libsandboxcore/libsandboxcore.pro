@@ -4,9 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += script quick
-
-QT       -= gui
+QT += script quick
+QT -= gui
 
 TARGET = sandboxcore
 TEMPLATE = lib
@@ -23,7 +22,7 @@ SOURCES += \
     OgreHelper.cpp \
     Scene.cpp \
     DebugDrawer.cpp \
-   # SceneDynamics.cpp \
+    # SceneDynamics.cpp \
     Bindings/ScriptTimer.cpp
 
 HEADERS +=\
@@ -33,7 +32,7 @@ HEADERS +=\
     OgreHelper.h \
     Scene.h \
     DebugDrawer.h \
-   # SceneDynamics.h \
+    # SceneDynamics.h \
     Bindings/ScriptTimer.h \
     Actor.h
 

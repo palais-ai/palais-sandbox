@@ -98,7 +98,7 @@ static bool loadScript(QScriptEngine *engine, const QString& filename)
     }
 
     engine->evaluate(ba, filename);
-    checkScriptEngineException(*engine, "loading [" + filename + "]");
+    checkScriptEngineException(*engine, "loadScript(" + filename + ")");
     return true;
 }
 
@@ -195,8 +195,9 @@ void timers_update(float deltaTime)
 
 void Random_register(QScriptEngine& engine)
 {
-    // Reset the random seed.
+    // Reset the random seeds for Qt and the C standard library.
     qsrand(777);
+    srand(777);
 
     QScriptValue random = engine.newObject();
 
@@ -343,8 +344,7 @@ QScriptValue script_clearInterval(QScriptContext *context, QScriptEngine *engine
     return script_removeTimer_private(context, engine);
 }
 
-//class VariantMapPrototype : public QScriptable, public QObject
-// FIXME: Add dynamic wrapper for qvariantmap* - using QScriptClass maybe?
+// TODO: Add a dynamic wrapper for qvariantmap* - using QScriptClass maybe?
 void QVariantMapPtr_register_prototype(QScriptEngine& engine)
 {
     QScriptValue obj = engine.newObject();
@@ -373,7 +373,7 @@ QScriptValue RangeQueryResult_prototype_actors(QScriptContext *context, QScriptE
     {
         return context->throwError(QScriptContext::TypeError,
                                    "RangeQueryResult.prototype.actors: \
-                                    this object is not a RangeQueryResult");
+                                    this object is not a RangeQueryResult.");
     }
 
     QScriptValue retVal = engine->newArray();
@@ -422,7 +422,7 @@ QScriptValue RaycastResult_prototype_distance(QScriptContext *context, QScriptEn
     {
         return context->throwError(QScriptContext::TypeError,
                                    "RaycastResult.prototype.distance: "
-                                   "this object is not a RaycastResult");
+                                   "this object is not a RaycastResult.");
     }
     return res->distance;
 }
@@ -430,12 +430,11 @@ QScriptValue RaycastResult_prototype_distance(QScriptContext *context, QScriptEn
 QScriptValue RaycastResult_prototype_actor(QScriptContext *context, QScriptEngine *engine)
 {
     RaycastResult* res = qscriptvalue_cast<RaycastResult*>(context->thisObject());
-
     if (!res)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "RaycastResult.prototype.distance: "
-                                   "this object is not a RaycastResult");
+                                   "this object is not a RaycastResult.");
     }
 
     QSharedPointer<Actor> strong = res->actor.toStrongRef();
@@ -458,7 +457,7 @@ QScriptValue RaycastResult_prototype_hasHit(QScriptContext *context, QScriptEngi
     {
         return context->throwError(QScriptContext::TypeError,
                                    "RaycastResult.prototype.distance: "
-                                   "this object is not a RaycastResult");
+                                   "this object is not a RaycastResult.");
     }
     return res->actor != NULL;
 }
@@ -531,7 +530,6 @@ QScriptValue Vector3_prototype_ctor(QScriptContext *context, QScriptEngine *engi
         }
 
         Ogre::Vector3 v(x,y,z);
-
         return engine->toScriptValue(v);
     }
     else
@@ -544,12 +542,11 @@ QScriptValue Vector3_prototype_ctor(QScriptContext *context, QScriptEngine *engi
 QScriptValue Vector3_prototype_x(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.x: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -578,12 +575,11 @@ QScriptValue Vector3_prototype_x(QScriptContext *context, QScriptEngine *engine)
 QScriptValue Vector3_prototype_y(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.y: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -612,12 +608,11 @@ QScriptValue Vector3_prototype_y(QScriptContext *context, QScriptEngine *engine)
 QScriptValue Vector3_prototype_z(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.z: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -647,12 +642,11 @@ QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *
 {
     Q_UNUSED(engine);
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.toString: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     return QString("Vector3 (x: %1, y: %2, z: %3)")
@@ -664,12 +658,11 @@ QScriptValue Vector3_prototype_toString(QScriptContext *context, QScriptEngine *
 QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.add: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     if (context->argumentCount() >= 1)
@@ -686,11 +679,10 @@ QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engin
 
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.add: "
-                                       "Argument #0 object is not a Ogre::Vector3 or number.");
+                                       "Argument #0 object is neither an Ogre::Vector3 nor a number.");
         }
 
         *v += *v2;
-
         return engine->toScriptValue(v);
     }
 
@@ -700,12 +692,11 @@ QScriptValue Vector3_prototype_add(QScriptContext *context, QScriptEngine *engin
 QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.subtract: "
-                                   "this object is not a Ogre::Vector3 or number.");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     if (context->argumentCount() >= 1)
@@ -722,11 +713,10 @@ QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.subtract: "
-                                       "Argument #0 object is not a Ogre::Vector3 or number.");
+                                       "Argument #0 object is neither an Ogre::Vector3 nor a number.");
         }
 
         *v -= *v2;
-
         return engine->toScriptValue(v);
     }
 
@@ -736,12 +726,11 @@ QScriptValue Vector3_prototype_subtract(QScriptContext *context, QScriptEngine *
 QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.multiply: "
-                                   "this object is not a Ogre::Vector3 or number.");
+                                   "this object is not a Ogre::Vector3.");
     }
 
     if (context->argumentCount() >= 1)
@@ -758,11 +747,10 @@ QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.multiply: "
-                                       "Argument #0 object is not a Ogre::Vector3 or a number.");
+                                       "Argument #0 object is neither an Ogre::Vector3 nor a number.");
         }
 
         *v *= *v2;
-
         return engine->toScriptValue(v);
     }
 
@@ -772,12 +760,11 @@ QScriptValue Vector3_prototype_multiply(QScriptContext *context, QScriptEngine *
 QScriptValue Vector3_prototype_divide(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.divide: "
-                                   "this object is not a Ogre::Vector3 or number.");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     if (context->argumentCount() >= 1)
@@ -794,11 +781,10 @@ QScriptValue Vector3_prototype_divide(QScriptContext *context, QScriptEngine *en
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.divide: "
-                                       "Argument #0 object is not a Ogre::Vector3 or a number.");
+                                       "Argument #0 object is neither an Ogre::Vector3 nor a number.");
         }
 
         *v /= *v2;
-
         return engine->toScriptValue(v);
     }
 
@@ -808,16 +794,14 @@ QScriptValue Vector3_prototype_divide(QScriptContext *context, QScriptEngine *en
 QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.normalize: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     v->normalise();
-
     return engine->toScriptValue(v);
 }
 
@@ -825,12 +809,11 @@ QScriptValue Vector3_prototype_normalize(QScriptContext *context, QScriptEngine 
 QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.distance: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     if (context->argumentCount() >= 1)
@@ -840,7 +823,7 @@ QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.distance: "
-                                       "Argument #0 object is not a Ogre::Vector3");
+                                       "Argument #0 object is not an Ogre::Vector3.");
         }
 
         return v->distance(*v2);
@@ -852,12 +835,11 @@ QScriptValue Vector3_prototype_distance(QScriptContext *context, QScriptEngine *
 QScriptValue Vector3_prototype_dot(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.dot: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     if (context->argumentCount() >= 1)
@@ -867,7 +849,7 @@ QScriptValue Vector3_prototype_dot(QScriptContext *context, QScriptEngine *engin
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.dot: "
-                                       "Argument #0 object is not a Ogre::Vector3");
+                                       "Argument #0 object is not an Ogre::Vector3.");
         }
 
         return engine->toScriptValue(v->dotProduct(*v2));
@@ -879,12 +861,11 @@ QScriptValue Vector3_prototype_dot(QScriptContext *context, QScriptEngine *engin
 QScriptValue Vector3_prototype_cross(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::Vector3* v = qscriptvalue_cast<Ogre::Vector3*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.cross: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     if (context->argumentCount() >= 1)
@@ -894,7 +875,7 @@ QScriptValue Vector3_prototype_cross(QScriptContext *context, QScriptEngine *eng
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.cross: "
-                                       "Argument #0 object is not a Ogre::Vector3");
+                                       "Argument #0 object is not an Ogre::Vector3.");
         }
 
         return engine->toScriptValue(v->crossProduct(*v2));
@@ -910,7 +891,7 @@ QScriptValue Vector3_prototype_rotateBy(QScriptContext *context, QScriptEngine *
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.rotateBy: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     if (context->argumentCount() >= 1)
@@ -920,7 +901,7 @@ QScriptValue Vector3_prototype_rotateBy(QScriptContext *context, QScriptEngine *
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.rotateBy: "
-                                       "Argument #0 object is not a Ogre::Quaternion");
+                                       "Argument #0 object is not an Ogre::Quaternion.");
         }
         return engine->toScriptValue(*q * *v);
     }
@@ -936,7 +917,7 @@ QScriptValue Vector3_prototype_length(QScriptContext *context, QScriptEngine *en
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.length: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     return v->length();
@@ -949,7 +930,7 @@ QScriptValue Vector3_prototype_equals(QScriptContext *context, QScriptEngine *en
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Vector3.prototype.equals: "
-                                   "this object is not a Ogre::Vector3");
+                                   "this object is not an Ogre::Vector3.");
     }
 
     if (context->argumentCount() >= 1)
@@ -959,7 +940,7 @@ QScriptValue Vector3_prototype_equals(QScriptContext *context, QScriptEngine *en
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Vector3.prototype.equals: "
-                                       "Argument #0 object is not a Ogre::Vector3");
+                                       "Argument #0 object is not an Ogre::Vector3.");
         }
 
         return v->distance(*v2) < 0.001f;
@@ -1056,7 +1037,7 @@ QScriptValue Quaternion_prototype_x(QScriptContext *context, QScriptEngine *engi
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.x: "
-                                   "this object is not a Ogre::Quaternion");
+                                   "this object is not an Ogre::Quaternion.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -1089,7 +1070,7 @@ QScriptValue Quaternion_prototype_y(QScriptContext *context, QScriptEngine *engi
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.y: "
-                                   "this object is not a Ogre::Quaternion");
+                                   "this object is not an Ogre::Quaternion.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -1122,7 +1103,7 @@ QScriptValue Quaternion_prototype_z(QScriptContext *context, QScriptEngine *engi
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.z: "
-                                   "this object is not a Ogre::Quaternion");
+                                   "this object is not an Ogre::Quaternion.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -1155,7 +1136,7 @@ QScriptValue Quaternion_prototype_w(QScriptContext *context, QScriptEngine *engi
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.w: "
-                                   "this object is not a Ogre::Quaternion");
+                                   "this object is not an Ogre::Quaternion.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -1188,7 +1169,7 @@ QScriptValue Quaternion_prototype_normalize(QScriptContext *context, QScriptEngi
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.normalize: "
-                                   "this object is not a Ogre::Quaternion");
+                                   "this object is not an Ogre::Quaternion.");
     }
     q->normalise();
     return engine->toScriptValue(q);
@@ -1201,7 +1182,7 @@ QScriptValue Quaternion_prototype_inverse(QScriptContext *context, QScriptEngine
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.inverse: "
-                                   "this object is not a Ogre::Quaternion");
+                                   "this object is not an Ogre::Quaternion.");
     }
     return engine->toScriptValue(q->Inverse());
 }
@@ -1213,7 +1194,7 @@ QScriptValue Quaternion_prototype_multiply(QScriptContext *context, QScriptEngin
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.multiply: "
-                                   "this object is not a Ogre::Quaternion or number.");
+                                   "this object is not an Ogre::Quaternion.");
     }
 
     if (context->argumentCount() >= 1)
@@ -1223,8 +1204,8 @@ QScriptValue Quaternion_prototype_multiply(QScriptContext *context, QScriptEngin
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Quaternion.prototype.multiply: "
-                                       "Argument #0 object is not a Ogre::Quaternion "
-                                       "or a number or number.");
+                                       "Argument #0 object is neither an Ogre::Quaternion "
+                                       "nor a number.");
         }
 
         *q = *q * *q2;
@@ -1241,7 +1222,7 @@ QScriptValue Quaternion_prototype_slerp(QScriptContext *context, QScriptEngine *
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.slerp: "
-                                   "this object is not a Ogre::Quaternion or number.");
+                                   "this object is not an Ogre::Quaternion.");
     }
 
     if (context->argumentCount() >= 2)
@@ -1263,7 +1244,7 @@ QScriptValue Quaternion_prototype_slerp(QScriptContext *context, QScriptEngine *
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Quaternion.prototype.slerp: "
-                                       "Argument #1 object is not a Ogre::Quaternion.");
+                                       "Argument #1 object is not an Ogre::Quaternion.");
         }
 
         bool shortestPath = true;
@@ -1289,7 +1270,7 @@ QScriptValue Quaternion_prototype_nlerp(QScriptContext *context, QScriptEngine *
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.nlerp: "
-                                   "this object is not a Ogre::Quaternion or number.");
+                                   "this object is not an Ogre::Quaternion.");
     }
 
     if (context->argumentCount() >= 2)
@@ -1311,7 +1292,7 @@ QScriptValue Quaternion_prototype_nlerp(QScriptContext *context, QScriptEngine *
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Quaternion.prototype.nlerp: "
-                                       "Argument #1 object is not a Ogre::Quaternion.");
+                                       "Argument #1 object is not an Ogre::Quaternion.");
         }
 
         bool shortestPath = true;
@@ -1338,7 +1319,7 @@ QScriptValue Quaternion_prototype_length(QScriptContext *context, QScriptEngine 
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.length: "
-                                   "this object is not a Ogre::Quaternion");
+                                   "this object is not an Ogre::Quaternion.");
     }
     return q->Norm();
 }
@@ -1351,7 +1332,7 @@ QScriptValue Quaternion_prototype_toString(QScriptContext *context, QScriptEngin
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.toString: "
-                                   "this object is not a Ogre::Quaternion");
+                                   "this object is not an Ogre::Quaternion.");
     }
 
     return QString("Quaternion (w: %0, x: %1, y: %2, z: %3)")
@@ -1368,7 +1349,7 @@ QScriptValue Quaternion_prototype_equals(QScriptContext *context, QScriptEngine 
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Quaternion.prototype.equals: "
-                                   "this object is not a Ogre::Quaternion");
+                                   "this object is not an Ogre::Quaternion.");
     }
 
     if (context->argumentCount() == 1)
@@ -1378,7 +1359,7 @@ QScriptValue Quaternion_prototype_equals(QScriptContext *context, QScriptEngine 
         {
             return context->throwError(QScriptContext::TypeError,
                                        "Quaternion.prototype.equals: "
-                                       "Argument #0 object is not a Ogre::Quaternion");
+                                       "Argument #0 object is not an Ogre::Quaternion.");
         }
 
         return fabs(q->w - q2->w) < 0.001f &&
@@ -1457,12 +1438,11 @@ QScriptValue Color_prototype_ctor(QScriptContext *context, QScriptEngine *engine
 QScriptValue Color_prototype_r(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::ColourValue* v = qscriptvalue_cast<Ogre::ColourValue*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Color.prototype.r: "
-                                   "this object is not a Ogre::ColourValue");
+                                   "this object is not an Ogre::ColourValue.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -1491,12 +1471,11 @@ QScriptValue Color_prototype_r(QScriptContext *context, QScriptEngine *engine)
 QScriptValue Color_prototype_g(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::ColourValue* v = qscriptvalue_cast<Ogre::ColourValue*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Color.prototype.g: "
-                                   "this object is not a Ogre::ColourValue");
+                                   "this object is not an Ogre::ColourValue.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -1525,12 +1504,11 @@ QScriptValue Color_prototype_g(QScriptContext *context, QScriptEngine *engine)
 QScriptValue Color_prototype_b(QScriptContext *context, QScriptEngine *engine)
 {
     Ogre::ColourValue* v = qscriptvalue_cast<Ogre::ColourValue*>(context->thisObject());
-
     if (!v)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Color.prototype.b: "
-                                   "this object is not a Ogre::ColourValue");
+                                   "this object is not an Ogre::ColourValue.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -1564,7 +1542,7 @@ QScriptValue Color_prototype_a(QScriptContext *context, QScriptEngine *engine)
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Color.prototype.r: "
-                                   "this object is not a Ogre::ColourValue");
+                                   "this object is not an Ogre::ColourValue.");
     }
 
     QScriptValue obj = context->thisObject();
@@ -1599,7 +1577,7 @@ QScriptValue Color_prototype_toString(QScriptContext *context, QScriptEngine *en
     {
         return context->throwError(QScriptContext::TypeError,
                                    "Color.prototype.toString: "
-                                   "this object is not a Ogre::ColourValue");
+                                   "this object is not an Ogre::ColourValue.");
     }
 
     return QString("Color (r: %1, g: %2, b: %3, a: %4)")
@@ -1648,7 +1626,6 @@ QString cleanIdentifier(const QString& input)
             output.replace(i, 1, "_");
         }
     }
-
     return output;
 }
 } // END NS JavaScriptBindings

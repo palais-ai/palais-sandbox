@@ -47,11 +47,11 @@ public:
           Ogre::SceneNode* root,
           QOEngine* engine,
           const QString& sceneManagerName);
-
     ~Scene();
 
     Ogre::SceneManager* getOgreSceneManager() const;
 
+    // Drawer API
     DebugDrawer* createDebugDrawer(const QString& name, float opacity = 0.5);
     void destroyDebugDrawer(DebugDrawer* drawer);
     Q_INVOKABLE DebugDrawer* createDrawer(const QString& name, float opacity = 0.5);
@@ -63,8 +63,8 @@ public:
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
     virtual bool frameEnded(const Ogre::FrameEvent& evt);
 
+    // Actor API
     Q_INVOKABLE void toggleHighlight(const QString& name, bool highlighted);
-
     Q_INVOKABLE Actor* instantiate(const QString& name,
                                    const QString& meshName,
                                    const Ogre::Vector3& position = Ogre::Vector3::ZERO,
@@ -83,6 +83,7 @@ public:
 
     Q_INVOKABLE RangeQueryResult rangeQuery(const Ogre::Vector3& origin, float distance);
 
+    // Scene life cycle
     void setup();
     void teardown();
     void update(float time);

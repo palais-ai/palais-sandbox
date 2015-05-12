@@ -5,7 +5,6 @@
 #include <QScriptValue>
 #include <QVector>
 #include <QVariant>
-
 #include "GOAP.h"
 #include "AStar.h"
 
@@ -73,7 +72,8 @@ class Planner : public QObject
 {
     Q_OBJECT
 public:
-    typedef ailib::GOAPPlanner<planner_state_type, 0, PlanningHash<planner_state_type> > planner_type;
+    typedef ailib::GOAPPlanner<planner_state_type, 0, PlanningHash<planner_state_type> >
+            planner_type;
 
     explicit Planner(QObject *parent = 0);
     ~Planner();

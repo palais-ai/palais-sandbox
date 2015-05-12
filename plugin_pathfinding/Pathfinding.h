@@ -2,7 +2,6 @@
 #define PATHFINDING_H
 
 #include "AStar.h"
-
 #include <QObject>
 #include <QScriptValue>
 #include <OgreVector3.h>
@@ -48,7 +47,7 @@ public:
     void update(Scene& scene, float deltaTime);
     void updateActor(Actor& actor, float deltaTime);
 
-    void initNavGraphFromQONode(Ogre::SceneNode* node);
+    void initNavGraphFromNode(Ogre::SceneNode* node);
     void visualizeNavGraph(DebugDrawer* drawer) const;
     Q_INVOKABLE bool moveActor(Actor* actor,
                                const Ogre::Vector3& target,

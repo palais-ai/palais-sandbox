@@ -1,14 +1,9 @@
 #include "Scheduler.h"
-
 #include "HighResolutionTime.h"
 #include <algorithm>
 #include <queue>
-#include <iostream>
-#include <typeinfo>
 
 BEGIN_NS_AILIB
-
-#define PRINT_STATES 0
 
 Scheduler::Scheduler() :
     mListener(NULL)
@@ -23,7 +18,6 @@ void Scheduler::setListener(SchedulerListener* listener)
 
 void Scheduler::clear()
 {
-    std::cout << "Cleared " << mTasks.size() + mWaiting.size() << " in Scheduler.";
     while(!mTasks.empty())
     {
         Task* current = *mTasks.begin();
@@ -39,10 +33,6 @@ void Scheduler::clear()
 void Scheduler::enqueue(Task* task)
 {
     AI_ASSERT(task, "Enqueued tasks may not be NULL.");
-
-#if PRINT_STATES
-    std::cout << "Adding " << typeid(*task).name() << "." << std::endl;
-#endif
 
     if(task->getStatus() == StatusWaiting)
     {
@@ -65,9 +55,7 @@ void Scheduler::enqueue(Task* task)
 void Scheduler::dequeue(Task* task)
 {
     AI_ASSERT(task, "Dequeued tasks may not be NULL.");
-#if PRINT_STATES
-    std::cout << "Removing " << typeid(*task).name() << "." << std::endl;
-#endif
+
     const Status status = task->getStatus();
     if(status == StatusWaiting)
     {
@@ -82,18 +70,6 @@ void Scheduler::dequeue(Task* task)
         AI_ASSERT(false, "Only waiting or running tasks may be removed.");
     }
 }
-
-#if PRINT_STATES
-static void printTasks(const Scheduler::TaskList& tasks)
-{
-    std::cout << "Vector(" << tasks.size() << ") [ ";
-    for(Scheduler::TaskList::const_iterator it = tasks.begin(); it != tasks.end(); ++it)
-    {
-        std::cout << typeid(*(*it)).name() << ",";
-    }
-    std::cout << " ]" << std::endl;
-}
-#endif
 
 HighResolutionTime::Timestamp Scheduler::update(HighResolutionTime::Timestamp maxRuntime, float dt)
 {
@@ -115,9 +91,6 @@ HighResolutionTime::Timestamp Scheduler::update(HighResolutionTime::Timestamp ma
 
         // Ignore changes to the status of this task during its execution time.
         current->setListener(NULL);
-#if PRINT_STATES
-        std::cout << "Running " << typeid(*current).name() << "." << std::endl;
-#endif
 
         AI_ASSERT(current->getStatus() == StatusRunning,
                   "All tasks in the task queue must be running.");
@@ -143,11 +116,6 @@ HighResolutionTime::Timestamp Scheduler::update(HighResolutionTime::Timestamp ma
         {
             current->setListener(this);
         }
-
-#if PRINT_STATES
-        printTasks(mTasks);
-        printTasks(mWaiting);
-#endif
     }
 
     return currentRuntime;
@@ -155,7 +123,8 @@ HighResolutionTime::Timestamp Scheduler::update(HighResolutionTime::Timestamp ma
 
 void Scheduler::onStatusChanged(Task* task, Status from)
 {
-    // FIXME: Some tasks get lost in changes (probably from changing to running / waiting when they are not being executed..
+    // FIXME: Some tasks get lost during status changes
+    //        (probably from changing to running / waiting when they are not being executed)
     //        Allow this to happen by checking for the currently executed task here explicitly.
     if(from == StatusWaiting)
     {
@@ -189,10 +158,8 @@ void Scheduler::removeRunning(Task* task)
 
 void Scheduler::removeFrom(TaskList& list, Task* task)
 {
-    if(list.erase(task) != 1)
-    {
-        puts("Couldn't find task to erase.");
-    }
+    size_t numRemoved = list.erase(task);
+    AI_ASSERT(numRemoved == 1, "Couldn't find task to erase.");
     task->setListener(NULL);
 
     if(mListener)

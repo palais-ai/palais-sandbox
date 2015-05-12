@@ -18,13 +18,6 @@
 #include <OgreSceneQuery.h>
 #include <OgreStringConverter.h>
 
-#define VERBOSE_LOGGING false
-#define IF_VERBOSE(x__) do \
-{\
-    if(VERBOSE_LOGGING) {\
-    (x__);}\
-} while(false);
-
 Scene::Scene(const QString& name,
              const QString& sceneFile,
              const QString& logicFile,
@@ -41,13 +34,11 @@ Scene::Scene(const QString& name,
     mSphereQuery(getOgreSceneManager()->createSphereQuery(Ogre::Sphere())),
     mIsSetup(false)
 {
-    if(!mEngine)
-    {
-        qFatal("Scene requires an engine instance.");
-    }
-
+    // The scene requires an engine.
+    assert(mEngine);
     // This object must reside in the same thread as the ogre engine.
     assert(thread() == mEngine->thread());
+
     getActors(mRoot);
     Ogre::Root::getSingleton().addFrameListener(this);
 
@@ -161,7 +152,6 @@ void Scene::setCameraFocus(Actor* actor)
     const QString cameraName("cam1");
     QOCamera* camera = mEngine->getQQuickWindow()
                                       ->findChild<QOCamera*>(cameraName);
-
     if(!camera)
     {
         qFatal("Couldn't find camera with name (objectName=%s).",
@@ -205,7 +195,6 @@ QWeakPointer<Actor> Scene::getActorForNode(Ogre::SceneNode* node) const
     assert(node);
     QString name = QString::fromStdString(node->getName());
     QHash<QString, QSharedPointer<Actor> >::const_iterator it = mActors.find(name);
-
     if(it == mActors.end())
     {
         return QWeakPointer<Actor>();
@@ -375,8 +364,6 @@ Actor* Scene::instantiate(const QString& name,
     Ogre::SceneManager* scnMgr = getOgreSceneManager();
 
     Ogre::String meshFile = meshName.toStdString() + ".mesh";
-    IF_VERBOSE(qDebug() << "Loading mesh at " << QString::fromStdString(meshFile));
-
     try
     {
         Ogre::MeshManager::getSingleton().load(meshFile, "General");
@@ -424,7 +411,6 @@ void Scene::destroy(Actor* actor)
     actorRef->emitSignalBeforeRemoval();
 
     const int numRemoved = mActors.remove(actorRef->getName());
-    IF_VERBOSE(qDebug() << "[" << actorRef->getName() << "] : Num. Removed: " << numRemoved);
     assert(numRemoved == 1);
 
     JavaScriptBindings::removeActorBinding(actorRef.data(), mLogicScript);
@@ -515,6 +501,7 @@ Actor* Scene::addActor(Ogre::SceneNode* node)
     connect(newActor, &Actor::visibilityChanged,
             this, &Scene::onActorVisibilityChanged);
 
+    // Register the actor with the scripting system.
     JavaScriptBindings::addActorBinding(newActor, mLogicScript);
 
     emit actorAdded(name);
@@ -549,7 +536,7 @@ void Scene::setup()
     if(fun.isFunction())
     {
         fun.call();
-        JavaScriptBindings::checkScriptEngineException(mLogicScript, "onSetup");
+        JavaScriptBindings::checkScriptEngineException(mLogicScript, "Scene.onSetup");
     }
     else
     {
@@ -563,14 +550,15 @@ void Scene::teardown()
     if(fun.isFunction())
     {
         fun.call();
-        JavaScriptBindings::checkScriptEngineException(mLogicScript, "onTeardown");
+        JavaScriptBindings::checkScriptEngineException(mLogicScript, "Scene.onTeardown");
     }
     else
     {
         // No __onTeardown__ handler defined in script. This is not an error. (optional)
     }
 
-    // Delete actors here to trigger any dangling __delete__ events that the script might be listening to.
+    // Delete actors here to trigger any dangling __delete__ events that the script might be
+    // listening to.
     // No scripts should be called in the destructor.
     QStringList keys = mActors.keys();
     foreach(const QString& actorName, keys)
@@ -594,7 +582,7 @@ void Scene::update(float time)
     if(fun.isFunction())
     {
         fun.call(QScriptValue(), QScriptValueList() << deltaTimeInSeconds);
-        JavaScriptBindings::checkScriptEngineException(mLogicScript, "update");
+        JavaScriptBindings::checkScriptEngineException(mLogicScript, "Scene.update");
     }
     else
     {

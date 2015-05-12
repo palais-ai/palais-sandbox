@@ -21,7 +21,7 @@ enum Status
 class TaskListener
 {
 public:
-    virtual ~TaskListener() {}
+    virtual ~TaskListener();
     virtual void onStatusChanged(Task* task, Status from) = 0;
 };
 
@@ -41,7 +41,7 @@ public:
     HighResolutionTime::Timestamp getRuntime() const;
 private:
     TaskListener* mListener;
-    uint16_t mRuntime; // in microseconds
+    uint16_t mRuntime; //< in microseconds
     Status mStatus;
 };
 

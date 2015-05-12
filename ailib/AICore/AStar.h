@@ -11,11 +11,18 @@
 
 BEGIN_NS_AILIB
 
+/**
+ * @brief The AStar class implements the A* graph search algorithm using a preallocated node cache.
+ * By preallocating we use O(n) memory but significantly increase the performance of the A* search.
+ * Use the IDAStar class if preallocation is not feasible.
+ */
 template <typename GRAPH>
 class AStar
 {
 private:
-    // AStarNode carries the bookkeeping information necessary for the A* algorithm.
+    /**
+     * @brief AStarNode carries the bookkeeping information necessary for the A* algorithm.
+     */
     class AStarNode
     {
     public:
@@ -33,6 +40,10 @@ private:
         NodeState state;
     };
 
+    /**
+     * @brief The NodeComparator class is used for sorting the internal priority queue of the A*
+     * algorithm.
+     */
     class NodeComparator
     {
     public:
@@ -45,9 +56,7 @@ private:
     };
 
     const GRAPH& mGraph;
-
-    // Mutable, because it's an intermediary cache
-    mutable std::vector<AStarNode> mNodeInfo;
+    mutable std::vector<AStarNode> mNodeInfo; //< Cache structure
 public:
     typedef typename GRAPH::node_type node_type;
     typedef typename GRAPH::edge_type edge_type;
@@ -91,6 +100,23 @@ public:
         return findPath(start, goal, &zeroHeuristic, comparator, connections);
     }
 
+    /**
+     * @brief findPath retrieves a shortest path between a __start__ and a __goal__ node,
+     *        if a path exists.
+     *
+     * @param start A pointer to the start node on the search graph.
+     * @param goal A reference to the goal node on the search graph.
+     * @param heuristic Optional. The heuristic used to guide the search. Defaults to the zero
+     *                  heuristic. Which means all paths will be searched. Use an appropiate
+     *                  heuristic for your use case for optimal performance. The heuristic MUST
+     *                  be admissible (never overestimates) in order for this algorithm to work.
+     * @param comparator Optional. The node comparison function. Defaults to operator==()
+     * @param connections Optional. Returns the sequence of connections of the shortest path.
+     *                    Defaults to NULL.
+     *
+     * @return The path taken. A path is a sequence of nodes. Empty if no path can be found.
+     *         Use the __connection__ output parameter to obtain the connection sequence.
+     */
     path_type findPath(const node_type* const start,
                        const node_type& goal,
                        Heuristic heuristic = &zeroHeuristic,

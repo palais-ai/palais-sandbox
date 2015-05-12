@@ -2,6 +2,11 @@
 
 BEGIN_NS_AILIB
 
+TaskListener::~TaskListener()
+{
+
+}
+
 Task::Task() :
     mListener(0),
     mRuntime(0),
@@ -41,6 +46,8 @@ void Task::setStatus(Status status)
 
 void Task::addRuntime(const HighResolutionTime::Timestamp& runtime)
 {
+    // TODO: We could improve this by changing the runtime scale towards longer computation times.
+
     // The runtime counter overflows after 2^16 microseconds (which is approx. 65 ms).
     // This is fine for our purposes, since the 65 ms represent actual computation time.
     // The only penalty for overflowing is that this task may get execution priority over other

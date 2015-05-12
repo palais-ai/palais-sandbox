@@ -26,8 +26,6 @@ const Ogre::MeshPtr optimizeMesh(const Ogre::MeshPtr mesh)
         optimiseTool.setUVTolerance(1e-06);
 
         // Remove duplicate vertices using libmeshmagick
-        // This is important for the following algorithm to generate a discrete navigation graph
-        // from the continuous navigation mesh.
         optimiseTool.processMesh(mesh);
     }
     else

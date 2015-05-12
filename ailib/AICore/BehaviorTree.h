@@ -16,7 +16,7 @@ class Behavior;
 class BehaviorListener
 {
 public:
-    virtual ~BehaviorListener() {}
+    virtual ~BehaviorListener();
     virtual void onSuccess(Behavior* behavior) = 0;
     virtual void onFailure(Behavior* behavior) = 0;
     virtual void onReset(Behavior* behavior);
@@ -38,6 +38,8 @@ public:
     void notifyFailure();
     void notifyReset();
 
+    // Virtual to allow subclasses to decide whether or not the user data should be passed on
+    // to child behaviors.
     virtual void setUserData(const hold_any& data);
     hold_any& getUserData();
 private:
@@ -55,6 +57,8 @@ public:
 
     const BehaviorList& getChildren() const;
     BehaviorList& getChildren();
+
+    // Cascades the user data to all children.
     virtual void setUserData(const hold_any& data);
 private:
     BehaviorList mChildren;
@@ -70,7 +74,7 @@ public:
     SequentialComposite(Scheduler& scheduler,
                         const Composite::BehaviorList& children);
 
-    virtual ~SequentialComposite() {}
+    virtual ~SequentialComposite();
 
     virtual void run();
     virtual void terminate();
@@ -89,7 +93,7 @@ class Selector : public SequentialComposite
 public:
     Selector(Scheduler& scheduler,
              const Composite::BehaviorList& children);
-    virtual ~Selector() {}
+    virtual ~Selector();
 
     virtual void onSuccess(Behavior* behavior);
     virtual void onFailure(Behavior* behavior);
@@ -100,7 +104,7 @@ class Sequence : public SequentialComposite
 public:
     Sequence(Scheduler& scheduler,
              const Composite::BehaviorList& children);
-    virtual ~Sequence() {}
+    virtual ~Sequence();
 
     virtual void onSuccess(Behavior* behavior);
     virtual void onFailure(Behavior* behavior);
@@ -111,7 +115,7 @@ class Parallel : public Composite
 public:
     Parallel(Scheduler& scheduler,
              const Composite::BehaviorList& children);
-    virtual ~Parallel() {}
+    virtual ~Parallel();
 
     virtual void run();
     virtual void terminate();
@@ -201,7 +205,7 @@ class RandomSelector : public RandomComposite<Selector>
 public:
     RandomSelector(Scheduler& scheduler,
                    const Composite::BehaviorList& children);
-    virtual ~RandomSelector() {}
+    virtual ~RandomSelector();
 };
 
 class RandomSequence : public RandomComposite<Sequence>
@@ -209,10 +213,8 @@ class RandomSequence : public RandomComposite<Sequence>
 public:
     RandomSequence(Scheduler& scheduler,
                    const Composite::BehaviorList& children);
-    virtual ~RandomSequence() {}
+    virtual ~RandomSequence();
 };
-
-// TODO: UserDataScope
 
 END_NS_AILIB
 

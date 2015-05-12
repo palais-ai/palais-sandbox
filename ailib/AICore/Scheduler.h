@@ -43,6 +43,7 @@ public:
     }
 };
 
+// TODO: Add a SchedulingPolicy template parameter.
 class Scheduler : private TaskListener
 {
 public:
