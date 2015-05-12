@@ -1,3 +1,6 @@
 [submodule "QOgre"]
 	path = QOgre
 	url = https://github.com/palais-ai/QOgre.git
+[submodule "ailib"]
+	path = ailib
+	url = https://github.com/palais-ai/ailib.git
