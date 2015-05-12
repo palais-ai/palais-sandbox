@@ -1,6 +1,6 @@
 #include "InspectorModel.h"
 #include "KnowledgeModel.h"
-#include "utility/MetatypeDeclarations.h"
+#include "Utility/MetatypeDeclarations.h"
 #include <QtQml>
 #include <QSharedPointer>
 #include <QDebug>

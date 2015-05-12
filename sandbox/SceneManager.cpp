@@ -2,7 +2,7 @@
 #include "SceneLoader.h"
 #include "Scene.h"
 #include "Application.h"
-#include "utility/TimedLogger.h"
+#include "Utility/TimedLogger.h"
 #include "Bindings/JavascriptBindings.h"
 #include "QOEngine.h"
 #include <QtGlobal>

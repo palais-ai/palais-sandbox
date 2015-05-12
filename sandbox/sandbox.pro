@@ -17,12 +17,12 @@ SOURCES += main.cpp \
     SceneManager.cpp \
     SceneLoader.cpp \
     ProjectManager.cpp \
-    models/ActorModel.cpp \
-    models/ConsoleModel.cpp \
-    models/InspectorModel.cpp \
-    utility/TimedLogger.cpp \
-    utility/LogHandler.cpp \
-    models/SceneModel.cpp \
+    Models/ActorModel.cpp \
+    Models/ConsoleModel.cpp \
+    Models/InspectorModel.cpp \
+    Utility/TimedLogger.cpp \
+    Utility/LogHandler.cpp \
+    Models/SceneModel.cpp \
     PluginManager.cpp
 
 HEADERS += \
@@ -30,14 +30,14 @@ HEADERS += \
     SceneManager.h \
     SceneLoader.h \
     ProjectManager.h \
-    models/ActorModel.h \
-    models/ConsoleModel.h \
-    models/InspectorModel.h \
-    utility/TimedLogger.h \
-    utility/LogHandler.h \
-    models/SceneModel.h \
+    Models/ActorModel.h \
+    Models/ConsoleModel.h \
+    Models/InspectorModel.h \
+    Utility/TimedLogger.h \
+    Utility/LogHandler.h \
+    Models/SceneModel.h \
     PluginInterface.h \
-    utility/MetatypeDeclarations.h \
+    Utility/MetatypeDeclarations.h \
     PluginManager.h
 
 OTHER_FILES += \

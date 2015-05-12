@@ -17,7 +17,7 @@
 #include "QOEngine.h"
 #include "QOCamera.h"
 #include "QOItem.h"
-#include "models/InspectorModel.h"
+#include "Models/InspectorModel.h"
 
 std::string ProjectManager::sCurrentResourceGroupName = "CurrentScene";
 QString ProjectManager::sProjectKeyName = "name";

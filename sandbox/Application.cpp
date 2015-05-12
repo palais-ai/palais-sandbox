@@ -2,11 +2,11 @@
 #include "ProjectManager.h"
 #include "Scene.h"
 #include "Actor.h"
-#include "models/InspectorModel.h"
-#include "models/ConsoleModel.h"
-#include "models/SceneModel.h"
-#include "utility/TimedLogger.h"
-#include "utility/LogHandler.h"
+#include "Models/InspectorModel.h"
+#include "Models/ConsoleModel.h"
+#include "Models/SceneModel.h"
+#include "Utility/TimedLogger.h"
+#include "Utility/LogHandler.h"
 #include <cassert>
 #include <QCoreApplication>
 #include <QtQml/QQmlContext>

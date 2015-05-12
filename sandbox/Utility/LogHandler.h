@@ -1,7 +1,7 @@
 #ifndef LOGHANDLER_H
 #define LOGHANDLER_H
 
-#include "../models/ConsoleModel.h"
+#include "../Models/ConsoleModel.h"
 #include <QObject>
 #include <OgreLog.h>
 

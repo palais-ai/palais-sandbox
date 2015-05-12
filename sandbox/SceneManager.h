@@ -2,7 +2,6 @@
 #define SCENEMANAGER_H
 
 #include "PluginManager.h"
-
 #include <QObject>
 #include <QTime>
 #include <QAtomicInt>
