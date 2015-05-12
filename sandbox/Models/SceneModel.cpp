@@ -13,6 +13,7 @@ SceneModel::SceneModel(const QString& name) :
     mName(name),
     mActorSelected(false)
 {
+    ;
 }
 
 const QString& SceneModel::getName() const
@@ -110,7 +111,7 @@ void SceneModel::onActorRemoved(const QString& actorName)
     }
     else
     {
-        qWarning("Requested actor removal for %s that wasn't present.",
+        qWarning("SceneModel.onActorRemoved: Requested actor removal for %s that wasn't present.",
                  actorName.toLocal8Bit().constData());
     }
 }
@@ -129,7 +130,8 @@ void SceneModel::onActorChangedVisiblity(const QString& actorName, bool visible)
     }
     else
     {
-        qWarning("Requested actor visibility change for %s that wasn't present.",
+        qWarning("SceneModel.onActorChangedVisiblity: Requested actor visibility change for "
+                 "%s that wasn't present.",
                  actorName.toLocal8Bit().constData());
     }
 }
@@ -150,7 +152,8 @@ void SceneModel::onActorChangedSelection(const QString& actorName, bool selected
     }
     else
     {
-        qWarning("Requested actor selection change for %s that wasn't present.",
+        qWarning("SceneModel.onActorChangedSelection: Requested actor selection change for "
+                 "%s that wasn't present.",
                  actorName.toLocal8Bit().constData());
     }
 }
@@ -163,7 +166,8 @@ void SceneModel::setVisibleRequested(int index, bool visible)
     }
     else
     {
-        qWarning("Index out of bounds actor requested. Visibility change was not performed.");
+        qWarning("SceneModel.setVisibleRequested: Index out of bounds actor requested. "
+                 "Visibility change was not performed.");
     }
 }
 
@@ -175,7 +179,8 @@ void SceneModel::setSelectedRequested(int index, bool selected)
     }
     else
     {
-        qWarning("Index out of bounds actor requested. Selection was not performed.");
+        qWarning("SceneModel.setSelectedRequested: Index out of bounds actor requested. "
+                 "Selection was not performed.");
     }
 }
 
@@ -183,7 +188,7 @@ ActorModel SceneModel::actorForIndex(int index) const
 {
     if(index >= mActors.size())
     {
-        qWarning() << "Requested actor at index [ " << index
+        qWarning() << "SceneModel.actorForIndex: Requested actor at index [ " << index
                    << " ] that is out of bounds [ size=" << mActors.size()
                    << " ].";
         return ActorModel();

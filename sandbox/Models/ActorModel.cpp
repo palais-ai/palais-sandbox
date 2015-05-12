@@ -6,7 +6,7 @@ ActorModel::ActorModel(const QString& name,
     mIsVisible(isVisible),
     mIsSelected(false)
 {
-
+    ;
 }
 
 const QString& ActorModel::getName() const

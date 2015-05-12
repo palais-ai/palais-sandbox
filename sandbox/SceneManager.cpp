@@ -11,6 +11,7 @@
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
 
+// TODO: Move these to a settings file / dialog
 const float SceneManager::sMinimumSpeedFactor = 0.1f; // In times the normal speed
 const float SceneManager::sMaximumSpeedFactor = 10.f;  // In times the normal speed
 const float SceneManager::sMaximumTickRate    = 100.f; // In ticks Per Second
@@ -67,16 +68,18 @@ Scene* SceneManager::loadScene(const QString& name,
 
         if(!nextScene)
         {
-            qWarning("Scene %s could not be loaded.", name.toStdString().c_str());
+            qWarning("SceneManager.loadScene: Scene %s could not be loaded.",
+                     name.toStdString().c_str());
             return NULL;
         }
 
-        logger.stop("Scene load");
+        logger.stop("SceneManager.loadScene");
         return mCurrentScene = nextScene;
     }
     else
     {
-        qFatal("The ogre engine has to be instantiated to be able to load scenes.");
+        qFatal("SceneManager.loadScene: The ogre engine has to be instantiated "
+               "to be able to load scenes.");
         return NULL;
     }
 }
@@ -133,8 +136,8 @@ void SceneManager::setSimulationSpeed(float speedFactor)
     }
     else
     {
-        qWarning("Tried to set simulation speed to %.2f, \
-                  which is out of the valid range [%.2f, %.2f].",
+        qWarning("SceneManager.setSimulationSpeed: Tried to set simulation speed to %.2f, \
+                  which isn't within the range of valid values [%.2f, %.2f].",
                  speedFactor, sMinimumSpeedFactor, sMaximumSpeedFactor);
     }
 }

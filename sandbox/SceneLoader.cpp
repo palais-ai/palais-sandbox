@@ -15,6 +15,7 @@
 
 SceneLoader::SceneLoader()
 {
+    ;
 }
 
 Scene* SceneLoader::loadScene(QOEngine* engine,
@@ -45,7 +46,7 @@ Scene* SceneLoader::loadScene(QOEngine* engine,
         }
         catch(const std::runtime_error& ex)
         {
-            qWarning("%s", ex.what());
+            qWarning("SceneLoader.loadScene: %s", ex.what());
             return NULL;
         }
 
@@ -53,7 +54,8 @@ Scene* SceneLoader::loadScene(QOEngine* engine,
     }
     else
     {
-        qFatal("An initialized ogre engine and scene manager are required to load scenes.");
+        qFatal("SceneLoader.loadScene: An initialized ogre engine and scene manager "
+               "are required to load scenes.");
         return 0;
     }
 }
@@ -74,7 +76,8 @@ void SceneLoader::loadSceneVisuals(QOEngine* engine,
     }
     else
     {
-        qFatal("An initialized ogre engine and scene manager are required to load scenes.");
+        qFatal("SceneLoader.loadSceneVisuals: An initialized ogre engine and scene manager are "
+               "required to load scenes.");
     }
 }
 
@@ -84,7 +87,7 @@ void SceneLoader::loadSceneLogic(Scene* scene,
 {
     if(!scene)
     {
-        throw std::runtime_error("A scene must be initialized.");
+        throw std::runtime_error("The scene must be initialized.");
     }
 
     QFile file(logicFile);
@@ -102,7 +105,7 @@ void SceneLoader::loadSceneLogic(Scene* scene,
     JavaScriptBindings::addBindings(engine, scene);
     JavaScriptBindings::checkScriptEngineException(engine, "SceneLoader.loadSceneLogic");
 
-    qDebug("JS Bindings have been installed.");
+    qDebug("SceneLoader.loadSceneLogic: JS Bindings have been installed.");
 
     plugins.sceneStarted(*scene);
     JavaScriptBindings::checkScriptEngineException(engine,
@@ -110,6 +113,7 @@ void SceneLoader::loadSceneLogic(Scene* scene,
 
     engine.evaluate(QScriptProgram(QString(ba), logicFile));
     JavaScriptBindings::checkScriptEngineException(engine,
-                                                   QString("ScriptEngine.evaluate(%1)").arg(logicFile)
+                                                   QString("ScriptEngine.evaluate(%1)")
+                                                          .arg(logicFile)
                                                    );
 }

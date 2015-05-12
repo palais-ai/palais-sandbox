@@ -10,7 +10,7 @@ void OgreVector3Model::declareQML()
 {
     qmlRegisterUncreatableType<OgreVector3Model>("Inspector", 1, 0,
                                                  "OgreVector3",
-                                                 "Can't instantiate ogrevector3.");
+                                                 "Can't instantiate Ogre::Vector3.");
 }
 
 OgreVector3Model::OgreVector3Model(const Ogre::Vector3& vector) :
@@ -44,7 +44,7 @@ void OgreVector3ArrayModel::declareQML()
 {
     qmlRegisterUncreatableType<OgreVector3Model>("Inspector", 1, 0,
                                                  "OgreVector3Array",
-                                                 "Can't instantiate ogrevector3array.");
+                                                 "Can't instantiate OgreVector3Array.");
 }
 
 OgreVector3ArrayModel::OgreVector3ArrayModel(const QVector<Ogre::Vector3>& vectors) :
@@ -239,7 +239,8 @@ QVariant InspectorModel::data(const QModelIndex &index, int role) const
         {
             if(data.isNull())
             {
-                qWarning() << "NULL qObject encountered in knowledge. Can't display.";
+                qWarning("InspectorModel.data: NULL qObject encountered in knowledge. "
+                         "Can't display.");
                 return QVariant::fromValue(static_cast<QObject*>(0));
             }
 
@@ -253,8 +254,8 @@ QVariant InspectorModel::data(const QModelIndex &index, int role) const
                 return "QObject (Other Thread)";
             }
 
-            // This is important, otherwise the QMLEngine will take ownership of the returend object
-            // by default.
+            // This call important, without it the QMLEngine will take ownership of the returend
+            // object by default.
             QQmlEngine::setObjectOwnership(qobject, QQmlEngine::CppOwnership);
         }
 

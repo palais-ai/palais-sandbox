@@ -6,8 +6,8 @@
 class ActorModel
 {
 public:
-    ActorModel(const QString& name = "",
-               bool isVisible = false);
+    explicit ActorModel(const QString& name = "",
+                        bool isVisible = false);
 
     const QString& getName() const;
     bool isVisible() const;

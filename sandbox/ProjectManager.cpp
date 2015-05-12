@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Actor.h"
 #include "Application.h"
+#include "Models/InspectorModel.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -17,8 +18,8 @@
 #include "QOEngine.h"
 #include "QOCamera.h"
 #include "QOItem.h"
-#include "Models/InspectorModel.h"
 
+// Project structure templates
 std::string ProjectManager::sCurrentResourceGroupName = "CurrentScene";
 QString ProjectManager::sProjectKeyName = "name";
 QString ProjectManager::sProjectKeyScene = "scene";
@@ -100,14 +101,16 @@ void ProjectManager::onFocusSelectedActor()
 {
     if(!mSelectedActor)
     {
-        qWarning("Can't focus selected actor, because none is selected.");
+        qWarning("ProjectManager.onFocusSelectedActor: Can't focus selected actor, "
+                 "because none is selected.");
         return;
     }
 
     QOCamera* cameraNode = getCameraWithName("cam1");
     if(!cameraNode)
     {
-        qWarning("Can't focus selected actor without a corresponding CameraNode.");
+        qWarning("ProjectManager.onFocusSelectedActor: Can't focus selected actor without a "
+                 "corresponding CameraNode.");
         return;
     }
 
@@ -123,7 +126,8 @@ void ProjectManager::onSaveRenderView(const QUrl& url)
     QOItem* item = window->findChild<QOItem*>(itemName);
     if(!item)
     {
-        qFatal("Couldn't find ogre item with name (objectName=%s).",
+        qFatal("ProjectManager.onSaveRenderView: "
+               "Couldn't find ogre item with name (objectName=%s).",
                itemName.toLocal8Bit().constData());
     }
 
@@ -131,14 +135,15 @@ void ProjectManager::onSaveRenderView(const QUrl& url)
 
     if(img.isNull())
     {
-        qWarning("The screenshot couldn't be allocated. Out of memory.");
+        qWarning("ProjectManager.onSaveRenderView: The screenshot couldn't be allocated. "
+                 "Out of memory.");
         return;
     }
 
     QString path = url.toLocalFile();
     if(!img.save(path + ".png", "PNG", 100))
     {
-        qWarning("Failed to save current scene screenshot to %s",
+        qWarning("ProjectManager.onSaveRenderView: Failed to save current scene screenshot to %s",
                  path.toLocal8Bit().constData());
     }
 }
@@ -174,8 +179,8 @@ void ProjectManager::onActorRemoved(const QString& actorName)
     QOCamera* cameraNode = getCameraWithName("cam1");
     if(!cameraNode)
     {
-        // A crash is immanent if this happens anyway - Exit through qFatal.
-        qFatal("Can't determine focused actor without a corresponding CameraNode.");
+        qFatal("ProjectManager.onActorRemoved: Can't determine focused actor without "
+               "a corresponding CameraNode.");
     }
     else
     {
@@ -217,14 +222,16 @@ void ProjectManager::onSelectActorAtClickpoint(float mouseX,
     QOCamera* cameraNode = getCameraWithName("cam1");
     if(!cameraNode)
     {
-        qWarning("Cant determine an actor to select without a corresponding CameraNode.");
+        qWarning("ProjectManager.onSelectActorAtClickpoint: Can't determine an actor to select "
+                 "without a corresponding CameraNode.");
         return;
     }
 
     Ogre::Camera* camera = cameraNode->camera();
     if(!camera)
     {
-        qWarning("Cant determine an actor to select without a corresponding ogre camera.");
+        qWarning("ProjectManager.onSelectActorAtClickpoint: Can't determine an actor to select "
+                 "without a corresponding ogre camera.");
         return;
     }
 
@@ -251,7 +258,8 @@ void ProjectManager::onActorChangeSelected(const QString& actorName,
 
     if(!newSelected)
     {
-        qWarning("Can't select actor %s, because its not part of the scene.",
+        qWarning("ProjectManager.onActorChangeSelected: Can't select actor %s, "
+                 "because its not part of the scene.",
                  actorName.toLocal8Bit().constData());
         return;
     }
@@ -284,7 +292,7 @@ void ProjectManager::onReloadProject()
     assert(QThread::currentThread() == thread());
     if(!mCurrentProjectUrl.isEmpty())
     {
-        qDebug() << "Reloading " << mCurrentProjectUrl;
+        qDebug() << "ProjectManager.onReloadProject: Reloading " << mCurrentProjectUrl;
         onOpenProject(mCurrentProjectUrl);
     }
 }
@@ -407,7 +415,7 @@ void ProjectManager::onNewProject(QString name, QString logicFile, QString direc
     mainFile.close();
 }
 
-// FIXME: Move the parsing code to a separate class
+// TODO: Move the project parsing code to a separate class.
 void ProjectManager::onOpenProject(const QUrl url)
 {
     assert(QThread::currentThread() == thread());
@@ -445,7 +453,7 @@ void ProjectManager::onOpenProject(const QUrl url)
         QString value = obj[visualPropertyName].toString();
         if(value.isEmpty())
         {
-            qDebug() << "Scene property was empty.";
+            qDebug() << "ProjectManager.onOpenProject: 'scene' property was empty.";
             sceneFile = "";
         }
         else
@@ -455,7 +463,8 @@ void ProjectManager::onOpenProject(const QUrl url)
     }
     else
     {
-        qDebug() << "No scene file in project at " << url.toLocalFile()
+        qDebug() << "ProjectManager.onOpenProject: No scene file in project at "
+                 << url.toLocalFile()
                  << ". Specify a scene via the \"" << sProjectKeyScene << "\" property.";
     }
 
@@ -542,7 +551,7 @@ void ProjectManager::onOpenProject(const QUrl url)
     prepareScene(camera);
     loadResources(resources);
 
-    qDebug("Loading project %s with visuals (%s) and logic (%s).",
+    qDebug("ProjectManager.onOpenProject: Loading project %s with visuals (%s) and logic (%s).",
            name.toStdString().c_str(),
            sceneFile.toStdString().c_str(),
            logicFile.toStdString().c_str());
@@ -579,11 +588,12 @@ void ProjectManager::loadResources(const QStringList& paths)
             rgm.addResourceLocation(path.toStdString(),
                                     "FileSystem",
                                     sCurrentResourceGroupName);
-            qDebug() << "Loaded resource location at [" << path << "].";
+            qDebug() << "ProjectManager.loadResources: Loaded resource location at ["
+                     << path << "].";
         }
         else
         {
-            qWarning() << "Couldn't add resource location ["
+            qWarning() << "ProjectManager.loadResources: Couldn't add resource location ["
                        << path << "] because it doesn't exist.";
         }
     }
@@ -597,14 +607,14 @@ void ProjectManager::prepareScene(QOCamera* camera)
 {
     if(!camera)
     {
-        qFatal("Need a camera to prepare scene.");
+        qFatal("ProjectManager.prepareScene: Need a camera to prepare scene.");
         return;
     }
 
     Ogre::Root* root = Ogre::Root::getSingletonPtr();
     if(!root)
     {
-        qFatal("An Ogre Root must be instantiated before scene load.");
+        qFatal("ProjectManager.prepareScene: An Ogre Root must be instantiated before scene load.");
     }
 
     initializeSceneManager();
@@ -620,7 +630,7 @@ QOCamera* ProjectManager::getCameraWithName(const QString& cameraName)
 
     if(!camera)
     {
-        qFatal("Couldn't find camera with name (objectName=%s).",
+        qFatal("ProjectManager.getCameraWithName: Couldn't find camera with name (objectName=%s).",
                cameraName.toLocal8Bit().constData());
     }
 

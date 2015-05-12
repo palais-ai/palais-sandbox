@@ -59,7 +59,7 @@ macx {
 
     OGREDIR = $$(OGRE_HOME)
     isEmpty(OGREDIR) {
-        error($$TARGET needs Ogre to be built. Please set the environment variable OGRE_HOME pointing to your Ogre root directory.)
+        error($$TARGET needs OGRE to be built. Please set the environment variable OGRE_HOME pointing to your OGRE root directory.)
     }
 
     message(Packaging Ogre libraries in $$OGREDIR)

@@ -30,10 +30,9 @@ static void messageHandlerFun(QtMsgType type,
                               const QString& msg)
 {
     Q_UNUSED(context);
-
-    ConsoleModel::LogLevel level;
     fprintf(stderr, "%s\n", msg.toLocal8Bit().constData());
 
+    ConsoleModel::LogLevel level;
     switch (type)
     {
         case QtDebugMsg:
@@ -127,7 +126,7 @@ int Application::onApplicationStarted(int argc, char **argv)
 
     qmlRegisterType<Actor>();
 
-    // start Ogre once we are in the rendering thread (Ogre must live in the rendering thread)
+    // Start Ogre once we are in the rendering thread (Ogre must live in the rendering thread).
     connect(window, &QQuickWindow::frameSwapped,
             this, &Application::initializeOgre, Qt::DirectConnection);
 
@@ -174,6 +173,7 @@ void Application::initializeOgre()
 
     mApplicationEngine->rootContext()->setContextProperty("ProjectManager", mProjectManager);
 
+    // Connect the components' signals and slots.
     connect(mProjectManager, &ProjectManager::timePassed,
             mConsoleModel.data(), &ConsoleModel::onTimePassed);
 
@@ -214,7 +214,8 @@ void Application::initializeOgre()
         }
         else
         {
-            qFatal("Couldn't find dialog (id=%s).", dialogName.toStdString().c_str());
+            qFatal("Application.initializeOgre: Couldn't find dialog (id=%s).",
+                   dialogName.toStdString().c_str());
         }
     }
 
@@ -229,7 +230,8 @@ void Application::initializeOgre()
         }
         else
         {
-            qFatal("Couldn't find dialog (id=%s).", dialogName.toStdString().c_str());
+            qFatal("Application.initializeOgre: Couldn't find dialog (id=%s).",
+                   dialogName.toStdString().c_str());
         }
     }
 
@@ -244,7 +246,8 @@ void Application::initializeOgre()
         }
         else
         {
-            qFatal("Couldn't find dialog (id=%s).", dialogName.toStdString().c_str());
+            qFatal("Application.initializeOgre: Couldn't find dialog (id=%s).",
+                   dialogName.toStdString().c_str());
         }
     }
 
@@ -256,7 +259,7 @@ void Application::onOgreIsReady()
 {
     if(!mApplicationEngine)
     {
-        qFatal("Application engine must be running when ogre is ready.");
+        qFatal("Application.onOgreIsReady: Application engine must be running when ogre is ready.");
         return;
     }
 
@@ -279,7 +282,7 @@ void Application::onSceneLoaded(Scene* scene)
 {
     if(!scene)
     {
-        qFatal("SceneLoaded signal was sent but scene wasn't instantiated.");
+        qFatal("Application.onSceneLoaded: SceneLoaded signal was sent but scene wasn't instantiated.");
         return;
     }
 
@@ -345,7 +348,8 @@ void Application::onSceneLoadFailed(const QString& message)
     }
     else
     {
-        qWarning("Application engine should already be running when a scene load fails.");
+        qWarning("Application.onSceneLoadFailed: Application engine should already be running "
+                 "when a scene load fails.");
     }
 }
 
@@ -369,13 +373,15 @@ void Application::onPlayButtonPressed()
 {
     if(!mProjectManager)
     {
-        qWarning("ProjectManager must've been instantiated to start playing a scene.");
+        qWarning("Application,onPlayButtonPressed: ProjectManager must've been instantiated "
+                 "to start playing a scene.");
         return;
     }
 
     if(!mProjectManager->getSceneLoaded())
     {
-        qWarning("The play button was pressed, despite no scene being loaded.");
+        qWarning("Application,onPlayButtonPressed: The play button was pressed, "
+                 "despite no scene being loaded.");
         return;
     }
 
