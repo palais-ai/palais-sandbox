@@ -38,8 +38,7 @@ HEADERS += \
     models/scenemodel.h \
     PluginInterface.h \
     utility/MetatypeDeclarations.h \
-    PluginManager.h \
-    sandboxsettings.h
+    PluginManager.h
 
 OTHER_FILES += \
     config/resources.cfg
