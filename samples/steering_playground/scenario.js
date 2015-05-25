@@ -1,4 +1,5 @@
 require("movement.js")
+require("navigation_graph.js")
 
 function spawnAgent(position, color) {
 	var agent = Scene.instantiate(color + "Agent", "soldier2" + color, position);

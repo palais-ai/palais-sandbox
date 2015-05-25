@@ -66,52 +66,42 @@ QScriptValue planning_add_action(QScriptContext *context, QScriptEngine *engine)
                                    "Planner.add_action: this object is not a Planner");
     }
 
-    QScriptValue precondition, postcondition, cost, perform;
+    QScriptValue precondition = engine->newFunction(planning_default_precondition);
+    QScriptValue postcondition = engine->newFunction(planning_default_postcondition);
+    QScriptValue cost = engine->newFunction(planning_default_cost);
+    QScriptValue perform = engine->newFunction(planning_default_cost);
     QString name;
-    if(context->argumentCount() >= 4)
+    for(int i = 0; i < context->argumentCount(); ++i)
     {
-        for(int i = 0; i < 4; ++i)
+        QScriptValue val = context->argument(i);
+
+        if(!val.isFunction() && i != 4)
         {
-            QScriptValue val = context->argument(i);
-
-            if(!val.isFunction())
-            {
-                return context->throwError(QScriptContext::TypeError,
-                                           "Planner.add_action: arguments must be functions.");
-            }
-
-            switch(i)
-            {
-            case 0:
-                precondition = val;
-                break;
-            case 1:
-                postcondition = val;
-                break;
-            case 2:
-                cost = val;
-                break;
-            case 3:
-                perform = val;
-                break;
-            }
+            return context->throwError(QScriptContext::TypeError,
+                                       "Planner.add_action: arguments must be functions.");
         }
 
-        if(context->argumentCount() > 4)
+        switch(i)
         {
-            QScriptValue val = context->argument(4);
+        case 0:
+            precondition = val;
+            break;
+        case 1:
+            postcondition = val;
+            break;
+        case 2:
+            cost = val;
+            break;
+        case 3:
+            perform = val;
+            break;
+        case 4:
             if(val.isString())
             {
                 name = val.toString();
             }
+            break;
         }
-    }
-    else
-    {
-        precondition = engine->newFunction(planning_default_precondition);
-        postcondition = engine->newFunction(planning_default_postcondition);
-        cost = engine->newFunction(planning_default_cost);
-        perform = engine->newFunction(planning_default_cost);
     }
 
     planner->addAction(new ScriptAction(precondition, postcondition, cost, perform, name));
@@ -135,10 +125,19 @@ ScriptAction::ScriptAction(const QScriptValue& precondition,
 
 bool ScriptAction::isPreconditionFulfilled(const planner_state_type& state) const
 {
+    if(!mPrecondition.isFunction())
+    {
+        qWarning("ScriptAction.isPreconditionFulfilled [%s]: Function was not defined.",
+                 mName.toLocal8Bit().data());
+        return true;
+    }
+
     QScriptEngine* engine = mPrecondition.engine();
     if(!engine)
     {
-        qWarning("Precondition script function was invalidated.");
+        qWarning("ScriptAction.isPreconditionFulfilled [%s]: "
+                 "Precondition script function was invalidated.",
+                 mName.toLocal8Bit().data());
         return false;
     }
 
@@ -147,7 +146,9 @@ bool ScriptAction::isPreconditionFulfilled(const planner_state_type& state) cons
 
     if(retVal.isUndefined() || retVal.isNull())
     {
-        qWarning("Script precondition didn't give a valid return value.");
+        qWarning("ScriptAction.isPreconditionFulfilled [%s]: "
+                 "Script precondition didn't give a valid return value.",
+                 mName.toLocal8Bit().data());
         return false;
     }
 
@@ -157,18 +158,47 @@ bool ScriptAction::isPreconditionFulfilled(const planner_state_type& state) cons
 
 void ScriptAction::applyPostcondition(planner_state_type& state) const
 {
-    QScriptValue value = mPrecondition.engine()->toScriptValue(state);
+    if(!mPostcondition.isFunction())
+    {
+        qWarning("ScriptAction.applyPostcondition [%s]: Function was not defined.",
+                 mName.toLocal8Bit().data());
+    }
+
+    QScriptValue value = mPostcondition.engine()->toScriptValue(state);
     state = mPostcondition.call(QScriptValue(), QScriptValueList() << value).toVariant().toMap();
 }
 
 float ScriptAction::getCost(const planner_state_type& state) const
 {
-    QScriptValue value = mPrecondition.engine()->toScriptValue(state);
-    return mPostcondition.call(QScriptValue(), QScriptValueList() << value).toNumber();
+    if(!mCost.isFunction())
+    {
+        qWarning("ScriptAction.getCost [%s]: Function was not defined.",
+                 mName.toLocal8Bit().data());
+        return 0;
+    }
+
+    QScriptValue stateValue = mCost.engine()->toScriptValue(state);
+    QScriptValue costValue = mCost.call(QScriptValue(), QScriptValueList() << stateValue);
+    if(costValue.isNumber())
+    {
+        return costValue.toNumber();
+    }
+    else
+    {
+        qWarning("ScriptAction.getCost [%s]: Cost function returned a value that "
+                 "wasn't a number. Assuming 0.", mName.toLocal8Bit().data());
+        return 0;
+    }
 }
 
 void ScriptAction::perform(Actor* actor)
 {
+    if(!mPerform.isFunction())
+    {
+        qWarning("ScriptAction.perform [%s]: Function was not defined.",
+                 mName.toLocal8Bit().data());
+    }
+
     QScriptValue value = mPerform.engine()->toScriptValue(actor);
     mPerform.call(QScriptValue(), QScriptValueList() << value);
 }
@@ -202,7 +232,6 @@ static bool variantMapComparator(const QVariantMap& node,
                                  const QVariantMap& goal)
 {
     QVariantMap::const_iterator it = goal.constBegin();
-
     for(; it != goal.end(); ++it)
     {
         if(node.contains(it.key()) && node[it.key()] == it.value())
@@ -217,12 +246,57 @@ static bool variantMapComparator(const QVariantMap& node,
     return true;
 }
 
+QStringList Planner::findPlan(const QVariantMap& startState,
+                              const QVariantMap& endState,
+                              int maxDepth)
+{
+    bool isAlreadyThere;
+    ailib::AStar<planner_type::graph_type>::connections_type connections;
+    connections = findPlan(startState, endState, &isAlreadyThere, maxDepth);
+
+    if(connections.empty())
+    {
+        qDebug("Planner.findPlan: No possible solution found.");
+    }
+    else if(isAlreadyThere)
+    {
+        qDebug("Planner.findPlan: Plan's goal has already been reached.");
+    }
+    else
+    {
+        // TODO: Kickoff to sequentially perform actions,
+        // recalculate the plan if unexpected state changes happen.
+        qDebug() << "Planner.makePlan: Found planning solutions with "
+                 << connections.size() << " steps.";
+
+        const planner_type::graph_type& graph = mPlanner.getGraph();
+        ailib::AStar<planner_type::graph_type>::connections_type::const_iterator it;
+        QStringList names;
+        for(it = connections.begin(); it != connections.end(); ++it)
+        {
+            ScriptAction* action = static_cast<ScriptAction*>((graph.getSuccessorsBegin(it->fromNode) +
+                                                               it->edgeIndex)->userData);
+
+            if(action)
+            {
+                names.append(action->getName());
+            }
+            else
+            {
+                qWarning("Planner.findPlan: ScriptAction wasn't set.");
+            }
+        }
+        return names;
+    }
+    return QStringList();
+}
+
 ailib::AStar<Planner::planner_type::graph_type>::connections_type
 Planner::findPlan(const QVariantMap& startState,
                   const QVariantMap& endState,
-                  bool* isAlreadyThere)
+                  bool* isAlreadyThere,
+                  int maxDepth)
 {
-    const int32_t maxDepth = 5;
     size_t startIdx = mPlanner.buildGraph(startState, endState, maxDepth);
 
     qDebug() << "Planner.findPlan: Built a planning state graph with "
@@ -255,47 +329,25 @@ Planner::findPlan(const QVariantMap& startState,
 }
 
 void Planner::makePlan(Actor* actor,
-                       const planner_state_type& endState)
+                       const planner_state_type& endState,
+                       int32_t maxDepth)
 {
     const QVariantMap& knowledge = actor->getKnowledge();
 
-    bool isAlreadyThere;
-    ailib::AStar<planner_type::graph_type>::connections_type connections;
-    connections = findPlan(knowledge, endState, &isAlreadyThere);
+    QStringList names = findPlan(knowledge, endState, maxDepth);
 
-    if(connections.empty())
-    {
-        qDebug("Planner.makePlan: No possible solution found.");
-    }
-    else if(isAlreadyThere)
-    {
-        qDebug("Planner.makePlan: Plan's goal has already been reached.");
-    }
-    else
+    if(!names.empty())
     {
         // TODO: Kickoff to sequentially perform actions,
         // recalculate the plan if unexpected state changes happen.
         qDebug() << "Planner.makePlan: Found planning solutions with "
-                 << connections.size() << " steps.";
+                 << names.size() << " steps.";
 
-        const planner_type::graph_type& graph = mPlanner.getGraph();
-        ailib::AStar<planner_type::graph_type>::connections_type::const_iterator it;
-        QStringList names;
-        for(it = connections.begin(); it != connections.end(); ++it)
-        {
-            ScriptAction* action = static_cast<ScriptAction*>((graph.getSuccessorsBegin(it->fromNode) +
-                                                               it->edgeIndex)->userData);
-
-            if(action)
-            {
-                names.append(action->getName());
-            }
-            else
-            {
-                qWarning("Planner.makePlan: ScriptAction wasn't set.");
-            }
-        }
         actor->setKnowledge("plan", names);
+    }
+    else
+    {
+        actor->removeKnowledge("plan");
     }
 }
 

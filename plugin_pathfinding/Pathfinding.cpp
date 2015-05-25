@@ -1,4 +1,5 @@
 #include "Pathfinding.h"
+#include "IDAStar.h"
 #include "OgreHelper.h"
 #include "DebugDrawer.h"
 #include "Bindings/JavascriptBindings.h"
@@ -26,7 +27,7 @@ Q_DECLARE_METATYPE(QScriptValue)
 static ailib::real_type euclideanHeuristic(const Pathfinding::NavigationGraph::node_type& n1,
                                            const Pathfinding::NavigationGraph::node_type& n2)
 {
-    return n1.getCentroid().squaredDistance(n2.getCentroid());
+    return n1.getCentroid().distance(n2.getCentroid());
 }
 
 void Pathfinding::updateActor(Actor &actor, float deltaTime)
@@ -266,11 +267,50 @@ Pathfinding::planPath(const Ogre::Vector3& from,
                    << " is not covered by the navmesh. No valid path could be calculated.";
         return ailib::AStar<NavigationGraph>::path_type();
     }
+/**
+    QString node = "[";
+    for(size_t idx = 0; idx < mGraph.getNumNodes(); ++idx)
+    {
+        Triangle* tri = mGraph.getNode(idx);
+        node += QString("new GraphNode( ") + QString("%1").arg(idx) + QString(", ") + QString("%1").arg(tri->centroid.x) + QString(", ")
+                                  + QString("%1").arg(tri->centroid.y) + QString(", ")
+                                  + QString("%1").arg(tri->centroid.z) + QString(", [");
+
+        const NavigationGraph::edge_type* begin = mGraph.getSuccessorsBegin(idx);
+        const NavigationGraph::edge_type* end   = mGraph.getSuccessorsEnd(idx);
+        for(const NavigationGraph::edge_type* it = begin; it != end; ++it)
+        {
+            node += QString("new GraphEdge( ") + QString("%1").arg(it->cost) + QString(", ") + QString("%1").arg(it->targetIndex) + QString(" )");
+
+            if(it + 1 != end)
+            {
+                node += ",";
+            }
+        }
+
+        node += QString("])");
+
+        if(idx + 1 != mGraph.getNumNodes())
+        {
+            node += ",\n";
+        }
+    }
+    node += "]";
+
+    qDebug() << node;*/
 
     ailib::AStar<NavigationGraph> astar(mGraph);
     ailib::AStar<NavigationGraph>::path_type path = astar.findPath(start,
                                                                    *goal,
                                                                    euclideanHeuristic);
+/**
+    ailib::IDAStar<NavigationGraph> astar2(mGraph);
+    ailib::IDAStar<NavigationGraph>::path_type path2 = astar.findPath(start,
+                                                                     goal,
+                                                                     euclideanHeuristic,
+                                                                     80);
+    printf("%ld\n", path2.size());*/
+
     if(isAlreadyThere)
     {
         *isAlreadyThere = path.size() == 1 && path[0] == start;

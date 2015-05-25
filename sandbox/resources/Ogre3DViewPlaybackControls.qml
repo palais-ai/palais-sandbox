@@ -50,6 +50,11 @@ RowLayout {
             value: 1
             opacity: 1
             onValueChanged: ProjectManager.setSimulationSpeed(speedSlider.value)
+
+            Connections {
+                target: speedMenuItem
+                onTriggered: speedSlider.value = speedSlider.maximumValue
+            }
         }
     }
 

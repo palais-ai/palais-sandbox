@@ -4,6 +4,8 @@ import Ogre 1.0
 Rectangle {
     id: ogre
 
+    property bool doWhiteRendering: false
+
     Camera {
         id: cam1
         objectName: "cam1"
@@ -15,7 +17,7 @@ Rectangle {
         anchors.fill: parent;
         camera: cam1
         engine: OgreEngine
-        backgroundColor: colors.gray
+        backgroundColor: doWhiteRendering ? "white" : colors.gray
 
         MouseArea {
             anchors.fill: parent
@@ -65,6 +67,7 @@ Rectangle {
             anchors.right: parent.right
             anchors.topMargin: 14
             id: mainControls
+            visible: !doWhiteRendering
         }
 
         Ogre3DCameraControls {
@@ -73,6 +76,7 @@ Rectangle {
             anchors.topMargin: 14
             anchors.leftMargin: 14
             id: cameraControls
+            visible: !doWhiteRendering
         }
 
         Rectangle {
@@ -82,6 +86,7 @@ Rectangle {
             radius: 3
             anchors.centerIn: playbackControls
             id: playbackControlsBackground
+            visible: !doWhiteRendering
         }
 
         Ogre3DViewPlaybackControls {
@@ -89,6 +94,7 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 38
+            visible: !doWhiteRendering
         }
     }
 }

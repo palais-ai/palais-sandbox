@@ -54,6 +54,13 @@ ApplicationWindow {
             }
 
             MenuItem {
+                id: speedMenuItem
+                text: "Set maximum simulation speed"
+                shortcut: "Ctrl+E"
+                enabled: ApplicationWrapper.sceneLoaded
+            }
+
+            MenuItem {
                 text: "Unselect actor"
                 shortcut: "Ctrl+U"
                 enabled: ApplicationWrapper.sceneLoaded && ActorModel.actorSelected
