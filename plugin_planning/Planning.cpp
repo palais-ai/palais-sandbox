@@ -264,8 +264,6 @@ QStringList Planner::findPlan(const QVariantMap& startState,
     }
     else
     {
-        // TODO: Kickoff to sequentially perform actions,
-        // recalculate the plan if unexpected state changes happen.
         qDebug() << "Planner.makePlan: Found planning solutions with "
                  << connections.size() << " steps.";
 
