@@ -4,7 +4,7 @@ require("actions.js")
 var gPos = flag_green.position;
 flag_red.position = new Vector3(gPos.x * -1, gPos.y, gPos.z * -1)
 
-var defaultHealth = 2;
+var defaultHealth = 1;
 // Sets the initial actor state.
 function setInitialState(actor) 
 {  

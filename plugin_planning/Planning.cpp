@@ -264,8 +264,10 @@ QStringList Planner::findPlan(const QVariantMap& startState,
     }
     else
     {
+        /*
         qDebug() << "Planner.makePlan: Found planning solutions with "
                  << connections.size() << " steps.";
+        */
 
         const planner_type::graph_type& graph = mPlanner.getGraph();
         ailib::AStar<planner_type::graph_type>::connections_type::const_iterator it;
@@ -297,11 +299,13 @@ Planner::findPlan(const QVariantMap& startState,
 {
     size_t startIdx = mPlanner.buildGraph(startState, endState, maxDepth);
 
+    /*
     qDebug() << "Planner.findPlan: Built a planning state graph with "
              << mPlanner.getGraph().getNumNodes()
              << " nodes. (maxdepth="
              << maxDepth
              << ")";
+    */
 
     ailib::AStar<planner_type::graph_type>::connections_type connections;
     ailib::AStar<planner_type::graph_type> astar(mPlanner.getGraph());
