@@ -93,11 +93,12 @@ function testApproachRandom(numActions, actionSet, goal) {
 	eSet = uniqName(eSet);
 	pcSet = uniqName(pcSet);
 
+	/*
 	print("--- PRECONDITIONS --")
 	for(var i = 0; i < pcSet.length; ++i) {
 		print(pcSet[i].name);
 	}
-	print("----------")
+	print("----------")*/
 
 	if(goal === undefined) {
 		goal = {}
