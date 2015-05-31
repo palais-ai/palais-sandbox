@@ -27,6 +27,7 @@ function spawnFighter(teamColor, name)
     actor.setKnowledge("movement_speed", 1)   // in meters per second.
     actor.setKnowledge("rotation_speed", 140) // in degrees per second.
 
+    /*
     var root = constructBehaviorTreeForActor(actor)
 
     Scheduler.enqueue(root)
@@ -45,7 +46,7 @@ function spawnFighter(teamColor, name)
             actor.removeKnowledge("lookat_target")
         }
     })
-
+    */
     // For testing purposes:
     calculatePlan(actor);
 }

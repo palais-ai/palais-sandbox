@@ -22,7 +22,8 @@ function onSetup() {
 	var teamSize = 1;
 	Scene.setKnowledge("goal_red", flag_red.position);
 	Scene.setKnowledge("goal_green", flag_green.position);
-	spawnTeam(teamSize)
+	spawnFighter("red", "player_team_" + "red" + "_" + 1)
+	//spawnTeam(teamSize)
 	//spawnTeam(teamSize)
 }
 

@@ -1,4 +1,5 @@
 require("levenshtein.js")
+require("bt_genetic.js")
 
 function uniq(a) {
     var prims = {"boolean":{}, "number":{}, "string":{}}, objs = [];
@@ -244,7 +245,7 @@ function testApproachRandom(numActions, actionSet, goal) {
 	printTree(root)
 	print(btPlayout(root, {"enemy_in_range" : true}, {"made_points": true}, 7));
     */
-    var maxSimulations = 200;
+    var maxSimulations = 250;
     var steps = 1;
     var allNgrams = {}
     for(var i = 1; i <= steps; ++i) {
@@ -308,11 +309,10 @@ function testApproachRandom(numActions, actionSet, goal) {
 	var steps = getKeys(ngrams).length;
 	var idx = 1;
 	var randomSolutions = []
-	for(var i = 5; i <= 5; ++i) {
+	for(var i = 1; i <= steps; ++i) {
 		var ngrams = getTopNgrams(allNgrams[idx.toString()], i);
 
 		var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions, allSolutions, goal);
-
 		/*var total = 0;
 		var distSum = 0;
 		var dist2Sum = 0;

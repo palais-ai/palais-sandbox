@@ -6,9 +6,7 @@ Q_DECLARE_METATYPE(GeneticPrototype*)
 
 void Genetic_register_prototype(QScriptEngine& engine)
 {
-    const int typeId = qRegisterMetaType<GeneticPrototype*>("GeneticPrototype*");
-    QScriptValue prototype = engine.newQObject((GeneticPrototype*)0);
-    engine.setDefaultPrototype(typeId, prototype);
+    //const int typeId = qRegisterMetaType<GeneticPrototype*>("GeneticPrototype*");
 
     engine.globalObject().setProperty("Genetic",
                                       engine.newFunction(Genetic_prototype_ctor));
@@ -28,7 +26,7 @@ GeneticPrototype::GeneticPrototype() :
 
 void GeneticPrototype::onGeneration(uint32_t generation, ailib::real_type fitness)
 {
-    QScriptValue fn = getGeneratorFunction();
+    QScriptValue fn = getOnGenerationFunction();
     if(fn.isFunction())
     {
         fn.call(QScriptValue(), QScriptValueList() << generation << fitness);
@@ -172,7 +170,7 @@ static QScriptValue generate(uint32_t idx)
         if(fn.isFunction())
         {
             QScriptValue val = fn.call(QScriptValue(),
-                           QScriptValueList() << idx);
+                                       QScriptValueList() << idx);
             JavaScriptBindings::checkScriptEngineException(*gCurrentGeneticPrototype->engine(),
                                                            "Genetic.generate");
             return val;

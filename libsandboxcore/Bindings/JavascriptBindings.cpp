@@ -233,27 +233,29 @@ void checkScriptEngineException(QScriptEngine& engine, const QString& context)
 {
     if(engine.hasUncaughtException())
     {
+        QString msg = engine.uncaughtException().toString();
+        QString bt = engine.uncaughtExceptionBacktrace().join("\n");
         engine.uncaughtExceptionLineNumber();
         if(context.isEmpty())
         {
             qCritical() << "Exception in loaded logic file "
                         << ", ERROR:"
-                        << engine.uncaughtException().toString()
+                        << msg
                         << ", on line "
                         << engine.uncaughtExceptionLineNumber()
                         << ", backtrace: "
-                        << engine.uncaughtExceptionBacktrace().join("\n");
+                        << bt;
         }
         else
         {
             qCritical() << "Exception in "
                         << context
                         << ", ERROR:"
-                        << engine.uncaughtException().toString()
+                        << msg
                         << ", on line "
                         << engine.uncaughtExceptionLineNumber()
                         << ", backtrace: "
-                        << engine.uncaughtExceptionBacktrace().join("\n");
+                        << bt;
         }
         engine.clearExceptions();
     }

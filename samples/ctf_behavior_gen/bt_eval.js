@@ -1,5 +1,3 @@
-require("bt_genetic.js")
-
 function btPlayout(node, state, goal, maxDepth) {
 	var actions = [];
 	if(!isGoal(state, goal)) {
@@ -45,40 +43,6 @@ function isGoal(state, goal) {
 		} 
 	}
 	return true;
-}
-
-function buildTree1(ngrams, actions, pcSet) {
-	var startState = {}
-	for(var j = 0; j < pcSet.length; ++j) {
-		startState[ pcSet[j].name ] = pcSet[j].value;
-	}
-
-	var costForNgram = function(ngram) {
-		ngram = ngram.split(",");
-
-		var c = 0
-		for(var k = 0; k < ngram.length; ++k) {
-			c += actions[ngram[k]].cost(startState)
-		}
-		return c
-	}
-
-	ngrams = getKeys(ngrams).sort(function(l,r) {
-    	return costForNgram(l) - costForNgram(r)
-	});
-
-	var root = new Node("Selector", [])
-    for(var i = 0; i < ngrams.length; ++i) {
-    	var ng = ngrams[i];
-    	var names = ng.split(",");
-    	var sequence = new Node("Sequence", []);
-
-    	for(var j = 0; j < names.length; ++j) {
-    		sequence.children.push(new Node("Action", actions[names[j]]))
-    	}
-    	root.children.push(sequence);
-    }
-    return root;
 }
 
 function consolidateConditions(conditions) {
