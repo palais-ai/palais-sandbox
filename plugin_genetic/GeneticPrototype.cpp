@@ -28,7 +28,13 @@ GeneticPrototype::GeneticPrototype() :
 
 void GeneticPrototype::onGeneration(uint32_t generation, ailib::real_type fitness)
 {
-    qDebug() << "GeneticPrototype.onGeneration[" << generation << "]: Fitness=" << fitness << ".";
+    QScriptValue fn = getGeneratorFunction();
+    if(fn.isFunction())
+    {
+        fn.call(QScriptValue(), QScriptValueList() << generation << fitness);
+        JavaScriptBindings::checkScriptEngineException(*engine(),
+                                                       "Genetic.onGeneration");
+    }
 }
 
 void GeneticPrototype::setFitnessFunction(QScriptValue fun)
@@ -69,6 +75,16 @@ void GeneticPrototype::setGeneratorFunction(QScriptValue fun)
 QScriptValue GeneticPrototype::getGeneratorFunction() const
 {
     return mGenerator;
+}
+
+void GeneticPrototype::setOnGenerationFunction(QScriptValue fun)
+{
+    mOnGeneration = fun;
+}
+
+QScriptValue GeneticPrototype::getOnGenerationFunction() const
+{
+    return mOnGeneration;
 }
 
 void GeneticPrototype::setPopulationSize(int size)

@@ -1,3 +1,5 @@
+require("bt_genetic.js")
+
 function btPlayout(node, state, goal, maxDepth) {
 	var actions = [];
 	if(!isGoal(state, goal)) {
@@ -89,50 +91,35 @@ function consolidateConditions(conditions) {
 
 			for(var prop in state) {
 				if(counts[prop] === undefined) {
-					counts[prop] = 1;
+					counts[prop] = {}
+				}
+				
+				var obj = counts[prop]
+				var value = state[prop]
+				if(obj[value] === undefined) {
+					obj[ value ] = 1;
 				} else {
-					counts[prop] += 1;
+					obj[ value ] += 1;
 				}
 				total++;
 			}
 		}
 
-		for(var c in counts) {
-			counts[c] = counts[c] / total;
-			if(counts[c] < 0.9) {
-				delete counts[c];
+		var newCond = {}
+		for(var key in counts) {
+			for(var values in counts[key]) {
+				var probability = value / total;
+				if(probability >= 0.9) {
+					newCond[key] = value
+				}
 			}
 		}
-		conditions[k] = counts;
+		conditions[k] = newCond;
 	}
 	return conditions;
 }
 
-function findBestTree(ngrams, actions, pcSet, trigrams, conditions, allSolutions) {
-	var ga = new Genetic();
-
-	ga.populationSize = 20;
-
-	ga.fitness = function(c) {
-		return 5;
-	}
-
-	ga.crossover = function(l,r) {
-		return r;
-	}
-
-	ga.mutation = function(c) {
-		return c + 1;
-	}
-
-	ga.generator = function(idx) {
-		return idx;
-	}
-
-	return ga.optimise(100, 0.1, 0.6, 0.05)
-}
-
-function buildTree(ngrams /* sorted most to least likely */, actions, pcSet, trigrams, conditions) {
+function buildTree(ngrams, actions, pcSet, trigrams, conditions, allSolutions, goal) {
 	var root = new Node("Selector", [])
 
 	var ngrams = getKeys(ngrams)
@@ -144,18 +131,9 @@ function buildTree(ngrams /* sorted most to least likely */, actions, pcSet, tri
 		return lv - rv;
 	})
 
-	var root = new Node("Selector", [])
-    for(var i = 0; i < ngrams.length; ++i) {
-    	var ng = ngrams[i];
-    	var names = ng.split(",");
-    	var sequence = new Node("Sequence", [], conditions[ng]);
-
-    	for(var j = 0; j < names.length; ++j) {
-    		sequence.children.push(new Node("Action", actions[names[j]]))
-    	}
-    	root.children.push(sequence);
-    }
-	return root;
+	var bestTree = findBestTree(ngrams, actions, pcSet, trigrams, conditions, allSolutions, goal);
+	return {"tree" : treeFromString(bestTree.root, 0, actions),
+			"fitness" : bestTree.fitness};
 }
 
 function printTree(node) {

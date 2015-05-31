@@ -62,6 +62,17 @@ function uniqName(set) {
 	})
 }
 
+function buildStartState(pcSet, combination) {
+	var startState = {}
+	for(var j = 0; j < pcSet.length; ++j) {
+		var mask = (1 << j);
+		if ((combination & mask) != 0) {
+			startState[ pcSet[j].name ] = pcSet[j].value;
+		}
+	}
+	return startState 
+};
+
 function testApproachRandom(numActions, actionSet, goal) {
 	var planner = new Planner();
 
@@ -135,17 +146,6 @@ function testApproachRandom(numActions, actionSet, goal) {
 	                      action.name);
 	}
 
-	var buildStartState = function(combination) {
-		var startState = {}
-    	for(var j = 0; j < pcSet.length; ++j) {
-			var mask = (1 << j);
-			if ((combination & mask) != 0) {
-				startState[ pcSet[j].name ] = pcSet[j].value;
-			}
-		}
-		return startState 
-	};
-
 	var getTopNgrams = function(ngrams, limit) {
 		var sortByProbability = function(set, l, r) {
 			return set[r] - set[l]
@@ -216,7 +216,7 @@ function testApproachRandom(numActions, actionSet, goal) {
     			nextCombination = Random.uniformInt(0, maxCombinations)
     		}
 
-    		var s = buildStartState(nextCombination)
+    		var s = buildStartState(pcSet, nextCombination)
     		var path = planner.findPlan(s, goal, 7)
     		var nodes = planner.findPlanNodes(s,goal,7)
     		allSolutions[nextCombination.toString()] = path;
@@ -244,7 +244,7 @@ function testApproachRandom(numActions, actionSet, goal) {
 	printTree(root)
 	print(btPlayout(root, {"enemy_in_range" : true}, {"made_points": true}, 7));
     */
-    var maxSimulations = 1024;
+    var maxSimulations = 200;
     var steps = 1;
     var allNgrams = {}
     for(var i = 1; i <= steps; ++i) {
@@ -308,18 +308,18 @@ function testApproachRandom(numActions, actionSet, goal) {
 	var steps = getKeys(ngrams).length;
 	var idx = 1;
 	var randomSolutions = []
-	for(var i = 1; i <= steps; ++i) {
+	for(var i = 5; i <= 5; ++i) {
 		var ngrams = getTopNgrams(allNgrams[idx.toString()], i);
 
-		var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions);
+		var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions, allSolutions, goal);
 
-		var total = 0;
+		/*var total = 0;
 		var distSum = 0;
 		var dist2Sum = 0;
 		var theoreticalBound = 0;
 		for(var startState in allSolutions) {
 			var solution = allSolutions[startState];
-			var btSolution = btPlayout(root, buildStartState(parseInt(startState)), goal, 5);
+			var btSolution = btPlayout(root, buildStartState(pcSet, parseInt(startState)), goal, 5);
 			var randomSolution = genRandSolution(5);
 			var dist = (new Levenshtein(solution.join(), btSolution.join())).distance;
 			var dist2 = (new Levenshtein(solution.join(), randomSolution.join())).distance;
@@ -329,13 +329,13 @@ function testApproachRandom(numActions, actionSet, goal) {
 			dist2Sum += dist2;
 			total++;
 			theoreticalBound += overlap;
-		}
+		}*/
 		//print(distSum)
 		//print(total)
 		//print("--- run (" + i + ") ---")
 		//print('Average leventshtein distance: ' + distSum / total)
 		//print('Theoretical coverage bound: ' + theoreticalBound / total)
-		print(i + ";" + distSum / total)
+		print(i + ";" + root.fitness)
 	}
 
 	return;

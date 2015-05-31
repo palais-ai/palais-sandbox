@@ -16,6 +16,7 @@ class GeneticPrototype : public QObject, public QScriptable, public ailib::Genet
     Q_PROPERTY(QScriptValue mutation READ getMutationFunction WRITE setMutationFunction)
     Q_PROPERTY(QScriptValue crossover READ getCrossoverFunction WRITE setCrossoverFunction)
     Q_PROPERTY(QScriptValue generator READ getGeneratorFunction WRITE setGeneratorFunction)
+    Q_PROPERTY(QScriptValue onGeneration READ getOnGenerationFunction WRITE setOnGenerationFunction)
     Q_PROPERTY(int populationSize READ getPopulationSize WRITE setPopulationSize)
 public:
     GeneticPrototype();
@@ -30,6 +31,8 @@ public:
     QScriptValue getMutationFunction() const;
     void setGeneratorFunction(QScriptValue fun);
     QScriptValue getGeneratorFunction() const;
+    void setOnGenerationFunction(QScriptValue fun);
+    QScriptValue getOnGenerationFunction() const;
     void setPopulationSize(int size);
     int getPopulationSize() const;
 
@@ -38,7 +41,7 @@ public:
                                       float pCrossover,
                                       float pMutation);
 private:
-    QScriptValue mFitness, mCrossover, mMutation, mGenerator;
+    QScriptValue mFitness, mCrossover, mMutation, mGenerator, mOnGeneration;
     int mPopulationSize;
 };
 
