@@ -78,6 +78,10 @@ public:
     explicit Planner(QObject *parent = 0);
     ~Planner();
 
+    Q_INVOKABLE QList<QVariantMap> findPlanNodes(const QVariantMap& startState,
+                                                 const QVariantMap& endState,
+                                                 int maxDepth);
+
     Q_INVOKABLE QStringList findPlan(const QVariantMap& startState,
                                      const QVariantMap& endState,
                                      int maxDepth);
@@ -89,7 +93,8 @@ public:
     ailib::AStar<planner_type::graph_type>::connections_type findPlan(const QVariantMap& startState,
                                                                       const QVariantMap& endState,
                                                                       bool* isAlreadyThere,
-                                                                      int32_t maxDepth);
+                                                                      int32_t maxDepth,
+                                                                      ailib::AStar<planner_type::graph_type>::path_type* path = NULL);
 
     void addAction(ScriptAction* action);
     void update(Scene& scene, float deltaTime);

@@ -245,6 +245,39 @@ static bool variantMapComparator(const QVariantMap& node,
     }
     return true;
 }
+QList<QVariantMap> Planner::findPlanNodes(const QVariantMap& startState,
+                                 const QVariantMap& endState,
+                                 int maxDepth)
+{
+    ailib::AStar<planner_type::graph_type>::path_type path;
+    bool isAlreadyThere;
+    ailib::AStar<planner_type::graph_type>::connections_type connections;
+    connections = findPlan(startState, endState, &isAlreadyThere, maxDepth, &path);
+
+    QList<QVariantMap> retVal;
+    if(path.empty())
+    {
+        qDebug("Planner.findPlan: No possible solution found.");
+    }
+    else if(isAlreadyThere)
+    {
+        qDebug("Planner.findPlan: Plan's goal has already been reached.");
+    }
+    else
+    {
+        /*
+        qDebug() << "Planner.makePlan: Found planning solutions with "
+                 << connections.size() << " steps.";
+        */
+
+        ailib::AStar<planner_type::graph_type>::path_type::iterator it;
+        for(it = path.begin(); it != path.end(); ++it)
+        {
+            retVal.append(**it);
+        }
+    }
+    return retVal;
+}
 
 QStringList Planner::findPlan(const QVariantMap& startState,
                               const QVariantMap& endState,
@@ -295,7 +328,8 @@ ailib::AStar<Planner::planner_type::graph_type>::connections_type
 Planner::findPlan(const QVariantMap& startState,
                   const QVariantMap& endState,
                   bool* isAlreadyThere,
-                  int maxDepth)
+                  int maxDepth,
+                  ailib::AStar<planner_type::graph_type>::path_type* pathPtr)
 {
     size_t startIdx = mPlanner.buildGraph(startState, endState, maxDepth);
 
@@ -325,6 +359,11 @@ Planner::findPlan(const QVariantMap& startState,
     if(isAlreadyThere)
     {
         *isAlreadyThere = path.size() == 1 && *path[0] == startState;
+    }
+
+    if(pathPtr)
+    {
+        *pathPtr = path;
     }
 
     return connections;
