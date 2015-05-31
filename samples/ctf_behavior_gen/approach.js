@@ -1,4 +1,4 @@
-require("leventshtein.js")
+require("levenshtein.js")
 
 function uniq(a) {
     var prims = {"boolean":{}, "number":{}, "string":{}}, objs = [];
