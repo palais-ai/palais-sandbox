@@ -154,7 +154,9 @@ function calculatePlan(actor)
 	    preconditionSet = preconditionSet.concat(action.preconditions)
     }
 
-	
+    //var tree = ["[L3","[S2","s","r","[S4",{"enemy_in_range":true},"t","[S2","s","r","s","[S2","g","r"]
+    //printTree(treeFromString(tree,0,allActions).root)
+
     testApproachRandom(10);
     //testApproachRandom(0, allActions, {"made_points" : true});
 }

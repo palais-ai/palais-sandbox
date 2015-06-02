@@ -106,7 +106,7 @@ static ailib::real_type fitness(const QScriptValue& c)
             QScriptValue val = fn.call(QScriptValue(),
                            QScriptValueList() << c);
             JavaScriptBindings::checkScriptEngineException(*gCurrentGeneticPrototype->engine(),
-                                                           "Genetic.crossover");
+                                                           "Genetic.fitness");
             return val.toNumber();
         }
         else
@@ -129,6 +129,7 @@ static QScriptValue crossover(const QScriptValue& l, const QScriptValue& r)
                            QScriptValueList() << l << r);
             JavaScriptBindings::checkScriptEngineException(*gCurrentGeneticPrototype->engine(),
                                                            "Genetic.crossover");
+            assert(!val.isUndefined());
             return val;
         }
         else
@@ -151,6 +152,7 @@ static QScriptValue mutate(const QScriptValue& c)
                                        QScriptValueList() << c);
             JavaScriptBindings::checkScriptEngineException(*gCurrentGeneticPrototype->engine(),
                                                            "Genetic.mutate");
+            assert(!val.isUndefined());
             return val;
         }
         else
@@ -173,6 +175,8 @@ static QScriptValue generate(uint32_t idx)
                                        QScriptValueList() << idx);
             JavaScriptBindings::checkScriptEngineException(*gCurrentGeneticPrototype->engine(),
                                                            "Genetic.generate");
+
+            assert(!val.isUndefined());
             return val;
         }
         else
@@ -188,6 +192,7 @@ struct GeneticHash
 {
     uint64_t operator()(QScriptValue state) const
     {
+        Q_UNUSED(state)
         return 0;
     }
 };

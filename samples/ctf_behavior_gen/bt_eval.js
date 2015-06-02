@@ -83,7 +83,7 @@ function consolidateConditions(conditions) {
 	return conditions;
 }
 
-function buildTree(ngrams, actions, pcSet, trigrams, conditions, allSolutions, goal) {
+function buildTree(ngrams, actions, pcSet, trigrams, conditions, allSolutions, goal, params) {
 	var root = new Node("Selector", [])
 
 	var ngrams = getKeys(ngrams)
@@ -95,16 +95,26 @@ function buildTree(ngrams, actions, pcSet, trigrams, conditions, allSolutions, g
 		return lv - rv;
 	})
 
-	var bestTree = findBestTree(ngrams, actions, pcSet, trigrams, conditions, allSolutions, goal);
-	return {"tree" : treeFromString(bestTree.root, 0, actions),
+	var bestTree = findBestTree(ngrams, actions, pcSet, trigrams, conditions, allSolutions, goal, params);
+	
+	return {"tree" : treeFromString(bestTree.root, 0, actions).root,
+			"treeString" : bestTree.root,
 			"fitness" : bestTree.fitness};
 }
 
 function printTree(node) {
 	var isSelector = node.type === "Selector";
 	var isSequence = node.type === "Sequence";
+
 	if(isSequence || isSelector) {
 		print(node.type)
+
+		print("{")
+		for(var key in node.pcs) {
+			print(key)
+		}
+		print("}")
+
 		for(var i = 0; i < node.children.length; ++i) {
 			printTree(node.children[i]);
 		}

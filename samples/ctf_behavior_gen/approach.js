@@ -245,7 +245,7 @@ function testApproachRandom(numActions, actionSet, goal) {
 	printTree(root)
 	print(btPlayout(root, {"enemy_in_range" : true}, {"made_points": true}, 7));
     */
-    var maxSimulations = 250;
+    var maxSimulations = 200;
     var steps = 1;
     var allNgrams = {}
     for(var i = 1; i <= steps; ++i) {
@@ -306,46 +306,43 @@ function testApproachRandom(numActions, actionSet, goal) {
 		return actions;
 	}
 
-	var steps = getKeys(ngrams).length;
+	params = {};
+	params.populationSize = 250
+	params.generations = 5
+	params.elitism = 0.02
+	params.crossover = 0.33
+	params.mutation = 0.2
+
 	var idx = 1;
-	var randomSolutions = []
-	for(var i = 1; i <= steps; ++i) {
-		var ngrams = getTopNgrams(allNgrams[idx.toString()], i);
+	var ngrams = getTopNgrams(allNgrams[idx.toString()], 15);
 
-		var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions, allSolutions, goal);
-		/*var total = 0;
-		var distSum = 0;
-		var dist2Sum = 0;
-		var theoreticalBound = 0;
-		for(var startState in allSolutions) {
-			var solution = allSolutions[startState];
-			var btSolution = btPlayout(root, buildStartState(pcSet, parseInt(startState)), goal, 5);
-			var randomSolution = genRandSolution(5);
-			var dist = (new Levenshtein(solution.join(), btSolution.join())).distance;
-			var dist2 = (new Levenshtein(solution.join(), randomSolution.join())).distance;
-			var overlap = calculateOverlap(ngrams, solution);
-			print(solution + " vs. " + btSolution + " = " + dist + " (overlap = " + overlap + " )");
-			distSum += dist;
-			dist2Sum += dist2;
-			total++;
-			theoreticalBound += overlap;
-		}*/
-		//print(distSum)
-		//print(total)
-		//print("--- run (" + i + ") ---")
-		//print('Average leventshtein distance: ' + distSum / total)
-		//print('Theoretical coverage bound: ' + theoreticalBound / total)
-		print(i + ";" + root.fitness)
+	for(var i = 1; i <= 20; ++i) {
+		params.generations = i
+
+		print("==== GEN " + i + " ====")
+		for(var j = 0; j < 20; ++j) {
+			var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions, allSolutions, goal, params);
+			print(root.fitness)
+		}
 	}
 
-	return;
-	for(var i = 1; i <= steps; ++i) {
-		var ngrams = allNgrams[i.toString()];
+	var ngrams = getTopNgrams(allNgrams[idx.toString()], 25);
 
-		print(" ------- NGRAMS(" + i + ") ------- ");
-	    for(var ng in ngrams) {
-	    	print(ng + ";" + ngrams[ng]);
-	    }
-	    print(" ---- END NGRAMS(" + i + ") ------- ");
+	for(var i = 1; i <= 20; ++i) {
+		params.generations = i
+
+		print("==== GEN " + i + " ====")
+		for(var j = 0; j < 20; ++j) {
+			var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions, allSolutions, goal, params);
+			print(root.fitness)
+		}
 	}
+
+	//var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions, allSolutions, goal, params);
+	//print(root.treeString)
+	//print("fitness= " + root.fitness)
+	//printTree(root.tree)
 }
+
+
+
