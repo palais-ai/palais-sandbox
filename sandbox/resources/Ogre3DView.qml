@@ -4,7 +4,7 @@ import Ogre 1.0
 Rectangle {
     id: ogre
 
-    property bool doWhiteRendering: false
+    property bool doWhiteRendering: true
 
     Camera {
         id: cam1

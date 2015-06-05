@@ -206,9 +206,15 @@ QWeakPointer<Actor> Scene::getActorForNode(Ogre::SceneNode* node) const
 }
 
 RaycastResult Scene::raycast(const Ogre::Vector3& origin,
-                             const Ogre::Vector3& direction)
+                             const Ogre::Vector3& direction,
+                             int mask)
 {
     Ogre::Ray ray(origin, direction.normalisedCopy());
+
+    if(mask != 0)
+    {
+        mRayQuery->setQueryMask(mask);
+    }
 
     mRayQuery->setRay(ray);
     mRayQuery->setSortByDistance(true);
@@ -245,8 +251,13 @@ RaycastResult Scene::raycast(const Ogre::Vector3& origin,
     return retVal;
 }
 
-RangeQueryResult Scene::rangeQuery(const Ogre::Vector3& origin, float distance)
+RangeQueryResult Scene::rangeQuery(const Ogre::Vector3& origin, float distance, int mask)
 {
+    if(mask != 0)
+    {
+        mSphereQuery->setQueryMask(mask);
+    }
+
     mSphereQuery->setSphere(Ogre::Sphere(origin, distance));
     mSphereQuery->setQueryTypeMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
     Ogre::SceneQueryResultMovableList& result = mSphereQuery->execute().movables;

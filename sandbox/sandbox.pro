@@ -101,6 +101,7 @@ macx {
     PluginFiles.files += $$OUT_PWD/../plugin_planning/libplugin_planning.dylib
     PluginFiles.files += $$OUT_PWD/../plugin_behaviortree/libplugin_behaviortree.dylib
     PluginFiles.files += $$OUT_PWD/../plugin_genetic/libplugin_genetic.dylib
+    PluginFiles.files += $$OUT_PWD/../plugin_steering/libplugin_steering.dylib
     PluginFiles.path = Contents/Plugins
 
     MediaFiles.files += $$files(media/*)

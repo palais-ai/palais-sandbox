@@ -8,6 +8,7 @@ SUBDIRS = QOgre \
           plugin_planning \
           plugin_behaviortree \
           plugin_genetic \
+          plugin_steering \
           sandbox
 
 CONFIG += ordered

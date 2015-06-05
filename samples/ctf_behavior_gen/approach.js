@@ -307,36 +307,37 @@ function testApproachRandom(numActions, actionSet, goal) {
 	}
 
 	params = {};
-	params.populationSize = 250
+	params.populationSize = 300
 	params.generations = 5
 	params.elitism = 0.02
-	params.crossover = 0.33
-	params.mutation = 0.2
+	params.crossover = 0.5
+	params.mutation = 0.15
 
 	var idx = 1;
-	var ngrams = getTopNgrams(allNgrams[idx.toString()], 15);
-
-	for(var i = 1; i <= 20; ++i) {
-		params.generations = i
-
-		print("==== GEN " + i + " ====")
-		for(var j = 0; j < 20; ++j) {
-			var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions, allSolutions, goal, params);
-			print(root.fitness)
-		}
-	}
-
 	var ngrams = getTopNgrams(allNgrams[idx.toString()], 25);
 
 	for(var i = 1; i <= 20; ++i) {
 		params.generations = i
 
 		print("==== GEN " + i + " ====")
-		for(var j = 0; j < 20; ++j) {
+		for(var j = 0; j < 30; ++j) {
 			var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions, allSolutions, goal, params);
 			print(root.fitness)
 		}
 	}
+
+/*
+	var ngrams = getTopNgrams(allNgrams[idx.toString()], 25);
+
+	for(var i = 1; i <= 20; ++i) {
+		params.generations = i
+
+		print("==== GEN " + i + " ====")
+		for(var j = 0; j < 10; ++j) {
+			var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions, allSolutions, goal, params);
+			print(root.fitness)
+		}
+	}*/
 
 	//var root = buildTree(ngrams, actionSet, pcSet, trigrams, conditions, allSolutions, goal, params);
 	//print(root.treeString)

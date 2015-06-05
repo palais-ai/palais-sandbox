@@ -13,6 +13,8 @@ Actor::Actor(Ogre::SceneNode* node) :
     {
         qFatal("Node must be initialized.");
     }
+
+    //setMask(0);
     node->setListener(this);
     node->setUserAny(Ogre::Any(this));
 }
@@ -213,6 +215,31 @@ void Actor::setScale(float factor)
 {
     assert(mNode);
     mNode->setScale(factor, factor, factor);
+}
+
+int Actor::getMask() const
+{
+    assert(mNode);
+    if(mNode->numAttachedObjects() != 0)
+    {
+        return mNode->getAttachedObject(0)->getQueryFlags();
+    }
+    else
+    {
+        return 0;
+    }
+}
+void Actor::setMask(int mask)
+{
+    assert(mNode);
+
+    if(mNode->numAttachedObjects() != 0)
+    {
+        for(size_t i = 0; i < mNode->numAttachedObjects(); ++i)
+        {
+            mNode->getAttachedObject(i)->setQueryFlags(mask);
+        }
+    }
 }
 
 void Actor::toggleHighlight(bool highlighted)

@@ -79,9 +79,12 @@ public:
 
     // Reports the first hit actor in the scene.
     Q_INVOKABLE RaycastResult raycast(const Ogre::Vector3& origin,
-                                      const Ogre::Vector3& direction);
+                                      const Ogre::Vector3& direction,
+                                      int mask = 0);
 
-    Q_INVOKABLE RangeQueryResult rangeQuery(const Ogre::Vector3& origin, float distance);
+    Q_INVOKABLE RangeQueryResult rangeQuery(const Ogre::Vector3& origin,
+                                            float distance,
+                                            int mask = 0);
 
     // Scene life cycle
     void setup();

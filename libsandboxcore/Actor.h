@@ -19,6 +19,7 @@ class DLL_EXPORT Actor : public KnowledgeModel, public Ogre::Node::Listener
     Q_PROPERTY(Ogre::Quaternion rotation READ getRotation WRITE setRotation)
     Q_PROPERTY(Ogre::Vector3 scale READ getScale WRITE setScale)
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible)
+    Q_PROPERTY(int mask READ getMask WRITE setMask)
 public:
     explicit Actor(Ogre::SceneNode* node);
     ~Actor();
@@ -50,6 +51,8 @@ public:
     void setRotation(const Ogre::Quaternion& rotation);
     const Ogre::Vector3& getScale() const;
     void setScale(const Ogre::Vector3& scale);
+    int getMask() const;
+    void setMask(int mask);
 
     QString getName() const;
     Ogre::SceneNode* getSceneNode();

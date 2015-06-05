@@ -15,6 +15,7 @@ function onSetup() {
 	spawnAgent(new Vector3(2.5,0,2.5), "red");
 
 	redAgent.setKnowledge("lookat_target", greenAgent.position);
+	redAgent.mask = 0;
 	greenAgent.setKnowledge("lookat_target", redAgent.position);
 	greenAgent.setKnowledge("movement_target", new Vector3(-3,0,3))
 	greenAgent.knowledgeRemoved.connect(function(key) {
@@ -42,6 +43,12 @@ function update(deltaTime) {
 
 	// Apply the custom movement behavior.
 	var v = movementBehavior(redAgent, greenAgent.position, maxSpeed);
+
+	var v2 = avoidObstacle(redAgent.position, v, maxSpeed, 1);
+
+	if(!v2.equals(new Vector3(0,0,0))) {
+		v = v2;
+	}
 
 	// Clamp the agent's velocity to __maxSpeed__.
 	if(v.length() > maxSpeed) {
