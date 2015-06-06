@@ -2,9 +2,7 @@
 #include "Behavior.h"
 #include <OgreSceneManager.h>
 
-using namespace ailib;
-
-Q_DECLARE_METATYPE(Scheduler*)
+Q_DECLARE_METATYPE(ailib::Scheduler*)
 
 BehaviorPlugin::BehaviorPlugin(QObject *parent) :
     QObject(parent),
@@ -31,12 +29,11 @@ void BehaviorPlugin::onSceneStarted(const PluginInterface& interface, Scene& sce
     QScriptEngine& engine = scene.getScriptEngine();
     mCurrentEngine = &engine;
 
-    engine.setDefaultPrototype(qMetaTypeId<Scheduler*>(),
+    engine.setDefaultPrototype(qMetaTypeId<ailib::Scheduler*>(),
                                engine.newQObject(new SchedulerPrototype,
                                                  QScriptEngine::ScriptOwnership));
     engine.globalObject().setProperty("Scheduler",
-                                      engine.toScriptValue(&mScheduler),
-                                      QScriptValue::Undeletable | QScriptValue::ReadOnly);
+                                      engine.toScriptValue(&mScheduler));
 
     behavior_tree_register_prototypes(engine);
 }
@@ -53,9 +50,11 @@ void BehaviorPlugin::update(const PluginInterface& interface, Scene& scene, floa
 {
     Q_UNUSED(interface);
     Q_UNUSED(scene);
-    HighResolutionTime::Timestamp timeInMs =
-            HighResolutionTime::milliseconds(mScheduler.update(HighResolutionTime::milliseconds(8.f),
-                                                               deltaTime));
+    ailib::HighResolutionTime::Timestamp timeInMs =
+            ailib::HighResolutionTime::milliseconds(mScheduler.update(
+                                                       ailib::HighResolutionTime::milliseconds(8.f),
+                                                       deltaTime));
+
     if(timeInMs > 16)
     {
         //qDebug() << "Excessive frametime: " << timeInMs;

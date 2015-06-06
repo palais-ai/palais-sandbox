@@ -2,6 +2,8 @@
 #include "DebugDrawer.h"
 #include <OgreSceneManager.h>
 
+Scene* gCurrentScene = NULL;
+
 PathfindingPlugin::PathfindingPlugin(QObject *parent) :
     QObject(parent),
     mPathfindingDrawer(NULL)
@@ -21,6 +23,8 @@ void PathfindingPlugin::onUnload(const PluginInterface& interface)
 void PathfindingPlugin::onSceneStarted(const PluginInterface& interface, Scene& scene)
 {
     Q_UNUSED(interface);
+
+    gCurrentScene = &scene;
 
     QListIterator<QObject*> it(scene.getActorsArray());
     while(it.hasNext())
@@ -51,6 +55,8 @@ void PathfindingPlugin::onSceneEnded(const PluginInterface& interface, Scene& sc
         scene.destroyDebugDrawer(mPathfindingDrawer);
         mPathfindingDrawer = NULL;
     }
+
+    gCurrentScene = NULL;
 }
 
 void PathfindingPlugin::update(const PluginInterface& interface, Scene& scene, float deltaTime)

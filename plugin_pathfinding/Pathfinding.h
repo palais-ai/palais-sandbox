@@ -1,11 +1,12 @@
 #ifndef PATHFINDING_H
 #define PATHFINDING_H
 
-#include "AStar.h"
+#include "AStarTask.h"
 #include <QObject>
 #include <QScriptValue>
 #include <OgreVector3.h>
 #include <OgreQuaternion.h>
+#include <QHash>
 
 class DebugDrawer;
 class Actor;
@@ -38,7 +39,19 @@ private:
     Ogre::Vector3 computeCentroid();
 };
 
-class Pathfinding : public QObject
+class PathfindingRequest
+{
+public:
+    PathfindingRequest(Actor* actor,
+                       const Ogre::Vector3& target,
+                       QScriptValue onFinishedCallback);
+
+    Actor* actor;
+    Ogre::Vector3 target;
+    QScriptValue onFinishedCallback;
+};
+
+class Pathfinding : public QObject, public ailib::AStarTaskListener<ailib::Graph<Triangle, 3> >
 {
     Q_OBJECT
 public:
@@ -46,6 +59,10 @@ public:
 
     void update(Scene& scene, float deltaTime);
     void updateActor(Actor& actor, float deltaTime);
+
+    virtual void onAStarResult(AStarType* task,
+                               const AStarType::path_type& path,
+                               const connections_type* connections);
 
     void initNavGraphFromNode(Ogre::SceneNode* node);
     void visualizeNavGraph(DebugDrawer* drawer) const;
@@ -55,16 +72,17 @@ public:
 
     Q_INVOKABLE void cancelMove(Actor* actor);
 
-    ailib::AStar<NavigationGraph>::path_type planPath(const Ogre::Vector3& from,
-                                                      const Ogre::Vector3& to,
-                                                      bool* isAlreadyThere = NULL);
-
+    bool planPath(const Ogre::Vector3& to,
+                  Actor* actor,
+                  QScriptValue onFinishedCallback);
     const NavigationGraph::node_type* getNavNodeClosestToPoint(const Ogre::Vector3& point);
 private slots:
     void onActorRemoved(Actor* actor);
 private:
     void removeCallback(Actor* actor);
+
     NavigationGraph mGraph;
+    QHash<ailib::AStarTask<NavigationGraph>*, PathfindingRequest> mRequests;
 };
 
 #endif // PATHFINDING_H

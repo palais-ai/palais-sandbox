@@ -41,9 +41,11 @@ function update(deltaTime) {
 	var maxSpeed = 0.75;
 	var before = redAgent.position;
 
-	// Apply the custom movement behavior.
-	var v = movementBehavior(redAgent, greenAgent.position, maxSpeed);
+	var targetVel = greenAgent.position.subtract(greenAgent.getKnowledge("movement_target")).multiply(-1);
 
+	// Apply the custom movement behavior.
+	var v = evade(redAgent, greenAgent.position, targetVel, maxSpeed, 0.5)
+	//var v = movementBehavior(redAgent, greenAgent.position, maxSpeed);
 	var v2 = avoidObstacle(redAgent.position, v, maxSpeed, 1);
 
 	if(!v2.equals(new Vector3(0,0,0))) {

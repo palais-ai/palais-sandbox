@@ -1,5 +1,6 @@
 #include "Pathfinding.h"
 #include "IDAStar.h"
+#include "Scheduler.h"
 #include "OgreHelper.h"
 #include "DebugDrawer.h"
 #include "Bindings/JavascriptBindings.h"
@@ -22,12 +23,27 @@
 #include <OgreStringConverter.h>
 #include <algorithm>
 
+using namespace ailib;
+
 Q_DECLARE_METATYPE(QScriptValue)
+Q_DECLARE_METATYPE(Scheduler*)
+
+extern Scene* gCurrentScene;
 
 static ailib::real_type euclideanHeuristic(const Pathfinding::NavigationGraph::node_type& n1,
                                            const Pathfinding::NavigationGraph::node_type& n2)
 {
     return n1.getCentroid().distance(n2.getCentroid());
+}
+
+PathfindingRequest::PathfindingRequest(Actor* actor,
+                                      const Ogre::Vector3& target,
+                                      QScriptValue onFinishedCallback) :
+    actor(actor),
+    target(target),
+    onFinishedCallback(onFinishedCallback)
+{
+    ;
 }
 
 void Pathfinding::updateActor(Actor &actor, float deltaTime)
@@ -143,6 +159,8 @@ void Pathfinding::update(Scene& scene, float deltaTime)
     }
 }
 
+namespace Local
+{
 class Edge
 {
 public:
@@ -161,9 +179,10 @@ public:
     }
 };
 
-static uint qHash(const Edge& key)
+static uint qHash(const Local::Edge& key)
 {
      return key.index1 ^ key.index2;
+}
 }
 
 Triangle::Triangle(const Ogre::Vector3& v1,
@@ -245,18 +264,18 @@ Pathfinding::getNavNodeClosestToPoint(const Ogre::Vector3& point)
     return NULL;
 }
 
-ailib::AStar<Pathfinding::NavigationGraph>::path_type
-Pathfinding::planPath(const Ogre::Vector3& from,
-                      const Ogre::Vector3& to,
-                      bool* isAlreadyThere)
+bool Pathfinding::planPath(const Ogre::Vector3& to,
+                           Actor* actor,
+                           QScriptValue onFinishedCallback)
 {
+    const Ogre::Vector3& from = actor->getPosition();
     const NavigationGraph::node_type* start = getNavNodeClosestToPoint(from);
     if(!start)
     {
         qWarning() << "Pathfinding.planPath: Start position "
                    << Ogre::StringConverter::toString(from).c_str()
                    << " is not covered by the navmesh. No valid path could be calculated.";
-        return ailib::AStar<NavigationGraph>::path_type();
+        return false;
     }
 
     const NavigationGraph::node_type* goal = getNavNodeClosestToPoint(to);
@@ -265,7 +284,26 @@ Pathfinding::planPath(const Ogre::Vector3& from,
         qWarning() << "Pathfinding.planPath: Target position "
                    << Ogre::StringConverter::toString(to).c_str()
                    << " is not covered by the navmesh. No valid path could be calculated.";
-        return ailib::AStar<NavigationGraph>::path_type();
+        return false;
+    }
+
+    if(gCurrentScene)
+    {
+        QScriptEngine& engine = gCurrentScene->getScriptEngine();
+        QScriptValue value = engine.globalObject().property("Scheduler");
+        ailib::Scheduler* s = qscriptvalue_cast<Scheduler*>(value);
+        if(s)
+        {
+            ailib::AStarTask<NavigationGraph>* task = new ailib::AStarTask<NavigationGraph>
+                                                                              (this,
+                                                                               mGraph,
+                                                                               start,
+                                                                               goal,
+                                                                               euclideanHeuristic);
+            s->enqueue(task);
+            mRequests.insert(task, PathfindingRequest(actor, to, onFinishedCallback));
+            return true;
+        }
     }
 
     ailib::AStar<NavigationGraph> astar(mGraph);
@@ -273,12 +311,80 @@ Pathfinding::planPath(const Ogre::Vector3& from,
                                                                    *goal,
                                                                    euclideanHeuristic);
 
-    if(isAlreadyThere)
+    mRequests.insert(NULL, PathfindingRequest(actor, to, onFinishedCallback));
+    onAStarResult(NULL, path, NULL);
+    return true;
+}
+
+void Pathfinding::onAStarResult(AStarType* task,
+                               const AStarType::path_type& path,
+                               const connections_type* connections)
+{
+    Q_UNUSED(task);
+    Q_UNUSED(connections);
+
+    QHash<ailib::AStarTask<NavigationGraph>*, PathfindingRequest>::iterator rit =
+            mRequests.find(static_cast<ailib::AStarTask<NavigationGraph>*>(task));
+    if(rit == mRequests.end())
     {
-        *isAlreadyThere = path.size() == 1 && path[0] == start;
+        qWarning() << "Pathfinding.moveActor: Request was not added.";
+        return;
     }
 
-    return path;
+    //delete task;
+    Actor* actor = rit->actor;
+    Ogre::Vector3 target = rit->target;
+    QScriptValue onFinishedCallback = rit->onFinishedCallback;
+
+    mRequests.remove(static_cast<ailib::AStarTask<NavigationGraph>*>(task));
+
+    if(!actor)
+    {
+        qWarning() << "Pathfinding.moveActor: Actor has not been set.";
+        return;
+    }
+
+    if(path.empty())
+    {
+        qWarning() << "Pathfinding.moveActor: Could not find a path for actor [ "
+                   << actor->getName() << " ] to reach "
+                   << Ogre::StringConverter::toString(target).c_str();
+        return;
+    }
+
+    const Ogre::Vector3& from = actor->getPosition();
+    const NavigationGraph::node_type* start = getNavNodeClosestToPoint(from);
+    bool isAlreadyThere = path.size() == 1 && path[0] == start;
+    if(isAlreadyThere)
+    {
+        qDebug() << "Pathfinding.moveActor: Target triangle has already been reached.";
+        actor->setKnowledge("movement_target", QVariant::fromValue(target));
+        return;
+    }
+
+    QVector<Ogre::Vector3> qpath;
+    // Don't save the first entry as we immediately store it in "movement_target"
+    ailib::AStar<Pathfinding::NavigationGraph>::path_type::const_iterator it = path.begin() + 1;
+    for(; it != path.end(); ++it)
+    {
+        qpath += (*it)->getCentroid();
+    }
+
+    // Add the move from the navigation mesh node to the actual goal aswell.
+    qpath += target;
+
+    actor->setKnowledge("current_path", QVariant::fromValue(qpath));
+    actor->setKnowledge("movement_target", QVariant::fromValue(qpath.first()));
+
+    // Residual from another pathfinding call, that was interrupted before reaching the goal.
+    removeCallback(actor);
+
+    if(!onFinishedCallback.isUndefined())
+    {
+        connect(actor, &Actor::removedFromScene,
+                this, &Pathfinding::onActorRemoved);
+        actor->setKnowledge("goal_reached_callback", QVariant::fromValue(onFinishedCallback));
+    }
 }
 
 void
@@ -316,19 +422,19 @@ Pathfinding::initNavGraphFromNode(Ogre::SceneNode* node)
         QScopedArrayPointer<Ogre::Vector3> vertices(verticesPtr);
         QScopedArrayPointer<unsigned> indices(indicesPtr);
 
-        QHash<Edge, QSet<uint32_t> > edgeConnections;
+        QHash<Local::Edge, QSet<uint32_t> > edgeConnections;
         for(size_t i = 0; i < indexCount; i+=3)
         {
             uint32_t idx = graph.addNode(Pathfinding::NavigationGraph::node_type(vertices[indices[i]],
                                                                                  vertices[indices[i+1]],
                                                                                  vertices[indices[i+2]]));
 
-            edgeConnections[Edge(indices[i],   indices[i+1])] += idx;
-            edgeConnections[Edge(indices[i+1], indices[i+2])] += idx;
-            edgeConnections[Edge(indices[i+2], indices[i])]   += idx;
+            edgeConnections[Local::Edge(indices[i],   indices[i+1])] += idx;
+            edgeConnections[Local::Edge(indices[i+1], indices[i+2])] += idx;
+            edgeConnections[Local::Edge(indices[i+2], indices[i])]   += idx;
         }
 
-        QHashIterator<Edge, QSet<uint32_t> > it(edgeConnections);
+        QHashIterator<Local::Edge, QSet<uint32_t> > it(edgeConnections);
 
         while(it.hasNext())
         {
@@ -389,51 +495,7 @@ bool Pathfinding::moveActor(Actor* actor,
                             const Ogre::Vector3& target,
                             QScriptValue onFinishedCallback)
 {
-    bool isAlreadyThere;
-    ailib::AStar<Pathfinding::NavigationGraph>::path_type path;
-    path = Pathfinding::planPath(actor->getPosition(),
-                                 target,
-                                 &isAlreadyThere);
-
-    if(path.empty())
-    {
-        qWarning() << "Pathfinding.moveActor: Could not find a path for actor [ "
-                   << actor->getName() << " ] to reach "
-                   << Ogre::StringConverter::toString(target).c_str();
-        return false;
-    }
-
-    if(isAlreadyThere)
-    {
-        qDebug() << "Pathfinding.moveActor: Target triangle has already been reached.";
-        actor->setKnowledge("movement_target", QVariant::fromValue(target));
-        return false;
-    }
-
-    QVector<Ogre::Vector3> qpath;
-    // Don't save the first entry as we immediately store it in "movement_target"
-    ailib::AStar<Pathfinding::NavigationGraph>::path_type::const_iterator it = path.begin() + 1;
-    for(; it != path.end(); ++it)
-    {
-        qpath += (*it)->getCentroid();
-    }
-
-    // Add the move from the navigation mesh node to the actual goal aswell.
-    qpath += target;
-
-    actor->setKnowledge("current_path", QVariant::fromValue(qpath));
-    actor->setKnowledge("movement_target", QVariant::fromValue(qpath.first()));
-
-    // Residual from another pathfinding call, that was interrupted before reaching the goal.
-    removeCallback(actor);
-
-    if(!onFinishedCallback.isUndefined())
-    {
-        connect(actor, &Actor::removedFromScene,
-                this, &Pathfinding::onActorRemoved);
-        actor->setKnowledge("goal_reached_callback", QVariant::fromValue(onFinishedCallback));
-    }
-    return true;
+    return Pathfinding::planPath(target, actor, onFinishedCallback);
 }
 
 void Pathfinding::cancelMove(Actor* actor)
