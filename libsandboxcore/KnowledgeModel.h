@@ -10,6 +10,7 @@ class DLL_EXPORT KnowledgeModel : public QObject
     Q_OBJECT
     // __knowledge__ has to be a pointer so that it is passed by reference to the scripting system.
     Q_PROPERTY(QVariantMap* knowledge READ getKnowledgePtr)
+    Q_PROPERTY(QVariantMap knowledgeMap READ getKnowledge)
 public:
     KnowledgeModel();
 

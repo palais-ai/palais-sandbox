@@ -75,6 +75,16 @@ Ogre::SceneManager* Scene::getOgreSceneManager() const
     return Ogre::Root::getSingleton().getSceneManager(mSceneManagerName.toStdString());
 }
 
+void Scene::play()
+{
+    emit requestPlay();
+}
+
+void Scene::pause()
+{
+    emit requestPause();
+}
+
 DebugDrawer* Scene::createDebugDrawer(const QString& name, float opacity)
 {
     if(mDrawers.contains(name))

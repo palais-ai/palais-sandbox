@@ -73,6 +73,11 @@ Scene* SceneManager::loadScene(const QString& name,
             return NULL;
         }
 
+        connect(nextScene, &Scene::requestPlay,
+                this, &SceneManager::start);
+        connect(nextScene, &Scene::requestPause,
+                this, &SceneManager::pause);
+
         logger.stop("SceneManager.loadScene");
         return mCurrentScene = nextScene;
     }
@@ -91,8 +96,11 @@ void SceneManager::pause()
 
 void SceneManager::start()
 {
-    mLastUpdateTime = QTime::currentTime();
-    mSceneStarted = true;
+    if(!mSceneStarted)
+    {
+        mLastUpdateTime = QTime::currentTime();
+        mSceneStarted = true;
+    }
 }
 
 bool SceneManager::isPlaying() const
@@ -111,7 +119,7 @@ void SceneManager::timerEvent(QTimerEvent*)
         const float accumBefore = mAccumulator;
 
         float oneStep =  1000.f / sAITickRate;
-        while(mAccumulator > oneStep)
+        while(mAccumulator > oneStep && mSceneStarted)
         {
             // We update at constant rates to keep the results the same,
             // independent of simulation speed.

@@ -21,8 +21,6 @@ class SceneManager : public QObject
 public:
     explicit SceneManager(QOEngine* engine);
 
-    void pause();
-    void start();
     void update(float deltaTime);
     bool isPlaying() const;
 
@@ -36,6 +34,9 @@ public:
     void unloadCurrentScene();
 signals:
     void timePassed(const QTime& time);
+public slots:
+    void pause();
+    void start();
 protected:
     void timerEvent(QTimerEvent *);
 private:

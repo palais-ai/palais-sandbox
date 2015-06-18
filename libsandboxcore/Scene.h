@@ -51,6 +51,9 @@ public:
 
     Ogre::SceneManager* getOgreSceneManager() const;
 
+    Q_INVOKABLE void play();
+    Q_INVOKABLE void pause();
+
     // Drawer API
     DebugDrawer* createDebugDrawer(const QString& name, float opacity = 0.5);
     void destroyDebugDrawer(DebugDrawer* drawer);
@@ -108,6 +111,8 @@ signals:
     void actorRemovedObject(Actor* actor);
     void actorChangedVisibility(const QString& actorName, bool visible);
     void actorDestroyLater(Actor* actor);
+    void requestPlay();
+    void requestPause();
 public slots:
     void onRequestEmitCurrentActors();
     void onActorChangeVisible(const QString& actorName,
